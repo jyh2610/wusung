@@ -9,16 +9,53 @@
     "lint": "next lint"
   },
   "dependencies": {
+    "@nextui-org/react": "^2.4.1",
+    "@react-stately/data": "^3.11.4",
+    "@tanstack/react-query": "^5.45.1",
+    "@tanstack/react-query-devtools": "^5.29.2",
+    "@vanilla-extract/css": "^1.15.3",
+    "@vanilla-extract/dynamic": "^2.1.2",
+    "@vanilla-extract/next-plugin": "^2.4.3",
+    "axios": "^1.7.2",
+    "cookies-next": "^4.2.1",
+    "dayjs": "^1.11.11",
+    "next": "13.5.6",
     "react": "^18",
     "react-dom": "^18",
-    "next": "13.5.6"
+    "react-icons": "^5.2.1",
+    "react-query": "^3.39.3",
+    "react-quill": "^2.0.0",
+    "sharp": "^0.33.4",
+    "zustand": "^4.5.2"
   },
   "devDependencies": {
-    "typescript": "^5",
+    "@types/bun": "latest",
+    "@types/lodash": "^4.17.9",
     "@types/node": "^20",
     "@types/react": "^18",
     "@types/react-dom": "^18",
+    "@types/react-gtm-module": "^2.0.3",
+    "@types/react-router": "5.1.8",
+    "@types/react-router-dom": "^5.3.3",
+    "@typescript-eslint/eslint-plugin": "^5.45.0",
+    "@typescript-eslint/parser": "^5.45.0",
+    "autoprefixer": "^10",
+    "babel-plugin-named-exports-order": "^0.0.2",
+    "classnames": "^2.3.2",
     "eslint": "^8",
-    "eslint-config-next": "13.5.6"
-  }
+    "eslint-config-next": "13.5.6",
+    "eslint-config-prettier": "^9.0.0",
+    "eslint-import-resolver-typescript": "^3.6.0",
+    "eslint-plugin-import": "^2.28.1",
+    "eslint-plugin-prettier": "^5.0.0",
+    "husky": "^8.0.0",
+    "lint-staged": "^14.0.1",
+    "prettier": "^3.0.3",
+    "prop-types": "^15.8.1",
+    "tsconfig-paths-webpack-plugin": "^4.1.0",
+    "typescript": "^5",
+    "webpack": "^5.84.1"
+  },
+  "module": "index.ts",
+  "type": "module"
 }
