@@ -4,6 +4,7 @@ export const colors = {
     600: '#D52990'
   },
   gray_scale: {
-    400: '#BFBFBF'
+    400: '#BFBFBF',
+    800: '#444444'
   }
 };
