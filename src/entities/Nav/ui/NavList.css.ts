@@ -8,5 +8,10 @@ export const listFontStyle = style({
   fontSize: '32px',
   lineHeight: '38px',
   color: colors.gray_scale[800],
-  textAlign: 'center'
+  textAlign: 'center',
+  selectors: {
+    '&:hover': {
+      cursor: 'pointer'
+    }
+  }
 });

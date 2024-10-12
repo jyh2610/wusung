@@ -17,7 +17,12 @@ export function Button({ type = 'default', content, disabled }: ButtonProps) {
       : buttonStyles.base;
   return (
     <>
-      <button className={`${buttonClass}`}>{content}</button>
+      <button
+        style={{ width: '100%', height: '100%' }}
+        className={`${buttonClass}`}
+      >
+        {content}
+      </button>
     </>
   );
 }
