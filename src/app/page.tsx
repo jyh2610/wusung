@@ -1,4 +1,4 @@
-import { LineBanner, Banner } from '@/entities';
+import { Banner, LineBanner } from '@/entities';
 
 export default function Home() {
   return (
