@@ -1,2 +1,2 @@
-export { MainBanner } from './Banner/index';
+export { MainBanner } from './MainBanner/index';
 export { LineBanner } from './LineBanner/index';
