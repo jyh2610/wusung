@@ -1,9 +1,9 @@
-import { Banner, LineBanner } from '@/entities';
+import { MainBanner, LineBanner } from '@/entities';
 
 export default function Home() {
   return (
     <main>
-      <Banner />
+      <MainBanner />
       <LineBanner />
     </main>
   );
