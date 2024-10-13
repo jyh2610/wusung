@@ -13,3 +13,18 @@ export const bannerStyle = style({
   borderTopLeftRadius: '120px',
   borderBottomLeftRadius: '120px'
 });
+
+export const bannerHeaderStyles = style({
+  width: '553px',
+  height: '76px',
+  textAlign: 'center',
+  backgroundColor: 'rgba(35, 37, 39, 0.4)',
+  padding: '9px 10px',
+  position: 'absolute',
+  marginTop: '142px',
+  marginLeft: '100px',
+  color: '#FFFFFF',
+  fontSize: '48px',
+  fontWeight: '600',
+  lineHeight: '57.28px'
+});

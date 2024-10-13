@@ -1,37 +1,27 @@
 import { style, styleVariants } from '@vanilla-extract/css';
-import { colors } from '@/design-tokens';
+import { colors } from '@/design-tokens/colors';
 
-const baseButton = style({
+export const buttonBase = style({
+  width: '100%',
+  height: '100%',
+  border: 'none',
   borderRadius: '12px',
   padding: '12px 40px',
+  fontSize: '18px',
+  fontWeight: '500',
+  lineHeight: '25px',
+  textAlign: 'center',
   cursor: 'pointer',
-  color: 'white',
-  transition: 'background-color 0.3s ease',
-  border: '1px solid green'
+  display: 'inline-block'
 });
 
-const backgroundButton = styleVariants({
+export const buttonVariants = styleVariants({
   default: {
-    backgroundColor: '#3498db'
+    backgroundColor: colors.gray_scale['default'],
+    color: colors.gray_scale['default']
   },
-  hover: {
-    backgroundColor: '#2980b9'
+  brand: {
+    backgroundColor: colors.brand['400'],
+    color: colors.brand[0]
   }
 });
-
-const transparentButton = style({
-  backgroundColor: 'transparent',
-  border: '1px solid white'
-});
-
-const disabledButton = style({
-  opacity: 0.6,
-  pointerEvents: 'none'
-});
-
-export const buttonStyles = {
-  base: baseButton,
-  background: backgroundButton,
-  transparent: transparentButton,
-  disabled: disabledButton
-};

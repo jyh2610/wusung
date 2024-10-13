@@ -6,8 +6,12 @@ import {
   LoginHeaderStyles,
   LoginStyles,
   LoginBottomStyles,
-  bannerContentsStyle
+  bannerContentsStyle,
+  InfoFucStyles,
+  InfoContentStyles
 } from './Login.css';
+import { VerticalLine } from '@/shared/ui/VerticalLine';
+import { colors } from '@/design-tokens';
 
 export function Login() {
   return (
@@ -29,11 +33,15 @@ export function Login() {
           />
         </div>
         <div className={LoginBottomStyles}>
-          <Button content={'로그인'} type={'default'} btnSize={'large'} />
-          <div>
-            <span>회원가입</span>
-            <span>|</span>
-            <span>아이디·비밀번호 찾기</span>
+          <Button content={'로그인'} type={'brand'} btnSize={'large'} />
+          <div className={InfoFucStyles}>
+            <span className={InfoContentStyles}>회원가입</span>
+            <VerticalLine
+              height="25px"
+              thickness="1px"
+              color={colors.gray_scale[300]}
+            />
+            <span className={InfoContentStyles}>아이디·비밀번호 찾기</span>
           </div>
         </div>
       </div>

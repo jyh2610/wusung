@@ -1,28 +1,21 @@
 import React from 'react';
-import { SizeTypes } from '../types';
-import { buttonStyles } from './Button.css';
+import { buttonBase, buttonVariants } from './Button.css';
 
-interface ButtonProps {
-  type: 'default' | 'transparent';
+interface ButtonType {
   content: string;
-  btnSize: SizeTypes;
-  disabled?: boolean;
+  type?: 'default' | 'brand';
+  btnSize?: 'small' | 'medium' | 'large';
 }
 
-export function Button({ type = 'default', content, disabled }: ButtonProps) {
-  const buttonClass = disabled
-    ? buttonStyles.disabled
-    : type === 'transparent'
-      ? buttonStyles.transparent
-      : buttonStyles.base;
+export const Button = ({
+  content,
+  type = 'default',
+  btnSize = 'medium',
+  ...props
+}: ButtonType) => {
   return (
-    <>
-      <button
-        style={{ width: '100%', height: '100%' }}
-        className={`${buttonClass}`}
-      >
-        {content}
-      </button>
-    </>
+    <button className={`${buttonBase} ${buttonVariants[type]}`} {...props}>
+      {content}
+    </button>
   );
-}
+};

@@ -34,3 +34,28 @@ export const LoginBodyStyles = style({
 export const LoginBottomStyles = style({
   marginTop: '28px'
 });
+
+export const InfoFucStyles = style({
+  display: 'flex',
+  justifyContent: 'center',
+  alignItems: 'center',
+  paddingTop: '16px',
+  textAlign: 'center',
+  selectors: {
+    '&:hover': {
+      cursor: 'pointer'
+    }
+  }
+});
+
+export const InfoContentStyles = style({
+  fontSize: '18px',
+  lineHeight: '25px',
+  fontWeight: '500',
+  color: colors.gray_scale[700],
+  selectors: {
+    '&:hover': {
+      color: colors.brand[400]
+    }
+  }
+});
