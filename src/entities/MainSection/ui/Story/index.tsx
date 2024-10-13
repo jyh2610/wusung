@@ -8,6 +8,7 @@ import {
 } from './index.css';
 import Image from 'next/image';
 import { BorderButton } from '@/shared/ui';
+import { companyInfo } from '@/shared/const/Info';
 
 export function Story() {
   return (
@@ -15,7 +16,7 @@ export function Story() {
       <div>
         <p className={storyHeaderTextStyles}>Story</p>
         <span className={storyHeaderContentStyles}>
-          모두가 행복한 우성인지펜
+          모두가 행복한 {companyInfo.name}
         </span>
         <div className={storyContent}>
           모두의 뇌건강을 지키고 어르신과 가족, <br />
