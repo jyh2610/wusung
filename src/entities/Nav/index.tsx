@@ -1,4 +1,4 @@
-import React from 'react';
+import Image from 'next/image';
 import { NavLists } from './const';
 import {
   NavStyle,
@@ -7,7 +7,6 @@ import {
   LogoStyle
 } from './index.css';
 import { NavList } from './ui';
-import Image from 'next/image';
 
 export function Nav() {
   return (

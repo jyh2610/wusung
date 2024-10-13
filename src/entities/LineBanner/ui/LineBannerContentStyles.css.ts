@@ -1,5 +1,5 @@
-import { colors } from '@/design-tokens';
 import { style } from '@vanilla-extract/css';
+import { colors } from '@/design-tokens';
 
 export const LineBannerContentStyles = style({
   width: '100%',
