@@ -10,7 +10,8 @@ export const LineBannerContentStyles = style({
   fontWeight: 500,
   fontSize: '32px',
   lineHeight: '38.19px',
-  textAlign: 'center'
+  textAlign: 'center',
+  paddingLeft: '20px'
 });
 
 export const contentStyles = style({
