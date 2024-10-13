@@ -2,13 +2,13 @@ import React from 'react';
 import { colors } from '@/design-tokens';
 import { Button, Input } from '@/shared/ui';
 import { VerticalLine } from '@/shared/ui/VerticalLine';
-import { ConsultationInquiry } from '..';
+import { ConsultationInquiry } from './ ConsultationInquiry';
 import {
-  LoginBodyStyles,
-  LoginHeaderStyles,
-  LoginStyles,
-  LoginBottomStyles,
   bannerContentsStyle,
+  LoginStyles,
+  LoginHeaderStyles,
+  LoginBodyStyles,
+  LoginBottomStyles,
   InfoFucStyles,
   InfoContentStyles
 } from './Login.css';

@@ -1,5 +1,4 @@
 import { style } from '@vanilla-extract/css';
-import { colors } from '@/design-tokens';
 
 export const LineBannerStyles = style({
   position: 'absolute',

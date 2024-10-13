@@ -1,4 +1,3 @@
-import { LineBanner } from '../LineBanner';
 import { bannerStyle, bannerHeaderStyles } from './index.css';
 import { Login } from './ui';
 
