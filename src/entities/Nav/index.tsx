@@ -10,7 +10,7 @@ import { NavList } from './ui';
 
 export function Nav() {
   return (
-    <div className={NavStyle}>
+    <nav className={NavStyle}>
       <div className={ListContainerStyle}>
         <div className={LogoStyle}>
           <Image fill src={'/images/logo.svg'} alt={'logo'} />
@@ -21,6 +21,6 @@ export function Nav() {
           ))}
         </div>
       </div>
-    </div>
+    </nav>
   );
 }

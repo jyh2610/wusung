@@ -5,18 +5,9 @@ import {
   style
 } from '@vanilla-extract/css';
 
-// export const container = style({
-//   padding: 10,
-//   backgroundColor: 'red'
-// });
-
 export const mtStyle = style({
   display: 'flex',
   paddingTop: '10px'
-});
-
-globalStyle('body', {
-  backgroundColor: 'yellow'
 });
 
 export const themeVars = createThemeContract({
@@ -28,7 +19,8 @@ export const themeVars = createThemeContract({
   }
 });
 
-export const container = style({
-  background: themeVars.color.brand,
-  fontFamily: themeVars.font.body
+export const MainStyles = style({
+  display: 'flex',
+  flexDirection: 'column',
+  justifyContent: 'center'
 });

@@ -1,10 +1,14 @@
-import { MainBanner, LineBanner } from '@/entities';
+import { MainBanner, LineBanner, MainSection } from '@/entities';
+import { MainStyles } from './style.css';
 
 export default function Home() {
   return (
-    <main>
-      <MainBanner />
-      <LineBanner />
+    <main className={MainStyles}>
+      <section>
+        <MainBanner />
+        <LineBanner />
+      </section>
+      <MainSection />
     </main>
   );
 }
