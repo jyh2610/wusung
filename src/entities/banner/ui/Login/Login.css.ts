@@ -2,13 +2,13 @@ import { style } from '@vanilla-extract/css';
 import { colors } from '@/design-tokens/colors';
 
 export const bannerContentsStyle = style({
+  height: '505px',
   marginTop: '80.5px',
   marginLeft: '68%'
 });
 
 export const LoginStyles = style({
   width: '360px',
-  height: '505px',
   backgroundColor: colors.gray_scale['default'],
   zIndex: 1,
   borderRadius: '20px',

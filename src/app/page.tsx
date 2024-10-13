@@ -1,9 +1,10 @@
-import { Banner } from '@/entities/banner';
+import { LineBanner, Banner } from '@/entities';
 
 export default function Home() {
   return (
-    <div>
+    <main>
       <Banner />
-    </div>
+      <LineBanner />
+    </main>
   );
 }

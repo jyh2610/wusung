@@ -1,3 +1,4 @@
+import { LineBanner } from '../LineBanner';
 import { bannerStyle, bannerHeaderStyles } from './index.css';
 import { ConsultationInquiry, Login } from './ui';
 

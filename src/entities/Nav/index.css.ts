@@ -12,7 +12,7 @@ export const NavStyle = style({
 export const ListContainerStyle = style({
   width: '90%',
   maxWidth: '1360px',
-  height: '100%',
+  height: '62px',
   display: 'flex',
   justifyContent: 'center',
   alignItems: 'center',
@@ -20,13 +20,22 @@ export const ListContainerStyle = style({
 });
 
 export const LogoStyle = style({
-  backgroundColor: 'black',
   width: '13%',
-  height: '95px'
+  height: '85px',
+  position: 'relative',
+  display: 'flex',
+  alignItems: 'center',
+  selectors: {
+    '&:hover': {
+      cursor: 'pointer'
+    }
+  }
 });
 
 export const NavListStyle = style({
   width: '70%',
   display: 'flex',
-  justifyContent: 'space-between'
+  justifyContent: 'space-between',
+  alignItems: 'center',
+  paddingTop: '11.5px'
 });

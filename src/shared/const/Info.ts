@@ -5,5 +5,5 @@ export const companyInfo = {
   phone: '010-3938-9008',
   email: 'admin@localhost.com',
   businessNumber: '883-46-00572',
-  logo: '/images/logo.png'
+  logo: '/images/logo.svg'
 };

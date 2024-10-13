@@ -1,5 +1,7 @@
 import React from 'react';
+import { colors } from '@/design-tokens';
 import { Button, Input } from '@/shared/ui';
+import { VerticalLine } from '@/shared/ui/VerticalLine';
 import { ConsultationInquiry } from '..';
 import {
   LoginBodyStyles,
@@ -10,8 +12,6 @@ import {
   InfoFucStyles,
   InfoContentStyles
 } from './Login.css';
-import { VerticalLine } from '@/shared/ui/VerticalLine';
-import { colors } from '@/design-tokens';
 
 export function Login() {
   return (
