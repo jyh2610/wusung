@@ -1,7 +1,9 @@
 import { style } from '@vanilla-extract/css';
+import { colors } from '@/design-tokens';
 
 export const featuresContainer = style({
   width: '100%',
+  minWidth: '1360px',
   backgroundColor: '#D8D8D8',
   marginTop: '160px',
   display: 'flex',
@@ -11,8 +13,30 @@ export const featuresContainer = style({
   padding: '120px 280px'
 });
 
+export const headerContainer = style({
+  width: '100%',
+  display: 'flex',
+  flexDirection: 'column',
+  justifyContent: 'flex-start',
+  gap: '16px',
+  marginBottom: '92px'
+});
+export const headerTitle = style({
+  color: colors.brand[500],
+  fontWeight: 500,
+  fontSize: '32px',
+  lineHeight: '48px',
+  fontFamily: 'sans-serif'
+});
+export const headerContent = style({
+  color: colors.gray_scale[900],
+  fontSize: '60px',
+  lineHeight: '71.6px',
+  fontWeight: '600'
+});
+
 export const boxContainer = style({
-  width: '1360px',
+  width: '100%',
   display: 'flex',
   flexDirection: 'column',
   gap: '40px'
