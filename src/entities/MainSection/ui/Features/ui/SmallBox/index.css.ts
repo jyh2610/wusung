@@ -1,10 +1,10 @@
 import { style } from '@vanilla-extract/css';
 import { colors } from '@/design-tokens';
 
-export const bigBoxContainer = style({
+export const smallBoxContainer = style({
   height: '374px',
   borderRadius: '20px',
-  padding: '48px 40px',
+  padding: '48px 0',
   backgroundColor: colors.gray_scale['default']
 });
 
@@ -16,7 +16,7 @@ export const iconContainer = style({
 });
 
 export const contentContainer = style({
-  margin: '40px'
+  margin: '40px 0'
 });
 
 export const title = style({
@@ -31,16 +31,8 @@ export const content = style({
   fontWeight: '400',
   lineHeight: '40px',
   color: colors.gray_scale['700'],
+  letterSpacing: '-2.5%',
   textAlign: 'center',
   marginTop: '40px',
-  whiteSpace: 'pre-wrap',
-  letterSpacing: '-2.5%'
-});
-
-export const subContent = style({
-  fontSize: '18px',
-  fontWeight: '400',
-  lineHeight: '25px',
-  color: colors.gray_scale['700'],
-  textAlign: 'center'
+  whiteSpace: 'pre-wrap'
 });

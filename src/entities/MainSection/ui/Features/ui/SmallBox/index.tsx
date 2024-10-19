@@ -1,24 +1,22 @@
 import Image from 'next/image';
 import { IFeatureContents } from '../../const';
 import {
-  bigBoxContainer,
+  smallBoxContainer,
+  title,
   iconContainer,
   contentContainer,
-  title,
-  content,
-  subContent
+  content
 } from './index.css';
 
-export function BigBox({ feature }: { feature: IFeatureContents }) {
+export function SmallBox({ feature }: { feature: IFeatureContents }) {
   return (
-    <div className={bigBoxContainer}>
+    <div className={smallBoxContainer}>
       <div className={iconContainer}>
         <Image src={feature.image} alt="icon" fill />
       </div>
       <div className={contentContainer}>
         <p className={title}>{feature.title}</p>
         <div className={content}>{feature.content}</div>
-        <div className={subContent}>{feature.subContent}</div>
       </div>
     </div>
   );
