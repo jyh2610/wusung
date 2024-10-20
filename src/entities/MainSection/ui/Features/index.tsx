@@ -1,24 +1,19 @@
 import React from 'react';
 import { companyInfo } from '@/shared/const/Info';
+import { Header } from '../Header';
 import { bigFeaturesContents, smallFeaturesContents } from './const';
 import {
   featuresContainer,
   boxContainer,
   bigBoxContainer,
-  smallBoxContainer,
-  headerContainer,
-  headerTitle,
-  headerContent
+  smallBoxContainer
 } from './index.css';
 import { BigBox, SmallBox } from './ui';
 
 export function Features() {
   return (
     <div className={featuresContainer}>
-      <div className={headerContainer}>
-        <p className={headerTitle}>Feature</p>
-        <p className={headerContent}>{companyInfo.name}이 특별한 이유</p>
-      </div>
+      <Header title={'Feature'} content={`${companyInfo.name}이 특별한 이유`} />
       <div className={boxContainer}>
         <div className={bigBoxContainer}>
           {bigFeaturesContents.map(feature => (

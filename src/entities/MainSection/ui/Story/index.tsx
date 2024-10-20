@@ -1,23 +1,15 @@
-import React from 'react';
-import {
-  storyHeaderStyles,
-  storyHeaderTextStyles,
-  storyHeaderContentStyles,
-  storyImage,
-  storyContent
-} from './index.css';
 import Image from 'next/image';
-import { BorderButton } from '@/shared/ui';
+import React from 'react';
 import { companyInfo } from '@/shared/const/Info';
+import { BorderButton } from '@/shared/ui';
+import { Header } from '../Header';
+import { storyHeaderStyles, storyImage, storyContent } from './index.css';
 
 export function Story() {
   return (
     <div className={storyHeaderStyles}>
       <div>
-        <p className={storyHeaderTextStyles}>Story</p>
-        <span className={storyHeaderContentStyles}>
-          모두가 행복한 {companyInfo.name}
-        </span>
+        <Header title={'Story'} content={`모두가 행복한 ${companyInfo.name}`} />
         <div className={storyContent}>
           모두의 뇌건강을 지키고 어르신과 가족, <br />
           각 기관에서 일하시는 관리자들이 즐겁게 생활할 수 있는
