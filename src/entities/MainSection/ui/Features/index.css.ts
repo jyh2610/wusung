@@ -1,16 +1,21 @@
 import { style } from '@vanilla-extract/css';
 import { colors } from '@/design-tokens';
 
-export const featuresContainer = style({
-  width: '100%',
-  minWidth: '1360px',
+export const sectionContainer = style({
+  width: '100vw',
   backgroundColor: '#D8D8D8',
   marginTop: '160px',
   display: 'flex',
-  flexDirection: 'column',
   justifyContent: 'center',
   alignItems: 'center',
-  padding: '120px 280px'
+  padding: '120px 0'
+});
+export const featuresContainer = style({
+  maxWidth: '1360px',
+  display: 'flex',
+  flexDirection: 'column',
+  justifyContent: 'center',
+  alignItems: 'center'
 });
 
 export const headerContainer = style({
