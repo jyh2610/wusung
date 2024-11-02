@@ -1,8 +1,8 @@
+import { colors } from '@/design-tokens';
 import { VerticalLine } from '@/shared/ui/VerticalLine';
 import { mainLineBannerData } from './const';
 import { LineBannerStyles } from './index.css';
 import { LineBannerContent } from './ui/LineBannerContent';
-import { colors } from '@/design-tokens';
 
 export function LineBanner() {
   return (

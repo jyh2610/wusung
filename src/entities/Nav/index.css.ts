@@ -6,7 +6,10 @@ export const NavStyle = style({
   height: '135px',
   display: 'flex',
   justifyContent: 'center',
-  alignItems: 'center'
+  alignItems: 'center',
+  position: 'fixed',
+  backgroundColor: 'white',
+  zIndex: '99'
 });
 
 export const ListContainerStyle = style({
