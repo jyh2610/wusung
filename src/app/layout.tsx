@@ -1,6 +1,7 @@
 import localFont from '@next/font/local';
 import type { Metadata } from 'next';
 import './globals.css';
+import { Footer } from '@/entities';
 import { Nav } from '@/entities/Nav';
 import { NextUiProvider, QueryProvider } from './_provider';
 
@@ -21,6 +22,7 @@ export default function RootLayout({
           <NextUiProvider>
             <Nav />
             {children}
+            <Footer />
           </NextUiProvider>
         </QueryProvider>
       </body>

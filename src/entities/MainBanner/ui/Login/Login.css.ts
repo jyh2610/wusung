@@ -31,6 +31,10 @@ export const LoginBodyStyles = style({
   gap: '20px'
 });
 
+export const LogedOutStyles = style({
+  backgroundColor: colors.brand[700]
+});
+
 export const LoginBottomStyles = style({
   marginTop: '28px'
 });
@@ -58,4 +62,17 @@ export const InfoContentStyles = style({
       color: colors.brand[400]
     }
   }
+});
+
+export const logoutStyles = style({
+  width: '100%',
+  color: colors.gray_scale[700],
+  fontSize: '18px',
+  fontWeight: '500',
+  lineHeight: '25px',
+  cursor: 'pointer',
+  letterSpacing: '-2.5%',
+  border: 'none',
+  backgroundColor: 'transparent',
+  marginTop: '16px'
 });

@@ -9,6 +9,7 @@ export const colors = {
   },
   gray_scale: {
     default: '#FFFFFF',
+    200: '#EFEFEF',
     300: '#E2E2E2',
     400: '#BFBFBF',
     600: '#777777',

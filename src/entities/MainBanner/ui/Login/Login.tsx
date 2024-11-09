@@ -3,6 +3,7 @@ import { colors } from '@/design-tokens';
 import { Button, Input } from '@/shared/ui';
 import { VerticalLine } from '@/shared/ui/VerticalLine';
 import { ConsultationInquiry } from './ ConsultationInquiry';
+import Logged from './Logged';
 import {
   bannerContentsStyle,
   LoginStyles,
@@ -16,7 +17,8 @@ import {
 export function Login() {
   return (
     <div className={bannerContentsStyle}>
-      <div className={LoginStyles}>
+      <Logged />
+      {/* <div className={LoginStyles}>
         <div className={LoginHeaderStyles}>
           <p>로그인</p>
         </div>
@@ -44,7 +46,7 @@ export function Login() {
             <span className={InfoContentStyles}>아이디·비밀번호 찾기</span>
           </div>
         </div>
-      </div>
+      </div> */}
 
       <div>
         <ConsultationInquiry />

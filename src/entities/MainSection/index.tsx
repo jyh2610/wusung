@@ -1,5 +1,6 @@
 import { MainSectionStyles } from './index.css';
 import { Story, Features, Notice } from './ui';
+import { FamilySite } from './ui/FamilySite';
 
 export function MainSection() {
   return (
@@ -7,6 +8,7 @@ export function MainSection() {
       <Story />
       <Features />
       <Notice />
+      <FamilySite />
     </section>
   );
 }
