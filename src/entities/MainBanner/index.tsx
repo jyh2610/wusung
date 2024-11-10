@@ -1,5 +1,6 @@
 import { bannerStyle, bannerHeaderStyles } from './index.css';
 import { Login } from './ui';
+import { BeforeLogIn } from './ui/Login/BeforeLogIn';
 
 export function MainBanner() {
   return (

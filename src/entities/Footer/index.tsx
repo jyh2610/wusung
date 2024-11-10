@@ -11,7 +11,7 @@ export function Footer() {
           사업자등록번호: {companyInfo.businessNumber} | Tel. :
           {companyInfo.phone}
         </p>
-        <p>주소 : ${companyInfo.address}</p>
+        <p>주소 : {companyInfo.address}</p>
         <p>Copyright © 2020 - 2024 {companyInfo.name} All rights reserved.</p>
       </div>
     </div>
