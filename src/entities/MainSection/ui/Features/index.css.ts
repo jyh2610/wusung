@@ -35,8 +35,8 @@ export const headerTitle = style({
 });
 export const headerContent = style({
   color: colors.gray_scale[900],
-  fontSize: '60px',
-  lineHeight: '71.6px',
+  fontSize: '48px',
+  lineHeight: '57.28px',
   fontWeight: '600'
 });
 

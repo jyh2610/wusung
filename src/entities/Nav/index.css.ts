@@ -7,7 +7,7 @@ export const NavStyle = style({
   display: 'flex',
   justifyContent: 'center',
   alignItems: 'center',
-  backgroundColor: 'white',
+  backgroundColor: 'transparent',
   zIndex: '99'
 });
 
