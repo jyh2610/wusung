@@ -3,18 +3,24 @@ import { borderButtonBase, buttonBase, buttonVariants } from './Button.css';
 
 interface ButtonType {
   content: string;
-  type?: 'default' | 'brand' | 'borderBrand';
+  type?: 'default' | 'brand' | 'borderBrand' | 'beforeSelection';
   btnSize?: 'small' | 'medium' | 'large';
+  onClick?: (prop?: unknown) => void;
 }
 
 export const Button = ({
   content,
   type = 'default',
   btnSize = 'medium',
+  onClick,
   ...props
 }: ButtonType) => {
   return (
-    <button className={`${buttonBase} ${buttonVariants[type]}`} {...props}>
+    <button
+      onClick={onClick}
+      className={`${buttonBase} ${buttonVariants[type]}`}
+      {...props}
+    >
       {content}
     </button>
   );

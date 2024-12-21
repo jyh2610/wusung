@@ -33,6 +33,10 @@ export const buttonVariants = styleVariants({
     backgroundColor: colors.gray_scale['default'],
     color: colors.gray_scale['default']
   },
+  beforeSelection: {
+    backgroundColor: colors.gray_scale['500'],
+    color: colors.brand['0']
+  },
   brand: {
     backgroundColor: colors.brand['400'],
     color: colors.brand[0]

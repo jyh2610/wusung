@@ -20,14 +20,19 @@ export default function RootLayout({
     <html lang="ko">
       <body
         style={{
-          backgroundColor: colors.bg,
-          minHeight: '100vh'
+          backgroundColor: colors.bg
         }}
       >
         <QueryProvider>
           <NextUiProvider>
             <Nav />
-            {children}
+            <main
+              style={{
+                marginTop: '135px'
+              }}
+            >
+              {children}
+            </main>
             <Footer />
           </NextUiProvider>
         </QueryProvider>

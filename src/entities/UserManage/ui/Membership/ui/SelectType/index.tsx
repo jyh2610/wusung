@@ -1,10 +1,23 @@
 import React from 'react';
 import { CustomImage } from '@/shared/ui';
-import { selectTypeStyle } from './index.css';
+import { selectTypeStyle, selectedStyle } from './index.css';
 
-export function SelectType({ title, logo }: { logo: string; title: string }) {
+export function SelectType({
+  title,
+  logo,
+  onClick,
+  selected
+}: {
+  logo: string;
+  title: string;
+  onClick: () => void;
+  selected: boolean;
+}) {
   return (
-    <div className={selectTypeStyle}>
+    <div
+      className={`${selectTypeStyle} ${selected ? selectedStyle : ''}`}
+      onClick={onClick}
+    >
       <div
         style={{
           position: 'relative',

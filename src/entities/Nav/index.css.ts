@@ -1,13 +1,16 @@
 // index.css 파일에서 스타일을 수정
+import { colors } from '@/design-tokens';
 import { style } from '@vanilla-extract/css';
 
 export const NavStyle = style({
   width: '100vw',
   height: '135px',
+  position: 'fixed',
+  top: '0',
   display: 'flex',
   justifyContent: 'center',
   alignItems: 'center',
-  backgroundColor: 'transparent',
+  backgroundColor: colors.brand[100],
   zIndex: '99'
 });
 

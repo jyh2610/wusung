@@ -2,7 +2,6 @@ import { style } from '@vanilla-extract/css';
 import { colors } from '@/design-tokens';
 
 export const memberShipStyle = style({
-  maxWidth: '1000px',
   margin: '0 auto'
 });
 
@@ -20,9 +19,24 @@ export const titleContentStyle = style({
   lineHeight: '40px',
   letterSpacing: '-2.5%',
   textAlign: 'center',
-  color: colors.gray_scale[800]
+  color: colors.gray_scale[800],
+  marginTop: '15px'
 });
 
 export const selectContainerStyle = style({
-  display: 'flex'
+  display: 'flex',
+  gap: '15px',
+  marginTop: '80px'
+});
+
+export const buttonStyle = style({
+  width: '40%',
+  height: '56px',
+  margin: '0 auto',
+  fontSize: '20px',
+  fontWeight: '500',
+  lineHeight: '23.87px',
+  letterSpacing: '-2.5%',
+  cursor: 'pointer',
+  marginTop: '100px'
 });

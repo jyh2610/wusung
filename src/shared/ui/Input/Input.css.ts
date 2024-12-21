@@ -9,6 +9,10 @@ export const inputClass = style({
 });
 
 export const inputSizeClass = styleVariants({
+  defaultValue: {
+    width: '100%',
+    height: '100%'
+  },
   small: {},
   medium: {
     width: '280px',
