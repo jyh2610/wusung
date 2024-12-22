@@ -3,10 +3,8 @@ import { pageContainer } from './index.css';
 
 export default function JoinMemberShip() {
   return (
-    <>
-      <section className={pageContainer}>
-        <MemberShip />
-      </section>
-    </>
+    <section className={pageContainer}>
+      <MemberShip />
+    </section>
   );
 }

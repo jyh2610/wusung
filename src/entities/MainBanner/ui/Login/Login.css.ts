@@ -36,7 +36,8 @@ export const LogedOutStyles = style({
 });
 
 export const LoginBottomStyles = style({
-  marginTop: '28px'
+  margin: '28px 0 32px 0',
+  height: '56px'
 });
 
 export const InfoFucStyles = style({

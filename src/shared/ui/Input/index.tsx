@@ -8,6 +8,8 @@ interface InputProps extends React.InputHTMLAttributes<HTMLInputElement> {
   inputSize?: SizeTypes;
   labelInputGap?: number;
   labelSize?: number;
+  labelPosition?: 'default' | 'vertical';
+  onChange?: (event: React.ChangeEvent<HTMLInputElement>) => void;
 }
 
 export const Input: React.FC<InputProps> = ({
@@ -16,13 +18,18 @@ export const Input: React.FC<InputProps> = ({
   placeholder,
   labelInputGap = 40,
   labelSize = 176,
+  labelPosition = 'default',
+  onChange,
   ...props
 }) => {
+  const isVertical = labelPosition === 'vertical';
+
   return (
     <div
       style={{
         display: 'flex',
-        alignItems: 'center',
+        flexDirection: isVertical ? 'column' : 'row', // 세로 정렬 조건 추가
+        alignItems: isVertical ? 'flex-start' : 'center', // 세로 정렬 시 왼쪽 정렬
         gap: `${labelInputGap}px`,
         width: '100%',
         height: '100%'
@@ -32,6 +39,7 @@ export const Input: React.FC<InputProps> = ({
       <input
         placeholder={placeholder}
         className={`${inputClass} ${inputSizeClass[inputSize]}`}
+        onChange={onChange}
         {...props}
       />
     </div>

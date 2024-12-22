@@ -1,3 +1,5 @@
+import { checkUserName } from './api';
+
 interface ISignup {
   label: string;
   placeholder: string;

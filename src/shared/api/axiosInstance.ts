@@ -1,5 +1,5 @@
 // axiosInstance.js
-import axios from 'axios';
+import axios, { AxiosError, AxiosRequestConfig, AxiosResponse } from 'axios';
 
 const axiosInstance = axios.create({
   baseURL: 'https://13.124.172.100',
@@ -31,5 +31,31 @@ axiosInstance.interceptors.response.use(
     return Promise.reject(error);
   }
 );
+export interface ErrorResponse {
+  statusCode: number;
+  message: string;
+  error: string;
+}
+interface CustomAxiosRequestConfig extends AxiosRequestConfig {
+  _retry?: boolean;
+}
+const handleAxiosError = async (error: AxiosError) => {
+  console.error('Axios error:', error);
 
-export default axiosInstance;
+  const originalRequest = error.config as CustomAxiosRequestConfig;
+
+  if (error.response?.status === 401) {
+  }
+
+  return Promise.reject(error);
+};
+
+const request = async <T>(
+  param: CustomAxiosRequestConfig
+): Promise<AxiosResponse<T>> => {
+  return axiosInstance(param)
+    .then((res: AxiosResponse<T>) => res)
+    .catch(handleAxiosError);
+};
+
+export default request;

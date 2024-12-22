@@ -19,6 +19,7 @@ export function Story() {
         <div
           style={{
             width: '200px',
+            height: '49px',
             marginTop: '36px'
           }}
         >

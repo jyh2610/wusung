@@ -21,15 +21,25 @@ export function BeforeLogIn() {
           label="아이디"
           inputSize="medium"
           placeholder="아이디를 입력해 주세요"
+          labelPosition="vertical"
+          labelInputGap={4}
         />
         <Input
+          labelPosition="vertical"
+          labelInputGap={4}
           label="비밀번호"
           inputSize="medium"
           placeholder="비밀번호를 입력해 주세요"
         />
       </div>
       <div className={LoginBottomStyles}>
-        <Button content={'로그인'} type={'brand'} btnSize={'large'} />
+        <div
+          style={{
+            height: '49px'
+          }}
+        >
+          <Button content={'로그인'} type={'brand'} btnSize={'large'} />
+        </div>
         <div className={InfoFucStyles}>
           <span className={InfoContentStyles}>회원가입</span>
           <VerticalLine

@@ -6,7 +6,7 @@ export const buttonBase = style({
   height: '100%',
   border: 'none',
   borderRadius: '12px',
-  padding: '12px 40px',
+  // padding: '12px 40px',
   fontSize: '18px',
   fontWeight: '500',
   lineHeight: '25px',
@@ -19,7 +19,7 @@ export const borderButtonBase = style({
   width: '100%',
   height: '100%',
   borderRadius: '12px',
-  padding: '12px 40px',
+  // padding: '12px 40px',
   fontSize: '18px',
   fontWeight: '500',
   lineHeight: '25px',
@@ -27,7 +27,7 @@ export const borderButtonBase = style({
   cursor: 'pointer',
   display: 'inline-block'
 });
-
+//'small' | 'medium' | 'large';
 export const buttonVariants = styleVariants({
   default: {
     backgroundColor: colors.gray_scale['default'],

@@ -11,7 +11,6 @@ interface ButtonType {
 export const Button = ({
   content,
   type = 'default',
-  btnSize = 'medium',
   onClick,
   ...props
 }: ButtonType) => {
@@ -29,7 +28,6 @@ export const Button = ({
 export const BorderButton = ({
   content,
   type = 'default',
-  btnSize = 'medium',
   ...props
 }: ButtonType) => {
   return (
