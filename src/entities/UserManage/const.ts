@@ -1,3 +1,4 @@
+import { IEmail } from '@/shared/ui/types';
 import { checkUserName } from './api';
 
 interface ISignup {
@@ -147,5 +148,24 @@ export const inputGroups = [
         ]
       }
     ]
+  }
+];
+
+export const emailList: IEmail[] = [
+  {
+    label: 'naver.com',
+    value: 'naver.com'
+  },
+  {
+    label: 'google.com',
+    value: 'gmail.com'
+  },
+  {
+    label: 'kakao.com',
+    value: 'kakao.com'
+  },
+  {
+    label: 'daum.net',
+    value: 'daum.net'
   }
 ];

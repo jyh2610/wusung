@@ -3,6 +3,7 @@ import { SizeTypes } from '../types';
 import { inputClass, inputSizeClass } from './Input.css';
 
 interface InputProps extends React.InputHTMLAttributes<HTMLInputElement> {
+  type?: string;
   label?: string | React.ReactNode;
   placeholder?: string;
   inputSize?: SizeTypes;
@@ -13,13 +14,13 @@ interface InputProps extends React.InputHTMLAttributes<HTMLInputElement> {
 }
 
 export const Input: React.FC<InputProps> = ({
+  type = 'text',
   label,
   inputSize = 'defaultValue',
   placeholder,
   labelInputGap = 40,
   labelSize = 176,
   labelPosition = 'default',
-  onChange,
   ...props
 }) => {
   const isVertical = labelPosition === 'vertical';
@@ -37,9 +38,9 @@ export const Input: React.FC<InputProps> = ({
     >
       {label && <label style={{ width: `${labelSize}px` }}>{label}</label>}
       <input
+        type={type}
         placeholder={placeholder}
         className={`${inputClass} ${inputSizeClass[inputSize]}`}
-        onChange={onChange}
         {...props}
       />
     </div>

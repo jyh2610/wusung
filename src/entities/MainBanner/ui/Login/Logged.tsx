@@ -3,6 +3,7 @@ import React from 'react';
 import { colors } from '@/design-tokens';
 import { Button } from '@/shared/ui';
 import { VerticalLine } from '@/shared/ui/VerticalLine';
+import { logout } from '../../api';
 import {
   LoginStyles,
   LoginHeaderStyles,
@@ -13,6 +14,14 @@ import {
 } from './Login.css';
 
 function Logged() {
+  const logOut = async () => {
+    try {
+      logout('');
+    } catch (error) {
+      console.error(error);
+    }
+  };
+
   return (
     <div>
       <div className={LoginStyles}>
@@ -30,7 +39,9 @@ function Logged() {
             btnSize={'large'}
             content={'우성인지펜 실행'}
           />
-          <button className={logoutStyles}>로그아웃</button>
+          <button onClick={logOut} className={logoutStyles}>
+            로그아웃
+          </button>
         </div>
       </div>
     </div>

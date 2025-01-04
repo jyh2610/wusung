@@ -1,7 +1,12 @@
 import { style } from '@vanilla-extract/css';
 import { colors } from '@/design-tokens';
 
-export const inputContainer = style({ padding: '80px 0' });
+export const inputContainer = style({
+  display: 'flex',
+  flexDirection: 'column',
+  gap: '28px',
+  marginBottom: '230px'
+});
 
 export const title = style({
   fontSize: '48px',
@@ -26,4 +31,10 @@ export const info = style({
   lineHeight: '25px',
   letterSpacing: '-2.5%',
   color: colors.gray_scale[700]
+});
+
+export const submitButton = style({
+  width: '400px',
+  height: '56px',
+  margin: '0 auto'
 });

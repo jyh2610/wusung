@@ -1,13 +1,36 @@
+'use client';
+
+import { useForm } from 'react-hook-form';
 import { colors } from '@/design-tokens';
-import { inputGroups } from '../const';
-import { CommonInputField, DynamicInputGroup } from '../ui/CommonInputField';
-import { info, inputContainer, subTitle, title } from './index.css';
+import { CommonSignupInput, LocationInfo } from '@/entities';
+import { Button } from '@/shared/ui';
+import { CompanyForm } from '../ui/SignupForm/Company';
+import { TermsOfUse } from '../ui/SignupForm/TermsOfUse';
+import {
+  info,
+  inputContainer,
+  submitButton,
+  subTitle,
+  title
+} from './index.css';
 
 export function Company() {
+  const {
+    register,
+    handleSubmit,
+    watch,
+    formState: { errors }
+  } = useForm();
+
+  const onSubmit = (data: unknown) => {
+    console.log(data);
+  };
+
   return (
     <div className={inputContainer}>
       <div
         style={{
+          marginTop: '80px',
           marginBottom: '40px'
         }}
       >
@@ -29,12 +52,15 @@ export function Company() {
           </span>
         </p>
       </div>
-      <div>
-        {inputGroups.map((group, index) => (
-          <DynamicInputGroup key={index} fields={group.fields} />
-        ))}
-      </div>
-      <CommonInputField />
+      <form className={inputContainer} onSubmit={handleSubmit(onSubmit)}>
+        <CommonSignupInput register={register} errors={errors} />
+        <CompanyForm register={register} errors={errors} />
+        <LocationInfo register={register} errors={errors} />
+        <TermsOfUse />
+        <div className={submitButton}>
+          <Button type={'beforeSelection'} content={'가입하기'} />
+        </div>
+      </form>
     </div>
   );
 }

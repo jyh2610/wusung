@@ -1,5 +1,5 @@
 import request from '@/shared/api/axiosInstance';
-import { IPostCheckIdRes } from '../type';
+import { ILoginData, IPostCheckIdRes } from '../type';
 
 export const checkUserName = async (userName: string) => {
   const res = await request<IPostCheckIdRes>({

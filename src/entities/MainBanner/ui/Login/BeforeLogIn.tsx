@@ -1,7 +1,13 @@
-import React from 'react';
+'use client';
+
+import { useRouter } from 'next/navigation';
+import React, { useState } from 'react';
 import { colors } from '@/design-tokens';
+import { routeMap, showErrorAlert, showSuccessAlert } from '@/shared';
 import { Button, Input } from '@/shared/ui';
 import { VerticalLine } from '@/shared/ui/VerticalLine';
+import { login } from '../../api';
+import { ILoginData } from '../../type';
 import {
   LoginStyles,
   LoginHeaderStyles,
@@ -11,6 +17,22 @@ import {
   InfoContentStyles
 } from './Login.css';
 export function BeforeLogIn() {
+  const [loginData, setLoginData] = useState<ILoginData>({
+    userName: '',
+    password: ''
+  });
+
+  const navigate = useRouter();
+
+  const sendLogin = async () => {
+    try {
+      await login(loginData);
+      showSuccessAlert('로그인 성공');
+    } catch (error) {
+      showErrorAlert('로그인 실패');
+    }
+  };
+
   return (
     <div className={LoginStyles}>
       <div className={LoginHeaderStyles}>
@@ -23,13 +45,24 @@ export function BeforeLogIn() {
           placeholder="아이디를 입력해 주세요"
           labelPosition="vertical"
           labelInputGap={4}
+          onChange={e =>
+            setLoginData(prev => {
+              return { ...prev, userName: e.target.value };
+            })
+          }
         />
         <Input
+          type="password"
           labelPosition="vertical"
           labelInputGap={4}
           label="비밀번호"
           inputSize="medium"
           placeholder="비밀번호를 입력해 주세요"
+          onChange={e =>
+            setLoginData(prev => {
+              return { ...prev, password: e.target.value };
+            })
+          }
         />
       </div>
       <div className={LoginBottomStyles}>
@@ -38,10 +71,20 @@ export function BeforeLogIn() {
             height: '49px'
           }}
         >
-          <Button content={'로그인'} type={'brand'} btnSize={'large'} />
+          <Button
+            onClick={sendLogin}
+            content={'로그인'}
+            type={'brand'}
+            btnSize={'large'}
+          />
         </div>
         <div className={InfoFucStyles}>
-          <span className={InfoContentStyles}>회원가입</span>
+          <span
+            onClick={() => navigate.push(routeMap.signup)}
+            className={InfoContentStyles}
+          >
+            회원가입
+          </span>
           <VerticalLine
             height="25px"
             thickness="1px"

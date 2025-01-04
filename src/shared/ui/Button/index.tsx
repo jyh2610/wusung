@@ -5,7 +5,7 @@ interface ButtonType {
   content: string;
   type?: 'default' | 'brand' | 'borderBrand' | 'beforeSelection';
   btnSize?: 'small' | 'medium' | 'large';
-  onClick?: (prop?: unknown) => void;
+  onClick?: () => void;
 }
 
 export const Button = ({
