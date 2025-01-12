@@ -5,6 +5,7 @@ import { colors } from '@/design-tokens';
 import { Footer } from '@/entities';
 import { Nav } from '@/entities/Nav';
 import { NextUiProvider, QueryProvider } from './_provider';
+import { layout } from './style.css';
 
 export const metadata: Metadata = {
   title: 'Create Next App',
@@ -26,13 +27,7 @@ export default function RootLayout({
         <QueryProvider>
           <NextUiProvider>
             <Nav />
-            <main
-              style={{
-                marginTop: '135px'
-              }}
-            >
-              {children}
-            </main>
+            <main className={layout}>{children}</main>
             <Footer />
           </NextUiProvider>
         </QueryProvider>

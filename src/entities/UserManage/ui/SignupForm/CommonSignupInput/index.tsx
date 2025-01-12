@@ -1,4 +1,7 @@
-import React from 'react';
+'use client';
+
+import React, { useState } from 'react';
+import { useDaumPostcodePopup } from 'react-daum-postcode';
 import { useForm } from 'react-hook-form';
 import { checkUserName } from '@/entities/UserManage/api';
 import { emailList } from '@/entities/UserManage/const';
@@ -19,15 +22,6 @@ interface IProps {
 }
 
 export function CommonSignupInput({ register, errors }: IProps) {
-  const checkId = async (id: string) => {
-    try {
-      await checkUserName(id);
-      return true;
-    } catch {
-      return false;
-    }
-  };
-
   return (
     <div className={inputContainer}>
       <SignupInput
@@ -47,15 +41,50 @@ export function CommonSignupInput({ register, errors }: IProps) {
     </div>
   );
 }
+const scriptUrl =
+  'https://t1.daumcdn.net/mapjsapi/bundle/postcode/prod/postcode.v2.js';
 
 export const LocationInfo = ({ register, errors }: IProps) => {
+  const open = useDaumPostcodePopup(scriptUrl);
+
+  const handleComplete = (data: {
+    address: unknown;
+    addressType: string;
+    bname: string;
+    buildingName: string;
+  }) => {
+    let fullAddress = data.address;
+    let extraAddress = '';
+
+    if (data.addressType === 'R') {
+      if (data.bname !== '') {
+        extraAddress += data.bname;
+      }
+      if (data.buildingName !== '') {
+        extraAddress +=
+          extraAddress !== '' ? `, ${data.buildingName}` : data.buildingName;
+      }
+      fullAddress += extraAddress !== '' ? ` (${extraAddress})` : '';
+    }
+
+    console.log(fullAddress);
+  };
+
+  const handleClick = () => {
+    open({ onComplete: handleComplete });
+  };
+
   return (
     <div className={inputContainer}>
       <div className={inputBox}>
         <div className={searchAddress}>
           <SignupInput label={'주소'} placeholder={'주소를 검색해주세요'} />
           <div className={subButton}>
-            <Button type="borderBrand" content="주소 검색" />
+            <Button
+              onClick={handleClick}
+              type="borderBrand"
+              content="주소 검색"
+            />
           </div>
         </div>
         <SignupInput

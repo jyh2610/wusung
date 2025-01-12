@@ -24,3 +24,10 @@ export const MainStyles = style({
   flexDirection: 'column',
   justifyContent: 'center'
 });
+
+export const layout = style({
+  marginTop: '135px',
+  minHeight: 'calc(100vh - 303px)',
+  flex: 1,
+  backgroundColor: 'rgba(251, 250, 247, 1)'
+});

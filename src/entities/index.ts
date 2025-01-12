@@ -7,3 +7,4 @@ export {
   CommonSignupInput,
   LocationInfo
 } from './UserManage/ui/SignupForm/CommonSignupInput';
+export { LoginModal } from './UserManage/index';

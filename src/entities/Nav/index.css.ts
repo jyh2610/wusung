@@ -1,6 +1,6 @@
 // index.css 파일에서 스타일을 수정
-import { colors } from '@/design-tokens';
 import { style } from '@vanilla-extract/css';
+import { colors } from '@/design-tokens';
 
 export const NavStyle = style({
   width: '100vw',
