@@ -8,6 +8,16 @@ export const inputContainer = style({
   marginBottom: '230px'
 });
 
+export const locationContainer = style({
+  backgroundColor: colors.gray_scale['default'],
+  boxShadow: 'rgba(90, 79, 45, 0.02)',
+  borderRadius: '40px',
+  display: 'flex',
+  flexDirection: 'column',
+  gap: '40px',
+  padding: '80px'
+});
+
 export const title = style({
   fontSize: '48px',
   fontWeight: '600',
