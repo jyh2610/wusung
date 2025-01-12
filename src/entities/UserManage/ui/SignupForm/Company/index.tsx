@@ -1,5 +1,6 @@
 import React from 'react';
 import { useForm } from 'react-hook-form';
+import { verifyCoporate } from '@/entities/UserManage/api';
 import { Button, Input } from '@/shared/ui';
 import {
   buttonContainer,
@@ -15,6 +16,20 @@ interface IProps {
   errors: Record<string, unknown>;
 }
 export function CompanyForm({ register, errors }: IProps) {
+  const verifyCoeporate = async () => {
+    try {
+      const res = await verifyCoporate({
+        b_no: '8834600572',
+        start_dt: '20230101',
+        p_nm: '우성인지��',
+        b_nm: '우성인지��'
+      });
+      console.log(res);
+    } catch {
+      console.error('Failed to verify corporate number');
+    }
+  };
+
   return (
     <div className={inputContainer}>
       <SignupInput
@@ -32,7 +47,11 @@ export function CompanyForm({ register, errors }: IProps) {
       />
 
       <div className={buttonContainer}>
-        <Button type={'borderBrand'} content={'기관 인증'} />
+        <Button
+          onClick={verifyCoeporate}
+          type={'borderBrand'}
+          content={'기관 인증'}
+        />
       </div>
     </div>
   );

@@ -3,7 +3,11 @@
 import React, { useState } from 'react';
 import { useDaumPostcodePopup } from 'react-daum-postcode';
 import { useForm } from 'react-hook-form';
-import { checkUserName } from '@/entities/UserManage/api';
+import {
+  checkAuthenticationNumber,
+  checkUserName,
+  verifyPhoneNum
+} from '@/entities/UserManage/api';
 import { emailList } from '@/entities/UserManage/const';
 import { Button, IEmail, Input, SelectBox } from '@/shared/ui';
 import {
@@ -74,6 +78,27 @@ export const LocationInfo = ({ register, errors }: IProps) => {
     open({ onComplete: handleComplete });
   };
 
+  const checkPhoneVerification = async () => {
+    try {
+      const res = await verifyPhoneNum('01062582610');
+      console.log(res);
+    } catch {
+      console.error('Failed to verify phone number');
+    }
+  };
+
+  const checkPhoneAuthentication = async () => {
+    try {
+      const res = await checkAuthenticationNumber({
+        code: '123123',
+        phoneNum: '01062582610'
+      });
+      console.log(res);
+    } catch {
+      console.error('Failed to verify phone number');
+    }
+  };
+
   return (
     <div className={inputContainer}>
       <div className={inputBox}>
@@ -100,7 +125,11 @@ export const LocationInfo = ({ register, errors }: IProps) => {
             placeholder={'번호를 입력해주세요'}
           />
           <div className={subButton}>
-            <Button type="borderBrand" content="인증번호 발송" />
+            <Button
+              onClick={checkPhoneVerification}
+              type="borderBrand"
+              content="인증번호 발송"
+            />
           </div>
         </div>
         <div>
@@ -111,7 +140,11 @@ export const LocationInfo = ({ register, errors }: IProps) => {
               placeholder={'인증 번호를 입력해주세요'}
             />
             <div className={subButton}>
-              <Button type="borderBrand" content="인증번호 확인" />
+              <Button
+                onClick={checkPhoneAuthentication}
+                type="borderBrand"
+                content="인증번호 확인"
+              />
             </div>
           </div>
         </div>
