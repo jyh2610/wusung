@@ -1,4 +1,5 @@
 import { style } from '@vanilla-extract/css';
+import { recipe } from '@vanilla-extract/recipes';
 import { colors } from '@/design-tokens';
 
 export const inputContainer = style({
@@ -15,6 +16,8 @@ export const inputHeight = style({
   width: '100%',
   height: '57px',
   display: 'flex',
+  alignItems: 'center',
+  flexDirection: 'column',
   gap: '40px'
 });
 

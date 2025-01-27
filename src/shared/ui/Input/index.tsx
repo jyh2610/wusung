@@ -1,5 +1,5 @@
 import React from 'react';
-import { UseFormRegister } from 'react-hook-form';
+import { UseFormRegisterReturn } from 'react-hook-form';
 import { SizeTypes } from '../types';
 import { inputClass, inputSizeClass } from './Input.css';
 
@@ -14,7 +14,7 @@ interface InputProps extends React.InputHTMLAttributes<HTMLInputElement> {
   onChange?: (event: React.ChangeEvent<HTMLInputElement>) => void;
   name?: string;
   // eslint-disable-next-line @typescript-eslint/no-explicit-any
-  register?: UseFormRegister<any>;
+  register?: UseFormRegisterReturn;
   rules?: object;
   error?: string;
 }
@@ -47,14 +47,36 @@ export const Input: React.FC<InputProps> = ({
       }}
     >
       {label && <label style={{ width: `${labelSize}px` }}>{label}</label>}
-      <input
-        type={type}
-        placeholder={placeholder}
-        className={`${inputClass} ${inputSizeClass[inputSize]}`}
-        {...(register && name ? register(name, rules) : {})} // register 적용
-        {...props}
-      />
-      {error && <p style={{ color: 'red' }}>{error}</p>}
+      <div
+        style={{
+          display: 'flex',
+          flexDirection: isVertical ? 'column' : 'row',
+          alignItems: isVertical ? 'flex-start' : 'center',
+          gap: `${labelInputGap}px`,
+          width: '100%',
+          height: '100%',
+          position: 'relative'
+        }}
+      >
+        <input
+          style={{}}
+          type={type}
+          placeholder={placeholder}
+          className={`${inputClass} ${inputSizeClass[inputSize]}`}
+          {...(register ? register : {})} // register 적용
+          {...props}
+        />
+        <p
+          style={{
+            top: '68px',
+            left: '10px',
+            color: 'red',
+            position: 'absolute'
+          }}
+        >
+          {error}
+        </p>
+      </div>
     </div>
   );
 };

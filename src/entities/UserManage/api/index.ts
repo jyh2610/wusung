@@ -4,7 +4,7 @@ import { ILoginData, IPostCheckIdRes } from '../type';
 export const checkUserName = async (userName: string) => {
   const res = await request<IPostCheckIdRes>({
     method: 'POST',
-    url: '/api/signup/username-check',
+    url: '/api/common/signup/username-check',
     data: {
       username: userName
     }
@@ -15,7 +15,7 @@ export const checkUserName = async (userName: string) => {
 export const verifyPhoneNum = async (num: string) => {
   const res = await request<IPostCheckIdRes>({
     method: 'POST',
-    url: '/api/signup/phone/verification/send',
+    url: '/api/common/signup/phone/verification/send',
     data: {
       phoneNum: num
     }
@@ -34,7 +34,7 @@ export const checkAuthenticationNumber = async ({
 }: IAuthenticationNumber) => {
   const res = await request<IPostCheckIdRes>({
     method: 'POST',
-    url: '/api/signup/phone/verification/confirm',
+    url: '/api/common/signup/phone/verification/confirm',
     data: {
       code,
       phoneNum
@@ -58,7 +58,7 @@ export const verifyCoporate = async ({
 }: ICheckCorporate) => {
   const res = await request<IPostCheckIdRes>({
     method: 'POST',
-    url: '/api/signup/corporate/verification',
+    url: '/api/common/signup/corporate/verification',
     data: {
       b_no,
       start_dt,

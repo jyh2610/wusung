@@ -14,14 +14,46 @@ import {
   title
 } from './index.css';
 
+export interface IForm {
+  id: string;
+  password: string;
+  passwordConfirm: string;
+  representativeName: string;
+  companyName: string;
+  corporateNumber: string;
+  openingDate: string;
+  name: string;
+  address: string;
+  phone: string;
+  email: string;
+  termOfUse: [boolean, boolean];
+}
+
 export function Company() {
   const {
     register,
     handleSubmit,
     watch,
     formState: { errors }
-  } = useForm();
+  } = useForm<IForm>({
+    mode: 'onSubmit',
+    defaultValues: {
+      id: '',
+      password: '',
+      passwordConfirm: '',
+      representativeName: '',
+      companyName: '',
+      corporateNumber: '',
+      name: '',
+      openingDate: '',
+      address: '',
+      phone: '',
+      email: '',
+      termOfUse: [false, false]
+    }
+  });
 
+  console.log(errors);
   const onSubmit = (data: unknown) => {
     console.log(data);
   };
@@ -53,12 +85,16 @@ export function Company() {
         </p>
       </div>
       <form className={inputContainer} onSubmit={handleSubmit(onSubmit)}>
-        <CommonSignupInput register={register} errors={errors} />
+        <CommonSignupInput register={register} errors={errors} watch={watch} />
         <CompanyForm register={register} errors={errors} />
-        <LocationInfo register={register} errors={errors} />
+        <LocationInfo register={register} errors={errors} watch={watch} />
         <TermsOfUse />
         <div className={submitButton}>
-          <Button type={'beforeSelection'} content={'가입하기'} />
+          <Button
+            type={'beforeSelection'}
+            content={'가입하기'}
+            onClick={handleSubmit(onSubmit)}
+          />
         </div>
       </form>
     </div>

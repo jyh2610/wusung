@@ -22,7 +22,10 @@ export function IndividualComponent() {
     handleSubmit,
     watch,
     formState: { errors }
-  } = useForm();
+  } = useForm({
+    mode: 'onSubmit',
+    defaultValues: {}
+  });
 
   const onSubmit = (data: unknown) => {
     console.log(data);
@@ -57,7 +60,7 @@ export function IndividualComponent() {
       <form className={inputContainer} onSubmit={handleSubmit(onSubmit)}>
         <CommonSignupInput register={register} errors={errors} />
 
-        <LocationInfo register={register} errors={errors} />
+        <LocationInfo type={'indivisual'} register={register} errors={errors} />
         <TermsOfUse />
         <div className={submitButton}>
           <Button type={'beforeSelection'} content={'가입하기'} />

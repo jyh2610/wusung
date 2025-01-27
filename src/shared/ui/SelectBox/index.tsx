@@ -7,11 +7,11 @@ import { IEmail } from '../types';
 // IProps 인터페이스 정의
 interface IProps {
   options: IEmail[];
+  placeholder: string;
 }
 
-export function SelectBox({ options }: IProps) {
+export function SelectBox({ options, placeholder }: IProps) {
   const [selectedOption, setSelectedOption] = useState<IEmail | null>(null);
-  console.log(options);
   const handleChange = (newValue: SingleValue<IEmail>, actionMeta: unknown) => {
     setSelectedOption(newValue);
   };
@@ -22,6 +22,7 @@ export function SelectBox({ options }: IProps) {
       onChange={handleChange}
       isDisabled={false}
       options={options}
+      placeholder={placeholder}
       styles={{
         container: provided => ({
           ...provided,
