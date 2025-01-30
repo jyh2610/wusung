@@ -27,8 +27,7 @@ export function SignupInput({
   return (
     <div
       style={{
-        width: '100%',
-        height: '94px'
+        width: '100%'
       }}
     >
       <div className={inputHeight}>

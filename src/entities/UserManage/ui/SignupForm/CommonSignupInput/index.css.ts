@@ -11,7 +11,7 @@ export const searchAddress = style({
 export const inputBox = style({
   display: 'flex',
   flexDirection: 'column',
-  gap: '12px'
+  gap: '40px'
 });
 
 export const emailBox = style({

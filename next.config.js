@@ -8,7 +8,7 @@ const nextConfig = {
     return [
       {
         source: '/api/:path*', // 프론트엔드에서 사용하는 API 경로
-        destination: 'http://13.124.172.100.sslip.io/api/:path*' // 실제 백엔드 서버 URL
+        destination: 'https://13.124.172.100.sslip.io/api/:path*' // 실제 백엔드 서버 URL
       }
     ];
   }

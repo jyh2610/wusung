@@ -1,10 +1,16 @@
 'use client';
 
 import { useState } from 'react';
-import { FieldErrors, UseFormRegister, UseFormWatch } from 'react-hook-form';
+import {
+  Control,
+  FieldErrors,
+  UseFormRegister,
+  UseFormSetValue,
+  UseFormWatch
+} from 'react-hook-form';
 import { BsCheck2, BsX } from 'react-icons/bs';
 import { checkUserName } from '@/entities/UserManage/api';
-import { IForm } from '@/entities/UserManage/Company';
+import { IForm } from '@/entities/UserManage/type';
 import { inputContainer } from '../index.css';
 import { SignupInput } from '../SingnupInput';
 import { searchAddress, validateId } from './index.css';
@@ -14,6 +20,7 @@ export interface IProps {
   errors: FieldErrors<IForm>;
   type?: string;
   watch: UseFormWatch<IForm>;
+  setValue?: UseFormSetValue<IForm>;
 }
 
 export function CommonSignupInput({ register, errors, watch }: IProps) {
@@ -38,13 +45,12 @@ export function CommonSignupInput({ register, errors, watch }: IProps) {
     display: 'flex',
     alignItems: 'center'
   };
-
   return (
     <div className={inputContainer}>
       <div className={searchAddress}>
         <SignupInput
           register={register('id', {
-            required: '반드시 입력해주세요',
+            required: { value: true, message: '반드시 입력해주세요.' },
             validate: async (value: string) => {
               const isAvailable = await checkUserNameHandler(value); // 비동기 검증
               return isAvailable || '이미 사용 중인 아이디입니다.'; // 검증 실패 시 메시지 반환
@@ -79,8 +85,9 @@ export function CommonSignupInput({ register, errors, watch }: IProps) {
           label={'비밀번호'}
           type="password"
           placeholder={'사용하실 비밀번호를 입력해주세요'}
+          error={errors.password && errors.password?.message}
           register={register('password', {
-            required: '반드시 입력해주세요',
+            required: { value: true, message: '반드시 입력해주세요.' },
             minLength: 8,
             maxLength: 20,
             pattern:
@@ -94,6 +101,7 @@ export function CommonSignupInput({ register, errors, watch }: IProps) {
           label={'비밀번호 확인'}
           type="password"
           placeholder={'비밀번호를 다시 한 번 입력해주세요'}
+          error={errors.passwordConfirm && errors.passwordConfirm?.message}
           register={register('passwordConfirm', {
             required: { value: true, message: '비밀번호를 입력해주세요.' },
             validate: value => {

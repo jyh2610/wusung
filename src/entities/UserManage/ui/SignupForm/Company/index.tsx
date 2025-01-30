@@ -1,17 +1,17 @@
 import React from 'react';
-import { UseFormRegister } from 'react-hook-form';
+import { FieldErrors, UseFormRegister } from 'react-hook-form';
 import { verifyCoporate } from '@/entities/UserManage/api';
-import { IForm } from '@/entities/UserManage/Company';
+import { IForm } from '@/entities/UserManage/type';
 import { Button, Input } from '@/shared/ui';
 import { buttonContainer, inputContainer } from '../index.css';
 import { SignupInput } from '../SingnupInput';
 
 interface IProps {
   register: UseFormRegister<IForm>;
-  errors: Record<string, unknown>;
+  errors: FieldErrors<IForm>;
 }
 export function CompanyForm({ register, errors }: IProps) {
-  const verifyCoeporate = async () => {
+  const verifyCorporate = async () => {
     try {
       const res = await verifyCoporate({
         b_no: '8834600572',
@@ -24,7 +24,6 @@ export function CompanyForm({ register, errors }: IProps) {
       console.error('Failed to verify corporate number');
     }
   };
-
   return (
     <div className={inputContainer}>
       <SignupInput
@@ -33,6 +32,7 @@ export function CompanyForm({ register, errors }: IProps) {
         register={register('representativeName', {
           required: { value: true, message: '반드시 입력해주세요' }
         })}
+        error={errors.representativeName && errors.representativeName.message}
       />
       <SignupInput
         label={'기관명'}
@@ -40,6 +40,7 @@ export function CompanyForm({ register, errors }: IProps) {
         register={register('companyName', {
           required: { value: true, message: '반드시 입력해주세요' }
         })}
+        error={errors.companyName && errors.companyName.message}
       />
       <SignupInput
         register={register('corporateNumber', {
@@ -47,6 +48,7 @@ export function CompanyForm({ register, errors }: IProps) {
         })}
         label={'사업자 번호'}
         placeholder={'사업자번호를 입력해주세요'}
+        error={errors.corporateNumber && errors.corporateNumber.message}
       />
       <SignupInput
         register={register('openingDate', {
@@ -54,11 +56,12 @@ export function CompanyForm({ register, errors }: IProps) {
         })}
         label={'개업일자'}
         placeholder={'사업자번호를 입력해주세요'}
+        error={errors.openingDate && errors.openingDate.message}
       />
 
       <div className={buttonContainer}>
         <Button
-          onClick={verifyCoeporate}
+          onClick={verifyCorporate}
           type={'borderBrand'}
           content={'기관 인증'}
         />

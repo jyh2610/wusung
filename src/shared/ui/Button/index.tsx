@@ -5,7 +5,8 @@ interface ButtonType {
   content: string;
   type?: 'default' | 'brand' | 'borderBrand' | 'beforeSelection';
   btnSize?: 'small' | 'medium' | 'large';
-  onClick?: () => void;
+  // eslint-disable-next-line @typescript-eslint/no-explicit-any
+  onClick?: (e: any) => void;
 }
 
 export const Button = ({

@@ -5,7 +5,7 @@ export const checkUserName = async (userName: string) => {
   const res = await request<IPostCheckIdRes>({
     method: 'POST',
     url: '/api/common/signup/username-check',
-    data: {
+    params: {
       username: userName
     }
   });

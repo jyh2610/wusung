@@ -5,16 +5,19 @@ import { Component, ReactNode, useState } from 'react';
 import { overlayStyle, panelStyle } from './modal.css'; // 스타일 파s일 불러오기
 
 interface ModalProps {
-  children: ReactNode;
+  children: JSX.Element;
   isOpen: boolean;
   setIsOpen: () => void;
+  modalSize: { width: string; height: string };
 }
 
-export function Modal({ children, isOpen, setIsOpen }: ModalProps) {
+export function Modal({ children, isOpen, setIsOpen, modalSize }: ModalProps) {
   return (
     <Dialog open={isOpen} onClose={setIsOpen}>
       <div className={overlayStyle}>
-        <DialogPanel className={panelStyle}>{children}</DialogPanel>
+        <DialogPanel style={modalSize} className={panelStyle}>
+          {children}
+        </DialogPanel>
       </div>
     </Dialog>
   );

@@ -1,5 +1,6 @@
 'use client';
 
+import { useState } from 'react';
 import { useDaumPostcodePopup } from 'react-daum-postcode';
 import {
   verifyPhoneNum,
@@ -26,6 +27,7 @@ import {
   searchAddress,
   emailBox
 } from './index.css';
+import PhoneAuthModal from './PhoneAuthModal';
 
 const scriptUrl =
   'https://t1.daumcdn.net/mapjsapi/bundle/postcode/prod/postcode.v2.js';
@@ -34,6 +36,7 @@ export const LocationInfo = ({
   type = 'company',
   register,
   errors,
+  setValue,
   watch
 }: IProps) => {
   const open = useDaumPostcodePopup(scriptUrl);
@@ -41,12 +44,21 @@ export const LocationInfo = ({
   const monthList = generateMonths();
   const dayList = generateDays(2025, 1);
 
+  const [isVerified, setIsVerified] = useState(false);
+  const [isModal, setIsModal] = useState(false);
+
   const handleClick = () => {
-    open({ onComplete: handleComplete });
+    open({
+      onComplete: data => {
+        const res = handleComplete(data);
+        setValue && setValue('address', res);
+      }
+    });
   };
 
   const checkPhoneVerification = async () => {
     try {
+      setIsVerified(true);
       const res = await verifyPhoneNum('01062582610');
       console.log(res);
     } catch {
@@ -69,33 +81,51 @@ export const LocationInfo = ({
   return (
     <div className={inputContainer}>
       <div className={inputBox}>
-        <SignupInput
-          register={register('name', {
-            required: { value: true, message: '반드시 입력해주세요.' }
-          })}
-          label={'이름'}
-          placeholder={'이름를 입력해주세요'}
-        />
-        <div className={birthContainer}>
-          <label className={birthLabelBox}>생년월일</label>
-          <div className={birthBox}>
-            <div className={birthDropdown}>
-              <SelectBox options={yearList} placeholder={'년'} />
+        {type === 'indivisual' && (
+          <>
+            <SignupInput
+              register={register('name', {
+                required: { value: true, message: '반드시 입력해주세요.' }
+              })}
+              label={'이름'}
+              placeholder={'이름를 입력해주세요'}
+              error={errors.name && errors.name?.message}
+            />
+            <div className={birthContainer}>
+              <label className={birthLabelBox}>생년월일</label>
+              <div className={birthBox}>
+                <div className={birthDropdown}>
+                  <SelectBox options={yearList} placeholder={'년'} />
+                </div>
+                <div className={birthDropdown}>
+                  <SelectBox options={monthList} placeholder={'월'} />
+                </div>
+                <div className={birthDropdown}>
+                  <SelectBox options={dayList} placeholder={'일'} />
+                </div>
+              </div>
             </div>
-            <div className={birthDropdown}>
-              <SelectBox options={monthList} placeholder={'월'} />
-            </div>
-            <div className={birthDropdown}>
-              <SelectBox options={dayList} placeholder={'일'} />
-            </div>
-          </div>
-        </div>
-
+          </>
+        )}
         <div className={searchAddress}>
-          <SignupInput label={'주소'} placeholder={'주소를 검색해주세요'} />
+          <SignupInput
+            register={register('address', {
+              required:
+                type === 'indivisual'
+                  ? false
+                  : { value: true, message: '반드시 입력해주세요.' }
+            })}
+            error={errors.address && errors.address?.message}
+            label={'주소'}
+            isNeed={type === 'indivisual' ? false : true}
+            placeholder={'주소를 검색해주세요'}
+          />
           <div className={subButton}>
             <Button
-              onClick={handleClick}
+              onClick={e => {
+                e.preventDefault();
+                handleClick();
+              }}
               type="borderBrand"
               content="주소 검색"
             />
@@ -103,11 +133,19 @@ export const LocationInfo = ({
         </div>
         <SignupInput
           isNeed={false}
+          register={register('detailAddress', {
+            required:
+              type === 'indivisual'
+                ? false
+                : { value: true, message: '반드시 입력해주세요.' }
+          })}
+          error={errors.detailAddress && errors.detailAddress?.message}
           placeholder={'상세 주소를 입력해주세요'}
           label={''}
         />
       </div>
       <div className={inputBox}>
+        <PhoneAuthModal isModal={isModal} setIsModal={setIsModal} />
         <div className={searchAddress}>
           <SignupInput
             label={'휴대폰 번호'}
@@ -115,34 +153,49 @@ export const LocationInfo = ({
             register={register('phone', {
               required: { value: true, message: '반드시 입력해주세요.' }
             })}
+            error={errors.phone && errors.phone?.message}
           />
           <div className={subButton}>
             <Button
-              onClick={checkPhoneVerification}
+              onClick={e => {
+                e.preventDefault();
+                setIsModal(true);
+                checkPhoneVerification();
+              }}
               type="borderBrand"
               content="인증번호 발송"
             />
           </div>
         </div>
-        <div>
-          <div className={searchAddress}>
-            <SignupInput
-              isNeed={false}
-              label={''}
-              placeholder={'인증 번호를 입력해주세요'}
-            />
-            <div className={subButton}>
-              <Button
-                onClick={checkPhoneAuthentication}
-                type="borderBrand"
-                content="인증번호 확인"
+        {isVerified && (
+          <div>
+            <div className={searchAddress}>
+              <SignupInput
+                isNeed={false}
+                label={''}
+                placeholder={'인증 번호를 입력해주세요'}
               />
+              <div className={subButton}>
+                <Button
+                  onClick={e => {
+                    e.preventDefault();
+                    checkPhoneAuthentication();
+                  }}
+                  type="borderBrand"
+                  content="인증번호 확인"
+                />
+              </div>
             </div>
           </div>
-        </div>
+        )}
       </div>
       <div className={emailBox}>
-        <SignupInput label={'이메일'} isNeed={false} placeholder={''} />
+        <SignupInput
+          register={register('email')}
+          label={'이메일'}
+          isNeed={false}
+          placeholder={''}
+        />
         <span>@</span>
         <div
           style={{

@@ -4,6 +4,7 @@ import { useForm } from 'react-hook-form';
 import { colors } from '@/design-tokens';
 import { CommonSignupInput, LocationInfo } from '@/entities';
 import { Button } from '@/shared/ui';
+import { IForm } from '../type';
 import { CompanyForm } from '../ui/SignupForm/Company';
 import { TermsOfUse } from '../ui/SignupForm/TermsOfUse';
 import {
@@ -14,29 +15,15 @@ import {
   title
 } from './index.css';
 
-export interface IForm {
-  id: string;
-  password: string;
-  passwordConfirm: string;
-  representativeName: string;
-  companyName: string;
-  corporateNumber: string;
-  openingDate: string;
-  name: string;
-  address: string;
-  phone: string;
-  email: string;
-  termOfUse: [boolean, boolean];
-}
-
 export function Company() {
   const {
     register,
     handleSubmit,
     watch,
+    setValue,
     formState: { errors }
   } = useForm<IForm>({
-    mode: 'onSubmit',
+    mode: 'onChange',
     defaultValues: {
       id: '',
       password: '',
@@ -44,19 +31,19 @@ export function Company() {
       representativeName: '',
       companyName: '',
       corporateNumber: '',
-      name: '',
       openingDate: '',
       address: '',
+      detailAddress: '',
       phone: '',
       email: '',
       termOfUse: [false, false]
     }
   });
-
-  console.log(errors);
   const onSubmit = (data: unknown) => {
     console.log(data);
   };
+
+  console.log(watch());
 
   return (
     <div className={inputContainer}>
@@ -87,13 +74,21 @@ export function Company() {
       <form className={inputContainer} onSubmit={handleSubmit(onSubmit)}>
         <CommonSignupInput register={register} errors={errors} watch={watch} />
         <CompanyForm register={register} errors={errors} />
-        <LocationInfo register={register} errors={errors} watch={watch} />
-        <TermsOfUse />
+        <LocationInfo
+          setValue={setValue}
+          register={register}
+          errors={errors}
+          watch={watch}
+        />
+        <TermsOfUse setValue={setValue} watch={watch} />
         <div className={submitButton}>
           <Button
             type={'beforeSelection'}
             content={'가입하기'}
-            onClick={handleSubmit(onSubmit)}
+            onClick={(e: React.MouseEvent<HTMLButtonElement>) => {
+              e.preventDefault();
+              handleSubmit(onSubmit)();
+            }}
           />
         </div>
       </form>

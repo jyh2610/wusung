@@ -24,7 +24,7 @@ export const generateDays = (year: number, month: number) => {
 };
 
 export const handleComplete = (data: {
-  address: unknown;
+  address: string;
   addressType: string;
   bname: string;
   buildingName: string;
@@ -42,6 +42,5 @@ export const handleComplete = (data: {
     }
     fullAddress += extraAddress !== '' ? ` (${extraAddress})` : '';
   }
-
-  console.log(fullAddress);
+  return data.address;
 };

@@ -17,6 +17,7 @@ interface InputProps extends React.InputHTMLAttributes<HTMLInputElement> {
   register?: UseFormRegisterReturn;
   rules?: object;
   error?: string;
+  value?: string;
 }
 
 export const Input: React.FC<InputProps> = ({
@@ -34,7 +35,6 @@ export const Input: React.FC<InputProps> = ({
   ...props
 }) => {
   const isVertical = labelPosition === 'vertical';
-
   return (
     <div
       style={{
@@ -52,7 +52,6 @@ export const Input: React.FC<InputProps> = ({
           display: 'flex',
           flexDirection: isVertical ? 'column' : 'row',
           alignItems: isVertical ? 'flex-start' : 'center',
-          gap: `${labelInputGap}px`,
           width: '100%',
           height: '100%',
           position: 'relative'
@@ -63,7 +62,7 @@ export const Input: React.FC<InputProps> = ({
           type={type}
           placeholder={placeholder}
           className={`${inputClass} ${inputSizeClass[inputSize]}`}
-          {...(register ? register : {})} // register 적용
+          {...(register ? register : {})}
           {...props}
         />
         <p

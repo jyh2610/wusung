@@ -1,6 +1,6 @@
 'use client';
 
-import { useForm } from 'react-hook-form';
+import { Path, PathValue, useForm } from 'react-hook-form';
 import { colors } from '@/design-tokens';
 import { Button } from '@/shared/ui';
 import {
@@ -10,6 +10,7 @@ import {
   submitButton,
   title
 } from '../Company/index.css';
+import { IForm } from '../type';
 import {
   CommonSignupInput,
   LocationInfo
@@ -21,12 +22,21 @@ export function IndividualComponent() {
     register,
     handleSubmit,
     watch,
+    setValue,
     formState: { errors }
-  } = useForm({
+  } = useForm<IForm>({
     mode: 'onSubmit',
-    defaultValues: {}
+    defaultValues: {
+      id: '',
+      password: '',
+      passwordConfirm: '',
+      name: '',
+      address: '',
+      phone: '',
+      email: '',
+      termOfUse: [false, false]
+    }
   });
-
   const onSubmit = (data: unknown) => {
     console.log(data);
   };
@@ -58,10 +68,14 @@ export function IndividualComponent() {
         </p>
       </div>
       <form className={inputContainer} onSubmit={handleSubmit(onSubmit)}>
-        <CommonSignupInput register={register} errors={errors} />
-
-        <LocationInfo type={'indivisual'} register={register} errors={errors} />
-        <TermsOfUse />
+        <CommonSignupInput register={register} errors={errors} watch={watch} />
+        <LocationInfo
+          type={'indivisual'}
+          register={register}
+          errors={errors}
+          watch={watch}
+        />
+        <TermsOfUse watch={watch} setValue={setValue} />
         <div className={submitButton}>
           <Button type={'beforeSelection'} content={'가입하기'} />
         </div>
