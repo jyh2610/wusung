@@ -25,7 +25,7 @@ export function IndividualComponent() {
     setValue,
     formState: { errors }
   } = useForm<IForm>({
-    mode: 'onSubmit',
+    mode: 'onChange',
     defaultValues: {
       id: '',
       password: '',

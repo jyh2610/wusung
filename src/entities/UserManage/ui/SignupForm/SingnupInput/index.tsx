@@ -12,6 +12,7 @@ interface Props {
   name?: string;
   rules?: object;
   error?: string;
+  value?: string;
 }
 
 export function SignupInput({
@@ -22,6 +23,7 @@ export function SignupInput({
   name,
   rules,
   error,
+  value,
   type = 'text'
 }: Props) {
   return (
@@ -38,6 +40,7 @@ export function SignupInput({
           register={register}
           rules={rules}
           error={error}
+          value={value}
           label={
             <div className={labelContainer}>
               <span>{label}</span>

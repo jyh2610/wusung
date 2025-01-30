@@ -1,8 +1,9 @@
 import { LoginModal } from '@/entities';
+import { pageContainer } from '../signup/index.css';
 
 function Signin() {
   return (
-    <div>
+    <div className={pageContainer}>
       <LoginModal />
     </div>
   );

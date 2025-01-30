@@ -32,6 +32,8 @@ export const Input: React.FC<InputProps> = ({
   rules,
   register,
   error,
+  onChange,
+  value,
   ...props
 }) => {
   const isVertical = labelPosition === 'vertical';
@@ -60,6 +62,7 @@ export const Input: React.FC<InputProps> = ({
         <input
           style={{}}
           type={type}
+          value={value}
           placeholder={placeholder}
           className={`${inputClass} ${inputSizeClass[inputSize]}`}
           {...(register ? register : {})}

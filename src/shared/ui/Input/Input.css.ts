@@ -15,7 +15,7 @@ export const inputSizeClass = styleVariants({
   },
   small: {},
   medium: {
-    width: '280px',
+    width: '100%',
     height: '57px'
   },
   large: {}
