@@ -26,7 +26,7 @@ export const MainStyles = style({
 });
 
 export const layout = style({
-  marginTop: '135px',
+  marginTop: '140.4px',
   minHeight: 'calc(100vh - 303px)',
   flex: 1,
   backgroundColor: 'rgba(251, 250, 247, 1)'

@@ -3,10 +3,17 @@
 import { useState } from 'react';
 import { useDaumPostcodePopup } from 'react-daum-postcode';
 import {
+  UseFormRegister,
+  FieldErrors,
+  UseFormWatch,
+  UseFormSetValue
+} from 'react-hook-form';
+import {
   verifyPhoneNum,
   checkAuthenticationNumber
 } from '@/entities/UserManage/api';
 import { emailList } from '@/entities/UserManage/const';
+import { IForm } from '@/entities/UserManage/type';
 import { SelectBox } from '@/shared';
 import { Button } from '@/shared/ui';
 import { inputContainer, subButton } from '../index.css';
@@ -17,7 +24,6 @@ import {
   generateDays,
   handleComplete
 } from '../utils';
-import { IProps } from './CommonSignupInput';
 import {
   inputBox,
   birthContainer,
@@ -31,6 +37,14 @@ import PhoneAuthModal from './PhoneAuthModal';
 
 const scriptUrl =
   'https://t1.daumcdn.net/mapjsapi/bundle/postcode/prod/postcode.v2.js';
+
+export interface IProps {
+  register: UseFormRegister<IForm>;
+  errors: FieldErrors<IForm>;
+  type?: string;
+  watch: UseFormWatch<IForm>;
+  setValue: UseFormSetValue<IForm>;
+}
 
 export const LocationInfo = ({
   type = 'company',
@@ -51,7 +65,7 @@ export const LocationInfo = ({
     open({
       onComplete: data => {
         const res = handleComplete(data);
-        setValue && setValue('address', res);
+        setValue('address', res);
       }
     });
   };
@@ -109,15 +123,15 @@ export const LocationInfo = ({
         )}
         <div className={searchAddress}>
           <SignupInput
-            register={register('address', {
+            {...register('address', {
               required:
                 type === 'indivisual'
                   ? false
                   : { value: true, message: '반드시 입력해주세요.' }
             })}
-            error={errors.address && errors.address?.message}
+            error={errors.address?.message}
             label={'주소'}
-            isNeed={type === 'indivisual' ? false : true}
+            isNeed={type !== 'indivisual'}
             placeholder={'주소를 검색해주세요'}
           />
           <div className={subButton}>

@@ -4,5 +4,6 @@ export const routeMap = {
   signup: '/signup',
   about: '/about',
   payment: '/payment',
-  program: '/program'
+  program: '/program',
+  introduce: '/introduce'
 };

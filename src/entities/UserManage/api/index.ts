@@ -1,5 +1,5 @@
 import request from '@/shared/api/axiosInstance';
-import { ILoginData, IPostCheckIdRes } from '../type';
+import { IForm, ILoginData, IPostCheckIdRes } from '../type';
 
 export const checkUserName = async (userName: string) => {
   const res = await request<IPostCheckIdRes>({
@@ -66,5 +66,15 @@ export const verifyCoporate = async ({
       b_nm
     }
   });
+  return res.data;
+};
+
+export const individualSignup = async (form: IForm) => {
+  const res = await request<ILoginData>({
+    method: 'POST',
+    url: '/api/common/signup/individual',
+    data: form
+  });
+  console.log(res.data);
   return res.data;
 };

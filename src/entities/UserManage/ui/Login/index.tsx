@@ -1,6 +1,10 @@
 'use client';
 
+import Link from 'next/link';
 import React from 'react';
+import { useForm } from 'react-hook-form';
+import { login } from '@/entities/MainBanner/api';
+import { routeMap } from '@/shared';
 import { Button, Input } from '@/shared/ui';
 import {
   buttonContainer,
@@ -15,10 +19,6 @@ import {
   loginHeader,
   loginInput
 } from './index.css';
-import Link from 'next/link';
-import { routeMap } from '@/shared';
-import { login } from '@/entities/MainBanner/api';
-import { useForm } from 'react-hook-form';
 
 interface ILoginForm {
   id: string;
@@ -97,11 +97,11 @@ export function LoginModal() {
           </div>
 
           <div className={label}>
-            <Link className={hover} href={'/signin'}>
+            <Link className={hover} href={'/signin/find/id'}>
               아이디 찾기
             </Link>
             <span className={findAccountSpan}>|</span>
-            <Link className={hover} href={''}>
+            <Link className={hover} href={'/signin/find/password'}>
               비밀번호 찾기
             </Link>
           </div>

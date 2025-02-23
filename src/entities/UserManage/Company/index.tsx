@@ -4,6 +4,7 @@ import { useForm } from 'react-hook-form';
 import { colors } from '@/design-tokens';
 import { CommonSignupInput, LocationInfo } from '@/entities';
 import { Button } from '@/shared/ui';
+import { individualSignup } from '../api';
 import { IForm } from '../type';
 import { CompanyForm } from '../ui/SignupForm/Company';
 import { TermsOfUse } from '../ui/SignupForm/TermsOfUse';
@@ -39,8 +40,9 @@ export function Company() {
       termOfUse: [false, false]
     }
   });
-  const onSubmit = (data: unknown) => {
+  const onSubmit = async (data: IForm) => {
     console.log(data);
+    await individualSignup(data);
   };
 
   console.log(watch());
@@ -83,12 +85,13 @@ export function Company() {
         <TermsOfUse setValue={setValue} watch={watch} />
         <div className={submitButton}>
           <Button
+            btnType="submit"
             type={'beforeSelection'}
             content={'가입하기'}
-            onClick={(e: React.MouseEvent<HTMLButtonElement>) => {
-              e.preventDefault();
-              handleSubmit(onSubmit)();
-            }}
+            // onClick={(e: React.MouseEvent<HTMLButtonElement>) => {
+            //   e.preventDefault();
+            //   handleSubmit(onSubmit)();
+            // }}
           />
         </div>
       </form>

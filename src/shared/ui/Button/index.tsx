@@ -7,9 +7,11 @@ interface ButtonType {
   btnSize?: 'small' | 'medium' | 'large';
   // eslint-disable-next-line @typescript-eslint/no-explicit-any
   onClick?: (e: any) => void;
+  btnType?: 'button' | 'submit' | 'reset' | undefined;
 }
 
 export const Button = ({
+  btnType = 'button',
   content,
   type = 'default',
   onClick,
@@ -29,10 +31,12 @@ export const Button = ({
 export const BorderButton = ({
   content,
   type = 'default',
+  btnType,
   ...props
 }: ButtonType) => {
   return (
     <button
+      type={btnType}
       className={`${borderButtonBase} ${buttonVariants[type]}`}
       {...props}
     >

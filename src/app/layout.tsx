@@ -21,7 +21,8 @@ export default function RootLayout({
     <html lang="ko">
       <body
         style={{
-          backgroundColor: colors.bg
+          backgroundColor: colors.bg,
+          position: 'relative'
         }}
       >
         <QueryProvider>

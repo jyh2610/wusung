@@ -4,7 +4,7 @@ import { colors } from '@/design-tokens';
 
 export const NavStyle = style({
   width: '100vw',
-  height: '135px',
+  height: '11%',
   position: 'fixed',
   top: '0',
   display: 'flex',

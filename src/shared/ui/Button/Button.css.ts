@@ -30,8 +30,8 @@ export const borderButtonBase = style({
 //'small' | 'medium' | 'large';
 export const buttonVariants = styleVariants({
   default: {
-    backgroundColor: colors.gray_scale['default'],
-    color: colors.gray_scale['default']
+    backgroundColor: 'transparent',
+    color: colors.gray_scale['700']
   },
   beforeSelection: {
     backgroundColor: colors.gray_scale['500'],

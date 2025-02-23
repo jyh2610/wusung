@@ -25,7 +25,6 @@ export function IndividualComponent() {
     setValue,
     formState: { errors }
   } = useForm<IForm>({
-    mode: 'onChange',
     defaultValues: {
       id: '',
       password: '',
@@ -72,12 +71,18 @@ export function IndividualComponent() {
         <LocationInfo
           type={'indivisual'}
           register={register}
+          setValue={setValue}
           errors={errors}
           watch={watch}
         />
         <TermsOfUse watch={watch} setValue={setValue} />
         <div className={submitButton}>
-          <Button type={'beforeSelection'} content={'가입하기'} />
+          <Button
+            btnType="submit"
+            type={'beforeSelection'}
+            content={'가입하기'}
+            onClick={() => handleSubmit(onSubmit)}
+          />
         </div>
       </form>
     </div>

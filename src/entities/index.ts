@@ -8,3 +8,5 @@ export {
   LocationInfo
 } from './UserManage/ui/SignupForm/CommonSignupInput';
 export { LoginModal } from './UserManage/index';
+export { FindAccounts } from './UserManage';
+export { FloatingMenu } from './floatingMenu/index';

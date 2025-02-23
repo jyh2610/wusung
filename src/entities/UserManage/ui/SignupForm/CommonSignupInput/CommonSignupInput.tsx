@@ -1,6 +1,6 @@
 'use client';
 
-import { useState } from 'react';
+import { useEffect, useState } from 'react';
 import {
   Control,
   FieldErrors,
@@ -37,7 +37,6 @@ export function CommonSignupInput({ register, errors, watch }: IProps) {
       console.log(err);
     }
   };
-
   const password = watch('password');
   const id = watch('id');
   console.log(watch('password'));
@@ -45,6 +44,23 @@ export function CommonSignupInput({ register, errors, watch }: IProps) {
     display: 'flex',
     alignItems: 'center'
   };
+
+  useEffect(() => {
+    if (!id) return; // 값이 비어있으면 실행하지 않음
+
+    const delayDebounceFn = setTimeout(async () => {
+      try {
+        const res = await checkUserName(id);
+        const isAvailable = res.message === '사용 가능한 아이디입니다.';
+        setValidateUserName(isAvailable);
+      } catch (err) {
+        console.error(err);
+      }
+    }, 500); // 500ms 딜레이 (디바운스)
+
+    return () => clearTimeout(delayDebounceFn); // Cleanup function
+  }, [id]); // ✅ id가 변경될 때만 실행됨
+
   return (
     <div className={inputContainer}>
       <div className={searchAddress}>
