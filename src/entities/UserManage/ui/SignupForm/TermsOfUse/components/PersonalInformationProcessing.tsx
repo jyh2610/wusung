@@ -1,4 +1,5 @@
 import React from 'react';
+import { colors } from '@/design-tokens';
 import { Button, Modal } from '@/shared/ui';
 import {
   cellStyle,
@@ -6,7 +7,6 @@ import {
   personalModalBody,
   title
 } from './index.css';
-import { colors } from '@/design-tokens';
 
 interface IProps {
   isModal: boolean;

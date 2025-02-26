@@ -1,5 +1,5 @@
-import { Button, Modal } from '@/shared/ui';
 import React from 'react';
+import { Button, Modal } from '@/shared/ui';
 
 interface IProps {
   isModal: boolean;

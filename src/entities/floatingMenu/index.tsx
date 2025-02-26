@@ -1,10 +1,13 @@
 'use client';
 
 import { usePathname, useRouter } from 'next/navigation';
+import { FaLocationDot } from 'react-icons/fa6';
+import { IoMdCall } from 'react-icons/io';
 import { colors } from '@/design-tokens';
 import { routeMap } from '@/shared';
+import { companyInfo } from '@/shared/const/Info';
 import { HorizontalLine } from '@/shared/ui/VerticalLine';
-import { menuList } from './const';
+import { MenuList } from './const';
 import {
   container,
   header,
@@ -19,11 +22,8 @@ import {
   listItem,
   selectedItem
 } from './index.css';
-import { companyInfo } from '@/shared/const/Info';
-import { IoMdCall } from 'react-icons/io';
-import { FaLocationDot } from 'react-icons/fa6';
 
-export function FloatingMenu() {
+export function FloatingMenu({ menuList }: { menuList: MenuList }) {
   const pathname = usePathname();
   const currentEndpoint = pathname.split('/').pop() || '';
   const router = useRouter();
@@ -42,7 +42,7 @@ export function FloatingMenu() {
         {list.map(item => (
           <li
             className={`${listItem} ${currentEndpoint === item ? selectedItem : ''}`}
-            key={item}
+            key={item.toString()}
             onClick={() => router.push(routeMap.introduce + '/' + item)}
           >
             {menuList.subTitle[item]}

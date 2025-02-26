@@ -1,9 +1,9 @@
-import React from 'react';
 import Image from 'next/image';
-import { container } from './index.css';
-import { Button } from '@/shared/ui';
-import { colors } from '@/design-tokens';
 import Link from 'next/link';
+import React from 'react';
+import { colors } from '@/design-tokens';
+import { Button } from '@/shared/ui';
+import { container } from './index.css';
 
 function Complete() {
   return (
@@ -64,7 +64,7 @@ function Complete() {
           }}
           href={'/'}
         >
-          <Button type="brand" content="로그인 하기" />
+          {/* <Button type="brand" content="로그인 하기" /> */}
         </Link>
       </div>
     </div>

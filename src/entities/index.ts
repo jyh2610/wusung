@@ -10,3 +10,4 @@ export {
 export { LoginModal } from './UserManage/index';
 export { FindAccounts } from './UserManage';
 export { FloatingMenu } from './floatingMenu/index';
+export { PaymentComponent } from './payment/index';

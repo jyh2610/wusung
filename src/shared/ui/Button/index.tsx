@@ -2,12 +2,12 @@ import React from 'react';
 import { borderButtonBase, buttonBase, buttonVariants } from './Button.css';
 
 interface ButtonType {
-  content: string;
   type?: 'default' | 'brand' | 'borderBrand' | 'beforeSelection';
   btnSize?: 'small' | 'medium' | 'large';
   // eslint-disable-next-line @typescript-eslint/no-explicit-any
   onClick?: (e: any) => void;
   btnType?: 'button' | 'submit' | 'reset' | undefined;
+  content: string;
 }
 
 export const Button = ({

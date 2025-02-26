@@ -1,7 +1,4 @@
-export const menuList = {
-  title: '우성인지펜 소개',
-  subTitle: {
-    greeting: '인사말',
-    map: '오시는길'
-  }
+export type MenuList = {
+  title: string;
+  subTitle: Record<string, string>; // 문자열 키-값 구조
 };

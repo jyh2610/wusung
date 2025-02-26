@@ -2,6 +2,10 @@
 
 import Image from 'next/image';
 import React, { useState } from 'react';
+import { UseFormSetValue, UseFormWatch } from 'react-hook-form';
+import { IoIosArrowForward, IoIosCheckmarkCircle } from 'react-icons/io';
+import { colors } from '@/design-tokens';
+import { IForm } from '@/entities/UserManage/type';
 import { inputContainer } from '../index.css';
 import { PersonalInformationProcessing } from './components/PersonalInformationProcessing';
 import { TermsOfUseModal } from './components/TermsOfUseModal';
@@ -14,10 +18,6 @@ import {
   selectBox,
   selectContainer
 } from './index.css';
-import { IForm } from '@/entities/UserManage/type';
-import { UseFormSetValue, UseFormWatch } from 'react-hook-form';
-import { IoIosArrowForward, IoIosCheckmarkCircle } from 'react-icons/io';
-import { colors } from '@/design-tokens';
 
 export function TermsOfUse({
   setValue,
