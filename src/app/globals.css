@@ -1,3 +1,7 @@
+@tailwind base;
+@tailwind components;
+@tailwind utilities;
+
 @font-face {
   font-family: 'Pretendard';
   src: url('/fonts/PretendardVariable.ttf') format('truetype'); /* TTF 파일 경로 */

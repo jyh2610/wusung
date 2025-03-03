@@ -1,9 +1,11 @@
 import { colors } from '@/design-tokens';
 import { Benefit, PaymentBody } from './ui';
+import { PaymentMethod } from './ui/paymentBody';
+import { Button } from '@/shared/ui';
 
 export function PaymentComponent() {
   return (
-    <div style={{ height: '100%', width: '928px' }}>
+    <div style={{ height: '100%', width: '888px' }}>
       <div>
         <h1
           style={{
@@ -19,6 +21,15 @@ export function PaymentComponent() {
       <div>
         <Benefit />
         <PaymentBody />
+        <div
+          style={{
+            width: '240px',
+            height: '56px',
+            margin: '40px auto 0 auto'
+          }}
+        >
+          <Button content="결제하기" type="brand" />
+        </div>
       </div>
     </div>
   );

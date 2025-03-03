@@ -26,6 +26,7 @@ import {
 export function FloatingMenu({ menuList }: { menuList: MenuList }) {
   const pathname = usePathname();
   const currentEndpoint = pathname.split('/').pop() || '';
+  const firstEndpoint = pathname.split('/')[1] || '';
   const router = useRouter();
 
   const list = Object.keys(menuList.subTitle) as Array<
@@ -43,7 +44,7 @@ export function FloatingMenu({ menuList }: { menuList: MenuList }) {
           <li
             className={`${listItem} ${currentEndpoint === item ? selectedItem : ''}`}
             key={item.toString()}
-            onClick={() => router.push(routeMap.introduce + '/' + item)}
+            onClick={() => router.push(`/${firstEndpoint}/${item}`)}
           >
             {menuList.subTitle[item]}
           </li>

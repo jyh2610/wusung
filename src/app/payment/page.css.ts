@@ -5,5 +5,5 @@ export const layoutContainer = style({
   display: 'flex',
   justifyContent: 'center',
   gap: '112px',
-  paddingTop: '80px'
+  paddingTop: '60px'
 });

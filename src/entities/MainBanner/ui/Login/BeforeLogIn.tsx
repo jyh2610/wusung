@@ -25,8 +25,13 @@ export function BeforeLogIn() {
   const navigate = useRouter();
 
   const sendLogin = async () => {
+    console.log(loginData);
+
     try {
-      await login(loginData);
+      await login({
+        userName: loginData.userName,
+        password: loginData.password
+      });
       showSuccessAlert('로그인 성공');
     } catch (error) {
       showErrorAlert('로그인 실패');
@@ -45,12 +50,14 @@ export function BeforeLogIn() {
           placeholder="아이디를 입력해 주세요"
           labelPosition="vertical"
           labelInputGap={4}
+          value={loginData.userName} // 추가
           onChange={e =>
             setLoginData(prev => {
               return { ...prev, userName: e.target.value };
             })
           }
         />
+
         <Input
           type="password"
           labelPosition="vertical"
@@ -58,6 +65,7 @@ export function BeforeLogIn() {
           label="비밀번호"
           inputSize="medium"
           placeholder="비밀번호를 입력해 주세요"
+          value={loginData.password} // 추가
           onChange={e =>
             setLoginData(prev => {
               return { ...prev, password: e.target.value };

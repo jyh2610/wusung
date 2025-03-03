@@ -9,7 +9,7 @@ export const benefit = {
 };
 
 export const paymentList = {
-  threeMonth: 50000,
-  sixMonth: 95000,
-  oneYear: 180000
+  threeMonth: [50000],
+  sixMonth: [95000, 100000],
+  oneYear: [180000, 200000]
 };
