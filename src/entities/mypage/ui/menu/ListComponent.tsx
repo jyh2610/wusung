@@ -17,7 +17,7 @@ export const ListComponent = ({
 }: ListItem) => {
   return (
     <li onClick={() => onClick(label)} className={liBox}>
-      {icon}
+      <span style={{ margin: 'auto 0' }}>{icon}</span>
       <span className={isSelected ? selectedText : text}>{label}</span>
     </li>
   );

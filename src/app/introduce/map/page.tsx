@@ -7,7 +7,7 @@ import { container, infoContainer, infoTitle } from './page.css';
 
 function Map() {
   return (
-    <div style={{ height: '100%' }}>
+    <div>
       <div>
         <h1
           style={{

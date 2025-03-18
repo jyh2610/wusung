@@ -1,10 +1,11 @@
 'use client';
 
 import { useState } from 'react';
-import { IoReceiptOutline } from 'react-icons/io5';
 import { AiFillQuestionCircle } from 'react-icons/ai';
 import { FaUserCog, FaCog } from 'react-icons/fa';
-import { ListComponent } from './ListComponent';
+import { IoReceiptOutline } from 'react-icons/io5';
+import { Button } from '@/shared/ui';
+import { menuItems } from '../../const';
 import {
   PaymentHistory,
   InquiryHistory,
@@ -20,8 +21,7 @@ import {
   useDateDuration,
   useDateTitle
 } from './index.css';
-import { Button } from '@/shared/ui';
-import { menuItems } from '../../const';
+import { ListComponent } from './ListComponent';
 export function MypageMenu({
   selectedMenu,
   setSelectedMenu

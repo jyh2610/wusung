@@ -16,5 +16,12 @@ export const footerStyle = style({
 export const footerContentStyle = style({
   marginLeft: '280px',
   paddingTop: '40px',
-  paddingBottom: '40px'
+  paddingBottom: '40px',
+
+  '@media': {
+    '(max-width: 1024px)': {
+      paddingTop: '10px',
+      paddingBottom: '10px'
+    }
+  }
 });

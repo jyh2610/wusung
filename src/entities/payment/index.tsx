@@ -5,7 +5,7 @@ import { Button } from '@/shared/ui';
 
 export function PaymentComponent() {
   return (
-    <div style={{ height: '100%', width: '888px' }}>
+    <div style={{ width: '888px' }}>
       <div>
         <h1
           style={{

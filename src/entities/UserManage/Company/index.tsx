@@ -88,10 +88,9 @@ export function Company() {
             btnType="submit"
             type={'beforeSelection'}
             content={'가입하기'}
-            // onClick={(e: React.MouseEvent<HTMLButtonElement>) => {
-            //   e.preventDefault();
-            //   handleSubmit(onSubmit)();
-            // }}
+            onClick={() => {
+              handleSubmit(onSubmit);
+            }}
           />
         </div>
       </form>

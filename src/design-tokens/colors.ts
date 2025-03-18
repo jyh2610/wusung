@@ -12,6 +12,7 @@ export const colors = {
   },
   gray_scale: {
     default: '#FFFFFF',
+    100: '#F5F5F5',
     200: '#EFEFEF',
     300: '#E2E2E2',
     400: '#BFBFBF',

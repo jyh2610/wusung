@@ -3,7 +3,6 @@ import { colors } from '@/design-tokens';
 
 export const container = style({
   width: '100%',
-  height: 'calc(100vh - 303px)',
   display: 'flex',
   flexDirection: 'column',
   justifyContent: 'center',
