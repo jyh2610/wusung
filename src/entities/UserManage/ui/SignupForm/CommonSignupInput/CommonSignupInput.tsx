@@ -39,7 +39,6 @@ export function CommonSignupInput({ register, errors, watch }: IProps) {
   };
   const password = watch('password');
   const id = watch('id');
-  console.log(watch('password'));
   const commonStyle = {
     display: 'flex',
     alignItems: 'center'

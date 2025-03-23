@@ -34,19 +34,16 @@ export function SignupInput({
     >
       <div className={inputHeight}>
         <Input
-          name={name}
-          placeholder={placeholder}
           type={type}
-          register={register}
-          rules={rules}
+          placeholder={placeholder}
           error={error}
-          value={value}
           label={
             <div className={labelContainer}>
               <span>{label}</span>
               {isNeed && <span className={starSpan}>*</span>}
             </div>
           }
+          {...(register ? register : {})} // ✅ register를 직접 적용
         />
       </div>
     </div>

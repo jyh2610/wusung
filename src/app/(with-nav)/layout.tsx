@@ -1,10 +1,10 @@
 import localFont from '@next/font/local';
 import type { Metadata } from 'next';
-import './globals.css';
+import '../globals.css';
 import { colors } from '@/design-tokens';
 import { Footer } from '@/entities';
 import { Nav } from '@/entities/Nav';
-import { QueryProvider, NextUiProvider } from './_provider';
+import { NextUiProvider, QueryProvider } from '../_provider';
 import { layout } from './style.css';
 
 export const metadata: Metadata = {
@@ -18,17 +18,16 @@ export default function RootLayout({
   children: React.ReactNode;
 }) {
   return (
-    <html lang="ko">
-      <body
-        style={{
-          backgroundColor: colors.bg,
-          position: 'relative'
-        }}
-      >
-        <QueryProvider>
-          <NextUiProvider>{children}</NextUiProvider>
-        </QueryProvider>
-      </body>
-    </html>
+    <div
+      style={{
+        backgroundColor: colors.bg,
+        position: 'relative',
+        minHeight: 'calc(100vh - 140.4px)'
+      }}
+    >
+      <Nav />
+      <main className={layout}>{children}</main>
+      <Footer />
+    </div>
   );
 }

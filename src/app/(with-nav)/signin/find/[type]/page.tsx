@@ -1,7 +1,7 @@
 'use client';
 import { useParams } from 'next/navigation';
 import React from 'react';
-import { pageContainer } from '@/app/signup/index.css';
+import { pageContainer } from '@/app/(with-nav)/signup/index.css';
 import { FindAccounts } from '@/entities';
 
 function Find() {

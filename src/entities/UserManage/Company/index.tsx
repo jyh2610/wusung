@@ -22,6 +22,7 @@ export function Company() {
     handleSubmit,
     watch,
     setValue,
+    trigger,
     formState: { errors }
   } = useForm<IForm>({
     mode: 'onChange',
@@ -45,7 +46,7 @@ export function Company() {
     await individualSignup(data);
   };
 
-  console.log(watch());
+  console.log('📌 현재 폼 상태:', watch());
 
   return (
     <div className={inputContainer}>
