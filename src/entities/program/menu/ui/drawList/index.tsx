@@ -1,12 +1,12 @@
 'use client';
 
-import { colors } from '@/design-tokens';
-import { IoIosAddCircle } from 'react-icons/io';
-import { titleContainer, title } from '../../index.css';
-import { Dispatch, SetStateAction, useState } from 'react';
 import { Box } from '@mui/material';
-import { SearchBar } from '../serachBar';
+import { Dispatch, SetStateAction, useState } from 'react';
+import { IoIosAddCircle } from 'react-icons/io';
+import { colors } from '@/design-tokens';
+import { titleContainer, title } from '../../index.css';
 import { UserBox } from '../../userBox';
+import { SearchBar } from '../serachBar';
 import { useBoxContainer } from './index.css';
 
 interface IProps {

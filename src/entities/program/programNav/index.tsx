@@ -1,5 +1,8 @@
+import { AppBar } from '@mui/material';
 import Image from 'next/image';
 import React from 'react';
+import { colors } from '@/design-tokens';
+import { Button } from '@/shared/ui';
 import {
   container,
   imgContainer,
@@ -7,10 +10,7 @@ import {
   textAlign,
   userInfoContainer
 } from './index.css';
-import { Button } from '@/shared/ui';
 import { btn } from './ui/navBtn/index.css';
-import { colors } from '@/design-tokens';
-import { AppBar } from '@mui/material';
 
 export function ProgramNav() {
   return (

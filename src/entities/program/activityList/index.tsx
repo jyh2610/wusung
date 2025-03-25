@@ -9,14 +9,13 @@ import {
   useTheme
 } from '@mui/material';
 import React, { useState } from 'react';
+import { colors } from '@/design-tokens';
+import { Activity } from './Activity';
 import {
   activityListContainer,
   difficultyBox,
   titleContainer
 } from './index.css';
-
-import { colors } from '@/design-tokens';
-import { Activity } from './Activity';
 
 const names = [
   'Oliver Hansen',

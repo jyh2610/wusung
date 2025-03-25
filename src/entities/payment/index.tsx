@@ -1,7 +1,6 @@
 import { colors } from '@/design-tokens';
-import { Benefit, PaymentBody } from './ui';
-import { PaymentMethod } from './ui/paymentBody';
 import { Button } from '@/shared/ui';
+import { Benefit, PaymentBody } from './ui';
 
 export function PaymentComponent() {
   return (

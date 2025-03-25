@@ -1,6 +1,6 @@
 import { style } from '@vanilla-extract/css';
-import { colors } from '@/design-tokens';
 import { recipe } from '@vanilla-extract/recipes';
+import { colors } from '@/design-tokens';
 
 export const titleContainer = style({
   display: 'flex',

@@ -1,5 +1,6 @@
 'use client';
 
+import { useState } from 'react';
 import { paymentList } from '../../const';
 import {
   container,
@@ -16,8 +17,6 @@ import {
   defaultPaymentTheme,
   selectedPaymentTheme
 } from './index.css';
-import { useState } from 'react';
-import { number } from 'prop-types';
 
 export function PaymentBody() {
   return (

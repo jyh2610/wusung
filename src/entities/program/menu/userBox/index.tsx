@@ -1,5 +1,6 @@
-import React, { Dispatch, SetStateAction, useState } from 'react';
 import classNames from 'classnames'; // 👈 여러 클래스를 동적으로 적용할 수 있음
+import Image from 'next/image';
+import React, { Dispatch, SetStateAction, useState } from 'react';
 import {
   container,
   selectedContainer,
@@ -12,7 +13,6 @@ import {
   roleBox,
   selectedOptContainer
 } from './index.css';
-import Image from 'next/image';
 
 interface IProps {
   isSelected: boolean;

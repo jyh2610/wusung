@@ -1,7 +1,7 @@
 import React from 'react';
-import { controlContainer, buttonStyle } from './index.css';
-import { LuUndo2, LuRedo2 } from 'react-icons/lu';
 import { IoReload } from 'react-icons/io5';
+import { LuUndo2, LuRedo2 } from 'react-icons/lu';
+import { controlContainer, buttonStyle } from './index.css';
 export function Control() {
   const date = new Date();
   const month = date.getMonth() + 1;
