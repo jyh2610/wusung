@@ -4,42 +4,9 @@ export const container = style({
   marginTop: '2rem'
 });
 
-export const header = style({
-  display: 'flex',
-  justifyContent: 'space-between',
-  alignItems: 'center',
-  marginBottom: '1rem'
-});
-
-export const monthTitle = style({
-  fontSize: '1.25rem',
-  fontWeight: '500'
-});
-
-export const button = style({
-  backgroundColor: '#ec008c',
-  color: 'white',
-  borderRadius: '0.375rem',
-  padding: '0.5rem 1rem',
-  ':hover': {
-    backgroundColor: '#d0007a'
-  }
-});
-
-export const buttonOutline = style({
-  border: '1px solid #ec008c',
-  color: '#ec008c',
-  borderRadius: '9999px',
-  padding: '0.5rem 1rem',
-  display: 'flex',
-  alignItems: 'center',
-  gap: '0.25rem',
-  fontSize: '0.875rem'
-});
-
 export const grid = style({
   display: 'grid',
-  gridTemplateColumns: 'repeat(7, 1fr)',
+  gridTemplateColumns: '1fr repeat(7, 1fr)', // 주차 1칸 + 요일 7칸
   textAlign: 'center',
   padding: '0.5rem 0',
   borderBottom: '1px solid #ddd',
@@ -49,13 +16,16 @@ export const grid = style({
 export const gridItem = style({
   padding: '0.5rem',
   textAlign: 'center',
-  borderRight: '1px solid #ddd'
+  borderRight: '1px solid #ddd',
+  minHeight: '50px' // 모든 칸 높이 통일
 });
 
 export const weekLabel = style({
+  fontWeight: 'bold',
+  backgroundColor: '#e0e0e0',
   display: 'flex',
   alignItems: 'center',
-  gap: '0.25rem'
+  justifyContent: 'center'
 });
 
 export const highlighted = style({
@@ -66,8 +36,7 @@ export const highlighted = style({
   display: 'flex',
   justifyContent: 'center',
   alignItems: 'center',
-  marginLeft: 'auto',
-  marginRight: 'auto'
+  margin: 'auto'
 });
 
 export const redText = style({
@@ -80,16 +49,19 @@ export const blueText = style({
 
 export const activityRow = style({
   display: 'grid',
-  gridTemplateColumns: 'repeat(8, 1fr)',
-  borderBottom: '1px solid #ddd'
+  gridTemplateColumns: '1fr repeat(7, 1fr)', // 주차 1칸 + 요일 7칸
+  borderBottom: '1px solid #ddd',
+  backgroundColor: '#fff'
 });
 
 export const activityCell = style({
   padding: '0.5rem',
   textAlign: 'center',
-  borderRight: '1px solid #ddd'
+  borderRight: '1px solid #ddd',
+  minHeight: '50px' // 모든 칸 높이 동일하게 설정
 });
 
 export const activityLabel = style({
+  fontWeight: 'bold',
   backgroundColor: '#f9fafb'
 });

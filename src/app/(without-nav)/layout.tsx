@@ -1,6 +1,5 @@
 import TemporaryDrawer from '@/entities/program/menu/DrawerMenu';
 import { ProgramNav } from '@/entities/program/programNav';
-import React from 'react';
 
 const drawerWidth = 300; // 사이드바 너비
 

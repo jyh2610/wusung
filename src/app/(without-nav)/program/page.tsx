@@ -1,5 +1,4 @@
 import { ProgramComponent } from '@/entities';
-import React from 'react';
 
 function Program() {
   return (
