@@ -1,4 +1,5 @@
 import { style } from '@vanilla-extract/css';
+import { colors } from '@/design-tokens';
 
 export const container = style({
   marginTop: '2rem'
@@ -8,21 +9,26 @@ export const grid = style({
   display: 'grid',
   gridTemplateColumns: '1fr repeat(7, 1fr)', // 주차 1칸 + 요일 7칸
   textAlign: 'center',
-  padding: '0.5rem 0',
-  borderBottom: '1px solid #ddd',
-  backgroundColor: '#f9fafb'
+  borderBottom: `1px solid ${colors.gray_scale[300]}`
+});
+
+export const weekDay = style({
+  padding: '3px 0',
+  borderTop: `1px solid ${colors.gray_scale[300]}`
 });
 
 export const gridItem = style({
-  padding: '0.5rem',
+  padding: '0 12px',
   textAlign: 'center',
-  borderRight: '1px solid #ddd',
-  minHeight: '50px' // 모든 칸 높이 통일
+  borderRight: `1px solid ${colors.gray_scale[300]}`,
+  minHeight: '50px',
+  display: 'flex',
+  alignItems: 'center',
+  justifyContent: 'space-between'
 });
 
 export const weekLabel = style({
   fontWeight: 'bold',
-  backgroundColor: '#e0e0e0',
   display: 'flex',
   alignItems: 'center',
   justifyContent: 'center'
@@ -50,18 +56,16 @@ export const blueText = style({
 export const activityRow = style({
   display: 'grid',
   gridTemplateColumns: '1fr repeat(7, 1fr)', // 주차 1칸 + 요일 7칸
-  borderBottom: '1px solid #ddd',
-  backgroundColor: '#fff'
+  borderBottom: `1px solid ${colors.gray_scale[300]}`
 });
 
 export const activityCell = style({
   padding: '0.5rem',
   textAlign: 'center',
-  borderRight: '1px solid #ddd',
+  borderRight: `1px solid ${colors.gray_scale[300]}`,
   minHeight: '50px' // 모든 칸 높이 동일하게 설정
 });
 
 export const activityLabel = style({
-  fontWeight: 'bold',
-  backgroundColor: '#f9fafb'
+  fontWeight: 'bold'
 });

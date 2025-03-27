@@ -11,7 +11,8 @@ import {
   blueText,
   activityRow,
   activityCell,
-  activityLabel
+  activityLabel,
+  weekDay
 } from './index.css';
 
 export function Calendar() {
@@ -71,11 +72,8 @@ export function Calendar() {
 
   return (
     <div className={container}>
-      <h2>
-        {year}년 {month}
-      </h2>
       {/* 요일 헤더 */}
-      <div className={grid}>
+      <div className={`${grid} ${weekDay}`}>
         <div className={weekLabel} />
         <div className={redText}>일</div>
         <div>월</div>
@@ -91,7 +89,10 @@ export function Calendar() {
         <div key={weekIdx}>
           {/* 날짜 행 */}
           <div className={grid}>
-            <div className={`${gridItem} ${weekLabel}`}>{weekIdx + 1}주차</div>
+            <div className={`${gridItem} ${weekLabel}`}>
+              {weekIdx + 1}주차
+              <input type="checkbox" />
+            </div>
             {week.map((dayNum, i) => {
               const isHighlighted = dayNum === today.getDate();
               const isRed = i === 0;
@@ -99,28 +100,21 @@ export function Calendar() {
 
               return (
                 <div key={i} className={gridItem}>
-                  <label
-                    style={{
-                      display: 'flex',
-                      flexDirection: 'column',
-                      alignItems: 'center'
-                    }}
+                  <span
+                    className={`${isRed ? redText : ''} ${isBlue ? blueText : ''} ${
+                      isHighlighted ? highlighted : ''
+                    }`}
                   >
-                    <span
-                      className={`${isRed ? redText : ''} ${isBlue ? blueText : ''} ${
-                        isHighlighted ? highlighted : ''
-                      }`}
-                    >
-                      {dayNum || ''}
-                    </span>
-                    {dayNum > 0 && (
-                      <input
-                        type="checkbox"
-                        checked={!!checkedDays[dayNum]}
-                        onChange={() => toggleCheckbox(dayNum)}
-                      />
-                    )}
-                  </label>
+                    {dayNum > 0 ? String(dayNum).padStart(2, '0') : ''}
+                  </span>
+
+                  {dayNum > 0 && (
+                    <input
+                      type="checkbox"
+                      checked={!!checkedDays[dayNum]}
+                      onChange={() => toggleCheckbox(dayNum)}
+                    />
+                  )}
                 </div>
               );
             })}
@@ -133,7 +127,7 @@ export function Calendar() {
             </div>
             {week.map((dayNum, i) => (
               <div key={i} className={activityCell}>
-                {dayNum > 0 ? '일정' : ''}
+                {dayNum > 0 ? '-' : ''}
               </div>
             ))}
           </div>
@@ -145,7 +139,7 @@ export function Calendar() {
             </div>
             {week.map((dayNum, i) => (
               <div key={i} className={activityCell}>
-                {dayNum > 0 ? '일정' : ''}
+                {dayNum > 0 ? '-' : ''}
               </div>
             ))}
           </div>
