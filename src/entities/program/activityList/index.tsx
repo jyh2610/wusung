@@ -1,5 +1,6 @@
 'use client';
 
+import { Droppable } from '@hello-pangea/dnd';
 import {
   MenuItem,
   OutlinedInput,
@@ -162,13 +163,25 @@ export function ActivityList() {
         </div>
       </div>
       <div className={activityListContainer}>
-        {activities.map((activity, index) => (
-          <Activity
-            key={index}
-            number={activity.number}
-            content={activity.content}
-          />
-        ))}
+        <Droppable droppableId="activityList">
+          {provided => (
+            <div
+              className={activityListContainer}
+              ref={provided.innerRef}
+              {...provided.droppableProps}
+            >
+              {activities.map((activity, index) => (
+                <Activity
+                  key={activity.number}
+                  number={activity.number}
+                  content={activity.content}
+                  index={index}
+                />
+              ))}
+              {provided.placeholder}
+            </div>
+          )}
+        </Droppable>
       </div>
     </div>
   );

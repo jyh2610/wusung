@@ -9,7 +9,7 @@ export const footerStyle = style({
   lineHeight: '22px',
   letterSpacing: '-2.5%',
   color: colors.gray_scale[700],
-  position: 'absolute',
+  // position: 'absolute',
   bottom: '0'
 });
 

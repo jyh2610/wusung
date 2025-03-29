@@ -4,12 +4,23 @@ import { Calendar } from './ui/calender';
 import { Control } from './ui/control';
 import Header from './ui/header';
 
-export function Scheduler() {
+interface Schedule {
+  [key: number]: {
+    cognitive?: string;
+    daily?: string;
+  };
+}
+
+interface CalendarProps {
+  schedule: Schedule;
+}
+
+export function Scheduler({ schedule }: CalendarProps) {
   return (
     <div className={container}>
       <Header />
       <Control />
-      <Calendar />
+      <Calendar schedule={schedule} />
     </div>
   );
 }
