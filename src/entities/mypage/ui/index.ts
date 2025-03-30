@@ -1,0 +1,1 @@
+export { MypageMenu } from './menu';
