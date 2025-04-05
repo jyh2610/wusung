@@ -90,3 +90,22 @@ export const getContentList = async (
     return undefined;
   }
 };
+
+export const getUserContentList = async ({
+  categoryId,
+  difficultyLevel
+}: {
+  categoryId: number;
+  difficultyLevel: number;
+}): Promise<IContent[] | undefined> => {
+  try {
+    const res = await request<ApiResponse>({
+      method: 'GET',
+      url: `/api/program/use/${categoryId}/${difficultyLevel}` // URL 수정 (category/list가 아닌 edu-content/list)
+    });
+    return res.data.data.content;
+  } catch (error) {
+    console.error(error);
+    return undefined;
+  }
+};

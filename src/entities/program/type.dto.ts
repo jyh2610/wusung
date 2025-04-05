@@ -17,6 +17,7 @@ export interface IContent {
   year: number;
   month: number;
   viewCount?: number;
+  thumbnailUrl: string;
   description?: string;
   isUsed?: boolean;
   createdAt?: string;

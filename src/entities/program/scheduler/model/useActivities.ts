@@ -1,15 +1,26 @@
 import { useState, useEffect } from 'react';
-import { getContentList } from '@/components/admin/api';
 import { IContent } from '../../type.dto';
+import { getContentList, getUserContentList } from '@/components/admin/api';
 
-export function useActivities() {
+interface IProps {
+  isAdmin: boolean;
+  categoryId: number;
+  difficultyLevel: number;
+}
+
+export function useActivities({
+  isAdmin,
+  categoryId,
+  difficultyLevel
+}: IProps) {
   const [activities, setActivities] = useState<IContent[]>([]);
 
-  const fetchActivities = async (
-    options = { categoryId: 1, difficultyLevel: 1 }
-  ) => {
+  const fetchActivities = async (options = { categoryId, difficultyLevel }) => {
     try {
-      const response = await getContentList(options);
+      const response = isAdmin
+        ? await getContentList(options)
+        : await getUserContentList(options);
+
       setActivities(response || []);
     } catch (error) {
       console.error('콘텐츠 목록 조회 실패:', error);
@@ -18,7 +29,7 @@ export function useActivities() {
 
   useEffect(() => {
     fetchActivities();
-  }, []);
+  }, [categoryId, difficultyLevel]);
 
   return { activities, fetchActivities, setActivities };
 }

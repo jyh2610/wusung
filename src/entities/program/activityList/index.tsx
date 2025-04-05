@@ -20,33 +20,27 @@ import {
 import { ICategoryLeaf, IContent } from '../type.dto';
 import { getCategoryLeaf } from '../api';
 
-const names = [
-  'Oliver Hansen',
-  'Van Henry',
-  'April Tucker',
-  'Ralph Hubbard',
-  'Omar Alexander',
-  'Carlos Abbott',
-  'Miriam Wagner',
-  'Bradley Wilkerson',
-  'Virginia Andrews',
-  'Kelly Snyder'
-];
 const ITEM_HEIGHT = 48;
 const ITEM_PADDING_TOP = 8;
 
+const difficultyMap = {
+  high: 3,
+  medium: 2,
+  low: 1
+};
+
 interface IProps {
   activities: IContent[];
+  onFilterChange: (categoryId: number, difficultyLevel: number) => void;
 }
 
-export function ActivityList({ activities }: IProps) {
+export function ActivityList({ activities, onFilterChange }: IProps) {
   const theme = useTheme();
   const [personName, setPersonName] = useState<string[]>([]);
   const [selectedLevel, setSelectedLevel] = useState<'high' | 'medium' | 'low'>(
     'medium'
   );
   const [names, setLeaf] = useState<ICategoryLeaf[]>([]);
-  console.log(activities);
 
   useEffect(() => {
     const getList = async () => {
@@ -65,23 +59,27 @@ export function ActivityList({ activities }: IProps) {
     }
   };
 
-  function getStyles(
-    name: string,
-    personName: readonly string[],
-    theme: Theme
-  ) {
-    return {
-      fontWeight: personName.includes(name)
-        ? theme.typography.fontWeightMedium
-        : theme.typography.fontWeightRegular
-    };
-  }
-
-  const handleChange = (event: SelectChangeEvent<typeof personName>) => {
+  const handleCategoryChange = (
+    event: SelectChangeEvent<typeof personName>
+  ) => {
     const {
       target: { value }
     } = event;
-    setPersonName(typeof value === 'string' ? value.split(',') : value);
+    const newPersonName = typeof value === 'string' ? value.split(',') : value;
+    setPersonName(newPersonName);
+
+    const selectedCategory = names.find(n => n.name === newPersonName[0]);
+    if (selectedCategory) {
+      onFilterChange(selectedCategory.categoryId, difficultyMap[selectedLevel]);
+    }
+  };
+
+  const handleLevelClick = (level: 'high' | 'medium' | 'low') => {
+    setSelectedLevel(level);
+    const selectedCategory = names.find(n => n.name === personName[0]);
+    if (selectedCategory) {
+      onFilterChange(selectedCategory.categoryId, difficultyMap[level]);
+    }
   };
 
   return (
@@ -105,10 +103,9 @@ export function ActivityList({ activities }: IProps) {
         </span>
         <div>
           <Select
-            multiple
             displayEmpty
             value={personName}
-            onChange={handleChange}
+            onChange={handleCategoryChange}
             input={<OutlinedInput />}
             sx={{ width: '240px', height: '50px' }}
             renderValue={selected => {
@@ -124,43 +121,27 @@ export function ActivityList({ activities }: IProps) {
             <MenuItem disabled value="">
               <em>선택</em>
             </MenuItem>
-            {Array.isArray(names) &&
-              names.map(name => (
-                <MenuItem key={name.categoryId} value={name.name}>
-                  {name.name}
-                </MenuItem>
-              ))}
+            {names.map(name => (
+              <MenuItem key={name.categoryId} value={name.name}>
+                {name.name}
+              </MenuItem>
+            ))}
           </Select>
         </div>
       </div>
       <div style={{ display: 'flex', gap: '8px' }}>
-        <div
-          className={difficultyBox({
-            level: 'high',
-            selected: selectedLevel === 'high'
-          })}
-          onClick={() => setSelectedLevel('high')}
-        >
-          난이도 상
-        </div>
-        <div
-          className={difficultyBox({
-            level: 'medium',
-            selected: selectedLevel === 'medium'
-          })}
-          onClick={() => setSelectedLevel('medium')}
-        >
-          난이도 중
-        </div>
-        <div
-          className={difficultyBox({
-            level: 'low',
-            selected: selectedLevel === 'low'
-          })}
-          onClick={() => setSelectedLevel('low')}
-        >
-          난이도 하
-        </div>
+        {(['high', 'medium', 'low'] as const).map(level => (
+          <div
+            key={level}
+            className={difficultyBox({
+              level,
+              selected: selectedLevel === level
+            })}
+            onClick={() => handleLevelClick(level)}
+          >
+            난이도 {level === 'high' ? '상' : level === 'medium' ? '중' : '하'}
+          </div>
+        ))}
       </div>
       <Droppable droppableId="activityList" isDropDisabled={true}>
         {provided => (
@@ -171,9 +152,10 @@ export function ActivityList({ activities }: IProps) {
           >
             {activities.map((activity, index) => (
               <Activity
-                key={activity.eduContentId} // `activity.number`와 `activity.content` 조합
+                key={activity.eduContentId}
                 number={activity.eduContentId || 0}
                 content={activity.title}
+                thumbnailUrl={activity.thumbnailUrl}
                 index={index}
               />
             ))}

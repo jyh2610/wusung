@@ -92,3 +92,17 @@ export const activityContent = style({
   wordBreak: 'break-word', // ✅ 단어가 길면 줄바꿈
   textOverflow: 'ellipsis' // ✅ 너무 길면 "..." 표시
 });
+export const thumbnailPopup = style({
+  position: 'absolute',
+  top: '50%',
+  left: '105%',
+  transform: 'translateY(-50%)',
+  backgroundColor: 'white',
+  border: '1px solid #ddd',
+  boxShadow: '0 4px 8px rgba(0,0,0,0.1)',
+  padding: '4px',
+  borderRadius: '8px',
+  width: '200px',
+  height: '150px',
+  zIndex: 10
+});

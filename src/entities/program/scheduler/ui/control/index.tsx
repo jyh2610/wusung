@@ -16,6 +16,7 @@ import { useScheduleStore } from '@/shared/stores/useScheduleStore';
 import { getPlan, IPlan } from '@/entities/program/api';
 import { Schedule } from '@/entities/program/type.dto';
 import { Button } from '@/shared/ui';
+import { autoRegisterPlan } from '../../model/autoRegisterPlan';
 
 export function Control({ isAdmin }: { isAdmin: boolean }) {
   const [isModalOpen, setModalOpen] = useState(false);
@@ -60,7 +61,13 @@ const PlanModal = ({ onClose }: IProps) => {
     try {
       const res = await getPlan({ year, month, difficultyLevel });
       setPlans(res);
-      // res?.mainEduContentIds && updateSchedule(res.mainEduContentIds);
+      console.log(res);
+
+      await autoRegisterPlan({
+        year: year,
+        month: month,
+        difficultyLevel: difficultyLevel
+      });
     } catch (error) {
       console.error('계획안 불러오기 실패:', error);
     }

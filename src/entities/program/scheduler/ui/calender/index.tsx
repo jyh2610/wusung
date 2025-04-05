@@ -12,7 +12,8 @@ import {
   weekDay,
   redText,
   blueText,
-  weekgridItem
+  weekgridItem,
+  weekLabelBg
 } from './index.css';
 import { Schedule } from '@/entities/program/type.dto';
 import { useDateStore } from '@/shared/stores/useDateStores';
@@ -74,7 +75,9 @@ export function Calendar({ schedule, isAdmin }: CalendarProps) {
         <div key={weekIdx}>
           {/* 날짜 표시 */}
           <div className={grid}>
-            <div className={`${gridItem} ${weekLabel}`}>{weekIdx + 1}주차</div>
+            <div className={`${gridItem} ${weekLabel} ${weekLabelBg}`}>
+              {weekIdx + 1}주차
+            </div>
             {week.map((dayNum, i) => (
               <div
                 key={i}

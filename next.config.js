@@ -4,6 +4,9 @@ const withVanillaExtract = createVanillaExtractPlugin({
   identifiers: ({ hash }) => `prefix_${hash}`
 });
 const nextConfig = {
+  images: {
+    domains: ['dwkcd9qfwbc4t.cloudfront.net']
+  },
   async rewrites() {
     return [
       {

@@ -275,7 +275,9 @@ export const getPlan = async ({
     });
 
     return res.data.data;
-  } catch (error) {}
+  } catch (error) {
+    console.error(error);
+  }
 };
 
 export interface PrintPDFPayload {
@@ -309,4 +311,15 @@ export const printPDF = async (
     console.error('📄 PDF 요청 실패:', error);
     return null;
   }
+};
+
+export const searchContent = async (eduContentId: number) => {
+  try {
+    const res = await request<IRes<IContent>>({
+      method: 'GET',
+      url: `/api/admin/edu-content/${eduContentId}`
+    });
+
+    return res.data.data;
+  } catch (error) {}
 };

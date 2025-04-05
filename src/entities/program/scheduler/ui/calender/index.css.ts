@@ -17,7 +17,9 @@ export const weekDay = style({
   maxHeight: '28px',
   borderTop: `1px solid ${colors.gray_scale[300]}`
 });
-
+export const weekLabelBg = style({
+  backgroundColor: colors.gray_scale[200]
+});
 export const weekgridItem = style({
   padding: '0 12px',
   textAlign: 'center',
