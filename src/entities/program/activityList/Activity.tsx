@@ -60,6 +60,7 @@ export function Activity({ number, content, index, thumbnailUrl }: IProps) {
           {showThumbnail && (
             <div
               className={index % 5 === 0 ? thumbnailPopupLeft : thumbnailPopup}
+              onMouseEnter={handleMouseLeave}
             >
               <Image
                 src={thumbnailUrl}

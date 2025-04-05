@@ -1,5 +1,5 @@
-import { ContentList } from "@/components/admin/content-list"
-import { ContentFilters } from "@/components/admin/content-filters"
+import { ContentList } from '@/components/admin/content-list';
+import { ContentFilters } from '@/components/admin/content-filters';
 
 export default function ContentPage() {
   return (
@@ -10,6 +10,5 @@ export default function ContentPage() {
       <ContentFilters />
       <ContentList />
     </div>
-  )
+  );
 }
-

@@ -20,10 +20,15 @@ import { Pencil, Trash2, MoreVertical, Eye } from 'lucide-react';
 import { useState, useEffect } from 'react';
 import { IContent } from '@/entities/program/type.dto';
 import { getContentList } from './api';
+import { useRouter } from 'next/navigation';
 
 export function ContentList() {
   const [contents, setContents] = useState<IContent[]>([]);
+  const router = useRouter();
 
+  const handleRowClick = (id: number) => {
+    router.push(`/admin/content/${id}`); // 상세 페이지 경로
+  };
   // 실제 구현 시에는 아래 주석을 해제하여 API에서 데이터를 가져오도록 함
   useEffect(() => {
     const fetchContents = async () => {
@@ -73,7 +78,10 @@ export function ContentList() {
             </TableRow>
           ) : (
             contents.map(content => (
-              <TableRow key={content.categoryId}>
+              <TableRow
+                onClick={() => handleRowClick(content.eduContentId!)}
+                key={content.categoryId}
+              >
                 <TableCell className="font-medium">{content.title}</TableCell>
                 <TableCell>{formatDate(content?.createdAt!)}</TableCell>
                 <TableCell>

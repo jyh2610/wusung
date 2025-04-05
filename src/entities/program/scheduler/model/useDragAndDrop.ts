@@ -7,7 +7,10 @@ export function useDragAndDrop(
   activities: IContent[],
   setActivities: Dispatch<SetStateAction<IContent[]>>
 ) {
-  const { schedule, updateSchedule } = useScheduleStore();
+  const { schedule, updateSchedule, addCoverItem, addEtcItem } =
+    useScheduleStore();
+  const coverItems = useScheduleStore(state => state.coverItems);
+  const etcItems = useScheduleStore(state => state.etcItems);
 
   const onDragEnd = (result: DropResult) => {
     const { source, destination, draggableId } = result;
@@ -17,9 +20,27 @@ export function useDragAndDrop(
     const id = Number(idStr);
 
     const [srcDayStr, srcCategory] = source.droppableId.split('-');
-    const [destDayStr, destCategory] = destination.droppableId.split('-');
-
     const srcDay = Number(srcDayStr);
+    const destId = destination.droppableId;
+
+    // ✅ 커버 드랍
+    if (destId === 'cover') {
+      addCoverItem({ id, content });
+      return;
+    }
+
+    // ✅ 기타 드랍
+    if (destId === 'etc') {
+      if (etcItems.length >= 2) {
+        alert('기타자료는 최대 2개까지만 넣을 수 있어요!');
+        return;
+      }
+      addEtcItem({ id, content });
+      return;
+    }
+
+    // ✅ 일반 드랍 (요일-카테고리)
+    const [destDayStr, destCategory] = destId.split('-');
     const destDay = Number(destDayStr);
 
     // 같은 위치면 무시

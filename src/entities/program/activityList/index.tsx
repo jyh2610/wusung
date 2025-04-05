@@ -155,7 +155,7 @@ export function ActivityList({ activities, onFilterChange }: IProps) {
                 key={activity.eduContentId}
                 number={activity.eduContentId || 0}
                 content={activity.title}
-                thumbnailUrl={activity.thumbnailUrl}
+                thumbnailUrl={activity?.thumbnailUrl!}
                 index={index}
               />
             ))}

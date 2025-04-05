@@ -1,4 +1,4 @@
-import { ContentUploadForm } from "@/components/admin/content-upload-form"
+import { ContentUploadForm } from '@/components/admin/content-upload-form';
 
 export default function ContentUploadPage() {
   return (
@@ -8,6 +8,5 @@ export default function ContentUploadPage() {
       </div>
       <ContentUploadForm />
     </div>
-  )
+  );
 }
-

@@ -1,5 +1,4 @@
-// axiosInstance.js
-import { getLocalStorageValue } from '@/lib/utils';
+import { getLocalStorageValue, setLocalStorageValue } from '@/lib/utils';
 import axios, { AxiosError, AxiosRequestConfig, AxiosResponse } from 'axios';
 import https from 'https';
 
@@ -16,31 +15,39 @@ const axiosInstance = axios.create({
 // 요청 인터셉터
 axiosInstance.interceptors.request.use(
   config => {
-    // 매 요청마다 localStorage에서 최신 토큰 가져오기
     const userInfo = getLocalStorageValue('userInfo');
     const token = userInfo ? JSON.parse(userInfo).token : '';
 
-    // 토큰이 있으면 Authorization 헤더에 추가
     if (token) {
       config.headers.Authorization = `Bearer ${token}`;
     }
 
     return config;
   },
-  error => {
-    return Promise.reject(error);
-  }
+  error => Promise.reject(error)
 );
 
 // 응답 인터셉터
 axiosInstance.interceptors.response.use(
   response => {
-    // 응답 데이터 처리
+    // ✅ 서버가 새 access token을 응답 헤더로 보내는 경우 처리
+    const newAccessToken = response.headers['authorization'];
+
+    if (newAccessToken) {
+      const token = newAccessToken.replace('Bearer ', '');
+      const storedUserInfo = getLocalStorageValue('userInfo');
+
+      if (storedUserInfo) {
+        const parsed = JSON.parse(storedUserInfo);
+        const updatedUserInfo = { ...parsed, token };
+        setLocalStorageValue('userInfo', JSON.stringify(updatedUserInfo));
+      }
+    }
+
     return response;
   },
-  error => {
-    // 에러 처리 (예: 401 에러 시 재로그인 처리)
-    return Promise.reject(error);
+  async error => {
+    return handleAxiosError(error);
   }
 );
 
@@ -59,8 +66,29 @@ const handleAxiosError = async (error: AxiosError) => {
 
   const originalRequest = error.config as CustomAxiosRequestConfig;
 
-  if (error.response?.status === 401) {
-    // 401 에러 처리 로직 추가
+  if (error.response?.status === 401 && !originalRequest._retry) {
+    originalRequest._retry = true;
+
+    const newAccessToken = error.response.headers['authorization'];
+
+    if (newAccessToken) {
+      const token = newAccessToken.replace('Bearer ', '');
+      const storedUserInfo = getLocalStorageValue('userInfo');
+
+      if (storedUserInfo) {
+        const parsed = JSON.parse(storedUserInfo);
+        const updatedUserInfo = { ...parsed, token };
+        setLocalStorageValue('userInfo', JSON.stringify(updatedUserInfo));
+      }
+
+      // 헤더에 새로운 토큰 추가 후 재시도
+      originalRequest.headers = {
+        ...originalRequest.headers,
+        Authorization: `Bearer ${token}`
+      };
+
+      return axiosInstance(originalRequest); // 요청 재시도
+    }
   }
 
   return Promise.reject(error);

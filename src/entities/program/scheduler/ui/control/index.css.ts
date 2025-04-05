@@ -5,7 +5,11 @@ export const controlContainer = style({
   display: 'flex',
   gap: '8px'
 });
-
+export const Container = style({
+  marginTop: '12px',
+  display: 'flex',
+  justifyContent: 'space-between'
+});
 export const buttonStyle = style({
   padding: '12px 20px',
   border: `1px solid ${colors.brand[400]}`,
@@ -94,4 +98,9 @@ export const confirmButtonWrapper = style({
   justifyContent: 'center',
   width: '150px',
   height: '46px'
+});
+
+export const additionalData = style({
+  display: 'flex',
+  gap: '12px'
 });

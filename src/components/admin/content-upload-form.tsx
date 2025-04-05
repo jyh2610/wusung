@@ -2,7 +2,7 @@
 
 import type React from 'react';
 import { useEffect, useState } from 'react';
-import { useRouter } from 'next/navigation';
+import { useRouter, useSearchParams } from 'next/navigation';
 import { Button } from '@/components/ui/button';
 import { Card, CardContent } from '@/components/ui/card';
 import { Input } from '@/components/ui/input';
@@ -21,7 +21,9 @@ import { IContent } from '@/entities/program/type.dto';
 import { eduContentReg } from '@/entities/program/api';
 import { X } from 'lucide-react';
 import { getCategoryList } from './api';
-import { ICategory } from '@/shared/type';
+import { ICategory, IRes } from '@/shared/type';
+import { EduContent } from '@/app/(without-nav)/admin/content/[id]/page';
+import request from '@/shared/api/axiosInstance';
 
 // 좌표 타입 정의
 interface Rectangle {
@@ -49,6 +51,9 @@ const customStyles = {
   })
 };
 export function ContentUploadForm() {
+  const searchParams = useSearchParams();
+
+  const id = searchParams.get('id');
   const router = useRouter();
   const [category, setCategory] = useState<ICategory[]>([]);
   const [form, setForm] = useState<IContent>({
@@ -61,6 +66,40 @@ export function ContentUploadForm() {
     isUsed: true,
     overlays: []
   });
+
+  useEffect(() => {
+    const fetchContent = async () => {
+      const token = localStorage.getItem('token');
+      try {
+        const res = await request<IRes<EduContent>>({
+          method: 'GET',
+          url: `/api/admin/edu-content/${id}`,
+          headers: {
+            Authorization: `Bearer ${token}`
+          }
+        });
+        const obj = res.data.data;
+        setForm({
+          title: obj.title,
+          difficultyLevel: obj.difficultyLevel,
+          categoryId: obj.categoryId,
+          year: obj.year,
+          month: obj.month,
+          description: obj.description,
+          isUsed: obj.isUsed,
+          overlays: obj.overlayLocations
+        });
+
+        const processedFiles: string[] = obj.files.map(file => file.fileUrl);
+
+        setFilePreviews(processedFiles);
+      } catch (error) {
+        console.error(error);
+      }
+    };
+
+    fetchContent();
+  }, []);
 
   const [files, setFiles] = useState<File[]>([]);
   const [filePreviews, setFilePreviews] = useState<string[]>([]);
