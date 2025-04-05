@@ -7,15 +7,14 @@ import Image from 'next/image';
 import { useState } from 'react';
 import { colors } from '@/design-tokens';
 import { DrawerList } from './ui/drawList';
+import { AddUser } from '../addUser';
 
 export default function TemporaryDrawer() {
   const [open, setOpen] = useState(false);
-
   return (
     <>
       <Toolbar />
 
-      {/* 🛠 Drawer: width를 고정하고 내용만 숨김 */}
       <Drawer
         open={open}
         onClose={() => setOpen(false)}

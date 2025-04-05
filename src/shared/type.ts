@@ -5,3 +5,7 @@ export interface ICategory {
   isUsed: boolean;
   children: ICategory[];
 }
+export interface IRes<T> {
+  data: T;
+  message: string;
+}

@@ -13,19 +13,14 @@ import {
   weekDay,
   activityListContainer
 } from './index.css';
-
-interface Schedule {
-  [key: number]: {
-    cognitive?: string;
-    daily?: string;
-  };
-}
+import { Schedule } from '@/entities/program/type.dto';
 
 interface CalendarProps {
   schedule: Schedule;
+  isAdmin: boolean;
 }
 
-export function Calendar({ schedule }: CalendarProps) {
+export function Calendar({ schedule, isAdmin }: CalendarProps) {
   const today = new Date();
   const year = today.getFullYear();
   const monthIndex = today.getMonth();
@@ -95,7 +90,7 @@ export function Calendar({ schedule }: CalendarProps) {
                     className={activityCell}
                   >
                     {dayNum > 0 && schedule[dayNum]?.cognitive
-                      ? schedule[dayNum].cognitive
+                      ? schedule[dayNum]?.cognitive.content
                       : '-'}
                     {provided.placeholder}
                   </div>
@@ -121,7 +116,7 @@ export function Calendar({ schedule }: CalendarProps) {
                     className={`${activityCell}`}
                   >
                     {dayNum > 0 && schedule[dayNum]?.daily
-                      ? schedule[dayNum].daily
+                      ? schedule[dayNum]?.daily.content
                       : '-'}
                     {provided.placeholder}
                   </div>

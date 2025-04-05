@@ -21,6 +21,7 @@ import {
 } from './index.css';
 import { json } from 'stream/consumers';
 import { useRouter } from 'next/navigation';
+import { setLocalStorageValue } from '@/lib/utils';
 
 interface ILoginForm {
   id: string;
@@ -47,7 +48,7 @@ export function LoginModal() {
   const submitLogin = async () => {
     try {
       const res = await login({ userName: id, password });
-      localStorage.setItem(
+      setLocalStorageValue(
         'userInfo',
         JSON.stringify({
           token: res.accessToken,

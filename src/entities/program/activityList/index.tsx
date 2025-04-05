@@ -9,7 +9,7 @@ import {
   Theme,
   useTheme
 } from '@mui/material';
-import React, { useState } from 'react';
+import React, { useEffect, useState } from 'react';
 import { colors } from '@/design-tokens';
 import { Activity } from './Activity';
 import {
@@ -17,6 +17,8 @@ import {
   difficultyBox,
   titleContainer
 } from './index.css';
+import { ICategoryLeaf, IContent } from '../type.dto';
+import { getCategoryLeaf } from '../api';
 
 const names = [
   'Oliver Hansen',
@@ -34,7 +36,7 @@ const ITEM_HEIGHT = 48;
 const ITEM_PADDING_TOP = 8;
 
 interface IProps {
-  activities: { number: number; content: string }[];
+  activities: IContent[];
 }
 
 export function ActivityList({ activities }: IProps) {
@@ -43,6 +45,15 @@ export function ActivityList({ activities }: IProps) {
   const [selectedLevel, setSelectedLevel] = useState<'high' | 'medium' | 'low'>(
     'medium'
   );
+  const [names, setLeaf] = useState<ICategoryLeaf[]>([]);
+
+  useEffect(() => {
+    const getList = async () => {
+      const res = await getCategoryLeaf();
+      setLeaf(res);
+    };
+    getList();
+  }, []);
 
   const MenuProps = {
     PaperProps: {
@@ -112,15 +123,12 @@ export function ActivityList({ activities }: IProps) {
             <MenuItem disabled value="">
               <em>선택</em>
             </MenuItem>
-            {names.map(name => (
-              <MenuItem
-                key={name}
-                value={name}
-                style={getStyles(name, personName, theme)}
-              >
-                {name}
-              </MenuItem>
-            ))}
+            {Array.isArray(names) &&
+              names.map(name => (
+                <MenuItem key={name.categoryId} value={name.name}>
+                  {name.name}
+                </MenuItem>
+              ))}
           </Select>
         </div>
       </div>
@@ -162,9 +170,9 @@ export function ActivityList({ activities }: IProps) {
           >
             {activities.map((activity, index) => (
               <Activity
-                key={`${activity.number}-${activity.content}`} // `activity.number`와 `activity.content` 조합
-                number={activity.number}
-                content={activity.content}
+                key={activity.eduContentId} // `activity.number`와 `activity.content` 조합
+                number={activity.eduContentId!}
+                content={activity.title}
                 index={index}
               />
             ))}

@@ -28,7 +28,6 @@ export default function ImageEditor({
   const fileInputRef = useRef<HTMLInputElement | null>(null);
   const [isEditing, setIsEditing] = useState(false);
   const [currentRect, setCurrentRect] = useState<Rectangle | null>(null);
-  const [scale, setScale] = useState(1);
   const [imageSize, setImageSize] = useState<{
     width: number;
     height: number;
@@ -39,28 +38,39 @@ export default function ImageEditor({
   const canvasRef = useRef<HTMLDivElement | null>(null);
   const startRef = useRef<{ x: number; y: number } | null>(null);
 
-  // 이미지가 변경될 때마다 이미지 크기 설정
+  // 화면에서 표시할 원본 좌표 저장 (PDF 변환 전)
+  const [originalCoordinates, setOriginalCoordinates] = useState<Rectangle[]>(
+    []
+  );
+
   useEffect(() => {
     if (image) {
       const img = new Image();
       img.onload = () => {
-        setImageSize({
-          width: img.width,
-          height: img.height
-        });
+        setImageSize({ width: img.width, height: img.height });
       };
       img.src = image;
       setSelectedRectIndex(null);
     } else {
       setImageSize(null);
+      setOriginalCoordinates([]);
     }
   }, [image]);
+
+  const convertToPDFCoordinates = (rect: Rectangle) => {
+    return {
+      x: (rect.x / imageSize!.width) * 100,
+      y: 100 - ((rect.y + rect.height) / imageSize!.height) * 100,
+      width: (rect.width / imageSize!.width) * 100,
+      height: (rect.height / imageSize!.height) * 100
+    };
+  };
 
   const handleMouseDown = (e: React.MouseEvent) => {
     if (!image || !canvasRef.current || !isEditing || !imageSize) return;
     const rect = canvasRef.current.getBoundingClientRect();
-    const startX = (e.clientX - rect.left) / scale;
-    const startY = (e.clientY - rect.top) / scale;
+    const startX = e.clientX - rect.left;
+    const startY = e.clientY - rect.top;
     startRef.current = { x: startX, y: startY };
     setCurrentRect({ x: startX, y: startY, width: 0, height: 0 });
   };
@@ -69,8 +79,8 @@ export default function ImageEditor({
     if (!startRef.current || !canvasRef.current || !isEditing || !imageSize)
       return;
     const rect = canvasRef.current.getBoundingClientRect();
-    const endX = (e.clientX - rect.left) / scale;
-    const endY = (e.clientY - rect.top) / scale;
+    const endX = e.clientX - rect.left;
+    const endY = e.clientY - rect.top;
     setCurrentRect({
       x: Math.min(startRef.current.x, endX),
       y: Math.min(startRef.current.y, endY),
@@ -82,47 +92,32 @@ export default function ImageEditor({
   const handleMouseUp = () => {
     if (!startRef.current || !currentRect || !isEditing || !imageSize) return;
 
-    // 최소 크기 검사 (너무 작은 좌표 영역은 무시)
     if (currentRect.width < 5 || currentRect.height < 5) {
       startRef.current = null;
       setCurrentRect(null);
       return;
     }
 
-    // 퍼센트로 변환된 좌표 추가
-    const newRect = {
-      x: (currentRect.x / imageSize.width) * 100,
-      y: (currentRect.y / imageSize.height) * 100,
-      width: (currentRect.width / imageSize.width) * 100,
-      height: (currentRect.height / imageSize.height) * 100
-    };
+    // 원본 좌표 저장 (픽셀 단위)
+    setOriginalCoordinates([...originalCoordinates, currentRect]);
 
-    // 상위 컴포넌트의 좌표 상태 업데이트
-    setCoordinates([...coordinates, newRect]);
-    setSelectedRectIndex(coordinates.length);
+    // 변환된 좌표 저장 (상위 컴포넌트 전달)
+    const pdfRect = convertToPDFCoordinates(currentRect);
+    setCoordinates([...coordinates, pdfRect]);
 
+    setSelectedRectIndex(originalCoordinates.length);
     startRef.current = null;
     setCurrentRect(null);
   };
 
-  const handleWheel = (e: React.WheelEvent) => {
-    e.preventDefault();
-    const newScale = Math.min(Math.max(scale + e.deltaY * -0.001, 0.5), 3);
-    setScale(newScale);
-  };
-
-  const handleComplete = () => {
-    setIsEditing(false);
-  };
-
-  const selectRectangle = (index: number) => {
-    setSelectedRectIndex(index);
-  };
-
   const deleteRectangle = (index: number, e: React.MouseEvent) => {
     e.stopPropagation();
+    const newOriginalCoordinates = [...originalCoordinates];
     const newCoordinates = [...coordinates];
+    newOriginalCoordinates.splice(index, 1);
     newCoordinates.splice(index, 1);
+
+    setOriginalCoordinates(newOriginalCoordinates);
     setCoordinates(newCoordinates);
 
     if (selectedRectIndex === index) {
@@ -149,10 +144,8 @@ export default function ImageEditor({
                   </p>
                 </div>
                 <input
-                  id="file"
                   type="file"
                   accept="image/*"
-                  multiple
                   className="hidden"
                   ref={fileInputRef}
                   onChange={handleImageUpload}
@@ -177,21 +170,17 @@ export default function ImageEditor({
                 alt="미리보기"
                 className="max-w-full max-h-[400px] object-contain"
               />
-              {coordinates.map((rect, index) => (
+
+              {originalCoordinates.map((rect, index) => (
                 <div
                   key={index}
-                  className={`absolute border-2 ${
-                    selectedRectIndex === index
-                      ? 'border-red-500'
-                      : 'border-blue-500'
-                  } bg-blue-300 bg-opacity-30 cursor-pointer`}
+                  className={`absolute border-2 ${selectedRectIndex === index ? 'border-red-500' : 'border-blue-500'} bg-blue-300 bg-opacity-30 cursor-pointer`}
                   style={{
-                    left: `${rect.x}%`,
-                    top: `${rect.y}%`,
-                    width: `${rect.width}%`,
-                    height: `${rect.height}%`
+                    left: `${(rect.x / imageSize!.width) * 100}%`,
+                    top: `${(rect.y / imageSize!.height) * 100}%`,
+                    width: `${(rect.width / imageSize!.width) * 100}%`,
+                    height: `${(rect.height / imageSize!.height) * 100}%`
                   }}
-                  onClick={() => selectRectangle(index)}
                 />
               ))}
             </div>
@@ -200,133 +189,110 @@ export default function ImageEditor({
           <div className="flex gap-2 mt-2">
             <Button
               type="button"
-              onClick={() => setIsEditing(true)}
-              className="bg-blue-500 text-white px-4 py-2 rounded flex items-center"
+              onClick={() => setIsEditing(true)} // 상태 변경
+              className="bg-blue-500 text-white px-4 py-2 rounded"
             >
               <Plus size={16} className="mr-1" /> 좌표 추가
             </Button>
 
-            <input
-              type="file"
-              accept="image/*"
-              multiple
-              className="hidden"
-              ref={fileInputRef}
-              onChange={handleImageUpload}
-            />
             <Button
-              variant="outline"
               type="button"
+              variant="outline"
               onClick={() => fileInputRef.current?.click()}
             >
               추가 이미지 업로드
             </Button>
           </div>
+          {isEditing && (
+            <div className="fixed top-0 left-0 w-screen h-screen bg-gray-900 bg-opacity-80 flex justify-center items-center z-50">
+              <div className="relative bg-white p-4 rounded shadow-lg">
+                <h3 className="text-lg font-bold">좌표 추가</h3>
+                <p className="text-sm text-gray-500 mb-4">
+                  이미지를 클릭하고 드래그하여 영역을 선택하세요.
+                </p>
 
-          {/* 좌표 목록 */}
-          {coordinates.length > 0 && (
-            <div className="mt-4 w-full border rounded-md p-3">
-              <h3 className="text-sm font-bold mb-2">
-                선택된 좌표 목록 ({coordinates.length}개)
-              </h3>
-              <div className="space-y-2 max-h-[200px] overflow-y-auto">
-                {coordinates.map((rect, index) => (
-                  <div
-                    key={index}
-                    className={`p-2 border rounded-md flex justify-between items-center cursor-pointer ${
-                      selectedRectIndex === index
-                        ? 'bg-blue-50 border-blue-500'
-                        : ''
-                    }`}
-                    onClick={() => selectRectangle(index)}
+                {/* 좌표 선택 영역 */}
+                <div
+                  ref={canvasRef}
+                  className="relative border cursor-crosshair"
+                  style={{
+                    width: imageSize?.width || 400,
+                    height: imageSize?.height || 300,
+                    backgroundImage: `url(${image})`,
+                    backgroundSize: 'cover'
+                  }}
+                  onMouseDown={handleMouseDown}
+                  onMouseMove={handleMouseMove}
+                  onMouseUp={handleMouseUp}
+                >
+                  {/* 기존 좌표 */}
+                  {originalCoordinates.map((rect, index) => (
+                    <div
+                      key={index}
+                      className="absolute border-2 border-blue-500 bg-blue-300 bg-opacity-30"
+                      style={{
+                        left: `${(rect.x / imageSize!.width) * 100}%`,
+                        top: `${(rect.y / imageSize!.height) * 100}%`,
+                        width: `${(rect.width / imageSize!.width) * 100}%`,
+                        height: `${(rect.height / imageSize!.height) * 100}%`
+                      }}
+                    />
+                  ))}
+
+                  {/* 현재 그리고 있는 좌표 */}
+                  {currentRect && (
+                    <div
+                      className="absolute border-2 border-red-500 bg-red-300 bg-opacity-30"
+                      style={{
+                        left: `${(currentRect.x / imageSize!.width) * 100}%`,
+                        top: `${(currentRect.y / imageSize!.height) * 100}%`,
+                        width: `${(currentRect.width / imageSize!.width) * 100}%`,
+                        height: `${(currentRect.height / imageSize!.height) * 100}%`
+                      }}
+                    />
+                  )}
+                </div>
+
+                <div className="flex justify-end gap-2 mt-4">
+                  <Button
+                    onClick={() => setIsEditing(false)}
+                    className="bg-gray-500 text-white px-4 py-2 rounded"
                   >
-                    <div className="text-xs">
-                      <span className="font-semibold">좌표 {index + 1}:</span>{' '}
-                      X: {rect.x.toFixed(2)}%, Y: {rect.y.toFixed(2)}%, W:{' '}
-                      {rect.width.toFixed(2)}%, H: {rect.height.toFixed(2)}%
-                    </div>
-                    <Button
-                      variant="ghost"
-                      size="sm"
-                      className="h-6 w-6 p-0 text-red-500"
-                      onClick={e => deleteRectangle(index, e)}
-                    >
-                      <Trash2 size={14} />
-                    </Button>
-                  </div>
-                ))}
+                    확인
+                  </Button>
+                </div>
               </div>
             </div>
           )}
-        </>
-      )}
 
-      {isEditing && image && imageSize && (
-        <div className="fixed top-0 left-0 w-screen h-screen bg-gray-900 bg-opacity-80 flex justify-center items-center z-50">
-          <div className="relative border bg-white shadow-lg p-4 flex flex-col items-center max-w-[90vw] max-h-[90vh] overflow-auto">
-            <h3 className="text-lg font-bold mb-2">좌표 영역 선택</h3>
-            <p className="text-sm text-gray-500 mb-4">
-              이미지를 클릭하고 드래그하여 영역을 선택하세요
-            </p>
-
-            <div
-              ref={canvasRef}
-              className="relative border mb-4 cursor-crosshair"
-              style={{
-                width: imageSize.width * scale,
-                height: imageSize.height * scale,
-                backgroundImage: `url(${image})`,
-                backgroundSize: 'cover'
-              }}
-              onMouseDown={handleMouseDown}
-              onMouseMove={handleMouseMove}
-              onMouseUp={handleMouseUp}
-              onWheel={handleWheel}
-            >
-              {/* 기존 좌표 표시 */}
-              {coordinates.map((rect, index) => (
+          <div className="mt-4 w-full border rounded-md p-3">
+            <h3 className="text-sm font-bold mb-2">
+              선택된 좌표 목록 ({originalCoordinates.length}개)
+            </h3>
+            <div className="space-y-2 max-h-[200px] overflow-y-auto">
+              {originalCoordinates.map((rect, index) => (
                 <div
                   key={index}
-                  className="absolute border-2 border-blue-500 bg-blue-300 bg-opacity-30"
-                  style={{
-                    left: `${rect.x}%`,
-                    top: `${rect.y}%`,
-                    width: `${rect.width}%`,
-                    height: `${rect.height}%`
-                  }}
-                />
+                  className="p-2 border rounded-md flex justify-between items-center cursor-pointer"
+                >
+                  <div className="text-xs">
+                    좌표 {index + 1}: X {rect.x}, Y {rect.y}, W {rect.width}, H{' '}
+                    {rect.height}
+                  </div>
+                  <Button
+                    variant="ghost"
+                    type="button"
+                    size="sm"
+                    className="h-6 w-6 p-0 text-red-500"
+                    onClick={e => deleteRectangle(index, e)}
+                  >
+                    <Trash2 size={14} />
+                  </Button>
+                </div>
               ))}
-
-              {/* 현재 그리고 있는 좌표 */}
-              {currentRect && (
-                <div
-                  className="absolute border-2 border-red-500 bg-red-300 bg-opacity-30"
-                  style={{
-                    left: `${(currentRect.x / imageSize.width) * 100}%`,
-                    top: `${(currentRect.y / imageSize.height) * 100}%`,
-                    width: `${(currentRect.width / imageSize.width) * 100}%`,
-                    height: `${(currentRect.height / imageSize.height) * 100}%`
-                  }}
-                />
-              )}
-            </div>
-
-            <div className="flex gap-4 w-full">
-              <Button
-                onClick={handleComplete}
-                className="bg-green-500 text-white px-4 py-2 rounded flex-1"
-              >
-                완료
-              </Button>
-              <Button
-                onClick={() => setIsEditing(false)}
-                className="bg-gray-500 text-white px-4 py-2 rounded flex-1"
-              >
-                취소
-              </Button>
             </div>
           </div>
-        </div>
+        </>
       )}
     </div>
   );

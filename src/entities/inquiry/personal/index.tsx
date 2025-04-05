@@ -54,7 +54,6 @@ export function Personal() {
   // ✅ react-hook-form으로 select 값 관리
   const selectedType = watch('type'); // 현재 선택된 값 추적
 
-  // eslint-disable-next-line @typescript-eslint/no-explicit-any
   const handleSelectChange = (event: any) => {
     setValue('type', event.target.value, { shouldValidate: true });
   };

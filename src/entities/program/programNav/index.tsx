@@ -1,3 +1,5 @@
+'use client';
+
 import { AppBar } from '@mui/material';
 import Image from 'next/image';
 import React from 'react';
@@ -11,8 +13,13 @@ import {
   userInfoContainer
 } from './index.css';
 import { btn } from './ui/navBtn/index.css';
+import { getLocalStorageValue } from '@/lib/utils';
 
 export function ProgramNav() {
+  const rawData = getLocalStorageValue('userInfo');
+  const userInfo = rawData ? JSON.parse(rawData) : null;
+  const id = userInfo?.username;
+
   return (
     <div className={container}>
       <div
@@ -91,7 +98,7 @@ export function ProgramNav() {
           <div className={imgContainer}>
             <Image fill src={'/images/ProfilePic.png'} alt={'프로필 썸네일'} />
           </div>
-          <div className={textAlign}>IDcontent</div>
+          <div className={textAlign}>{id}</div>
         </div>
 
         <div className={navBtnContainer}>

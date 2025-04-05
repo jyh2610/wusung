@@ -23,12 +23,12 @@ export default function AdminSidebar() {
     //   href: "/admin",
     //   active: pathname === "/admin",
     // },
-    // {
-    //   label: "콘텐츠 관리",
-    //   icon: FileText,
-    //   href: "/admin/content",
-    //   active: pathname === "/admin/content",
-    // },
+    {
+      label: '콘텐츠 관리',
+      icon: FileText,
+      href: '/admin/content',
+      active: pathname === '/admin/content'
+    },
     {
       label: '콘텐츠 업로드',
       icon: Upload,

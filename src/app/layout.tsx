@@ -2,7 +2,8 @@ import localFont from '@next/font/local';
 import type { Metadata } from 'next';
 import './globals.css';
 import { colors } from '@/design-tokens';
-
+import 'react-toastify/dist/ReactToastify.css';
+import { ToastContainer } from 'react-toastify';
 import { QueryProvider, NextUiProvider } from './_provider';
 
 export const metadata: Metadata = {
@@ -26,6 +27,7 @@ export default function RootLayout({
         <QueryProvider>
           <NextUiProvider>{children}</NextUiProvider>
         </QueryProvider>
+        <ToastContainer />
       </body>
     </html>
   );

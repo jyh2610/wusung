@@ -3,24 +3,19 @@ import { container } from './index.css';
 import { Calendar } from './ui/calender';
 import { Control } from './ui/control';
 import Header from './ui/header';
+import { Schedule } from '../type.dto';
 
-interface Schedule {
-  [key: number]: {
-    cognitive?: string;
-    daily?: string;
-  };
-}
-
-interface CalendarProps {
+interface Props {
+  isAdmin: boolean;
   schedule: Schedule;
 }
 
-export function Scheduler({ schedule }: CalendarProps) {
+export function SchedulerLayout({ schedule, isAdmin }: Props) {
   return (
     <div className={container}>
-      <Header />
-      <Control />
-      <Calendar schedule={schedule} />
+      <Header isAdmin={isAdmin} schedule={schedule} />
+      <Control isAdmin={isAdmin} />
+      <Calendar isAdmin={isAdmin} schedule={schedule} />
     </div>
   );
 }

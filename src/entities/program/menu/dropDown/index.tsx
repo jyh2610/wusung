@@ -1,31 +1,35 @@
 'use client';
 
-import { useState } from 'react';
+import { IEmail } from '@/shared/ui';
 import Select, { SingleValue } from 'react-select';
-import { IEmail } from '../types';
 
-// IProps 인터페이스 정의
 interface IProps {
   options: IEmail[];
   placeholder: string;
   isSearchable?: boolean;
+  value: string;
+  onChange: (value: string) => void;
 }
 
-export function SelectBox({
+export function DropDown({
   options,
   placeholder,
-  isSearchable = true
+  isSearchable = true,
+  value,
+  onChange
 }: IProps) {
-  const [selectedOption, setSelectedOption] = useState<IEmail | null>(null);
-  const handleChange = (newValue: SingleValue<IEmail>, actionMeta: unknown) => {
-    setSelectedOption(newValue);
+  const selectedOption = options.find(option => option.value === value) || null;
+
+  const handleChange = (newValue: SingleValue<IEmail>) => {
+    if (newValue) {
+      onChange(newValue.value); // 외부로 값 전달
+    }
   };
 
   return (
     <Select
       value={selectedOption}
       onChange={handleChange}
-      isDisabled={false}
       options={options}
       placeholder={placeholder}
       isSearchable={isSearchable}

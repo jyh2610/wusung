@@ -1,5 +1,7 @@
 import request from '@/shared/api/axiosInstance';
-import { IContent } from '../type.dto';
+import { ICategoryLeaf, IContent, IRegUser, IUser } from '../type.dto';
+import { IRes } from '@/shared/type';
+import { getLocalStorageValue } from '@/lib/utils';
 
 export const eduContentReg = async (
   content: IContent,
@@ -85,7 +87,7 @@ export const eduContentReg = async (
     );
     console.log('Files count:', imageFiles.length);
 
-    const userInfo = localStorage.getItem('userInfo');
+    const userInfo = getLocalStorageValue('userInfo');
     const token = userInfo ? JSON.parse(userInfo).token : '';
 
     // 요청 보내기
@@ -169,17 +171,17 @@ export const getList = async ({
 export const regSchedule = async ({
   year,
   month,
-  level,
+  difficultyLevel,
   coverEduContentId,
   middleEduContentIds,
   mainEduContentIds
 }: {
   year: number;
   month: number;
-  level: 1 | 2 | 3;
+  difficultyLevel: number;
   coverEduContentId: number;
   middleEduContentIds: number[];
-  mainEduContentIds: number[];
+  mainEduContentIds: number[][];
 }) => {
   try {
     const res = await request({
@@ -188,7 +190,7 @@ export const regSchedule = async ({
       data: {
         year,
         month,
-        level,
+        difficultyLevel,
         coverEduContentId,
         middleEduContentIds,
         mainEduContentIds
@@ -197,5 +199,114 @@ export const regSchedule = async ({
     return res.data;
   } catch (error) {
     console.error('스케줄 등록에 실패 했습니다.', error);
+  }
+};
+
+export const getCategoryLeaf = async (): Promise<ICategoryLeaf[]> => {
+  try {
+    const res = await request<IRes<ICategoryLeaf[]>>({
+      method: 'GET',
+      url: '/api/admin/edu-content/category/leaf'
+    });
+
+    return res.data.data; // ✅ TypeScript 경고 우회
+  } catch (error) {
+    console.error('카테고리 조회 실패:', error);
+    return [];
+  }
+};
+
+export const submitAddUser = async (form: IRegUser) => {
+  try {
+    const res = await request<IRes<ICategoryLeaf[]>>({
+      method: 'POST',
+      url: '/api/program/elder',
+      data: {
+        name: form.name,
+        birthDate: form.birthDate,
+        certificationStart: form.validate,
+        certificationEnd: form.validate,
+        recipientNumber: form.longTermNum,
+        disabilityGrade: form.grade,
+        difficultyLevel: form.difficulty,
+        managerName: form.servicer
+      }
+    });
+
+    return res.data.data; // ✅ TypeScript 경고 우회
+  } catch (error) {
+    console.error('카테고리 조회 실패:', error);
+    return [];
+  }
+};
+
+export const getUser = async () => {
+  try {
+    const res = await request<IRes<IUser[]>>({
+      method: 'GET',
+      url: '/api/program/elder/list'
+    });
+    return res.data.data;
+  } catch {}
+};
+
+export interface IPlan {
+  year: number;
+  month: number;
+  difficultyLevel: 1 | 2 | 3;
+  coverEduContentId: number;
+  middleEduContentIds: number[];
+  mainEduContentIds: number[][];
+}
+
+export const getPlan = async ({
+  year,
+  month,
+  difficultyLevel
+}: {
+  year: string;
+  month: string;
+  difficultyLevel: number;
+}) => {
+  try {
+    const res = await request<IRes<IPlan>>({
+      method: 'GET',
+      url: `/api/program/use/plan/${year}/${month}/${difficultyLevel}`
+    });
+
+    return res.data.data;
+  } catch (error) {}
+};
+
+export interface PrintPDFPayload {
+  year: number;
+  month: number;
+  difficultyLevel: number;
+  coverEduContentId: number;
+  middleEduContentIds: number[];
+  mainEduContentIds: number[][];
+}
+
+export const printPDF = async (
+  elderId: number,
+  payload: PrintPDFPayload
+): Promise<string | null> => {
+  try {
+    const res = await request<Blob>({
+      method: 'POST',
+      url: `/api/program/use/print?elderId=${elderId}`,
+      data: payload,
+      headers: {
+        Accept: 'application/pdf'
+      },
+      responseType: 'blob'
+    });
+
+    const blob = new Blob([res.data], { type: 'application/pdf' });
+    const url = URL.createObjectURL(blob);
+    return url;
+  } catch (error) {
+    console.error('📄 PDF 요청 실패:', error);
+    return null;
   }
 };

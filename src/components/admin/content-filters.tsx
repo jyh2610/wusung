@@ -11,8 +11,21 @@ import {
 } from '@/components/ui/select';
 import { Plus, Search } from 'lucide-react';
 import Link from 'next/link';
+import { useEffect, useState } from 'react';
+import { getCategoryList } from './api';
+import { ICategory } from '@/shared/type';
 
 export function ContentFilters() {
+  const [list, setList] = useState<ICategory[]>([]);
+
+  useEffect(() => {
+    const getList = async () => {
+      const res = await getCategoryList();
+      res && setList(res);
+    };
+    getList();
+  }, []);
+
   return (
     <div className="flex flex-col gap-4 md:flex-row md:items-center md:justify-between">
       <div className="flex flex-1 items-center gap-2">
@@ -25,23 +38,21 @@ export function ContentFilters() {
             <SelectValue placeholder="콘텐츠 유형" />
           </SelectTrigger>
           <SelectContent>
-            <SelectItem value="all">모든 유형</SelectItem>
-            <SelectItem value="blog">블로그</SelectItem>
-            <SelectItem value="news">뉴스</SelectItem>
-            <SelectItem value="event">이벤트</SelectItem>
-            <SelectItem value="video">비디오</SelectItem>
-            <SelectItem value="document">문서</SelectItem>
+            {list.map(item => (
+              <SelectItem key={item.categoryId} value={item.categoryId + ''}>
+                {item.name}
+              </SelectItem>
+            ))}
           </SelectContent>
         </Select>
         <Select defaultValue="all">
           <SelectTrigger className="w-[180px]">
-            <SelectValue placeholder="상태" />
+            <SelectValue placeholder="난이도" />
           </SelectTrigger>
           <SelectContent>
-            <SelectItem value="all">모든 상태</SelectItem>
-            <SelectItem value="published">게시됨</SelectItem>
-            <SelectItem value="draft">초안</SelectItem>
-            <SelectItem value="scheduled">예약됨</SelectItem>
+            <SelectItem value={'1'}>하</SelectItem>
+            <SelectItem value={'2'}>중</SelectItem>
+            <SelectItem value={'3'}>상</SelectItem>
           </SelectContent>
         </Select>
       </div>
