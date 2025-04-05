@@ -1,4 +1,3 @@
-// 📌 hooks/useDragAndDrop.ts
 import { DropResult, DragUpdate } from '@hello-pangea/dnd';
 import { Dispatch, SetStateAction } from 'react';
 import { IContent } from '../../type.dto';
@@ -8,55 +7,47 @@ export function useDragAndDrop(
   activities: IContent[],
   setActivities: Dispatch<SetStateAction<IContent[]>>
 ) {
-  const { schedule, updateSchedule } = useScheduleStore(); // ✅ Zustand 사용
-  console.log(schedule, '123123123123123');
+  const { schedule, updateSchedule } = useScheduleStore();
 
   const onDragEnd = (result: DropResult) => {
-    if (!result.destination) return;
-
     const { source, destination, draggableId } = result;
+    if (!destination) return;
 
-    const [numberStr, content] = draggableId.split('|');
-    const id = Number(numberStr);
+    const [idStr, content] = draggableId.split('|');
+    const id = Number(idStr);
 
-    if (!id || !content) {
-      console.error('🚨 잘못된 draggableId 형식:', draggableId);
-      return;
-    }
+    const [srcDayStr, srcCategory] = source.droppableId.split('-');
+    const [destDayStr, destCategory] = destination.droppableId.split('-');
 
-    if (destination.droppableId === 'activityList') {
-      return; // 원래 리스트로 복귀할 경우 처리 안 함
-    }
+    const srcDay = Number(srcDayStr);
+    const destDay = Number(destDayStr);
 
-    const [dayNum, category] = destination.droppableId.split('-');
-    const day = Number(dayNum);
+    // 같은 위치면 무시
+    if (srcDay === destDay && srcCategory === destCategory) return;
 
     const newSchedule = {
       ...schedule,
-      [day]: {
-        ...schedule[day],
-        [category]: { id, content }
+      [destDay]: {
+        ...schedule[destDay],
+        [destCategory]: { id, content }
+      },
+      [srcDay]: {
+        ...schedule[srcDay],
+        [srcCategory]: undefined
       }
     };
 
-    updateSchedule(newSchedule); // ✅ Zustand에서 업데이트
-
-    console.log(`📅 ${day}일 (${category})에 "${content}" 추가됨 (ID: ${id})`);
+    updateSchedule(newSchedule);
   };
 
   const onDragUpdate = (update: DragUpdate) => {
     const { destination } = update;
-
     if (destination) {
-      const droppableId = destination.droppableId;
-      const droppableElement = document.getElementById(droppableId);
-
-      if (droppableElement) {
-        droppableElement.scrollIntoView({
-          behavior: 'smooth',
-          block: 'nearest'
-        });
-      }
+      const droppableElement = document.getElementById(destination.droppableId);
+      droppableElement?.scrollIntoView({
+        behavior: 'smooth',
+        block: 'nearest'
+      });
     }
   };
 

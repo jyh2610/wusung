@@ -6,7 +6,14 @@ const drawerWidth = 300; // 사이드바 너비
 
 function ProgramNavlayout({ children }: { children: React.ReactNode }) {
   return (
-    <div style={{ display: 'flex', flexDirection: 'column', height: '100vh' ,backgroundColor: colors.bg}}>
+    <div
+      style={{
+        display: 'flex',
+        flexDirection: 'column',
+        height: '100vh',
+        backgroundColor: colors.bg
+      }}
+    >
       <ProgramNav />
       <div style={{ display: 'flex', flexGrow: 1 }}>
         <div style={{ width: `${drawerWidth}px`, flexShrink: 0 }}>

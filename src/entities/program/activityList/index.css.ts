@@ -95,6 +95,21 @@ export const activityContent = style({
 export const thumbnailPopup = style({
   position: 'absolute',
   top: '50%',
+  right: '105%',
+  transform: 'translateY(-50%)',
+  backgroundColor: 'white',
+  border: '1px solid #ddd',
+  boxShadow: '0 4px 8px rgba(0,0,0,0.1)',
+  padding: '4px',
+  borderRadius: '8px',
+  width: '150px',
+  height: '250px',
+  zIndex: 1300
+});
+
+export const thumbnailPopupLeft = style({
+  position: 'absolute',
+  top: '50%',
   left: '105%',
   transform: 'translateY(-50%)',
   backgroundColor: 'white',
@@ -102,7 +117,7 @@ export const thumbnailPopup = style({
   boxShadow: '0 4px 8px rgba(0,0,0,0.1)',
   padding: '4px',
   borderRadius: '8px',
-  width: '200px',
-  height: '150px',
-  zIndex: 10
+  width: '150px',
+  height: '250px',
+  zIndex: 1300
 });

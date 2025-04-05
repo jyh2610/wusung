@@ -11,12 +11,12 @@ import { useScheduleStore } from '@/shared/stores/useScheduleStore';
 
 export function ProgramComponent() {
   const isAdmin = useIsAdmin();
-  const { schedule, updateSchedule, undo, redo } = useScheduleStore();
+  const { schedule } = useScheduleStore();
 
   const [categoryId, setCategoryId] = useState<number>(1);
-  const [difficultyLevel, setDifficultyLevel] = useState<number>(2); // medium 기본값
+  const [difficultyLevel, setDifficultyLevel] = useState<number>(2);
 
-  const { activities, fetchActivities, setActivities } = useActivities({
+  const { activities, setActivities } = useActivities({
     isAdmin,
     categoryId,
     difficultyLevel
@@ -34,9 +34,9 @@ export function ProgramComponent() {
       <div
         style={{
           height: '100vh',
-          overflow: 'hidden',
           display: 'flex',
-          flexDirection: 'column'
+          flexDirection: 'column',
+          overflow: 'hidden'
         }}
       >
         <div style={{ flexGrow: 1, overflowY: 'auto' }}>

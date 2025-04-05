@@ -5,7 +5,8 @@ import {
   activityBox,
   activityNumber,
   activityContent,
-  thumbnailPopup
+  thumbnailPopup,
+  thumbnailPopupLeft
 } from './index.css';
 import Image from 'next/image';
 
@@ -35,7 +36,7 @@ export function Activity({ number, content, index, thumbnailUrl }: IProps) {
 
   return (
     <Draggable draggableId={`${number}|${content}`} index={index}>
-      {provided => (
+      {(provided, snapshot) => (
         <div
           ref={provided.innerRef}
           {...provided.draggableProps}
@@ -43,18 +44,31 @@ export function Activity({ number, content, index, thumbnailUrl }: IProps) {
           className={activityBox}
           onMouseEnter={handleMouseEnter}
           onMouseLeave={handleMouseLeave}
-          style={{ position: 'relative' }} // 썸네일 포지션 기준
+          style={{
+            position: 'relative',
+            zIndex: snapshot.isDragging ? 1000 : 'auto',
+            backgroundColor: 'white',
+            boxShadow: snapshot.isDragging
+              ? '0 4px 12px rgba(0, 0, 0, 0.15)'
+              : 'none',
+            ...provided.draggableProps.style // 꼭 마지막에 spreading 해야 드래그 제대로 적용됨
+          }}
         >
           <span className={activityNumber}>{number}</span>
           <span className={activityContent}>{content}</span>
 
           {showThumbnail && (
-            <div className={thumbnailPopup}>
+            <div
+              className={index % 5 === 0 ? thumbnailPopupLeft : thumbnailPopup}
+            >
               <Image
                 src={thumbnailUrl}
                 alt="thumbnail"
                 fill
-                style={{ borderRadius: '8px' }}
+                style={{
+                  borderRadius: '8px',
+                  objectFit: 'contain'
+                }}
               />
             </div>
           )}
