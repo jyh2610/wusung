@@ -9,7 +9,10 @@ import {
   activityRow,
   activityCell,
   activityLabel,
-  weekDay
+  weekDay,
+  redText,
+  blueText,
+  weekgridItem
 } from './index.css';
 import { Schedule } from '@/entities/program/type.dto';
 import { useDateStore } from '@/shared/stores/useDateStores';
@@ -53,9 +56,14 @@ export function Calendar({ schedule, isAdmin }: CalendarProps) {
     <div className={container}>
       {/* 요일 헤더 */}
       <div className={grid}>
-        <div className={gridItem} /> {/* 빈 칸 */}
+        <div className={weekgridItem} /> {/* 빈 칸 */}
         {weekdays.map((day, i) => (
-          <div key={i} className={`${gridItem} ${weekDay}`}>
+          <div
+            key={i}
+            className={`${weekgridItem} ${weekDay} ${i === 0 ? redText : ''} ${
+              i === 6 ? blueText : ''
+            }`}
+          >
             {day}
           </div>
         ))}
@@ -68,7 +76,12 @@ export function Calendar({ schedule, isAdmin }: CalendarProps) {
           <div className={grid}>
             <div className={`${gridItem} ${weekLabel}`}>{weekIdx + 1}주차</div>
             {week.map((dayNum, i) => (
-              <div key={i} className={gridItem}>
+              <div
+                key={i}
+                className={`${gridItem} ${i === 0 ? redText : ''} ${
+                  i === 6 ? blueText : ''
+                }`}
+              >
                 {dayNum > 0 ? String(dayNum).padStart(2, '0') : ''}
               </div>
             ))}
@@ -104,7 +117,9 @@ export function Calendar({ schedule, isAdmin }: CalendarProps) {
           {/* 일상생활 활동 */}
           <div className={activityRow}>
             <div className={activityCell}>
-              <div className={activityLabel}>일상생활 활동 & 추가 인지활동</div>
+              <div className={activityLabel}>
+                일상생활 활동 & <br /> 추가 인지활동
+              </div>
             </div>
             {week.map((dayNum, i) => (
               <Droppable

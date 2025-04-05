@@ -14,7 +14,17 @@ export const grid = style({
 
 export const weekDay = style({
   padding: '3px 0',
+  maxHeight: '28px',
   borderTop: `1px solid ${colors.gray_scale[300]}`
+});
+
+export const weekgridItem = style({
+  padding: '0 12px',
+  textAlign: 'center',
+  borderRight: `1px solid ${colors.gray_scale[300]}`,
+  display: 'flex',
+  alignItems: 'center',
+  justifyContent: 'space-between'
 });
 
 export const gridItem = style({
@@ -46,11 +56,11 @@ export const highlighted = style({
 });
 
 export const redText = style({
-  color: '#ec008c'
+  color: '#F42E2E'
 });
 
 export const blueText = style({
-  color: '#1e3a8a'
+  color: '#5457FF'
 });
 
 export const activityRow = style({
@@ -63,7 +73,7 @@ export const activityCell = style({
   padding: '0.5rem',
   textAlign: 'center',
   borderRight: `1px solid ${colors.gray_scale[300]}`,
-  minHeight: '50px' // 모든 칸 높이 동일하게 설정
+  minHeight: '62px' // 모든 칸 높이 동일하게 설정
 });
 
 export const activityLabel = style({
