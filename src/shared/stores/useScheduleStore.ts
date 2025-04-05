@@ -9,7 +9,7 @@ interface ScheduleState {
   updateSchedule: (newSchedule: Schedule) => void;
   undo: () => void;
   redo: () => void;
-  reInit: () => void; // ✅ 초기화 기능 추가
+  reInit: () => void;
 }
 
 // ✅ Zustand 스토어 생성
@@ -49,12 +49,11 @@ export const useScheduleStore = create<ScheduleState>(set => ({
         schedule: nextSchedule
       };
     }),
-
-  // ✅ 초기화 (Undo 가능하도록 수정)
   reInit: () =>
-    set(state => ({
-      history: [...state.history, state.schedule], // 초기화 이전 상태 저장
-      redoStack: [],
-      schedule: {} // 스케줄만 초기화
-    }))
+    set(state => {
+      return {
+        schedule: {},
+        history: []
+      };
+    })
 }));

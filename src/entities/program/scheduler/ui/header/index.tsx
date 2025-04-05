@@ -1,15 +1,20 @@
+'use client';
+
 import React from 'react';
 import { MdLocalPrintshop } from 'react-icons/md';
+import { IoIosArrowBack, IoIosArrowForward } from 'react-icons/io';
 import {
   headerContainer,
   titleStyle,
   printButton,
   iconStyle
 } from './index.css';
+
 import { Schedule } from '@/entities/program/type.dto';
 import { formatScheduleData } from '../../utils';
 import { printPDF, regSchedule } from '@/entities/program/api';
 import { useUserStore } from '@/shared/stores/useUserStore';
+import { useDateStore } from '@/shared/stores/useDateStores'; // ✅ 전역 상태 store
 import { toast } from 'react-toastify';
 
 function Header({
@@ -19,19 +24,37 @@ function Header({
   isAdmin: boolean;
   schedule: Schedule;
 }) {
-  const date = new Date();
-  const year = date.getFullYear();
-  const month = date.getMonth() + 1;
-  const mainEduContentIds = formatScheduleData(schedule);
+  // ✅ 전역 날짜 상태 사용
+  const { year, month, setYear, setMonth } = useDateStore();
+  const mainEduContentIds = formatScheduleData(schedule, year, month);
+
   const selectedUserId = useUserStore(state => state.selectedUserId);
   const users = useUserStore.getState().users;
   const selectedUser = users.find(user => user.elderId === selectedUserId);
 
+  const handlePrevMonth = () => {
+    if (month === 1) {
+      setMonth(12);
+      setYear(year - 1);
+    } else {
+      setMonth(month - 1);
+    }
+  };
+
+  const handleNextMonth = () => {
+    if (month === 12) {
+      setMonth(1);
+      setYear(year + 1);
+    } else {
+      setMonth(month + 1);
+    }
+  };
+
   const regScheduleHandler = async () => {
     try {
       await regSchedule({
-        year: 2025,
-        month: 1,
+        year,
+        month,
         difficultyLevel: 1,
         coverEduContentId: 2,
         middleEduContentIds: [3, 4],
@@ -56,9 +79,9 @@ function Header({
       }
 
       const pdfUrl = await printPDF(selectedUserId, {
-        year: 2025,
-        month: 3,
-        difficultyLevel: selectedUser.difficultyLevel, // 💡 여기!
+        year,
+        month,
+        difficultyLevel: selectedUser.difficultyLevel,
         coverEduContentId: 2,
         middleEduContentIds: [3, 4],
         mainEduContentIds: mainEduContentIds
@@ -84,9 +107,18 @@ function Header({
 
   return (
     <div className={headerContainer}>
+      <button type="button" onClick={handlePrevMonth}>
+        <IoIosArrowBack size={20} />
+      </button>
+
       <div className={titleStyle}>
         {year}년 {month}월
       </div>
+
+      <button type="button" onClick={handleNextMonth}>
+        <IoIosArrowForward size={20} />
+      </button>
+
       {!isAdmin ? (
         <button className={printButton} type="button" onClick={print}>
           <MdLocalPrintshop className={iconStyle} size={24} />

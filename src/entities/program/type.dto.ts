@@ -24,7 +24,7 @@ export interface IContent {
 }
 export interface ScheduleItem {
   content: string;
-  eduContentId: number;
+  id: number;
 }
 export interface Schedule {
   [key: number]: {

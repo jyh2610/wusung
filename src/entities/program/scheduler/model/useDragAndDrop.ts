@@ -9,6 +9,7 @@ export function useDragAndDrop(
   setActivities: Dispatch<SetStateAction<IContent[]>>
 ) {
   const { schedule, updateSchedule } = useScheduleStore(); // ✅ Zustand 사용
+  console.log(schedule, '123123123123123');
 
   const onDragEnd = (result: DropResult) => {
     if (!result.destination) return;

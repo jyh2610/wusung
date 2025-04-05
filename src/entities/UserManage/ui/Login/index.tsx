@@ -55,7 +55,7 @@ export function LoginModal() {
           username: res.username
         })
       );
-      router.push('/');
+      router.push('/signin');
       setValue('id', '');
       setValue('password', '');
     } catch (error) {

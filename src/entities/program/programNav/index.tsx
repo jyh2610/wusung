@@ -2,7 +2,7 @@
 
 import { AppBar } from '@mui/material';
 import Image from 'next/image';
-import React from 'react';
+import React, { useEffect, useState } from 'react';
 import { colors } from '@/design-tokens';
 import { Button } from '@/shared/ui';
 import {
@@ -13,12 +13,15 @@ import {
   userInfoContainer
 } from './index.css';
 import { btn } from './ui/navBtn/index.css';
-import { getLocalStorageValue } from '@/lib/utils';
 
 export function ProgramNav() {
-  const rawData = getLocalStorageValue('userInfo');
-  const userInfo = rawData ? JSON.parse(rawData) : null;
-  const id = userInfo?.username;
+  const [id, setId] = useState('');
+
+  useEffect(() => {
+    const rawData = localStorage?.getItem('userInfo');
+    const userInfo = rawData ? JSON.parse(rawData) : null;
+    setId(userInfo?.username);
+  }, []);
 
   return (
     <div className={container}>

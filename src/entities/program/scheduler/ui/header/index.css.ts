@@ -33,3 +33,10 @@ export const printButton = style({
 export const iconStyle = style({
   display: 'flex'
 });
+
+export const arrowButton = style({
+  background: 'none',
+  border: 'none',
+  cursor: 'pointer',
+  padding: '4px'
+});

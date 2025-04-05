@@ -22,10 +22,10 @@ export function convertToSchedule(
     const dailyId = ids[1];
 
     const cognitiveActivity = allActivities.find(
-      act => act.eduContentId === cognitiveId
+      act => act.eduContentId === Number(cognitiveId)
     );
     const dailyActivity = allActivities.find(
-      act => act.eduContentId === dailyId
+      act => act.eduContentId === Number(dailyId)
     );
 
     const daySchedule: Schedule[number] = {};
@@ -33,14 +33,14 @@ export function convertToSchedule(
     if (cognitiveActivity && cognitiveActivity.eduContentId !== undefined) {
       daySchedule.cognitive = {
         content: cognitiveActivity.title,
-        eduContentId: cognitiveActivity.eduContentId
+        id: cognitiveActivity.eduContentId
       };
     }
 
     if (dailyActivity && dailyActivity.eduContentId !== undefined) {
       daySchedule.daily = {
         content: dailyActivity.title,
-        eduContentId: dailyActivity.eduContentId
+        id: dailyActivity.eduContentId
       };
     }
 

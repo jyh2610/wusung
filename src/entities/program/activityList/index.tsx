@@ -46,6 +46,7 @@ export function ActivityList({ activities }: IProps) {
     'medium'
   );
   const [names, setLeaf] = useState<ICategoryLeaf[]>([]);
+  console.log(activities);
 
   useEffect(() => {
     const getList = async () => {
@@ -171,7 +172,7 @@ export function ActivityList({ activities }: IProps) {
             {activities.map((activity, index) => (
               <Activity
                 key={activity.eduContentId} // `activity.number`와 `activity.content` 조합
-                number={activity.eduContentId!}
+                number={activity.eduContentId || 0}
                 content={activity.title}
                 index={index}
               />
