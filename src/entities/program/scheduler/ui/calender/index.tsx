@@ -119,7 +119,7 @@ export function Calendar({ schedule, isAdmin }: CalendarProps) {
             {week.map((dayNum, i) => (
               <div
                 key={i}
-                className={`${gridItem} ${i === 0 ? redText : ''} ${i === 6 ? blueText : ''}`}
+                className={`${gridItem} ${weekLabelBg} ${i === 0 ? redText : ''} ${i === 6 ? blueText : ''}`}
               >
                 {dayNum > 0 ? String(dayNum).padStart(2, '0') : ''}
               </div>
