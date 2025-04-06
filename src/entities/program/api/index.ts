@@ -323,3 +323,14 @@ export const searchContent = async (eduContentId: number) => {
     return res.data.data;
   } catch (error) {}
 };
+
+export const deleteContent = async (eduContentId: number) => {
+  try {
+    await request<IRes<IContent>>({
+      method: 'GET',
+      url: `/api/admin/edu-content/${eduContentId}`
+    });
+  } catch (error) {
+    console.error('콘텐츠 삭제 실패');
+  }
+};

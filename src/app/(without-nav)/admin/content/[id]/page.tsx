@@ -13,6 +13,7 @@ import { Separator } from '@radix-ui/react-dropdown-menu';
 import { formatDate } from 'date-fns';
 import { Badge, Eye, Calendar, BarChart3, Clock } from 'lucide-react';
 import Image from 'next/image';
+import { deleteContent } from '@/entities/program/api';
 
 export interface EduContentFile {
   fileId: number;
@@ -43,6 +44,7 @@ export interface EduContent {
 export default function ContentPage() {
   const [content, setContent] = useState<EduContent | null>(null);
   const { id } = useParams();
+
   useEffect(() => {
     const fetchContent = async () => {
       const token = localStorage.getItem('token');

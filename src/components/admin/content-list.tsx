@@ -21,6 +21,7 @@ import { useState, useEffect } from 'react';
 import { IContent } from '@/entities/program/type.dto';
 import { getContentList } from './api';
 import { useRouter } from 'next/navigation';
+import { deleteContent } from '@/entities/program/api';
 
 export function ContentList() {
   const [contents, setContents] = useState<IContent[]>([]);
@@ -29,6 +30,11 @@ export function ContentList() {
   const handleRowClick = (id: number) => {
     router.push(`/admin/content/${id}`); // 상세 페이지 경로
   };
+
+  const deleteCon = async (id: number) => {
+    await deleteContent(id);
+  };
+
   // 실제 구현 시에는 아래 주석을 해제하여 API에서 데이터를 가져오도록 함
   useEffect(() => {
     const fetchContents = async () => {
@@ -101,15 +107,28 @@ export function ContentList() {
                       </Button>
                     </DropdownMenuTrigger>
                     <DropdownMenuContent align="end">
-                      <DropdownMenuItem>
+                      <DropdownMenuItem
+                        onClick={() =>
+                          router.push(`/admin/content/${content.eduContentId!}`)
+                        }
+                      >
                         <Eye className="mr-2 h-4 w-4" />
                         <span>보기</span>
                       </DropdownMenuItem>
-                      <DropdownMenuItem>
+                      <DropdownMenuItem
+                        onClick={() =>
+                          router.push(`/admin/upload/${content.eduContentId!}`)
+                        }
+                      >
                         <Pencil className="mr-2 h-4 w-4" />
                         <span>수정</span>
                       </DropdownMenuItem>
-                      <DropdownMenuItem className="text-destructive">
+                      <DropdownMenuItem
+                        className="text-destructive"
+                        onClick={() => {
+                          deleteCon(content.eduContentId!);
+                        }}
+                      >
                         <Trash2 className="mr-2 h-4 w-4" />
                         <span>삭제</span>
                       </DropdownMenuItem>

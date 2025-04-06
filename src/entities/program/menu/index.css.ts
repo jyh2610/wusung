@@ -10,5 +10,5 @@ export const titleContainer = style({
   alignItems: 'center',
   justifyContent: 'space-around',
   width: '250px',
-  marginBottom: '20px'
+  marginBottom: '32px'
 });

@@ -17,8 +17,8 @@ import {
   difficultyBox,
   titleContainer
 } from './index.css';
-import { ICategoryLeaf, IContent } from '../type.dto';
-import { getCategoryLeaf } from '../api';
+import { IContent } from '../type.dto';
+import { useCategoryStore } from '@/shared/stores/useCategoryStore';
 
 const ITEM_HEIGHT = 48;
 const ITEM_PADDING_TOP = 8;
@@ -40,15 +40,11 @@ export function ActivityList({ activities, onFilterChange }: IProps) {
   const [selectedLevel, setSelectedLevel] = useState<'high' | 'medium' | 'low'>(
     'medium'
   );
-  const [names, setLeaf] = useState<ICategoryLeaf[]>([]);
+  const { categories, fetchCategories } = useCategoryStore(); // zustand 사용
 
   useEffect(() => {
-    const getList = async () => {
-      const res = await getCategoryLeaf();
-      setLeaf(res);
-    };
-    getList();
-  }, []);
+    fetchCategories(); // 컴포넌트가 마운트되면 카테고리 데이터를 가져옵니다.
+  }, [fetchCategories]);
 
   const MenuProps = {
     PaperProps: {
@@ -68,7 +64,7 @@ export function ActivityList({ activities, onFilterChange }: IProps) {
     const newPersonName = typeof value === 'string' ? value.split(',') : value;
     setPersonName(newPersonName);
 
-    const selectedCategory = names.find(n => n.name === newPersonName[0]);
+    const selectedCategory = categories.find(n => n.name === newPersonName[0]);
     if (selectedCategory) {
       onFilterChange(selectedCategory.categoryId, difficultyMap[selectedLevel]);
     }
@@ -76,7 +72,7 @@ export function ActivityList({ activities, onFilterChange }: IProps) {
 
   const handleLevelClick = (level: 'high' | 'medium' | 'low') => {
     setSelectedLevel(level);
-    const selectedCategory = names.find(n => n.name === personName[0]);
+    const selectedCategory = categories.find(n => n.name === personName[0]);
     if (selectedCategory) {
       onFilterChange(selectedCategory.categoryId, difficultyMap[level]);
     }
@@ -121,7 +117,7 @@ export function ActivityList({ activities, onFilterChange }: IProps) {
             <MenuItem disabled value="">
               <em>선택</em>
             </MenuItem>
-            {names.map(name => (
+            {categories.map(name => (
               <MenuItem key={name.categoryId} value={name.name}>
                 {name.name}
               </MenuItem>

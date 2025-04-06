@@ -13,10 +13,11 @@ import {
   userInfoContainer
 } from './index.css';
 import { btn } from './ui/navBtn/index.css';
+import { useRouter } from 'next/navigation';
 
 export function ProgramNav() {
   const [id, setId] = useState('');
-
+  const router = useRouter();
   useEffect(() => {
     const rawData = localStorage?.getItem('userInfo');
     const userInfo = rawData ? JSON.parse(rawData) : null;
@@ -52,7 +53,7 @@ export function ProgramNav() {
             </div>
             <div className={textAlign}>이달의 인지활동지</div>
           </div>
-          <div className={btn}>
+          <div className={btn} onClick={() => router.push('/program/activity')}>
             <div className={imgContainer}>
               <Image fill src={'/images/navBtn2.png'} alt={'이동 버튼'} />
             </div>

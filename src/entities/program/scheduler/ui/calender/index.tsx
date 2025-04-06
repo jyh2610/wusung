@@ -50,14 +50,22 @@ export function Calendar({ schedule, isAdmin }: CalendarProps) {
     weeks.push(currentWeek);
   }
 
-  const renderCell = (dayNum: number, category: 'cognitive' | 'daily') => {
+  const renderCell = (
+    dayNum: number,
+    category: 'cognitive' | 'daily',
+    weekIdx: number,
+    colIdx: number // ← 추가!
+  ) => {
     const item = schedule[dayNum]?.[category];
-
+    const isDisabled = dayNum === 0;
+    const droppableId = isDisabled
+      ? `disabled-${weekIdx}-${colIdx}-${category}`
+      : `${dayNum}-${category}`;
     return (
       <Droppable
-        key={`${dayNum}-${category}`}
-        droppableId={`${dayNum}-${category}`}
-        isDropDisabled={dayNum === 0}
+        key={droppableId}
+        droppableId={droppableId}
+        isDropDisabled={isDisabled}
       >
         {provided => (
           <div
@@ -123,7 +131,9 @@ export function Calendar({ schedule, isAdmin }: CalendarProps) {
             <div className={activityCell}>
               <div className={activityLabel}>인지활동</div>
             </div>
-            {week.map(dayNum => renderCell(dayNum, 'cognitive'))}
+            {week.map((dayNum, colIdx) =>
+              renderCell(dayNum, 'cognitive', weekIdx, colIdx)
+            )}
           </div>
 
           {/* 일상생활 + 추가 인지 */}
@@ -131,7 +141,9 @@ export function Calendar({ schedule, isAdmin }: CalendarProps) {
             <div className={activityCell}>
               <div className={activityLabel}>일상생활 & 추가 인지활동</div>
             </div>
-            {week.map(dayNum => renderCell(dayNum, 'daily'))}
+            {week.map((dayNum, colIdx) =>
+              renderCell(dayNum, 'daily', weekIdx, colIdx)
+            )}
           </div>
         </div>
       ))}

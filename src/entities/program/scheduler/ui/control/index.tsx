@@ -16,7 +16,7 @@ import {
 } from './index.css';
 import { useScheduleStore } from '@/shared/stores/useScheduleStore';
 import { getPlan, IPlan } from '@/entities/program/api';
-import { Schedule } from '@/entities/program/type.dto';
+import { Schedule, ScheduleItem } from '@/entities/program/type.dto';
 import { Button } from '@/shared/ui';
 import { autoRegisterPlan } from '../../model/autoRegisterPlan';
 import { Draggable, Droppable } from '@hello-pangea/dnd';
@@ -26,7 +26,13 @@ export function Control({ isAdmin }: { isAdmin: boolean }) {
   const { undo, redo, reInit } = useScheduleStore();
   const coverItems = useScheduleStore(state => state.coverItems);
   const etcItems = useScheduleStore(state => state.etcItems);
+  const addEtcItem = useScheduleStore(state => state.addEtcItem); // addEtcItem 메소드를 가져옵니다.
+
   console.log(etcItems);
+
+  const handleDrop = (item: ScheduleItem) => {
+    addEtcItem(item);
+  };
 
   return (
     <div className={Container}>
