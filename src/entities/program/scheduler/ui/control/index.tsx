@@ -132,7 +132,8 @@ export function Control({ isAdmin }: { isAdmin: boolean }) {
                 backgroundColor: snapshot.isDraggingOver
                   ? '#f0f0f0'
                   : 'transparent',
-                transition: 'background-color 0.2s ease'
+                transition: 'background-color 0.2s ease',
+                position: 'relative'
               }}
             >
               <button>커버</button>
@@ -155,13 +156,6 @@ export function Control({ isAdmin }: { isAdmin: boolean }) {
               >
                 {coverItems.content.length > 0 ? 1 : 0}
               </div>
-
-              {/* Only show the number of items in the cover section */}
-              {coverItems && coverItems.content.length > 0 && (
-                <div>
-                  <span>1</span>
-                </div>
-              )}
 
               {provided.placeholder}
             </div>
