@@ -28,13 +28,16 @@ export function useDragAndDrop(
       addCoverItem({ id, content });
       return;
     }
+    console.log('Dropped onto ETC area!'); // 4. "etc" 블록 진입 확인
 
     // ✅ 기타 드랍
     if (destId === 'etc') {
       if (etcItems.length >= 2) {
+        console.log('ETC limit reached.');
         alert('기타자료는 최대 2개까지만 넣을 수 있어요!');
         return;
       }
+      console.log('Calling addEtcItem with:', { id, content }); // 5. addEtcItem 호출 직전 확인
       addEtcItem({ id, content });
       return;
     }

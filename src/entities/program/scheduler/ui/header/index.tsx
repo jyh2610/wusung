@@ -16,6 +16,7 @@ import { printPDF, regSchedule } from '@/entities/program/api';
 import { useUserStore } from '@/shared/stores/useUserStore';
 import { useDateStore } from '@/shared/stores/useDateStores'; // ✅ 전역 상태 store
 import { toast } from 'react-toastify';
+import { useScheduleStore } from '@/shared/stores/useScheduleStore';
 
 function Header({
   isAdmin,
@@ -27,6 +28,10 @@ function Header({
   // ✅ 전역 날짜 상태 사용
   const { year, month, setYear, setMonth } = useDateStore();
   const mainEduContentIds = formatScheduleData(schedule, year, month);
+  const { coverItems, etcItems } = useScheduleStore(state => ({
+    coverItems: state.coverItems,
+    etcItems: state.etcItems
+  }));
 
   const selectedUserId = useUserStore(state => state.selectedUserId);
   const users = useUserStore.getState().users;
@@ -52,12 +57,21 @@ function Header({
 
   const regScheduleHandler = async () => {
     try {
+      const coverItemId =
+        coverItems && coverItems.id !== 0 ? coverItems.id : null;
+      // etcItems 배열에서 id만 추출 (middleEduContentIds로 사용 가정)
+      const middleEduContentIds = etcItems.map(item => item.id);
+
+      // 디버깅 로그 (API 호출 전 값 확인)
+      console.log('Printing with coverEduContentId:', coverItemId);
+      console.log('Printing with middleEduContentIds:', middleEduContentIds);
+
       await regSchedule({
         year,
         month,
         difficultyLevel: 1,
-        coverEduContentId: 2,
-        middleEduContentIds: [3, 4],
+        coverEduContentId: coverItemId!,
+        middleEduContentIds: middleEduContentIds,
         mainEduContentIds: mainEduContentIds
       });
       toast.success('등록이 완료되었습니다!');
@@ -78,12 +92,22 @@ function Header({
         return;
       }
 
+      const coverItemId =
+        coverItems && coverItems.id !== 0 ? coverItems.id : null;
+      // etcItems 배열에서 id만 추출 (middleEduContentIds로 사용 가정)
+      const middleEduContentIds = etcItems.map(item => item.id);
+
+      // 디버깅 로그 (API 호출 전 값 확인)
+      console.log('Printing with coverEduContentId:', coverItemId);
+      console.log('Printing with middleEduContentIds:', middleEduContentIds);
+
+      // ✅ API 호출 수정
       const pdfUrl = await printPDF(selectedUserId, {
         year,
         month,
         difficultyLevel: selectedUser.difficultyLevel,
-        coverEduContentId: 2,
-        middleEduContentIds: [3, 4],
+        coverEduContentId: coverItemId!, // 가공된 cover item ID 사용
+        middleEduContentIds: middleEduContentIds, // 가공된 etc items ID 배열 사용
         mainEduContentIds: mainEduContentIds
       });
 
