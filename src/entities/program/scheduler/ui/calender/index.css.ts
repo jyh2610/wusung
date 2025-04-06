@@ -2,7 +2,9 @@ import { style } from '@vanilla-extract/css';
 import { colors } from '@/design-tokens';
 
 export const container = style({
-  marginTop: '2rem'
+  marginTop: '2rem',
+  borderTop: `1px solid ${colors.gray_scale[300]}`,
+  borderLeft: `1px solid ${colors.gray_scale[300]}`
 });
 
 export const grid = style({
@@ -14,8 +16,7 @@ export const grid = style({
 
 export const weekDay = style({
   padding: '3px 0',
-  maxHeight: '28px',
-  borderTop: `1px solid ${colors.gray_scale[300]}`
+  maxHeight: '28px'
 });
 export const weekLabelBg = style({
   backgroundColor: colors.gray_scale[200]
@@ -26,7 +27,7 @@ export const weekgridItem = style({
   borderRight: `1px solid ${colors.gray_scale[300]}`,
   display: 'flex',
   alignItems: 'center',
-  justifyContent: 'space-between'
+  justifyContent: 'center'
 });
 
 export const gridItem = style({

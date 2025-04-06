@@ -64,7 +64,8 @@ export function Control({ isAdmin }: { isAdmin: boolean }) {
                   ? '#f0f0f0'
                   : 'transparent',
                 transition: 'background-color 0.2s ease',
-                padding: '8px'
+                padding: '8px',
+                width: '150px'
               }}
             >
               <button>기타자료</button>
@@ -72,8 +73,8 @@ export function Control({ isAdmin }: { isAdmin: boolean }) {
               <div
                 style={{
                   position: 'absolute',
-                  top: '0px',
-                  right: '4px',
+                  top: '-5px',
+                  right: '-10px',
                   backgroundColor: 'red',
                   color: 'white',
                   borderRadius: '50%',
@@ -133,7 +134,8 @@ export function Control({ isAdmin }: { isAdmin: boolean }) {
                   ? '#f0f0f0'
                   : 'transparent',
                 transition: 'background-color 0.2s ease',
-                position: 'relative'
+                position: 'relative',
+                width: '150px'
               }}
             >
               <button>커버</button>
@@ -141,8 +143,8 @@ export function Control({ isAdmin }: { isAdmin: boolean }) {
               <div
                 style={{
                   position: 'absolute',
-                  top: '0px',
-                  right: '4px',
+                  top: '-5px',
+                  right: '-10px',
                   backgroundColor: 'red',
                   color: 'white',
                   borderRadius: '50%',
