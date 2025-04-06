@@ -112,14 +112,8 @@ function Header({
       });
 
       if (pdfUrl) {
-        const link = document.createElement('a');
-        link.href = pdfUrl;
-        link.download = '교육계획표.pdf';
-        document.body.appendChild(link);
-        link.click();
-        document.body.removeChild(link);
-
-        toast.success('PDF 다운로드 완료!');
+        // --- 새 탭에서 PDF 열기 ---
+        window.open(pdfUrl, '_blank'); // 새 탭/창에서 PDF URL 열기
       } else {
         toast.error('PDF 파일을 받지 못했습니다.');
       }

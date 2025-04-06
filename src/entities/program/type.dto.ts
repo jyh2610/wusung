@@ -58,3 +58,14 @@ export interface IUser {
   difficultyLevel: number;
   managerName: string;
 }
+
+export interface CategoryNode {
+  categoryId: number;
+  parentId: number | null; // 부모 ID가 없을 수 있으므로 null 허용
+  name: string;
+  isUsed: boolean;
+  children: CategoryNode[]; // 자식 노드들도 동일한 구조를 가지므로 재귀적으로 참조
+}
+
+// API 응답 전체 (CategoryNode의 배열)를 나타내는 타입
+export type CategoryResponse = CategoryNode[];

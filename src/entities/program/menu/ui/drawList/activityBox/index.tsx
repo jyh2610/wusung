@@ -1,22 +1,29 @@
 'use client';
 
-import { ICategoryLeaf } from '@/entities/program/type.dto';
-import { useCategoryStore } from '@/shared/stores/useCategoryStore';
+// import { useCategoryStore } from '@/shared/stores/useCategoryStore'; // 기존 스토어 import 제거
+import { useCategoryTreeStore } from '@/shared/stores/useCategoryTreeStore'; // ✅ 새로운 스토어 import
+import { CategoryNode } from '@/entities/program/type.dto'; // CategoryNode 타입 import
 import React, { useEffect } from 'react';
 import { listItem, selectedItem } from './index.css';
 import { title } from '../../../index.css';
 
 export function ActivityBox() {
-  const { categories, fetchCategories, selectedCategory, setSelectedCategory } =
-    useCategoryStore();
+  // ✅ 새로운 스토어에서 상태와 액션 가져오기
+  const {
+    categoryTree, // 이름 변경: categories -> categoryTree
+    fetchCategoryTree, // 이름 변경: fetchCategories -> fetchCategoryTree
+    selectedCategoryNode, // 이름 변경: selectedCategory -> selectedCategoryNode
+    setSelectedCategoryNode // 이름 변경: setSelectedCategory -> setSelectedCategoryNode
+  } = useCategoryTreeStore();
 
-  // 데이터를 가져오는 useEffect
+  // 데이터를 가져오는 useEffect (호출 함수 이름 변경)
   useEffect(() => {
-    fetchCategories();
-  }, [fetchCategories]);
+    fetchCategoryTree(); // ✅ fetchCategoryTree 호출
+  }, [fetchCategoryTree]);
 
-  const handleCategorySelect = (category: ICategoryLeaf) => {
-    setSelectedCategory(category); // 카테고리 선택 시 상태 업데이트
+  // 카테고리 선택 핸들러 (사용하는 상태/액션 이름 변경)
+  const handleCategorySelect = (category: CategoryNode) => {
+    setSelectedCategoryNode(category); // ✅ setSelectedCategoryNode 호출
   };
 
   return (
@@ -25,12 +32,14 @@ export function ActivityBox() {
         활동지 목록
       </h3>
       <ul>
-        {categories.map(item => (
+        {/* ✅ categoryTree 배열 순회 */}
+        {categoryTree.map(item => (
           <li
             key={item.categoryId}
             onClick={() => handleCategorySelect(item)}
             className={`${listItem} ${
-              selectedCategory?.categoryId === item.categoryId
+              // ✅ selectedCategoryNode와 비교
+              selectedCategoryNode?.categoryId === item.categoryId
                 ? selectedItem
                 : ''
             }`}

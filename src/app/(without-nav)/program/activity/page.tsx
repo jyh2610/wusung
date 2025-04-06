@@ -20,6 +20,8 @@ import {
 import { useActivities } from '@/entities/program/scheduler/model/useActivities';
 import Image from 'next/image';
 import { Button } from '@/shared/ui';
+import { printUserPrint } from '@/entities/program/api';
+import { toast } from 'react-toastify';
 
 function Activity() {
   const [personName, setPersonName] = useState<string[]>([]);
@@ -97,8 +99,34 @@ function Activity() {
   };
 
   // Handle print
-  const handlePrint = () => {
-    window.print(); // Simple print functionality
+  // Activity 컴포넌트 내부
+
+  const handlePrint = async () => {
+    try {
+      const selectedIdsArray = Array.from(selectedActivities);
+      // const selectedIdsArray = [...selectedActivities]; // Alternative
+
+      if (selectedIdsArray.length === 0) {
+        toast.warn('인쇄할 활동지를 선택해주세요.');
+        return;
+      }
+
+      console.log('Requesting PDF for printing IDs:', selectedIdsArray);
+      const pdfUrl = await printUserPrint(selectedIdsArray);
+
+      toast.info(
+        'PDF가 새 탭에서 열립니다. 해당 탭의 인쇄 기능을 이용해 주세요.'
+      );
+      if (pdfUrl) {
+        // --- 새 탭에서 PDF 열기 ---
+        window.open(pdfUrl, '_blank'); // 새 탭/창에서 PDF URL 열기
+      } else {
+        toast.error('PDF 파일을 받지 못했습니다.');
+      }
+    } catch (error) {
+      console.error('프린트 에러:', error);
+      toast.error('인쇄 실패되었습니다!');
+    }
   };
 
   return (
