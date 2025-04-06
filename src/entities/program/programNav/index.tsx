@@ -47,7 +47,7 @@ export function ProgramNav() {
         </div>
 
         <div className={navBtnContainer}>
-          <div className={btn}>
+          <div className={btn} onClick={() => router.push('/program')}>
             <div className={imgContainer}>
               <Image fill src={'/images/navBtn1.png'} alt={'이동 버튼'} />
             </div>
