@@ -4,10 +4,11 @@ import { ILoginData, ILoginRes, ILogoutData } from '../type';
 export const login = async ({ userName, password }: ILoginData) => {
   const res = await request<ILoginRes>({
     method: 'POST',
-    url: 'https://13.124.172.100.sslip.io/api/login',
+    url: '/api/login/code',
     data: {
       username: userName,
-      password: password
+      password: password,
+      code: '000000'
     }
   });
   return res.data;
