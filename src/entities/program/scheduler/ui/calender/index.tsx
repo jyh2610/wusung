@@ -74,7 +74,10 @@ export function Calendar({ schedule, isAdmin }: CalendarProps) {
             className={activityCell}
           >
             {item ? (
-              <Draggable draggableId={`${item.id}|${item.content}`} index={0}>
+              <Draggable
+                draggableId={`${item.id}|${item.content}|${category}`}
+                index={0}
+              >
                 {dragProvided => (
                   <div
                     ref={dragProvided.innerRef}
