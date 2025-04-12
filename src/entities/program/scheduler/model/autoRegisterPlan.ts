@@ -2,8 +2,8 @@ import { useScheduleStore } from '@/shared/stores/useScheduleStore';
 import { getPlan, searchContent } from '../../api';
 
 interface AutoRegisterParams {
-  year: string;
-  month: string;
+  year: number;
+  month: number;
   difficultyLevel: number;
 }
 

@@ -271,8 +271,8 @@ export const getPlan = async ({
   month,
   difficultyLevel
 }: {
-  year: string;
-  month: string;
+  year: number;
+  month: number;
   difficultyLevel: number;
 }) => {
   try {
