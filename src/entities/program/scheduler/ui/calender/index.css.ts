@@ -27,7 +27,7 @@ export const weekgridItem = style({
   borderRight: `1px solid ${colors.gray_scale[300]}`,
   display: 'flex',
   alignItems: 'center',
-  justifyContent: 'center'
+  justifyContent: 'space-between'
 });
 
 export const gridItem = style({
@@ -76,7 +76,10 @@ export const activityCell = style({
   padding: '0.5rem',
   textAlign: 'center',
   borderRight: `1px solid ${colors.gray_scale[300]}`,
-  minHeight: '62px' // 모든 칸 높이 동일하게 설정
+  minHeight: '62px',
+  display: 'flex',
+  justifyContent: 'center',
+  alignItems: 'center'
 });
 
 export const activityLabel = style({
@@ -86,4 +89,8 @@ export const activityLabel = style({
 export const activityListContainer = style({
   overflowY: 'auto',
   maxHeight: '1450px'
+});
+
+export const disabled = style({
+  backgroundColor: colors.gray_scale[300]
 });

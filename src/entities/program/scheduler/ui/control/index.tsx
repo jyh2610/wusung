@@ -1,19 +1,12 @@
 import React, { useState } from 'react';
 import { IoReload } from 'react-icons/io5';
-import { LuUndo2, LuRedo2 } from 'react-icons/lu';
 import {
   controlContainer,
   buttonStyle,
-  closeButton,
-  confirmButtonWrapper,
-  filterSection,
-  modalContent,
-  modalOverlay,
   additionalData,
   Container
 } from './index.css';
 import { useScheduleStore } from '@/shared/stores/useScheduleStore';
-import { Button } from '@/shared/ui';
 import { Draggable, Droppable } from '@hello-pangea/dnd';
 import { IPlan, getPlan } from '@/entities/program/api';
 import { autoRegisterPlan } from '../../model/autoRegisterPlan';
@@ -57,14 +50,14 @@ export function Control({ isAdmin }: { isAdmin: boolean }) {
   return (
     <div className={Container}>
       <div className={controlContainer}>
-        <button className={buttonStyle} onClick={undo}>
+        {/* <button className={buttonStyle} onClick={undo}>
           <LuUndo2 size={24} />
           실행 취소
         </button>
         <button className={buttonStyle} onClick={redo}>
           <LuRedo2 size={24} />
           실행 복구
-        </button>
+        </button> */}
         <button className={buttonStyle} onClick={reInit}>
           <IoReload size={24} />
           초기화

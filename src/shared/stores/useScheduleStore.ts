@@ -34,6 +34,11 @@ interface ScheduleState {
   redo: () => void;
   reInit: () => void;
 
+  removeScheduleItem: (dateKey: string, itemId: number) => void;
+
+  removeCoverItem: () => void;
+  removeEtcItem: (id: number) => void;
+
   addCoverItem: (item: ScheduleItem) => void;
   clearCoverItems: () => void;
 
@@ -47,6 +52,32 @@ export const useScheduleStore = create<ScheduleState>(set => ({
   redoStack: [],
   coverItems: { id: 0, content: '' }, // ✅ 초기값도 null
   etcItems: [],
+
+  removeScheduleItem: (dateKey, itemId) =>
+    set(state => {
+      const daySchedule = state.schedule[Number(dateKey)];
+
+      if (!daySchedule) return state;
+
+      // id가 일치하는 항목만 제거
+      const newDaySchedule = Object.fromEntries(
+        Object.entries(daySchedule).filter(([_, item]) => item?.id !== itemId)
+      );
+
+      return {
+        schedule: {
+          ...state.schedule,
+          [dateKey]: newDaySchedule
+        }
+      };
+    }),
+
+  removeCoverItem: () => set({ coverItems: undefined }),
+
+  removeEtcItem: id =>
+    set(state => ({
+      etcItems: state.etcItems.filter(item => item.id !== id)
+    })),
 
   updateSchedule: newSchedule =>
     set(state => ({

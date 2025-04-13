@@ -17,6 +17,9 @@ import {
 } from './index.css';
 import { Schedule } from '@/entities/program/type.dto';
 import { useDateStore } from '@/shared/stores/useDateStores';
+import { MdDelete } from 'react-icons/md';
+import { useState } from 'react';
+import { useScheduleStore } from '@/shared/stores/useScheduleStore';
 
 interface CalendarProps {
   schedule: Schedule;
@@ -27,12 +30,23 @@ const weekdays = ['일', '월', '화', '수', '목', '금', '토'];
 
 export function Calendar({ schedule, isAdmin }: CalendarProps) {
   const { year, month } = useDateStore();
-
+  const [disabledDrops, setDisabledDrops] = useState<Set<string>>(new Set());
+  const { removeScheduleItem } = useScheduleStore();
   const firstDayOfMonth = new Date(year, month - 1, 1);
   const daysInMonth = new Date(year, month, 0).getDate();
   const startDay = firstDayOfMonth.getDay();
-
   const weeks: number[][] = [];
+
+  const toggleMultipleDropsDisabled = (droppableIds: string[]) => {
+    setDisabledDrops(prev => {
+      const newSet = new Set(prev);
+      droppableIds.forEach(id => {
+        newSet.has(id) ? newSet.delete(id) : newSet.add(id);
+      });
+      return newSet;
+    });
+  };
+
   let currentWeek: number[] = new Array(startDay).fill(0);
 
   for (let day = 1; day <= daysInMonth; day++) {
@@ -54,13 +68,21 @@ export function Calendar({ schedule, isAdmin }: CalendarProps) {
     dayNum: number,
     category: 'cognitive' | 'daily',
     weekIdx: number,
-    colIdx: number // ← 추가!
+    colIdx: number
   ) => {
     const item = schedule[dayNum]?.[category];
-    const isDisabled = dayNum === 0;
-    const droppableId = isDisabled
-      ? `disabled-${weekIdx}-${colIdx}-${category}`
-      : `${dayNum}-${category}`;
+    const droppableId =
+      dayNum === 0
+        ? `disabled-${weekIdx}-${colIdx}-${category}`
+        : `${dayNum}-${category}`;
+
+    const isDisabled = dayNum === 0 || disabledDrops.has(droppableId);
+    const handleDelete = () => {
+      // 삭제 함수 호출
+      if (dayNum > 0 && item) {
+        removeScheduleItem(String(dayNum), item.id);
+      }
+    };
     return (
       <Droppable
         key={droppableId}
@@ -85,6 +107,7 @@ export function Calendar({ schedule, isAdmin }: CalendarProps) {
                     {...dragProvided.dragHandleProps}
                   >
                     {item.content}
+                    <MdDelete onClick={handleDelete} />
                   </div>
                 )}
               </Draggable>
@@ -100,6 +123,7 @@ export function Calendar({ schedule, isAdmin }: CalendarProps) {
 
   return (
     <div className={container}>
+      {/* 요일 헤더 */}
       <div className={grid}>
         <div className={weekgridItem} />
         {weekdays.map((day, i) => (
@@ -107,7 +131,24 @@ export function Calendar({ schedule, isAdmin }: CalendarProps) {
             key={i}
             className={`${weekgridItem} ${weekDay} ${i === 0 ? redText : ''} ${i === 6 ? blueText : ''}`}
           >
-            {day}
+            <span>{day}</span>
+            <input
+              type="checkbox"
+              onChange={() => {
+                const idsToToggle: string[] = [];
+                weeks.forEach(week =>
+                  week.forEach((dayNum, idx) => {
+                    if (idx === i && dayNum > 0) {
+                      idsToToggle.push(
+                        `${dayNum}-cognitive`,
+                        `${dayNum}-daily`
+                      );
+                    }
+                  })
+                );
+                toggleMultipleDropsDisabled(idsToToggle);
+              }}
+            />
           </div>
         ))}
       </div>
@@ -116,15 +157,45 @@ export function Calendar({ schedule, isAdmin }: CalendarProps) {
         <div key={weekIdx}>
           {/* 날짜 행 */}
           <div className={grid}>
+            {/* 주차 체크박스 */}
             <div className={`${gridItem} ${weekLabel} ${weekLabelBg}`}>
               {weekIdx + 1}주차
+              <input
+                style={{ marginLeft: '8px' }}
+                type="checkbox"
+                onChange={() => {
+                  const idsToToggle: string[] = [];
+                  week.forEach(dayNum => {
+                    if (dayNum > 0) {
+                      idsToToggle.push(
+                        `${dayNum}-cognitive`,
+                        `${dayNum}-daily`
+                      );
+                    }
+                  });
+                  toggleMultipleDropsDisabled(idsToToggle);
+                }}
+              />
             </div>
+
+            {/* 날짜별 체크박스 */}
             {week.map((dayNum, i) => (
               <div
                 key={i}
                 className={`${gridItem} ${weekLabelBg} ${i === 0 ? redText : ''} ${i === 6 ? blueText : ''}`}
               >
                 {dayNum > 0 ? String(dayNum).padStart(2, '0') : ''}
+                {dayNum > 0 && (
+                  <input
+                    type="checkbox"
+                    onChange={() =>
+                      toggleMultipleDropsDisabled([
+                        `${dayNum}-cognitive`,
+                        `${dayNum}-daily`
+                      ])
+                    }
+                  />
+                )}
               </div>
             ))}
           </div>
