@@ -105,8 +105,14 @@ export function Calendar({ schedule, isAdmin }: CalendarProps) {
                     ref={dragProvided.innerRef}
                     {...dragProvided.draggableProps}
                     {...dragProvided.dragHandleProps}
+                    style={{
+                      display: 'flex',
+                      gap: '4px',
+                      justifyContent: 'center',
+                      alignItems: 'center'
+                    }}
                   >
-                    {item.content}
+                    <span>{item.content}</span>
                     <MdDelete onClick={handleDelete} />
                   </div>
                 )}
