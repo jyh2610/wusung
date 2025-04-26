@@ -13,13 +13,13 @@ import {
   redText,
   blueText,
   weekgridItem,
-  weekLabelBg
+  weekLabelBg,
+  disabledCell
 } from './index.css';
 import { Schedule } from '@/entities/program/type.dto';
 import { useDateStore } from '@/shared/stores/useDateStores';
-import { MdDelete } from 'react-icons/md';
-import { useState, useEffect } from 'react';
 import { useScheduleStore } from '@/shared/stores/useScheduleStore';
+import { MdDelete } from 'react-icons/md';
 
 interface CalendarProps {
   schedule: Schedule;
@@ -30,16 +30,14 @@ const weekdays = ['일', '월', '화', '수', '목', '금', '토'];
 
 export function Calendar({ schedule, isAdmin }: CalendarProps) {
   const { year, month } = useDateStore();
-  const { removeScheduleItem } = useScheduleStore();
-
-  const [disabledDrops, setDisabledDrops] = useState<Set<string>>(new Set());
-  const [checkedDays, setCheckedDays] = useState<Set<string>>(new Set()); // ✅ 날짜 체크 상태
+  const { disabledDrops, toggleDisabledDrop, removeScheduleItem } =
+    useScheduleStore();
 
   const firstDayOfMonth = new Date(year, month - 1, 1);
   const daysInMonth = new Date(year, month, 0).getDate();
   const startDay = firstDayOfMonth.getDay();
-
   const weeks: number[][] = [];
+
   let currentWeek: number[] = new Array(startDay).fill(0);
 
   for (let day = 1; day <= daysInMonth; day++) {
@@ -49,64 +47,13 @@ export function Calendar({ schedule, isAdmin }: CalendarProps) {
       currentWeek = [];
     }
   }
+
   if (currentWeek.length > 0) {
     while (currentWeek.length < 7) {
       currentWeek.push(0);
     }
     weeks.push(currentWeek);
   }
-
-  // ✅ 초기 체크 (처음에는 모든 날짜가 체크된 상태)
-  useEffect(() => {
-    const initialChecked = new Set<string>();
-    for (let day = 1; day <= daysInMonth; day++) {
-      initialChecked.add(day.toString());
-    }
-    setCheckedDays(initialChecked);
-  }, [year, month]);
-
-  // ✅ 드랍 비활성화/활성화 + 스케줄 삭제
-  const toggleMultipleDropsDisabled = (
-    droppableIds: string[],
-    checked: boolean
-  ) => {
-    setDisabledDrops(prev => {
-      const newSet = new Set(prev);
-
-      droppableIds.forEach(id => {
-        if (checked) {
-          newSet.delete(id);
-        } else {
-          newSet.add(id);
-          const [dayStr, category] = id.split('-');
-          const dayNum = Number(dayStr);
-          if (!isNaN(dayNum)) {
-            removeScheduleItem(dayStr, dayNum);
-          }
-        }
-      });
-
-      return newSet;
-    });
-  };
-
-  // ✅ 날짜 체크박스 상태 업데이트
-  const toggleDayCheck = (dayNum: number, checked: boolean) => {
-    setCheckedDays(prev => {
-      const newSet = new Set(prev);
-      if (checked) {
-        newSet.add(dayNum.toString());
-      } else {
-        newSet.delete(dayNum.toString());
-      }
-      return newSet;
-    });
-
-    toggleMultipleDropsDisabled(
-      [`${dayNum}-cognitive`, `${dayNum}-daily`],
-      checked
-    );
-  };
 
   const renderCell = (
     dayNum: number,
@@ -138,7 +85,7 @@ export function Calendar({ schedule, isAdmin }: CalendarProps) {
           <div
             ref={provided.innerRef}
             {...provided.droppableProps}
-            className={activityCell}
+            className={`${activityCell} ${isDisabled ? disabledCell : ''}`}
           >
             {item ? (
               <Draggable
@@ -177,22 +124,28 @@ export function Calendar({ schedule, isAdmin }: CalendarProps) {
       {/* 요일 헤더 */}
       <div className={grid}>
         <div className={weekgridItem} />
-        {weekdays.map((day, i) => (
+        {weekdays.map((day, dayIdx) => (
           <div
-            key={i}
-            className={`${weekgridItem} ${weekDay} ${i === 0 ? redText : ''} ${i === 6 ? blueText : ''}`}
+            key={dayIdx}
+            className={`${weekgridItem} ${weekDay} ${dayIdx === 0 ? redText : ''} ${dayIdx === 6 ? blueText : ''}`}
           >
             <span>{day}</span>
             <input
               type="checkbox"
-              checked={weeks.some(
-                week => week[i] > 0 && checkedDays.has(week[i].toString())
-              )}
-              onChange={e => {
+              checked={
+                !weeks.some(
+                  week =>
+                    week[dayIdx] > 0 &&
+                    (disabledDrops.has(`${week[dayIdx]}-cognitive`) ||
+                      disabledDrops.has(`${week[dayIdx]}-daily`))
+                )
+              }
+              onChange={() => {
                 weeks.forEach(week => {
-                  const dayNum = week[i];
+                  const dayNum = week[dayIdx];
                   if (dayNum > 0) {
-                    toggleDayCheck(dayNum, e.target.checked);
+                    toggleDisabledDrop(`${dayNum}-cognitive`);
+                    toggleDisabledDrop(`${dayNum}-daily`);
                   }
                 });
               }}
@@ -201,42 +154,60 @@ export function Calendar({ schedule, isAdmin }: CalendarProps) {
         ))}
       </div>
 
-      {/* 주차 + 날짜 + 인지/일상 */}
+      {/* 날짜별 행들 */}
       {weeks.map((week, weekIdx) => (
         <div key={weekIdx}>
+          {/* 날짜 체크 + 체크박스 */}
           <div className={grid}>
             {/* 주차 */}
             <div className={`${gridItem} ${weekLabel} ${weekLabelBg}`}>
               {weekIdx + 1}주차
               <input
-                style={{ marginLeft: '8px' }}
                 type="checkbox"
-                checked={week.every(
-                  dayNum => dayNum === 0 || checkedDays.has(dayNum.toString())
-                )}
-                onChange={e => {
+                checked={
+                  !week.some(
+                    dayNum =>
+                      dayNum > 0 &&
+                      (disabledDrops.has(`${dayNum}-cognitive`) ||
+                        disabledDrops.has(`${dayNum}-daily`))
+                  )
+                }
+                onChange={() => {
                   week.forEach(dayNum => {
                     if (dayNum > 0) {
-                      toggleDayCheck(dayNum, e.target.checked);
+                      toggleDisabledDrop(`${dayNum}-cognitive`);
+                      toggleDisabledDrop(`${dayNum}-daily`);
                     }
                   });
                 }}
               />
             </div>
 
-            {/* 날짜별 */}
-            {week.map((dayNum, i) => (
+            {/* 일자 + 개별 체크박스 */}
+            {week.map((dayNum, dayIdx) => (
               <div
-                key={i}
-                className={`${gridItem} ${weekLabelBg} ${i === 0 ? redText : ''} ${i === 6 ? blueText : ''}`}
+                key={dayIdx}
+                className={`${gridItem} ${weekLabelBg} ${dayIdx === 0 ? redText : ''} ${dayIdx === 6 ? blueText : ''}`}
               >
-                {dayNum > 0 ? String(dayNum).padStart(2, '0') : ''}
-                {dayNum > 0 && (
-                  <input
-                    type="checkbox"
-                    checked={checkedDays.has(dayNum.toString())}
-                    onChange={e => toggleDayCheck(dayNum, e.target.checked)}
-                  />
+                {dayNum > 0 ? (
+                  <>
+                    {String(dayNum).padStart(2, '0')}
+                    <input
+                      type="checkbox"
+                      checked={
+                        !(
+                          disabledDrops.has(`${dayNum}-cognitive`) ||
+                          disabledDrops.has(`${dayNum}-daily`)
+                        )
+                      }
+                      onChange={() => {
+                        toggleDisabledDrop(`${dayNum}-cognitive`);
+                        toggleDisabledDrop(`${dayNum}-daily`);
+                      }}
+                    />
+                  </>
+                ) : (
+                  ''
                 )}
               </div>
             ))}
@@ -255,7 +226,7 @@ export function Calendar({ schedule, isAdmin }: CalendarProps) {
           {/* 일상생활 */}
           <div className={activityRow}>
             <div className={activityCell}>
-              <div className={activityLabel}>일상생활 & 추가 인지활동</div>
+              <div className={activityLabel}>일상생활</div>
             </div>
             {week.map((dayNum, colIdx) =>
               renderCell(dayNum, 'daily', weekIdx, colIdx)

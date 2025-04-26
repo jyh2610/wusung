@@ -8,7 +8,7 @@ import {
   IUser
 } from '../type.dto';
 import { IRes } from '@/shared/type';
-import { getLocalStorageValue } from '@/lib/utils';
+import { extractLeafNodes, getLocalStorageValue } from '@/lib/utils';
 
 export const eduContentReg = async (
   content: IContent,
@@ -343,7 +343,11 @@ export const deleteContent = async (eduContentId: number) => {
 };
 
 export const getUserCategoryTree = async (): Promise<
-  CategoryResponse | undefined
+  | {
+      data: CategoryResponse;
+      leafList: ICategoryLeaf[];
+    }
+  | undefined
 > => {
   try {
     const res = await request<IRes<CategoryResponse>>({
@@ -351,9 +355,22 @@ export const getUserCategoryTree = async (): Promise<
       url: `/api/program/use/category/tree`
     });
 
-    return res.data.data;
+    const treeData = res.data.data;
+    if (!treeData) return undefined;
+
+    // 리프만 추출
+    const leaves = extractLeafNodes<CategoryNode>(treeData);
+
+    // ✅ 필요한 형태로 변환
+    const leafList: ICategoryLeaf[] = leaves.map(leaf => ({
+      categoryId: leaf.categoryId,
+      name: leaf.name,
+      used: leaf.isUsed
+    }));
+
+    return { data: res.data.data, leafList };
   } catch (error) {
-    console.log(error);
+    console.error('getUserCategoryTree error:', error);
   }
 };
 

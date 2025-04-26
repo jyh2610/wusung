@@ -59,3 +59,27 @@ export const setLocalStorageValue = (key: string, value: string) => {
   if (typeof window === 'undefined') return null;
   return localStorage.setItem(key, value);
 };
+
+type AnyTreeNode = Record<string, any>;
+
+export function extractLeafNodes<T extends AnyTreeNode>(
+  nodes: T[],
+  childrenKey: keyof T = 'children' as keyof T
+): T[] {
+  const leaves: T[] = [];
+
+  const traverse = (nodeList: T[]) => {
+    nodeList.forEach(node => {
+      const children = node[childrenKey] as T[] | undefined;
+
+      if (!children || children.length === 0) {
+        leaves.push(node);
+      } else {
+        traverse(children);
+      }
+    });
+  };
+
+  traverse(nodes);
+  return leaves;
+}

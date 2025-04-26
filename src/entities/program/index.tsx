@@ -41,6 +41,7 @@ export function ProgramComponent() {
       >
         <div style={{ flexGrow: 1, overflowY: 'auto' }}>
           <ActivityList
+            isAdmin={isAdmin}
             activities={activities}
             onFilterChange={handleFilterChange}
           />

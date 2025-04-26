@@ -15,9 +15,16 @@ interface IProps {
   content: string;
   index: number;
   thumbnailUrl: string;
+  isAdmin: boolean;
 }
 
-export function Activity({ number, content, index, thumbnailUrl }: IProps) {
+export function Activity({
+  number,
+  content,
+  index,
+  thumbnailUrl,
+  isAdmin
+}: IProps) {
   const [showThumbnail, setShowThumbnail] = useState(false);
   const hoverTimeout = useRef<NodeJS.Timeout | null>(null);
 

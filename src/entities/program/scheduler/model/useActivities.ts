@@ -16,6 +16,8 @@ export function useActivities({
   const [activities, setActivities] = useState<IContent[]>([]);
 
   const fetchActivities = async (options = { categoryId, difficultyLevel }) => {
+    console.log(isAdmin);
+
     try {
       const response = isAdmin
         ? await getContentList(options)

@@ -64,7 +64,7 @@ function Header({
 
       // 디버깅 로그 (API 호출 전 값 확인)
       console.log('Printing with coverEduContentId:', coverItemId);
-      console.log('Printing with middleEduContentIds:', middleEduContentIds);
+      console.log('Printing with main:', mainEduContentIds);
 
       await regSchedule({
         year,
@@ -99,7 +99,7 @@ function Header({
 
       // 디버깅 로그 (API 호출 전 값 확인)
       console.log('Printing with coverEduContentId:', coverItemId);
-      console.log('Printing with middleEduContentIds:', middleEduContentIds);
+      console.log('Printing with main:', mainEduContentIds);
 
       // ✅ API 호출 수정
       const pdfUrl = await printPDF(selectedUserId, {

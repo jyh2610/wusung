@@ -1,16 +1,13 @@
-'use client';
-
-import { Droppable } from '@hello-pangea/dnd';
+import { useEffect, useState } from 'react';
 import {
+  Select,
   MenuItem,
   OutlinedInput,
-  Select,
-  SelectChangeEvent,
-  Theme,
-  useTheme
+  SelectChangeEvent
 } from '@mui/material';
-import React, { useEffect, useState } from 'react';
 import { colors } from '@/design-tokens';
+import { useCategoryStore } from '@/shared/stores/useCategoryStore';
+import { Droppable } from '@hello-pangea/dnd';
 import { Activity } from './Activity';
 import {
   activityListContainer,
@@ -18,33 +15,40 @@ import {
   titleContainer
 } from './index.css';
 import { IContent } from '../type.dto';
-import { useCategoryStore } from '@/shared/stores/useCategoryStore';
 
 const ITEM_HEIGHT = 48;
 const ITEM_PADDING_TOP = 8;
 
 const difficultyMap = {
-  high: 3,
+  high: 1,
   medium: 2,
-  low: 1
+  low: 3
 };
 
 interface IProps {
   activities: IContent[];
   onFilterChange: (categoryId: number, difficultyLevel: number) => void;
+  isAdmin: boolean;
 }
 
-export function ActivityList({ activities, onFilterChange }: IProps) {
-  const theme = useTheme();
+export function ActivityList({ activities, onFilterChange, isAdmin }: IProps) {
   const [personName, setPersonName] = useState<string[]>([]);
   const [selectedLevel, setSelectedLevel] = useState<'high' | 'medium' | 'low'>(
     'medium'
   );
-  const { categories, fetchCategories } = useCategoryStore(); // zustand 사용
+  const { categories, fetchCategories } = useCategoryStore();
 
   useEffect(() => {
-    fetchCategories(); // 컴포넌트가 마운트되면 카테고리 데이터를 가져옵니다.
+    fetchCategories(isAdmin);
   }, [fetchCategories]);
+
+  // ✅ 카테고리 불러온 후 첫 번째 항목 자동 선택
+  useEffect(() => {
+    if (categories?.length > 0) {
+      setPersonName([categories[0].name]);
+      onFilterChange(categories[0].categoryId, difficultyMap[selectedLevel]);
+    }
+  }, [categories]);
 
   const MenuProps = {
     PaperProps: {
@@ -108,23 +112,26 @@ export function ActivityList({ activities, onFilterChange }: IProps) {
               if (selected.length === 0) {
                 return <em>선택</em>;
               }
-
               return selected.join(', ');
             }}
             MenuProps={MenuProps}
             inputProps={{ 'aria-label': 'Without label' }}
           >
-            <MenuItem disabled value="">
-              <em>선택</em>
-            </MenuItem>
-            {categories.map(name => (
-              <MenuItem key={name.categoryId} value={name.name}>
-                {name.name}
+            {categories?.length === 0 && (
+              <MenuItem disabled value="">
+                <em>선택</em>
+              </MenuItem>
+            )}
+            {categories?.map(category => (
+              <MenuItem key={category.categoryId} value={category.name}>
+                {category.name}
               </MenuItem>
             ))}
           </Select>
         </div>
       </div>
+
+      {/* 난이도 선택 */}
       <div style={{ display: 'flex', gap: '8px' }}>
         {(['high', 'medium', 'low'] as const).map(level => (
           <div
@@ -139,6 +146,8 @@ export function ActivityList({ activities, onFilterChange }: IProps) {
           </div>
         ))}
       </div>
+
+      {/* 활동지 리스트 */}
       <Droppable droppableId="activityList" isDropDisabled={true}>
         {provided => (
           <div
@@ -148,10 +157,11 @@ export function ActivityList({ activities, onFilterChange }: IProps) {
           >
             {activities.map((activity, index) => (
               <Activity
+                isAdmin={isAdmin}
                 key={activity.eduContentId}
                 number={activity.eduContentId || 0}
                 content={activity.title}
-                thumbnailUrl={activity?.thumbnailUrl!}
+                thumbnailUrl={activity.thumbnailUrl!}
                 index={index}
               />
             ))}

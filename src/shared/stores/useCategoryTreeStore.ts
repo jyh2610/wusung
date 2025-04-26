@@ -26,7 +26,7 @@ export const useCategoryTreeStore = create<CategoryTreeState>(set => ({
     try {
       const treeData = await getUserCategoryTree(); // API 호출
       set({
-        categoryTree: treeData || [], // 성공 시 데이터 설정 (undefined면 빈 배열)
+        categoryTree: treeData?.data || [], // 성공 시 데이터 설정 (undefined면 빈 배열)
         isLoading: false
       });
     } catch (err) {

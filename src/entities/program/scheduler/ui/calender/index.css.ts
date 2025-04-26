@@ -94,3 +94,8 @@ export const activityListContainer = style({
 export const disabled = style({
   backgroundColor: colors.gray_scale[300]
 });
+
+export const disabledCell = style({
+  pointerEvents: 'none', // 클릭, 드래그 막기
+  backgroundColor: colors.gray_scale[100] // 연한 배경색 (선택)
+});

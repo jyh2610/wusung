@@ -23,7 +23,7 @@ import { Button } from '@/shared/ui';
 import { printUserPrint } from '@/entities/program/api';
 import { toast } from 'react-toastify';
 
-function Activity() {
+function Activity({ isAdmin }: { isAdmin: boolean }) {
   const [personName, setPersonName] = useState<string[]>([]);
   const [selectedLevel, setSelectedLevel] = useState<'high' | 'medium' | 'low'>(
     'medium'
@@ -40,7 +40,7 @@ function Activity() {
   });
 
   useEffect(() => {
-    fetchCategories();
+    fetchCategories(isAdmin);
   }, [fetchCategories]);
 
   const MenuProps = {
@@ -97,9 +97,6 @@ function Activity() {
   const handleDeselectAll = () => {
     setSelectedActivities(new Set());
   };
-
-  // Handle print
-  // Activity 컴포넌트 내부
 
   const handlePrint = async () => {
     try {
@@ -168,7 +165,7 @@ function Activity() {
             <MenuItem disabled value="">
               <em>선택</em>
             </MenuItem>
-            {categories.map(name => (
+            {categories?.map(name => (
               <MenuItem key={name.categoryId} value={name.name}>
                 {name.name}
               </MenuItem>
