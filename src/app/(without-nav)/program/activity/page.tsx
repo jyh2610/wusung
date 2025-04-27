@@ -22,8 +22,16 @@ import Image from 'next/image';
 import { Button } from '@/shared/ui';
 import { printUserPrint } from '@/entities/program/api';
 import { toast } from 'react-toastify';
+import { useCategoryTreeStore } from '@/shared/stores/useCategoryTreeStore';
 
 function Activity({ isAdmin }: { isAdmin: boolean }) {
+  const {
+    categoryTree,
+    fetchCategoryTree,
+    selectedCategoryNode,
+    setSelectedCategoryNode
+  } = useCategoryTreeStore();
+
   const [personName, setPersonName] = useState<string[]>([]);
   const [selectedLevel, setSelectedLevel] = useState<'high' | 'medium' | 'low'>(
     'medium'
@@ -32,16 +40,21 @@ function Activity({ isAdmin }: { isAdmin: boolean }) {
   const [selectedActivities, setSelectedActivities] = useState<Set<number>>(
     new Set()
   );
-  const { categories, fetchCategories } = useCategoryStore();
-  const { activities, setActivities } = useActivities({
-    isAdmin: false,
-    categoryId: categoryId ?? 0,
-    difficultyLevel: 1
-  });
 
-  useEffect(() => {
-    fetchCategories(isAdmin);
-  }, [fetchCategories]);
+  const { categories, fetchCategories } = useCategoryStore();
+
+  // Map selectedLevel to difficultyLevel values
+  const difficultyMap: Record<'high' | 'medium' | 'low', number> = {
+    high: 1,
+    medium: 2,
+    low: 3
+  };
+
+  const { activities, fetchActivities, setActivities } = useActivities({
+    isAdmin,
+    categoryId: categoryId ?? 0,
+    difficultyLevel: difficultyMap[selectedLevel] // Pass the mapped difficultyLevel
+  });
 
   const MenuProps = {
     PaperProps: {
@@ -54,14 +67,11 @@ function Activity({ isAdmin }: { isAdmin: boolean }) {
   const handleCategoryChange = (
     event: SelectChangeEvent<typeof personName>
   ) => {
-    const {
-      target: { value }
-    } = event;
+    const { value } = event.target;
     const newPersonName = typeof value === 'string' ? value.split(',') : value;
     setPersonName(newPersonName);
 
-    const selectedCategory = categories.find(n => n.name === newPersonName[0]);
-
+    const selectedCategory = categories?.find(n => n.name === newPersonName[0]);
     if (selectedCategory) {
       setCategoryId(selectedCategory.categoryId);
     }
@@ -69,10 +79,6 @@ function Activity({ isAdmin }: { isAdmin: boolean }) {
 
   const handleLevelClick = (level: 'high' | 'medium' | 'low') => {
     setSelectedLevel(level);
-    const selectedCategory = categories.find(n => n.name === personName[0]);
-    if (selectedCategory) {
-      setCategoryId(selectedCategory.categoryId);
-    }
   };
 
   const handleActivitySelect = (eduContentId: number) => {
@@ -85,15 +91,15 @@ function Activity({ isAdmin }: { isAdmin: boolean }) {
     setSelectedActivities(newSelectedActivities);
   };
 
-  // Handle "Select All" button
   const handleSelectAll = () => {
-    const allActivityIds = new Set(
-      activities.map(activity => activity.eduContentId!)
-    );
-    setSelectedActivities(allActivityIds);
+    if (activities && activities.length > 0) {
+      const allActivityIds = new Set(
+        activities.map(activity => activity.eduContentId!)
+      );
+      setSelectedActivities(allActivityIds);
+    }
   };
 
-  // Handle "Deselect All" button
   const handleDeselectAll = () => {
     setSelectedActivities(new Set());
   };
@@ -101,22 +107,17 @@ function Activity({ isAdmin }: { isAdmin: boolean }) {
   const handlePrint = async () => {
     try {
       const selectedIdsArray = Array.from(selectedActivities);
-      // const selectedIdsArray = [...selectedActivities]; // Alternative
-
       if (selectedIdsArray.length === 0) {
         toast.warn('인쇄할 활동지를 선택해주세요.');
         return;
       }
 
-      console.log('Requesting PDF for printing IDs:', selectedIdsArray);
       const pdfUrl = await printUserPrint(selectedIdsArray);
-
       toast.info(
         'PDF가 새 탭에서 열립니다. 해당 탭의 인쇄 기능을 이용해 주세요.'
       );
       if (pdfUrl) {
-        // --- 새 탭에서 PDF 열기 ---
-        window.open(pdfUrl, '_blank'); // 새 탭/창에서 PDF URL 열기
+        window.open(pdfUrl, '_blank');
       } else {
         toast.error('PDF 파일을 받지 못했습니다.');
       }
@@ -126,8 +127,36 @@ function Activity({ isAdmin }: { isAdmin: boolean }) {
     }
   };
 
+  useEffect(() => {
+    fetchCategories(isAdmin);
+  }, [fetchCategories, isAdmin]);
+
+  useEffect(() => {
+    if (categories && categories.length > 0 && personName.length === 0) {
+      const firstCategory = categories[0];
+      setPersonName([firstCategory.name]);
+      setCategoryId(firstCategory.categoryId);
+    }
+  }, [categories]);
+
+  useEffect(() => {
+    const fetchData = async () => {
+      if (categoryId !== null) {
+        try {
+          await fetchActivities();
+        } catch (error) {
+          console.error('활동지 불러오기 실패:', error);
+          toast.error('활동지 불러오기에 실패했습니다.');
+          setActivities([]); // 실패시 초기화
+        }
+      }
+    };
+    fetchData();
+  }, [categoryId, selectedLevel, fetchActivities, setActivities]);
+
   return (
     <div className={container}>
+      {/* 상단 */}
       <div
         className={titleContainer}
         style={{
@@ -136,29 +165,27 @@ function Activity({ isAdmin }: { isAdmin: boolean }) {
           alignItems: 'center'
         }}
       >
-        <div>
-          <span
+        <div style={{ display: 'flex' }}>
+          <div
             style={{
+              width: '150px',
               fontSize: '32px',
               fontWeight: 600,
               color: colors.gray_scale[900],
-              marginRight: '16px' // Add space between title and dropdown
+              marginRight: '16px'
             }}
           >
-            인지활동지 목록
-          </span>
+            {selectedCategoryNode?.name || '카테고리 선택'}
+          </div>
           <Select
             displayEmpty
             value={personName}
             onChange={handleCategoryChange}
             input={<OutlinedInput />}
             sx={{ width: '240px', height: '50px' }}
-            renderValue={selected => {
-              if (selected.length === 0) {
-                return <em>선택</em>;
-              }
-              return selected.join(', ');
-            }}
+            renderValue={selected =>
+              selected.length === 0 ? <em>선택</em> : selected.join(', ')
+            }
             MenuProps={MenuProps}
             inputProps={{ 'aria-label': 'Without label' }}
           >
@@ -173,7 +200,7 @@ function Activity({ isAdmin }: { isAdmin: boolean }) {
           </Select>
         </div>
 
-        {/* Dropdown and Buttons */}
+        {/* 버튼들 */}
         <div style={{ display: 'flex', gap: '8px', alignItems: 'center' }}>
           <div style={{ width: '113px', height: '56px' }}>
             <Button
@@ -195,7 +222,8 @@ function Activity({ isAdmin }: { isAdmin: boolean }) {
         </div>
       </div>
 
-      <div style={{ display: 'flex', gap: '8px' }}>
+      {/* 난이도 */}
+      <div style={{ display: 'flex', gap: '8px', marginTop: '12px' }}>
         {(['high', 'medium', 'low'] as const).map(level => (
           <div
             key={level}
@@ -210,38 +238,49 @@ function Activity({ isAdmin }: { isAdmin: boolean }) {
         ))}
       </div>
 
+      {/* 활동 리스트 */}
       <div style={{ marginTop: '20px' }}>
-        <div className={activityCardContainer}>
-          {activities.map(activity => (
-            <div key={activity.eduContentId} className={activityCard}>
-              <div style={{ display: 'flex', justifyContent: 'space-between' }}>
+        {activities && activities.length > 0 ? (
+          <div className={activityCardContainer}>
+            {activities.map(activity => (
+              <div key={activity.eduContentId} className={activityCard}>
+                <div
+                  style={{ display: 'flex', justifyContent: 'space-between' }}
+                >
+                  <div style={{ display: 'flex', gap: '8px' }}>
+                    <span>{activity.eduContentId}</span>
+                    <div>{activity.title}</div>
+                  </div>
+                  <Checkbox
+                    checked={selectedActivities.has(activity.eduContentId!)}
+                    onChange={() =>
+                      handleActivitySelect(activity.eduContentId!)
+                    }
+                  />
+                </div>
                 <div
                   style={{
-                    display: 'flex',
-                    justifyContent: 'space-between',
-                    gap: '8px'
+                    maxWidth: '256px',
+                    height: '357px',
+                    position: 'relative'
                   }}
                 >
-                  <span>{activity.eduContentId}</span>
-                  <div>{activity.title}</div>
+                  <Image src={activity.thumbnailUrl!} alt="썸네일" fill />
                 </div>
-                <Checkbox
-                  checked={selectedActivities.has(activity.eduContentId!)}
-                  onChange={() => handleActivitySelect(activity.eduContentId!)}
-                />
               </div>
-              <div
-                style={{
-                  maxWidth: '256px',
-                  height: '357px',
-                  position: 'relative'
-                }}
-              >
-                <Image src={activity.thumbnailUrl!} alt={'썸네일'} fill />
-              </div>
-            </div>
-          ))}
-        </div>
+            ))}
+          </div>
+        ) : (
+          <div
+            style={{
+              marginTop: '24px',
+              textAlign: 'center',
+              color: colors.gray_scale[500]
+            }}
+          >
+            활동지가 없습니다.
+          </div>
+        )}
       </div>
     </div>
   );

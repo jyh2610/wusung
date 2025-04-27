@@ -1,32 +1,32 @@
 import { create } from 'zustand';
-import { CategoryNode } from '@/entities/program/type.dto'; // CategoryNode 타입 정의 경로 확인
-import { getUserCategoryTree } from '@/entities/program/api'; // API 함수 경로 확인
+import { CategoryNode } from '@/entities/program/type.dto'; // CategoryNode 타입 정의
+import { getUserCategoryTree } from '@/entities/program/api'; // API 호출 함수
 
-// 스토어 상태 및 액션 인터페이스 정의
 interface CategoryTreeState {
-  categoryTree: CategoryNode[]; // 전체 카테고리 트리 데이터 (최상위 노드 배열)
-  selectedCategoryNode: CategoryNode | null; // 현재 선택된 카테고리 노드
-  isLoading: boolean; // 데이터 로딩 상태
-  error: Error | null; // 데이터 로딩 에러 상태
-  fetchCategoryTree: () => Promise<void>; // 트리 데이터 가져오는 액션
-  setSelectedCategoryNode: (category: CategoryNode | null) => void; // 선택된 노드 설정 액션
+  categoryTree: CategoryNode[]; // 전체 카테고리 트리
+  selectedCategoryNode: CategoryNode | null; // 선택된 카테고리 노드
+  isLoading: boolean; // 로딩 여부
+  error: Error | null; // 에러 여부
+
+  fetchCategoryTree: () => Promise<void>; // 카테고리 트리 가져오기
+  setSelectedCategoryNode: (category: CategoryNode | null) => void; // 선택 노드 설정
 }
 
-// Zustand 스토어 생성
 export const useCategoryTreeStore = create<CategoryTreeState>(set => ({
-  // 초기 상태
   categoryTree: [],
   selectedCategoryNode: null,
   isLoading: false,
   error: null,
 
-  // 액션: 카테고리 트리 데이터 가져오기
   fetchCategoryTree: async () => {
-    set({ isLoading: true, error: null }); // 로딩 시작, 에러 초기화
+    set({ isLoading: true, error: null });
     try {
-      const treeData = await getUserCategoryTree(); // API 호출
+      const treeData = await getUserCategoryTree(); // ✅ 트리 가져오기
+      const tree = treeData?.data || []; // 결과 없으면 빈 배열
+
       set({
-        categoryTree: treeData?.data || [], // 성공 시 데이터 설정 (undefined면 빈 배열)
+        categoryTree: tree,
+        selectedCategoryNode: tree.length > 0 ? tree[0] : null, // ✅ 첫 번째 항목 자동 선택
         isLoading: false
       });
     } catch (err) {
@@ -34,12 +34,11 @@ export const useCategoryTreeStore = create<CategoryTreeState>(set => ({
       set({
         error: err instanceof Error ? err : new Error('Unknown error'),
         isLoading: false
-      }); // 에러 설정, 로딩 종료
+      });
     }
   },
 
-  // 액션: 선택된 카테고리 노드 설정
   setSelectedCategoryNode: category => {
-    set({ selectedCategoryNode: category }); // selectedCategoryNode 상태 업데이트
+    set({ selectedCategoryNode: category });
   }
 }));

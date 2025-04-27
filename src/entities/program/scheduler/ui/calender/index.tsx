@@ -55,6 +55,19 @@ export function Calendar({ schedule, isAdmin }: CalendarProps) {
     weeks.push(currentWeek);
   }
 
+  const handleDisable = (dayNum: number) => {
+    toggleDisabledDrop(`${dayNum}-cognitive`);
+    toggleDisabledDrop(`${dayNum}-daily`);
+
+    // ✅ 체크 해제되면 스케줄 데이터도 삭제
+    if (schedule[dayNum]?.cognitive) {
+      removeScheduleItem(String(dayNum), schedule[dayNum].cognitive!.id);
+    }
+    if (schedule[dayNum]?.daily) {
+      removeScheduleItem(String(dayNum), schedule[dayNum].daily!.id);
+    }
+  };
+
   const renderCell = (
     dayNum: number,
     category: 'cognitive' | 'daily',
@@ -144,8 +157,7 @@ export function Calendar({ schedule, isAdmin }: CalendarProps) {
                 weeks.forEach(week => {
                   const dayNum = week[dayIdx];
                   if (dayNum > 0) {
-                    toggleDisabledDrop(`${dayNum}-cognitive`);
-                    toggleDisabledDrop(`${dayNum}-daily`);
+                    handleDisable(dayNum);
                   }
                 });
               }}
@@ -154,12 +166,11 @@ export function Calendar({ schedule, isAdmin }: CalendarProps) {
         ))}
       </div>
 
-      {/* 날짜별 행들 */}
+      {/* 날짜별 행 */}
       {weeks.map((week, weekIdx) => (
         <div key={weekIdx}>
-          {/* 날짜 체크 + 체크박스 */}
+          {/* 날짜 체크 + 주차 */}
           <div className={grid}>
-            {/* 주차 */}
             <div className={`${gridItem} ${weekLabel} ${weekLabelBg}`}>
               {weekIdx + 1}주차
               <input
@@ -175,15 +186,14 @@ export function Calendar({ schedule, isAdmin }: CalendarProps) {
                 onChange={() => {
                   week.forEach(dayNum => {
                     if (dayNum > 0) {
-                      toggleDisabledDrop(`${dayNum}-cognitive`);
-                      toggleDisabledDrop(`${dayNum}-daily`);
+                      handleDisable(dayNum);
                     }
                   });
                 }}
               />
             </div>
 
-            {/* 일자 + 개별 체크박스 */}
+            {/* 날짜 */}
             {week.map((dayNum, dayIdx) => (
               <div
                 key={dayIdx}
@@ -200,10 +210,7 @@ export function Calendar({ schedule, isAdmin }: CalendarProps) {
                           disabledDrops.has(`${dayNum}-daily`)
                         )
                       }
-                      onChange={() => {
-                        toggleDisabledDrop(`${dayNum}-cognitive`);
-                        toggleDisabledDrop(`${dayNum}-daily`);
-                      }}
+                      onChange={() => handleDisable(dayNum)}
                     />
                   </>
                 ) : (
