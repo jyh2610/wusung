@@ -13,16 +13,27 @@ import {
   userInfoContainer
 } from './index.css';
 import { btn } from './ui/navBtn/index.css';
-import { useRouter } from 'next/navigation';
+import { useRouter, usePathname } from 'next/navigation';
 
 export function ProgramNav() {
   const [id, setId] = useState('');
   const router = useRouter();
+  const pathname = usePathname(); // Get the current pathname using usePathname()
+
   useEffect(() => {
     const rawData = localStorage?.getItem('userInfo');
     const userInfo = rawData ? JSON.parse(rawData) : null;
     setId(userInfo?.username);
   }, []);
+
+  const getButtonStyle = (route: string) => {
+    return pathname === route
+      ? {} // No background color change for the selected button
+      : {
+          backgroundColor: 'transparent',
+          color: colors.gray_scale[700]
+        }; // Apply transparent background for non-selected buttons
+  };
 
   return (
     <div className={container}>
@@ -47,24 +58,42 @@ export function ProgramNav() {
         </div>
 
         <div className={navBtnContainer}>
-          <div className={btn} onClick={() => router.push('/program')}>
+          <div
+            className={btn}
+            onClick={() => router.push('/program')}
+            style={getButtonStyle('/program')}
+          >
             <div className={imgContainer}>
               <Image fill src={'/images/navBtn1.png'} alt={'이동 버튼'} />
             </div>
             <div className={textAlign}>이달의 인지활동지</div>
           </div>
-          <div className={btn} onClick={() => router.push('/program/activity')}>
+          <div
+            className={btn}
+            onClick={() => router.push('/program/activity')}
+            style={getButtonStyle('/program/activity')}
+          >
             <div className={imgContainer}>
               <Image fill src={'/images/navBtn2.png'} alt={'이동 버튼'} />
             </div>
-            <div className={textAlign}>영역별 활동지</div>
+            <div className={textAlign}>개별 활동지</div>
           </div>
+
           <div
             className={btn}
-            style={{
-              backgroundColor: 'transparent',
-              color: colors.gray_scale[700]
-            }}
+            onClick={() => router.push('/program/evaluation')}
+            style={getButtonStyle('/program/evaluation')}
+          >
+            <div className={imgContainer}>
+              <Image fill src={'/images/navBtn4.png'} alt={'이동 버튼'} />
+            </div>
+            <div className={textAlign}>평가자료</div>
+          </div>
+
+          <div
+            className={btn}
+            onClick={() => router.push('/program/etc')}
+            style={getButtonStyle('/program/etc')}
           >
             <div className={imgContainer}>
               <Image
@@ -76,12 +105,11 @@ export function ProgramNav() {
             </div>
             <div className={textAlign}>기타 자료</div>
           </div>
+
           <div
             className={btn}
-            style={{
-              backgroundColor: 'transparent',
-              color: colors.gray_scale[700]
-            }}
+            onClick={() => router.push('/program/guide')}
+            style={getButtonStyle('/program/guide')}
           >
             <div className={imgContainer}>
               <Image fill src={'/images/navBtn3.png'} alt={'이동 버튼'} />

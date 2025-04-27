@@ -17,7 +17,7 @@ import {
   SelectValue
 } from '@/components/ui/select';
 import ImageEditor from './ImageEditor';
-import { IContent } from '@/entities/program/type.dto';
+import { IContent, IOverlay } from '@/entities/program/type.dto';
 import { eduContentReg } from '@/entities/program/api';
 import { X } from 'lucide-react';
 import { getCategoryList } from './api';
@@ -67,6 +67,15 @@ export function ContentUploadForm() {
     overlays: []
   });
 
+  const [files, setFiles] = useState<File[]>([]);
+  const [filePreviews, setFilePreviews] = useState<string[]>([]);
+  const [imageCoordinates, setImageCoordinates] = useState<IOverlay[][]>([]);
+  const [selectedImageIndex, setSelectedImageIndex] = useState<number | null>(
+    null
+  );
+  const [isUploading, setIsUploading] = useState(false);
+  console.log(selectedImageIndex, imageCoordinates);
+
   useEffect(() => {
     const fetchContent = async () => {
       const token = localStorage.getItem('token');
@@ -89,7 +98,6 @@ export function ContentUploadForm() {
           isUsed: obj.isUsed,
           overlays: obj.overlayLocations
         });
-
         const processedFiles: string[] = obj.files.map(file => file.fileUrl);
 
         setFilePreviews(processedFiles);
@@ -101,15 +109,15 @@ export function ContentUploadForm() {
     fetchContent();
   }, []);
 
-  const [files, setFiles] = useState<File[]>([]);
-  const [filePreviews, setFilePreviews] = useState<string[]>([]);
-  const [imageCoordinates, setImageCoordinates] = useState<Array<Rectangle[]>>(
-    []
-  );
-  const [selectedImageIndex, setSelectedImageIndex] = useState<number | null>(
-    null
-  );
-  const [isUploading, setIsUploading] = useState(false);
+  useEffect(() => {
+    if (selectedImageIndex !== null) {
+      const updatedCoordinates =
+        form?.overlays && form?.overlays[selectedImageIndex]
+          ? [form?.overlays[selectedImageIndex]] // 'IOverlay[]'를 'IOverlay[][]'로 만들어줌
+          : [];
+      setImageCoordinates([updatedCoordinates]);
+    }
+  }, [selectedImageIndex, form?.overlays]);
 
   useEffect(() => {
     const fetchCategories = async () => {
@@ -207,15 +215,29 @@ export function ContentUploadForm() {
 
   // 이미지별 좌표 정보 업데이트 함수
   const updateImageCoordinates = (index: number, coordinates: Rectangle[]) => {
-    // 로컬 상태 업데이트
     const updatedCoordinates = [...imageCoordinates];
-    updatedCoordinates[index] = coordinates;
-    setImageCoordinates(updatedCoordinates);
 
-    // form state의 overlays도 함께 업데이트
-    handleChange('overlays', updatedCoordinates);
+    // 'coordinates'는 Rectangle[]이므로, 이를 IOverlay[] 형식으로 변환하여 상태 업데이트
+    updatedCoordinates[index] = coordinates.map(rectangle => ({
+      ...rectangle,
+      fileIndex: index, // fileIndex 추가
+      alignment: 'center',
+      type: 'image',
+      fixedText: ''
+    }));
+
+    setImageCoordinates(updatedCoordinates); // IOverlay[][] 형식으로 상태 업데이트
+    handleChange('overlays', updatedCoordinates); // 폼 데이터에 반영
   };
 
+  const convertOverlayToRectangle = (overlay: IOverlay): Rectangle => {
+    return {
+      x: overlay.x,
+      y: overlay.y,
+      width: overlay.width,
+      height: overlay.height
+    };
+  };
   return (
     <form onSubmit={handleSubmit}>
       <div className="grid gap-6">
@@ -348,7 +370,11 @@ export function ContentUploadForm() {
               {selectedImageIndex !== null && filePreviews.length > 0 ? (
                 <ImageEditor
                   image={filePreviews[selectedImageIndex]}
-                  coordinates={imageCoordinates[selectedImageIndex] || []}
+                  coordinates={
+                    imageCoordinates[selectedImageIndex]?.map(
+                      convertOverlayToRectangle
+                    ) || []
+                  }
                   setCoordinates={coordinates =>
                     updateImageCoordinates(selectedImageIndex, coordinates)
                   }

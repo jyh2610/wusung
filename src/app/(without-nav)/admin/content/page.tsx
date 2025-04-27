@@ -3,7 +3,6 @@ import { ContentFilters } from '@/components/admin/content-filters';
 import { useIsAdmin } from '@/components/hooks/useIsAdmin';
 
 export default function ContentPage() {
-  const isAdmin = useIsAdmin();
   return (
     <div className="p-6 space-y-6">
       <div className="flex items-center justify-between">

@@ -23,6 +23,7 @@ export interface IContent {
   createdAt?: string;
   overlays?: IOverlay[];
 }
+
 export interface ScheduleItem {
   content: string;
   id: number;
