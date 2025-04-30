@@ -7,8 +7,110 @@ import {
   IRegUser,
   IUser
 } from '../type.dto';
-import { IRes } from '@/shared/type';
+import { EduContent, IRes } from '@/shared/type';
 import { extractLeafNodes, getLocalStorageValue } from '@/lib/utils';
+export const putEduContent = async ({
+  eduContentId,
+  content,
+  deletedFileIds,
+  imageFiles
+}: {
+  eduContentId: number; // 수정할 학습자료 ID
+  content: IContent; // 수정할 내용
+  deletedFileIds: number[]; // 삭제할 파일 ID 목록
+  imageFiles: File[]; // 새로 추가할 이미지 파일들
+}) => {
+  try {
+    const formData = new FormData();
+
+    // 오버레이 처리
+    const processedOverlays: {
+      fileIndex: number;
+      x: any;
+      y: any;
+      width: any;
+      height: any;
+      alignment: string;
+      type: string;
+      fixedText: string;
+    }[] = [];
+
+    if (Array.isArray(content.overlays)) {
+      content.overlays.forEach((coordinates, fileIndex) => {
+        if (Array.isArray(coordinates)) {
+          coordinates.forEach(rect => {
+            processedOverlays.push({
+              fileIndex,
+              x: rect.x,
+              y: rect.y,
+              width: rect.width,
+              height: rect.height,
+              alignment: rect.alignment || 'center',
+              type: rect.type || 'image',
+              fixedText: rect.fixedText || ''
+            });
+          });
+        }
+      });
+    }
+
+    // ✅ 중첩 없이 서버가 기대하는 구조로 만들기
+    const requestBody = {
+      title: content.title,
+      difficultyLevel: content.difficultyLevel,
+      categoryId: content.categoryId,
+      year: content.year || 0,
+      month: content.month || 0,
+      description: content.description,
+      isUsed: content.isUsed,
+      overlays:
+        processedOverlays.length > 0
+          ? processedOverlays
+          : [
+              {
+                fileIndex: 0,
+                x: 0,
+                y: 0,
+                width: 0,
+                height: 0,
+                alignment: 'center',
+                type: 'image',
+                fixedText: ''
+              }
+            ],
+      deletedFileIdList: deletedFileIds,
+      overlayLocations: processedOverlays
+    };
+
+    formData.append('eduContentRegisterDTO', JSON.stringify(requestBody));
+
+    // 이미지 파일 추가
+    imageFiles.forEach(file => {
+      formData.append('files', file);
+    });
+
+    console.log('FormData payload:', JSON.stringify(requestBody, null, 2));
+    console.log('Files count:', imageFiles.length);
+
+    const userInfo = getLocalStorageValue('userInfo');
+    const token = userInfo ? JSON.parse(userInfo).token : '';
+
+    const res = await request({
+      method: 'PUT',
+      url: `/api/admin/edu-content/${eduContentId}`,
+      data: formData,
+      headers: {
+        'Content-Type': 'multipart/form-data',
+        Authorization: `Bearer ${token}`
+      }
+    });
+
+    return res.data;
+  } catch (error) {
+    console.error('Failed to update content:', error);
+    throw error;
+  }
+};
 
 export const eduContentReg = async (
   content: IContent,
@@ -294,6 +396,7 @@ export interface PrintPDFPayload {
   coverEduContentId: number;
   middleEduContentIds: number[];
   mainEduContentIds: number[][];
+  noPrintDate: boolean;
 }
 
 export const printPDF = async (
@@ -392,4 +495,13 @@ export const printUserPrint = async (printLIst: number[]) => {
   } catch (error) {
     console.log(error);
   }
+};
+export const getDetailContent = async (
+  categoryId: number
+): Promise<IContent[]> => {
+  const res = await request<IContent[]>({
+    method: 'GET',
+    url: `/api/content/detail?categoryId=${categoryId}`
+  });
+  return res.data ?? [];
 };

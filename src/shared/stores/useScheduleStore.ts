@@ -13,6 +13,8 @@ interface ScheduleState {
   coverItems: ScheduleItem;
   etcItems: ScheduleItem[];
 
+  noPrintDate: boolean;
+
   disabledDrops: Set<string>; // ✅ 추가
 
   updateSchedule: (newSchedule: Schedule) => void;
@@ -20,6 +22,7 @@ interface ScheduleState {
   redo: () => void;
   reInit: () => void;
 
+  toggleNoPrintDate: () => void;
   toggleDisabledDrop: (id: string) => void; // ✅ 토글 함수
   clearDisabledDrops: () => void; // ✅ 비우기 함수
 
@@ -39,6 +42,12 @@ export const useScheduleStore = create<ScheduleState>(set => ({
   coverItems: { id: 0, content: '' },
   etcItems: [],
   disabledDrops: new Set(),
+  noPrintDate: true,
+
+  toggleNoPrintDate: () =>
+    set(state => ({
+      noPrintDate: !state.noPrintDate
+    })),
 
   updateSchedule: newSchedule =>
     set(state => ({

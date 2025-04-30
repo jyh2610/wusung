@@ -18,15 +18,21 @@ import { autoRegisterPlan } from '../../model/autoRegisterPlan';
 import { useDateStore } from '@/shared/stores/useDateStores';
 import { useUserStore } from '@/shared/stores/useUserStore';
 import { toast } from 'react-toastify';
+import { color } from 'bun';
+import { colors } from '@/design-tokens';
 
 export function Control({ isAdmin }: { isAdmin: boolean }) {
   const [isModalOpen, setModalOpen] = useState(false);
   const [modalType, setModalType] = useState<'etc' | 'cover' | null>(null);
-
   const { reInit, removeEtcItem, removeCoverItems } = useScheduleStore();
   const coverItems = useScheduleStore(state => state.coverItems);
   const etcItems = useScheduleStore(state => state.etcItems);
   const addEtcItem = useScheduleStore(state => state.addEtcItem);
+
+  const { noPrintDate, toggleNoPrintDate } = useScheduleStore(state => ({
+    noPrintDate: state.noPrintDate,
+    toggleNoPrintDate: state.toggleNoPrintDate
+  }));
 
   const { year, month } = useDateStore();
   const selectedUserId = useUserStore(state => state.selectedUserId);
@@ -89,6 +95,21 @@ export function Control({ isAdmin }: { isAdmin: boolean }) {
 
       <div className={additionalData}>
         {/* 기타자료 */}
+
+        <div
+          className={buttonStyle}
+          style={{
+            backgroundColor: noPrintDate ? colors.brand[400] : '#f0f0f0',
+            color: noPrintDate ? colors.gray_scale['default'] : '',
+            transition: 'background-color 0.2s ease',
+            position: 'relative',
+            width: '150px'
+          }}
+          onClick={toggleNoPrintDate}
+        >
+          <button type="button">날짜 출력</button>
+        </div>
+
         <Droppable droppableId="etc" isDropDisabled={false}>
           {(provided, snapshot) => (
             <div

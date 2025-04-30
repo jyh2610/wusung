@@ -28,9 +28,11 @@ function Header({
   // ✅ 전역 날짜 상태 사용
   const { year, month, setYear, setMonth } = useDateStore();
   const mainEduContentIds = formatScheduleData(schedule, year, month);
-  const { coverItems, etcItems } = useScheduleStore(state => ({
+  const { coverItems, etcItems, noPrintDate } = useScheduleStore(state => ({
     coverItems: state.coverItems,
-    etcItems: state.etcItems
+    etcItems: state.etcItems,
+    noPrintDate: state.noPrintDate,
+    toggleNoPrintDate: state.toggleNoPrintDate
   }));
 
   const selectedUserId = useUserStore(state => state.selectedUserId);
@@ -94,26 +96,39 @@ function Header({
 
       const coverItemId =
         coverItems && coverItems.id !== 0 ? coverItems.id : null;
-      // etcItems 배열에서 id만 추출 (middleEduContentIds로 사용 가정)
       const middleEduContentIds = etcItems.map(item => item.id);
 
-      // 디버깅 로그 (API 호출 전 값 확인)
       console.log('Printing with coverEduContentId:', coverItemId);
       console.log('Printing with main:', mainEduContentIds);
 
-      // ✅ API 호출 수정
       const pdfUrl = await printPDF(selectedUserId, {
         year,
         month,
         difficultyLevel: selectedUser.difficultyLevel,
-        coverEduContentId: coverItemId!, // 가공된 cover item ID 사용
-        middleEduContentIds: middleEduContentIds, // 가공된 etc items ID 배열 사용
-        mainEduContentIds: mainEduContentIds
+        coverEduContentId: coverItemId!,
+        middleEduContentIds,
+        mainEduContentIds,
+        noPrintDate
       });
 
       if (pdfUrl) {
-        // --- 새 탭에서 PDF 열기 ---
-        window.open(pdfUrl, '_blank'); // 새 탭/창에서 PDF URL 열기
+        // 👉 iframe을 생성해서 자동 프린트
+        const iframe = document.createElement('iframe');
+        iframe.style.position = 'fixed';
+        iframe.style.right = '0';
+        iframe.style.bottom = '0';
+        iframe.style.width = '0';
+        iframe.style.height = '0';
+        iframe.src = pdfUrl;
+
+        iframe.onload = () => {
+          setTimeout(() => {
+            iframe.contentWindow?.focus();
+            iframe.contentWindow?.print();
+          }, 500); // 약간의 지연 필요
+        };
+
+        document.body.appendChild(iframe);
       } else {
         toast.error('PDF 파일을 받지 못했습니다.');
       }

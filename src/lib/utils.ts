@@ -5,7 +5,7 @@ export function cn(...inputs: ClassValue[]) {
   return twMerge(clsx(inputs));
 }
 // utils/scheduleConverter.ts
-import { IContent } from '@/entities/program/type.dto';
+import { CategoryNode, IContent } from '@/entities/program/type.dto';
 import { Schedule } from '@/entities/program/type.dto';
 export function convertToSchedule(
   data: any,
@@ -83,3 +83,23 @@ export function extractLeafNodes<T extends AnyTreeNode>(
   traverse(nodes);
   return leaves;
 }
+export const findEvaluationCategories = (
+  nodes: CategoryNode[]
+): CategoryNode[] => {
+  const result: CategoryNode[] = [];
+
+  const traverse = (nodeList: CategoryNode[]) => {
+    for (const node of nodeList) {
+      if (node.name === '평가자료') {
+        result.push(node);
+      }
+
+      if (node.children && node.children.length > 0) {
+        traverse(node.children);
+      }
+    }
+  };
+
+  traverse(nodes);
+  return result;
+};

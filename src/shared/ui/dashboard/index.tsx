@@ -1,5 +1,6 @@
 'use client';
 
+import { IContent } from '@/entities/program/type.dto';
 import Pagination from '@mui/material/Pagination';
 import Paper from '@mui/material/Paper';
 import Stack from '@mui/material/Stack';
@@ -12,15 +13,9 @@ import TableRow from '@mui/material/TableRow';
 import * as React from 'react';
 
 // 데이터 타입 정의
-interface RowType {
-  title: string;
-  author: string;
-  date: string;
-  views: number;
-}
 
 interface DashBoardProps {
-  rows: RowType[];
+  rows: IContent[];
 }
 
 export function DashBoard({ rows }: DashBoardProps) {
@@ -44,7 +39,7 @@ export function DashBoard({ rows }: DashBoardProps) {
           <TableHead>
             <TableRow>
               <TableCell>제목</TableCell>
-              <TableCell align="right">글쓴이</TableCell>
+              <TableCell align="right">난이도</TableCell>
               <TableCell align="right">날짜</TableCell>
               <TableCell align="right">조회수</TableCell>
             </TableRow>
@@ -56,9 +51,9 @@ export function DashBoard({ rows }: DashBoardProps) {
                   <TableCell component="th" scope="row">
                     {row.title}
                   </TableCell>
-                  <TableCell align="right">{row.author}</TableCell>
-                  <TableCell align="right">{row.date}</TableCell>
-                  <TableCell align="right">{row.views}</TableCell>
+                  <TableCell align="right">{row.difficultyLevel}</TableCell>
+                  <TableCell align="right">{`${row.year}-${row.month}`}</TableCell>
+                  <TableCell align="right">{row.viewCount}</TableCell>
                 </TableRow>
               ))
             ) : (

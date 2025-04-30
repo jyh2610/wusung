@@ -1,3 +1,5 @@
+'use client';
+
 import { getLocalStorageValue, setLocalStorageValue } from '@/lib/utils';
 import axios, { AxiosError, AxiosRequestConfig, AxiosResponse } from 'axios';
 import https from 'https';

@@ -2,7 +2,7 @@
 
 import { useEffect, useState } from 'react';
 import request from '@/shared/api/axiosInstance';
-import { IRes } from '@/shared/type';
+import { EduContent, IRes } from '@/shared/type';
 import { IContent } from '@/entities/program/type.dto';
 import { useParams, useRouter } from 'next/navigation';
 import { ContentUploadForm } from '@/components/admin/content-upload-form';
@@ -15,32 +15,6 @@ import { Badge, Eye, Calendar, BarChart3, Clock } from 'lucide-react';
 import Image from 'next/image';
 import { deleteContent } from '@/entities/program/api';
 
-export interface EduContentFile {
-  fileId: number;
-  fileName: string;
-  fileUrl: string;
-}
-
-export interface OverlayLocation {
-  // overlayLocations 안에 어떤 필드가 들어가는지 정확히 몰라서 임시로 any 처리
-  [key: string]: any;
-}
-
-export interface EduContent {
-  eduContentId: number;
-  title: string;
-  description: string;
-  categoryId: number;
-  difficultyLevel: number;
-  files: EduContentFile[];
-  overlayLocations: [];
-  isUsed: boolean;
-  viewCount: number;
-  year: number;
-  month: number;
-  createdAt: string; // ISO 문자열
-  updatedAt: string; // ISO 문자열
-}
 export default function ContentPage() {
   const [content, setContent] = useState<EduContent | null>(null);
   const { id } = useParams();

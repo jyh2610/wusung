@@ -140,7 +140,7 @@ export function ProgramNav() {
         </div>
 
         <div className={navBtnContainer}>
-          <div className={btn}>
+          <div className={btn} onClick={() => router.push('/')}>
             <div className={textAlign}>프로그램 종료</div>
           </div>
         </div>

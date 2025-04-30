@@ -18,11 +18,10 @@ import {
 } from '@/components/ui/select';
 import ImageEditor from './ImageEditor';
 import { IContent, IOverlay } from '@/entities/program/type.dto';
-import { eduContentReg } from '@/entities/program/api';
+import { eduContentReg, putEduContent } from '@/entities/program/api';
 import { X } from 'lucide-react';
 import { getCategoryList } from './api';
-import { ICategory, IRes } from '@/shared/type';
-import { EduContent } from '@/app/(without-nav)/admin/content/[id]/page';
+import { EduContent, ICategory, IRes } from '@/shared/type';
 import request from '@/shared/api/axiosInstance';
 
 // 좌표 타입 정의
@@ -54,6 +53,8 @@ export function ContentUploadForm() {
   const searchParams = useSearchParams();
 
   const id = searchParams.get('id');
+  console.log(id);
+
   const router = useRouter();
   const [category, setCategory] = useState<ICategory[]>([]);
   const [form, setForm] = useState<IContent>({
@@ -74,7 +75,7 @@ export function ContentUploadForm() {
     null
   );
   const [isUploading, setIsUploading] = useState(false);
-  console.log(selectedImageIndex, imageCoordinates);
+  const [deletedFileIds, setDeletedFileIds] = useState<number[]>([]);
 
   useEffect(() => {
     const fetchContent = async () => {
@@ -138,9 +139,16 @@ export function ContentUploadForm() {
     e.preventDefault();
     setIsUploading(true);
 
-    if (files.length > 0) {
+    if (files.length > 0 || id !== null) {
       try {
-        await eduContentReg(form, files);
+        id !== null
+          ? await putEduContent({
+              eduContentId: Number(id),
+              content: form,
+              deletedFileIds: deletedFileIds,
+              imageFiles: files
+            })
+          : await eduContentReg(form, files);
         setIsUploading(false);
         router.push('/admin/content');
       } catch (error) {
@@ -187,7 +195,7 @@ export function ContentUploadForm() {
     }
   };
 
-  const removeImage = (index: number) => {
+  const removeImage = (index: number, fileId: number | undefined) => {
     const newFiles = [...files];
     newFiles.splice(index, 1);
     setFiles(newFiles);
@@ -200,7 +208,12 @@ export function ContentUploadForm() {
     newCoordinates.splice(index, 1);
     setImageCoordinates(newCoordinates);
 
-    // 선택된 이미지가 삭제된 경우 처리
+    // Add the file ID to the deleted list (if it's defined)
+    if (fileId !== undefined) {
+      setDeletedFileIds(prev => [...prev, fileId]);
+    }
+
+    // Handle selected image index
     if (selectedImageIndex === index) {
       if (newPreviews.length > 0) {
         setSelectedImageIndex(0);
@@ -208,7 +221,6 @@ export function ContentUploadForm() {
         setSelectedImageIndex(null);
       }
     } else if (selectedImageIndex !== null && selectedImageIndex > index) {
-      // 선택된 이미지 앞의 이미지가 삭제된 경우 인덱스 조정
       setSelectedImageIndex(selectedImageIndex - 1);
     }
   };
@@ -417,7 +429,7 @@ export function ContentUploadForm() {
                             size={16}
                             onClick={e => {
                               e.stopPropagation();
-                              removeImage(index);
+                              removeImage(index, selectedImageIndex!);
                             }}
                           />
                         </div>
