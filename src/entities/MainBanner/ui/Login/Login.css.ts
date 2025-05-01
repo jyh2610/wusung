@@ -32,7 +32,10 @@ export const LoginBodyStyles = style({
 });
 
 export const LogedOutStyles = style({
-  backgroundColor: colors.brand[700]
+  backgroundColor: colors.brand['0'],
+  borderRadius: '8px',
+  padding: '12px 8px',
+  color: colors.brand[400]
 });
 
 export const LoginBottomStyles = style({

@@ -342,10 +342,10 @@ export const submitAddUser = async (form: IRegUser) => {
       }
     });
 
-    return res.data.data; // ✅ TypeScript 경고 우회
+    return res.data.data;
   } catch (error) {
-    console.error('카테고리 조회 실패:', error);
-    return [];
+    console.error('등록 실패:', error);
+    throw error; // ✅ 에러를 다시 던져서 상위에서 catch 가능하게
   }
 };
 

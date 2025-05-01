@@ -14,12 +14,9 @@ export const login = async ({ userName, password }: ILoginData) => {
   return res.data;
 };
 
-export const logout = async (token: string) => {
+export const logout = async () => {
   const res = await request<ILogoutData>({
     method: 'POST',
-    headers: {
-      Authorization: `Bearer ${token}`
-    },
     url: '/api/logout'
   });
   return res.data;

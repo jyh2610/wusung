@@ -89,18 +89,80 @@ export default function ContentPage() {
 
   const handlePrint = async () => {
     try {
+      // 이 함수는 selectedActivities 대신 단일 id를 사용하는 버전입니다.
       const pdfUrl = await printUserPrint([Number(id)]);
-      toast.info(
-        'PDF가 새 탭에서 열립니다. 해당 탭의 인쇄 기능을 이용해 주세요.'
-      );
+
       if (pdfUrl) {
-        window.open(pdfUrl, '_blank');
+        // PDF가 준비되면 인쇄 대화 상자를 띄울 것임을 사용자에게 알림
+        toast.info('PDF가 로딩되면 인쇄 대화 상자가 나타납니다.');
+
+        // 👉 사용자에게 보이지 않는 iframe을 생성해서 자동 프린트
+        const iframe = document.createElement('iframe');
+        iframe.style.position = 'fixed'; // 화면에 고정
+        iframe.style.right = '0'; // 화면 오른쪽 바깥
+        iframe.style.bottom = '0'; // 화면 아래쪽 바깥
+        iframe.style.width = '0'; // 너비 0
+        iframe.style.height = '0'; // 높이 0
+        iframe.style.border = 'none'; // 테두리 없음
+        iframe.style.visibility = 'hidden'; // 숨김 처리
+        iframe.style.pointerEvents = 'none'; // 마우스 이벤트 무시
+
+        iframe.src = pdfUrl; // 아이프레임 소스를 PDF URL로 설정
+
+        // 아이프레임 로딩 완료 시 인쇄 실행
+        iframe.onload = () => {
+          // 인쇄 대화 상자가 뜨는 데 약간의 지연이 필요할 수 있습니다.
+          setTimeout(() => {
+            // iframe의 contentWindow가 존재하는지 확인 후 focus와 print 호출
+            if (iframe.contentWindow) {
+              try {
+                iframe.contentWindow.focus();
+                iframe.contentWindow.print();
+                console.log('Print dialog initiated.');
+                // 아이프레임은 사용자가 인쇄 대화 상자를 닫으면 연결이 해제되므로
+                // 여기서 별도로 제거하는 코드는 추가하지 않습니다.
+              } catch (printError) {
+                console.error('Error initiating print on iframe:', printError);
+                toast.error('인쇄 대화 상자를 열 수 없습니다.');
+                // 오류 발생 시 아이프레임 제거
+                if (iframe.parentElement) {
+                  iframe.parentElement.removeChild(iframe);
+                }
+              }
+            } else {
+              console.error(
+                'iframe contentWindow is not available after load.'
+              );
+              toast.error('인쇄 창을 열 수 없습니다.');
+              // 오류 발생 시 아이프레임 제거
+              if (iframe.parentElement) {
+                iframe.parentElement.removeChild(iframe);
+              }
+            }
+          }, 500); // 500ms 지연 (조정 가능)
+        };
+
+        // 아이프레임 로딩 오류 처리
+        iframe.onerror = e => {
+          console.error('Error loading PDF in iframe:', e);
+          toast.error('PDF 로딩 중 오류가 발생했습니다.');
+          // 오류 발생 시 아이프레임 제거
+          if (iframe.parentElement) {
+            iframe.parentElement.removeChild(iframe);
+          }
+        };
+
+        // 생성한 아이프레임을 문서 본문에 추가
+        document.body.appendChild(iframe);
+
+        // 아이프레임을 특정 시간 후에 제거하는 코드는 삭제했습니다.
+        // 사용자가 인쇄 대화 상자를 직접 닫을 때까지 아이프레임이 유지됩니다.
       } else {
         toast.error('PDF 파일을 받지 못했습니다.');
       }
     } catch (error) {
       console.error('프린트 에러:', error);
-      toast.error('인쇄 실패되었습니다!');
+      toast.error('인쇄 실패되었습니다!'); // 일반적인 오류 메시지
     }
   };
 

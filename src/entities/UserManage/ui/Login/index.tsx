@@ -22,6 +22,7 @@ import {
 import { json } from 'stream/consumers';
 import { useRouter } from 'next/navigation';
 import { setLocalStorageValue } from '@/lib/utils';
+import { useAuthStore } from '@/shared/stores/useAuthStore';
 
 interface ILoginForm {
   id: string;
@@ -41,25 +42,21 @@ export function LoginModal() {
       password: ''
     }
   });
+  const { login } = useAuthStore.getState();
 
   const id = watch('id');
   const password = watch('password');
   const router = useRouter();
   const submitLogin = async () => {
     try {
-      const res = await login({ userName: id, password });
-      setLocalStorageValue(
-        'userInfo',
-        JSON.stringify({
-          token: res.accessToken,
-          username: res.username
-        })
-      );
-      router.push('/program');
+      // 로그인 요청
+      await login(id, password);
+      // id와 password 초기화
       setValue('id', '');
       setValue('password', '');
+      router.push('/');
     } catch (error) {
-      console.error(error);
+      console.error('로그인 실패:', error);
     }
   };
 

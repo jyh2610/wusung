@@ -14,17 +14,14 @@ import {
 } from './index.css';
 import { btn } from './ui/navBtn/index.css';
 import { useRouter, usePathname } from 'next/navigation';
+import { useAuthStore } from '@/shared/stores/useAuthStore';
 
 export function ProgramNav() {
-  const [id, setId] = useState('');
+  const { username } = useAuthStore(state => ({
+    username: state.username
+  }));
   const router = useRouter();
   const pathname = usePathname(); // Get the current pathname using usePathname()
-
-  useEffect(() => {
-    const rawData = localStorage?.getItem('userInfo');
-    const userInfo = rawData ? JSON.parse(rawData) : null;
-    setId(userInfo?.username);
-  }, []);
 
   const getButtonStyle = (route: string) => {
     return pathname === route
@@ -130,7 +127,7 @@ export function ProgramNav() {
           <div className={imgContainer}>
             <Image fill src={'/images/ProfilePic.png'} alt={'프로필 썸네일'} />
           </div>
-          <div className={textAlign}>{id}</div>
+          <div className={textAlign}>{username}</div>
         </div>
 
         <div className={navBtnContainer}>

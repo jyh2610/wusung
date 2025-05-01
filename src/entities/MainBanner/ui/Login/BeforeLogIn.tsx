@@ -16,6 +16,8 @@ import {
   InfoFucStyles,
   InfoContentStyles
 } from './Login.css';
+import { NomalInput } from '@/shared/ui/Input';
+import { useAuthStore } from '@/shared/stores/useAuthStore';
 export function BeforeLogIn() {
   const [loginData, setLoginData] = useState<ILoginData>({
     userName: '',
@@ -25,16 +27,17 @@ export function BeforeLogIn() {
   const navigate = useRouter();
 
   const sendLogin = async () => {
-    console.log(loginData);
-
+    const { login } = useAuthStore.getState();
     try {
-      await login({
-        userName: loginData.userName,
-        password: loginData.password
+      // 로그인 요청
+      await login(loginData.userName, loginData.password);
+      // id와 password 초기화
+      setLoginData({
+        userName: '',
+        password: ''
       });
-      showSuccessAlert('로그인 성공');
     } catch (error) {
-      showErrorAlert('로그인 실패');
+      console.error('로그인 실패:', error);
     }
   };
 
@@ -44,7 +47,7 @@ export function BeforeLogIn() {
         <p>로그인</p>
       </div>
       <div className={LoginBodyStyles}>
-        <Input
+        <NomalInput
           label="아이디"
           inputSize="medium"
           placeholder="아이디를 입력해 주세요"
@@ -58,7 +61,7 @@ export function BeforeLogIn() {
           }
         />
 
-        <Input
+        <NomalInput
           type="password"
           labelPosition="vertical"
           labelInputGap={4}

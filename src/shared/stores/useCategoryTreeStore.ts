@@ -1,15 +1,17 @@
 import { create } from 'zustand';
-import { CategoryNode } from '@/entities/program/type.dto'; // CategoryNode 타입 정의
-import { getUserCategoryTree } from '@/entities/program/api'; // API 호출 함수
+import { CategoryNode } from '@/entities/program/type.dto';
+import { getUserCategoryTree } from '@/entities/program/api';
 
 interface CategoryTreeState {
-  categoryTree: CategoryNode[]; // 전체 카테고리 트리
-  selectedCategoryNode: CategoryNode | null; // 선택된 카테고리 노드
-  isLoading: boolean; // 로딩 여부
-  error: Error | null; // 에러 여부
+  categoryTree: CategoryNode[];
+  selectedCategoryNode: CategoryNode | null;
+  isLoading: boolean;
+  error: Error | null;
 
-  fetchCategoryTree: () => Promise<void>; // 카테고리 트리 가져오기
-  setSelectedCategoryNode: (category: CategoryNode | null) => void; // 선택 노드 설정
+  fetchCategoryTree: () => Promise<void>;
+  setSelectedCategoryNode: (category: CategoryNode | null) => void;
+
+  findLeafCategoriesByName: (name: string) => CategoryNode[]; // ✅ 추가된 메서드
 }
 
 export const useCategoryTreeStore = create<CategoryTreeState>(set => ({
@@ -21,12 +23,12 @@ export const useCategoryTreeStore = create<CategoryTreeState>(set => ({
   fetchCategoryTree: async () => {
     set({ isLoading: true, error: null });
     try {
-      const treeData = await getUserCategoryTree(); // ✅ 트리 가져오기
-      const tree = treeData?.data || []; // 결과 없으면 빈 배열
+      const treeData = await getUserCategoryTree();
+      const tree = treeData?.data || [];
 
       set({
         categoryTree: tree,
-        selectedCategoryNode: tree.length > 0 ? tree[0] : null, // ✅ 첫 번째 항목 자동 선택
+        selectedCategoryNode: tree.length > 0 ? tree[0] : null,
         isLoading: false
       });
     } catch (err) {
@@ -40,5 +42,22 @@ export const useCategoryTreeStore = create<CategoryTreeState>(set => ({
 
   setSelectedCategoryNode: category => {
     set({ selectedCategoryNode: category });
+  },
+
+  findLeafCategoriesByName: (name: string): CategoryNode[] => {
+    const state = useCategoryTreeStore.getState();
+
+    const collectLeafNodes = (nodes: CategoryNode[]): CategoryNode[] => {
+      return nodes.flatMap(node => {
+        if (!node.children || node.children.length === 0) {
+          return [node];
+        }
+        return collectLeafNodes(node.children);
+      });
+    };
+
+    const matchedRoots = state.categoryTree.filter(node => node.name === name);
+
+    return matchedRoots.flatMap(root => collectLeafNodes([root]));
   }
 }));
