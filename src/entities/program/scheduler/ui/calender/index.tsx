@@ -30,12 +30,8 @@ const weekdays = ['일', '월', '화', '수', '목', '금', '토'];
 
 export function Calendar({ schedule, isAdmin }: CalendarProps) {
   const { year, month } = useDateStore();
-  const {
-    disabledDrops,
-    setDisabledDrop,
-    toggleDisabledDrop,
-    removeScheduleItem
-  } = useScheduleStore();
+  const { disabledDrops, setDisabledDrop, removeScheduleItem } =
+    useScheduleStore();
 
   const firstDayOfMonth = new Date(year, month - 1, 1);
   const daysInMonth = new Date(year, month, 0).getDate();
@@ -59,23 +55,29 @@ export function Calendar({ schedule, isAdmin }: CalendarProps) {
     weeks.push(currentWeek);
   }
 
+  // const updateDisableByDayNums = (dayNums: number[], enabled: boolean) => {
+  //   dayNums.forEach(dayNum => {
+  //     if (dayNum <= 0) return;
+  //     ['cognitive', 'daily'].forEach(category => {
+  //       const id = `${dayNum}-${category}`;
+  //       setDisabledDrop(id, !enabled); // 명시적 설정
+  //       const item = schedule[dayNum]?.[category as 'cognitive' | 'daily'];
+  //       if (!enabled && item) {
+  //         removeScheduleItem(String(dayNum), item!.id);
+  //       }
+  //     });
+  //   });
+  // };
+
   const updateDisableByDayNums = (dayNums: number[], enabled: boolean) => {
     dayNums.forEach(dayNum => {
       if (dayNum <= 0) return;
       ['cognitive', 'daily'].forEach(category => {
         const id = `${dayNum}-${category}`;
-        setDisabledDrop(id, !enabled); // 명시적 설정
-        const item = schedule[dayNum]?.[category as 'cognitive' | 'daily'];
-        if (!enabled && item) {
-          removeScheduleItem(String(dayNum), item!.id);
-        }
+        setDisabledDrop(id, !enabled); // ❗ 상태만 변경
+        // ❌ removeScheduleItem 호출 제거!
       });
     });
-  };
-  const handleToggleDisabledForDay = (dayNum: number) => {
-    toggleDisabledDrop(`${dayNum}-cognitive`);
-    toggleDisabledDrop(`${dayNum}-daily`);
-    // ❌ 상태(schedule) 삭제는 하지 않음
   };
 
   const renderCell = (
@@ -161,13 +163,12 @@ export function Calendar({ schedule, isAdmin }: CalendarProps) {
                   (!disabledDrops.has(`${week[dayIdx]}-cognitive`) &&
                     !disabledDrops.has(`${week[dayIdx]}-daily`))
               )}
-              onChange={() => {
-                weeks.forEach(week => {
-                  const dayNum = week[dayIdx];
-                  if (dayNum > 0) {
-                    handleToggleDisabledForDay(dayNum);
-                  }
-                });
+              onChange={e => {
+                const checked = e.target.checked;
+                const dayNums = weeks
+                  .map(week => week[dayIdx])
+                  .filter(d => d > 0);
+                updateDisableByDayNums(dayNums, checked);
               }}
             />
           </div>
@@ -189,12 +190,9 @@ export function Calendar({ schedule, isAdmin }: CalendarProps) {
                     (!disabledDrops.has(`${dayNum}-cognitive`) &&
                       !disabledDrops.has(`${dayNum}-daily`))
                 )}
-                onChange={() => {
-                  week.forEach(dayNum => {
-                    if (dayNum > 0) {
-                      handleToggleDisabledForDay(dayNum);
-                    }
-                  });
+                onChange={e => {
+                  const checked = e.target.checked;
+                  updateDisableByDayNums(week, checked);
                 }}
               />
             </div>
@@ -216,7 +214,9 @@ export function Calendar({ schedule, isAdmin }: CalendarProps) {
                           disabledDrops.has(`${dayNum}-daily`)
                         )
                       }
-                      onChange={() => handleToggleDisabledForDay(dayNum)}
+                      onChange={e =>
+                        updateDisableByDayNums([dayNum], e.target.checked)
+                      }
                     />
                   </>
                 ) : (

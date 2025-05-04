@@ -15,16 +15,10 @@ export const autoRegisterPlan = async ({
 }: AutoRegisterParams) => {
   try {
     const plan = await getPlan({ year, month, difficultyLevel });
-
     if (!plan?.mainEduContentIds?.length) return;
 
-    const {
-      schedule,
-      updateSchedule,
-      addCoverItem,
-      addEtcItem,
-      disabledDrops
-    } = useScheduleStore.getState();
+    const { schedule, updateSchedule, addCoverItem, addEtcItem } =
+      useScheduleStore.getState();
 
     const updatedSchedule = { ...schedule };
 
@@ -35,49 +29,42 @@ export const autoRegisterPlan = async ({
       const contents = await Promise.all(
         contentIds.map(id => searchContent(id))
       );
-
       const [cognitive, daily] = contents;
       const day = i + 1;
 
-      // ✅ Check if either cognitive or daily drop is disabled for the day
-      const cognitiveDisabled = disabledDrops.has(`${day}-cognitive`);
-      const dailyDisabled = disabledDrops.has(`${day}-daily`);
-
-      const daySchedule: Record<string, ScheduleItem> = {};
-
-      if (!cognitiveDisabled && cognitive) {
-        daySchedule.cognitive = {
-          id: cognitive.eduContentId!,
-          content: cognitive.title
-        };
-      }
-
-      if (!dailyDisabled && daily) {
-        daySchedule.daily = {
-          id: daily.eduContentId!,
-          content: daily.title
-        };
-      }
-
-      // ✅ Only assign if there's at least one valid entry
-      if (Object.keys(daySchedule).length > 0) {
-        updatedSchedule[day] = daySchedule;
-      }
-
-      // ✅ Cover & etc는 기존 로직 유지 (cover는 첫 날만)
-      if (i === 0 && cognitive && !cognitiveDisabled) {
+      if (i === 0 && cognitive) {
         addCoverItem({
           id: cognitive.eduContentId!,
           content: cognitive.title
         });
       }
 
-      if (daily && !dailyDisabled) {
+      if (daily) {
         addEtcItem({
           id: daily.eduContentId!,
           content: daily.title
         });
       }
+
+      // ✅ disabled 상태 고려 없이 모든 날짜에 등록
+      updatedSchedule[day] = {
+        ...(cognitive
+          ? {
+              cognitive: {
+                id: cognitive.eduContentId!,
+                content: cognitive.title
+              }
+            }
+          : {}),
+        ...(daily
+          ? {
+              daily: {
+                id: daily.eduContentId!,
+                content: daily.title
+              }
+            }
+          : {})
+      };
     }
 
     updateSchedule(updatedSchedule);

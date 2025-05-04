@@ -28,12 +28,15 @@ function Header({
   // ✅ 전역 날짜 상태 사용
   const { year, month, setYear, setMonth } = useDateStore();
   const mainEduContentIds = formatScheduleData(schedule, year, month);
-  const { coverItems, etcItems, noPrintDate } = useScheduleStore(state => ({
-    coverItems: state.coverItems,
-    etcItems: state.etcItems,
-    noPrintDate: state.noPrintDate,
-    toggleNoPrintDate: state.toggleNoPrintDate
-  }));
+  const { coverItems, etcItems, noPrintDate, disabledDrops } = useScheduleStore(
+    state => ({
+      disabledDrops: state.disabledDrops,
+      coverItems: state.coverItems,
+      etcItems: state.etcItems,
+      noPrintDate: state.noPrintDate,
+      toggleNoPrintDate: state.toggleNoPrintDate
+    })
+  );
 
   const selectedUserId = useUserStore(state => state.selectedUserId);
   const users = useUserStore.getState().users;
@@ -56,7 +59,33 @@ function Header({
       setMonth(month + 1);
     }
   };
+  // ✅ 비활성 날짜 필터링 적용한 mainEduContentIds 생성 함수
+  const getFilteredMainEduContentIds = () => {
+    const result: number[][] = [];
 
+    for (let day = 1; day <= 31; day++) {
+      const daySchedule = schedule[day];
+      const cognitiveKey = `${day}-cognitive`;
+      const dailyKey = `${day}-daily`;
+
+      // 완전 비활성화된 날짜는 제외
+      if (disabledDrops.has(cognitiveKey) && disabledDrops.has(dailyKey))
+        continue;
+
+      const ids: number[] = [];
+
+      if (!disabledDrops.has(cognitiveKey) && daySchedule?.cognitive?.id) {
+        ids.push(daySchedule.cognitive.id);
+      }
+      if (!disabledDrops.has(dailyKey) && daySchedule?.daily?.id) {
+        ids.push(daySchedule.daily.id);
+      }
+
+      result.push(ids);
+    }
+
+    return result;
+  };
   const regScheduleHandler = async () => {
     try {
       const coverItemId =
@@ -97,9 +126,7 @@ function Header({
       const coverItemId =
         coverItems && coverItems.id !== 0 ? coverItems.id : null;
       const middleEduContentIds = etcItems.map(item => item.id);
-
-      console.log('Printing with coverEduContentId:', coverItemId);
-      console.log('Printing with main:', mainEduContentIds);
+      const mainEduContentIds = getFilteredMainEduContentIds();
 
       const pdfUrl = await printPDF(selectedUserId, {
         year,
@@ -112,7 +139,6 @@ function Header({
       });
 
       if (pdfUrl) {
-        // 👉 iframe을 생성해서 자동 프린트
         const iframe = document.createElement('iframe');
         iframe.style.position = 'fixed';
         iframe.style.right = '0';
@@ -125,7 +151,7 @@ function Header({
           setTimeout(() => {
             iframe.contentWindow?.focus();
             iframe.contentWindow?.print();
-          }, 500); // 약간의 지연 필요
+          }, 500);
         };
 
         document.body.appendChild(iframe);
@@ -137,6 +163,62 @@ function Header({
       toast.error('프린트 실패되었습니다!');
     }
   };
+
+  // const print = async () => {
+  //   try {
+  //     if (!selectedUserId) {
+  //       toast.error('사용자가 선택되지 않았습니다.');
+  //       return;
+  //     }
+
+  //     if (!selectedUser) {
+  //       toast.error('선택된 사용자 정보를 찾을 수 없습니다.');
+  //       return;
+  //     }
+
+  //     const coverItemId =
+  //       coverItems && coverItems.id !== 0 ? coverItems.id : null;
+  //     const middleEduContentIds = etcItems.map(item => item.id);
+
+  //     console.log('Printing with coverEduContentId:', coverItemId);
+  //     console.log('Printing with main:', mainEduContentIds);
+
+  //     const pdfUrl = await printPDF(selectedUserId, {
+  //       year,
+  //       month,
+  //       difficultyLevel: selectedUser.difficultyLevel,
+  //       coverEduContentId: coverItemId!,
+  //       middleEduContentIds,
+  //       mainEduContentIds,
+  //       noPrintDate
+  //     });
+
+  //     if (pdfUrl) {
+  //       // 👉 iframe을 생성해서 자동 프린트
+  //       const iframe = document.createElement('iframe');
+  //       iframe.style.position = 'fixed';
+  //       iframe.style.right = '0';
+  //       iframe.style.bottom = '0';
+  //       iframe.style.width = '0';
+  //       iframe.style.height = '0';
+  //       iframe.src = pdfUrl;
+
+  //       iframe.onload = () => {
+  //         setTimeout(() => {
+  //           iframe.contentWindow?.focus();
+  //           iframe.contentWindow?.print();
+  //         }, 500); // 약간의 지연 필요
+  //       };
+
+  //       document.body.appendChild(iframe);
+  //     } else {
+  //       toast.error('PDF 파일을 받지 못했습니다.');
+  //     }
+  //   } catch (error) {
+  //     console.error('프린트 에러:', error);
+  //     toast.error('프린트 실패되었습니다!');
+  //   }
+  // };
 
   return (
     <div className={headerContainer}>
