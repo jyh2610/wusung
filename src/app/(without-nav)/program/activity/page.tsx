@@ -23,8 +23,16 @@ import { Button } from '@/shared/ui';
 import { printUserPrint } from '@/entities/program/api';
 import { toast } from 'react-toastify';
 import { useCategoryTreeStore } from '@/shared/stores/useCategoryTreeStore';
+import { usePathname, useRouter } from 'next/navigation';
+import { handleCurrentPathRoute } from '@/lib/utils';
 
 function Activity() {
+  const router = useRouter();
+  const pathname = usePathname();
+  const handleClick = (id: string) => {
+    const path = handleCurrentPathRoute(id, pathname);
+    router.push(path);
+  };
   const {
     categoryTree,
     fetchCategoryTree,
@@ -304,7 +312,11 @@ function Activity() {
         {activities && activities.length > 0 ? (
           <div className={activityCardContainer}>
             {activities.map(activity => (
-              <div key={activity.eduContentId} className={activityCard}>
+              <div
+                key={activity.eduContentId}
+                className={activityCard}
+                onClick={() => handleClick(activity.eduContentId + '')}
+              >
                 <div
                   style={{ display: 'flex', justifyContent: 'space-between' }}
                 >

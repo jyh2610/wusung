@@ -9,7 +9,7 @@ import {
   printButton,
   iconStyle
 } from './index.css';
-
+import { CircularProgress } from '@mui/material';
 import { Schedule } from '@/entities/program/type.dto';
 import { formatScheduleData } from '../../utils';
 import { printPDF, regSchedule } from '@/entities/program/api';
@@ -28,7 +28,7 @@ function Header({
 }) {
   const [isPrintModalOpen, setIsPrintModalOpen] = useState(false);
   const [autoFillDate, setAutoFillDate] = useState(true);
-
+  const [isPrinting, setIsPrinting] = useState(false);
   // ✅ 전역 날짜 상태 사용
   const { year, month, setYear, setMonth } = useDateStore();
   const mainEduContentIds = formatScheduleData(schedule, year, month);
@@ -46,10 +46,16 @@ function Header({
   const handleClosePrintModal = () => setIsPrintModalOpen(false);
 
   const handlePrintConfirm = async () => {
-    await print(); // 기존 print 함수 실행
-    setIsPrintModalOpen(false);
+    setIsPrinting(true);
+    try {
+      await print(); // 실제 인쇄 로직
+      setIsPrintModalOpen(false);
+    } catch (err) {
+      // 예외 처리 시 모달 닫지 않음
+    } finally {
+      setIsPrinting(false);
+    }
   };
-
   const selectedUserId = useUserStore(state => state.selectedUserId);
   const users = useUserStore.getState().users;
   const selectedUser = users.find(user => user.elderId === selectedUserId);
@@ -260,8 +266,12 @@ function Header({
                 variant="contained"
                 color="primary"
                 onClick={handlePrintConfirm}
+                disabled={isPrinting}
+                startIcon={
+                  isPrinting && <CircularProgress size={20} color="inherit" />
+                }
               >
-                인쇄
+                {isPrinting ? '인쇄 중...' : '인쇄'}
               </Button>
               <Button variant="outlined" onClick={handleClosePrintModal}>
                 취소

@@ -103,3 +103,8 @@ export const findEvaluationCategories = (
   traverse(nodes);
   return result;
 };
+
+export const handleCurrentPathRoute = (id: string, pathname: string) => {
+  const currentPath = pathname.replace(/\/$/, '');
+  return `${currentPath}/${id}`;
+};

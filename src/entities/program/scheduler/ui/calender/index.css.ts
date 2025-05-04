@@ -44,7 +44,8 @@ export const weekLabel = style({
   fontWeight: 'bold',
   display: 'flex',
   alignItems: 'center',
-  justifyContent: 'center'
+  justifyContent: 'center',
+  gap: '8px'
 });
 
 export const highlighted = style({

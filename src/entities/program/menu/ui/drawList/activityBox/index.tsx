@@ -9,7 +9,8 @@ import { title } from '../../../index.css';
 
 const endpointMapper: Record<string, string> = {
   evaluation: '평가자료',
-  etc: '기타자료'
+  etc: '기타자료',
+  activity: '개별 활동지'
 };
 
 export function ActivityBox() {
@@ -22,36 +23,34 @@ export function ActivityBox() {
     fetchCategoryTree,
     selectedCategoryNode,
     setSelectedCategoryNode,
-    findLeafCategoriesByName
+    findLeafCategoriesByName,
+    getChildrenOfRootByName
   } = useCategoryTreeStore();
 
   useEffect(() => {
     fetchCategoryTree();
   }, [fetchCategoryTree]);
 
-  const itemsToRender = useMemo<CategoryNode[]>(() => {
-    if (!categoryTree.length) return [];
-    if (categoryName) {
-      return findLeafCategoriesByName(categoryName);
-    }
-    return categoryTree; // fallback: 전체 루트 노드
-  }, [categoryTree, categoryName, findLeafCategoriesByName]);
+  const children = useCategoryTreeStore(state => {
+    return state.getChildrenOfRootByName(categoryName);
+  });
 
   const handleCategorySelect = (category: CategoryNode) => {
     setSelectedCategoryNode(category);
   };
   useEffect(() => {
-    if (itemsToRender.length > 0) {
-      setSelectedCategoryNode(itemsToRender[0]); // 첫 번째 항목 자동 선택
+    if (children.length > 0) {
+      setSelectedCategoryNode(children[0]); // 첫 번째 항목 자동 선택
     }
-  }, [itemsToRender, setSelectedCategoryNode]);
+  }, [children, setSelectedCategoryNode]);
+
   return (
     <div>
       <h3 className={title} style={{ marginBottom: '32px' }}>
-        활동지 목록
+        {categoryName} 목록
       </h3>
       <ul>
-        {itemsToRender.map(item => (
+        {children.map(item => (
           <li
             key={item.categoryId}
             onClick={() => handleCategorySelect(item)}

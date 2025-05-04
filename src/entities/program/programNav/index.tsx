@@ -17,9 +17,10 @@ import { useRouter, usePathname } from 'next/navigation';
 import { useAuthStore } from '@/shared/stores/useAuthStore';
 
 export function ProgramNav() {
-  const { username } = useAuthStore(state => ({
-    username: state.username
-  }));
+  const { username, checkAuthentication } = useAuthStore();
+  useEffect(() => {
+    checkAuthentication();
+  }, [checkAuthentication]);
   const router = useRouter();
   const pathname = usePathname(); // Get the current pathname using usePathname()
 

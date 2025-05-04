@@ -19,6 +19,7 @@ export const useAuthStore = create<AuthState>(set => ({
   login: async (id: string, password: string) => {
     try {
       const res = await login({ userName: id, password });
+      console.log(res);
 
       // 로그인 성공 시 로컬 스토리지에 정보 저장
       localStorage.setItem(

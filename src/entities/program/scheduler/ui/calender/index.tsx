@@ -20,6 +20,7 @@ import { Schedule } from '@/entities/program/type.dto';
 import { useDateStore } from '@/shared/stores/useDateStores';
 import { useScheduleStore } from '@/shared/stores/useScheduleStore';
 import { MdDelete } from 'react-icons/md';
+import { colors } from '@/design-tokens';
 
 interface CalendarProps {
   schedule: Schedule;
@@ -106,11 +107,15 @@ export function Calendar({ schedule, isAdmin }: CalendarProps) {
         droppableId={droppableId}
         isDropDisabled={isDisabled}
       >
-        {provided => (
+        {(provided, snapshot) => (
           <div
             ref={provided.innerRef}
             {...provided.droppableProps}
             className={`${activityCell} ${isDisabled ? disabledCell : ''}`}
+            style={{
+              minHeight: 60,
+              backgroundColor: snapshot.isDraggingOver ? colors.brand[0] : ''
+            }}
           >
             {item ? (
               <Draggable
@@ -181,7 +186,7 @@ export function Calendar({ schedule, isAdmin }: CalendarProps) {
           {/* 주차 */}
           <div className={grid}>
             <div className={`${gridItem} ${weekLabel} ${weekLabelBg}`}>
-              {weekIdx + 1}주차
+              <span>{weekIdx + 1}주차</span>
               <input
                 type="checkbox"
                 checked={week.every(

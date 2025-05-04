@@ -35,8 +35,7 @@ export function ProgramComponent() {
         style={{
           height: '100vh',
           display: 'flex',
-          flexDirection: 'column',
-          overflow: 'hidden'
+          flexDirection: 'column'
         }}
       >
         <div style={{ flexGrow: 1, overflowY: 'auto' }}>

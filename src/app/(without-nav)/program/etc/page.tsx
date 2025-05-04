@@ -7,10 +7,10 @@ import React, { useEffect, useState } from 'react';
 import { fetchEvaluationContentsOnly } from '../evaluation/utils';
 import { TableRow, TableCell } from '@mui/material';
 import { usePathname, useRouter } from 'next/navigation';
+import { handleCurrentPathRoute } from '@/lib/utils';
 
 const columns = [
   { id: 'title', label: '제목' },
-  { id: 'difficultyLevel', label: '난이도' },
   { id: 'date', label: '날짜' },
   { id: 'viewCount', label: '조회수' }
 ];
@@ -23,8 +23,8 @@ function ETC() {
   const pathname = usePathname();
 
   const handleClick = (id: string) => {
-    const currentPath = pathname.replace(/\/$/, '');
-    router.push(`${currentPath}/${id}`);
+    const path = handleCurrentPathRoute(id, pathname);
+    router.push(path);
   };
 
   const renderRow = (row: IContent) => (

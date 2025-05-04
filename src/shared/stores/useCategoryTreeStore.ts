@@ -12,6 +12,7 @@ interface CategoryTreeState {
   setSelectedCategoryNode: (category: CategoryNode | null) => void;
 
   findLeafCategoriesByName: (name: string) => CategoryNode[]; // ✅ 추가된 메서드
+  getChildrenOfRootByName: (name: string) => CategoryNode[];
 }
 
 export const useCategoryTreeStore = create<CategoryTreeState>(set => ({
@@ -19,6 +20,12 @@ export const useCategoryTreeStore = create<CategoryTreeState>(set => ({
   selectedCategoryNode: null,
   isLoading: false,
   error: null,
+
+  getChildrenOfRootByName: (name: string): CategoryNode[] => {
+    const state = useCategoryTreeStore.getState();
+    const root = state.categoryTree.find(node => node.name === name);
+    return root?.children || [];
+  },
 
   fetchCategoryTree: async () => {
     set({ isLoading: true, error: null });

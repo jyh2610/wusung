@@ -10,7 +10,6 @@ import { usePathname, useRouter } from 'next/navigation';
 
 const columns = [
   { id: 'title', label: '제목' },
-  { id: 'difficultyLevel', label: '난이도' },
   { id: 'date', label: '날짜' },
   { id: 'viewCount', label: '조회수' }
 ];

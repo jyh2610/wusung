@@ -96,20 +96,6 @@ export function Control({ isAdmin }: { isAdmin: boolean }) {
       <div className={additionalData}>
         {/* 기타자료 */}
 
-        <div
-          className={buttonStyle}
-          style={{
-            backgroundColor: noPrintDate ? colors.brand[400] : '#f0f0f0',
-            color: noPrintDate ? colors.gray_scale['default'] : '',
-            transition: 'background-color 0.2s ease',
-            position: 'relative',
-            width: '150px'
-          }}
-          onClick={toggleNoPrintDate}
-        >
-          <button type="button">날짜 출력</button>
-        </div>
-
         <Droppable droppableId="etc" isDropDisabled={false}>
           {(provided, snapshot) => (
             <div
