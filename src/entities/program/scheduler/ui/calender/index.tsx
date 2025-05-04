@@ -30,8 +30,12 @@ const weekdays = ['일', '월', '화', '수', '목', '금', '토'];
 
 export function Calendar({ schedule, isAdmin }: CalendarProps) {
   const { year, month } = useDateStore();
-  const { disabledDrops, toggleDisabledDrop, removeScheduleItem } =
-    useScheduleStore();
+  const {
+    disabledDrops,
+    setDisabledDrop,
+    toggleDisabledDrop,
+    removeScheduleItem
+  } = useScheduleStore();
 
   const firstDayOfMonth = new Date(year, month - 1, 1);
   const daysInMonth = new Date(year, month, 0).getDate();
@@ -55,17 +59,23 @@ export function Calendar({ schedule, isAdmin }: CalendarProps) {
     weeks.push(currentWeek);
   }
 
-  const handleDisable = (dayNum: number) => {
+  const updateDisableByDayNums = (dayNums: number[], enabled: boolean) => {
+    dayNums.forEach(dayNum => {
+      if (dayNum <= 0) return;
+      ['cognitive', 'daily'].forEach(category => {
+        const id = `${dayNum}-${category}`;
+        setDisabledDrop(id, !enabled); // 명시적 설정
+        const item = schedule[dayNum]?.[category as 'cognitive' | 'daily'];
+        if (!enabled && item) {
+          removeScheduleItem(String(dayNum), item!.id);
+        }
+      });
+    });
+  };
+  const handleToggleDisabledForDay = (dayNum: number) => {
     toggleDisabledDrop(`${dayNum}-cognitive`);
     toggleDisabledDrop(`${dayNum}-daily`);
-
-    // ✅ 체크 해제되면 스케줄 데이터도 삭제
-    if (schedule[dayNum]?.cognitive) {
-      removeScheduleItem(String(dayNum), schedule[dayNum].cognitive!.id);
-    }
-    if (schedule[dayNum]?.daily) {
-      removeScheduleItem(String(dayNum), schedule[dayNum].daily!.id);
-    }
+    // ❌ 상태(schedule) 삭제는 하지 않음
   };
 
   const renderCell = (
@@ -145,19 +155,17 @@ export function Calendar({ schedule, isAdmin }: CalendarProps) {
             <span>{day}</span>
             <input
               type="checkbox"
-              checked={
-                !weeks.some(
-                  week =>
-                    week[dayIdx] > 0 &&
-                    (disabledDrops.has(`${week[dayIdx]}-cognitive`) ||
-                      disabledDrops.has(`${week[dayIdx]}-daily`))
-                )
-              }
+              checked={weeks.every(
+                week =>
+                  week[dayIdx] === 0 ||
+                  (!disabledDrops.has(`${week[dayIdx]}-cognitive`) &&
+                    !disabledDrops.has(`${week[dayIdx]}-daily`))
+              )}
               onChange={() => {
                 weeks.forEach(week => {
                   const dayNum = week[dayIdx];
                   if (dayNum > 0) {
-                    handleDisable(dayNum);
+                    handleToggleDisabledForDay(dayNum);
                   }
                 });
               }}
@@ -169,31 +177,29 @@ export function Calendar({ schedule, isAdmin }: CalendarProps) {
       {/* 날짜별 행 */}
       {weeks.map((week, weekIdx) => (
         <div key={weekIdx}>
-          {/* 날짜 체크 + 주차 */}
+          {/* 주차 */}
           <div className={grid}>
             <div className={`${gridItem} ${weekLabel} ${weekLabelBg}`}>
               {weekIdx + 1}주차
               <input
                 type="checkbox"
-                checked={
-                  !week.some(
-                    dayNum =>
-                      dayNum > 0 &&
-                      (disabledDrops.has(`${dayNum}-cognitive`) ||
-                        disabledDrops.has(`${dayNum}-daily`))
-                  )
-                }
+                checked={week.every(
+                  dayNum =>
+                    dayNum === 0 ||
+                    (!disabledDrops.has(`${dayNum}-cognitive`) &&
+                      !disabledDrops.has(`${dayNum}-daily`))
+                )}
                 onChange={() => {
                   week.forEach(dayNum => {
                     if (dayNum > 0) {
-                      handleDisable(dayNum);
+                      handleToggleDisabledForDay(dayNum);
                     }
                   });
                 }}
               />
             </div>
 
-            {/* 날짜 */}
+            {/* 날짜 + 개별 체크박스 */}
             {week.map((dayNum, dayIdx) => (
               <div
                 key={dayIdx}
@@ -210,7 +216,7 @@ export function Calendar({ schedule, isAdmin }: CalendarProps) {
                           disabledDrops.has(`${dayNum}-daily`)
                         )
                       }
-                      onChange={() => handleDisable(dayNum)}
+                      onChange={() => handleToggleDisabledForDay(dayNum)}
                     />
                   </>
                 ) : (
@@ -233,7 +239,7 @@ export function Calendar({ schedule, isAdmin }: CalendarProps) {
           {/* 일상생활 */}
           <div className={activityRow}>
             <div className={activityCell}>
-              <div className={activityLabel}>일상생활</div>
+              <div className={activityLabel}>일상생활 & 추가 인지활동</div>
             </div>
             {week.map((dayNum, colIdx) =>
               renderCell(dayNum, 'daily', weekIdx, colIdx)

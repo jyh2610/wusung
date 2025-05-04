@@ -33,6 +33,7 @@ interface ScheduleState {
   clearCoverItems: () => void;
   addEtcItem: (item: ScheduleItem) => void;
   clearEtcItems: () => void;
+  setDisabledDrop: (id: string, disabled: boolean) => void;
 }
 
 export const useScheduleStore = create<ScheduleState>(set => ({
@@ -112,6 +113,13 @@ export const useScheduleStore = create<ScheduleState>(set => ({
           [dateKey]: newDaySchedule
         }
       };
+    }),
+
+  setDisabledDrop: (id: string, disabled: boolean) =>
+    set(state => {
+      const newSet = new Set(state.disabledDrops);
+      disabled ? newSet.add(id) : newSet.delete(id);
+      return { disabledDrops: newSet };
     }),
 
   removeCoverItems: () => set({ coverItems: { id: 0, content: '' } }),

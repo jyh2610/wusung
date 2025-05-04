@@ -1,8 +1,23 @@
+'use client';
+
 import { colors } from '@/design-tokens';
 import { Button } from '@/shared/ui';
 import { Benefit, PaymentBody } from './ui';
+import { usePayment } from './model/portyOneModel';
+import { useEffect } from 'react';
 
 export function PaymentComponent() {
+  const { requestPayment } = usePayment({
+    name: 'test',
+    price: 1000,
+    id: '123123',
+    currency: 'krw'
+  });
+
+  useEffect(() => {
+    requestPayment();
+  }, []);
+
   return (
     <div style={{ width: '888px' }}>
       <div>

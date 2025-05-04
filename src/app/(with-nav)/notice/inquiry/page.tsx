@@ -1,7 +1,26 @@
+'use client';
+
 import { colors } from '@/design-tokens';
 import { DashBoard } from '@/shared';
+import { TableRow, TableCell } from '@mui/material';
 
-export default function Inquiry() {
+function Inquiry() {
+  const columns = [
+    { id: 'title', label: '제목' },
+    { id: 'author', label: '작성자' },
+    { id: 'date', label: '날짜' },
+    { id: 'views', label: '조회수' }
+  ];
+
+  const renderRow = (row: ReturnType<typeof createData>) => (
+    <TableRow key={row.title} hover>
+      <TableCell>{row.title}</TableCell>
+      <TableCell align="right">{row.author}</TableCell>
+      <TableCell align="right">{row.date}</TableCell>
+      <TableCell align="right">{row.views}</TableCell>
+    </TableRow>
+  );
+
   return (
     <div>
       <div>
@@ -17,7 +36,7 @@ export default function Inquiry() {
         </h1>
       </div>
       <div>
-        <DashBoard rows={rows} />
+        <DashBoard columns={columns} rows={rows} renderRow={renderRow} />
       </div>
     </div>
   );
@@ -39,3 +58,5 @@ function createData(
 ) {
   return { title, author, date, views };
 }
+
+export default Inquiry;

@@ -24,14 +24,14 @@ import { printUserPrint } from '@/entities/program/api';
 import { toast } from 'react-toastify';
 import { useCategoryTreeStore } from '@/shared/stores/useCategoryTreeStore';
 
-function Activity({ isAdmin }: { isAdmin: boolean }) {
+function Activity() {
   const {
     categoryTree,
     fetchCategoryTree,
     selectedCategoryNode,
     setSelectedCategoryNode
   } = useCategoryTreeStore();
-
+  const isAdmin = true;
   const [personName, setPersonName] = useState<string[]>([]);
   const [selectedLevel, setSelectedLevel] = useState<'high' | 'medium' | 'low'>(
     'medium'

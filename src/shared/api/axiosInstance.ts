@@ -6,6 +6,7 @@ import https from 'https';
 
 const axiosInstance = axios.create({
   baseURL: 'https://13.124.172.100.sslip.io',
+  withCredentials: true,
   headers: {
     'Content-Type': 'application/json'
   },
