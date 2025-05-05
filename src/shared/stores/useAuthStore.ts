@@ -29,7 +29,8 @@ export const useAuthStore = create<AuthState>(set => ({
           username: res.username
         })
       );
-
+      document.cookie = `token=${res.accessToken}; path=/;`;
+      document.cookie = `username=${res.username}; path=/;`;
       // 상태 업데이트
       set({
         token: res.accessToken,
@@ -46,6 +47,10 @@ export const useAuthStore = create<AuthState>(set => ({
   logout: async () => {
     await logout();
     localStorage.removeItem('userInfo');
+    document.cookie = 'token=; path=/; expires=Thu, 01 Jan 1970 00:00:00 UTC;';
+    document.cookie =
+      'username=; path=/; expires=Thu, 01 Jan 1970 00:00:00 UTC;';
+
     set({ token: null, username: null, isAuthenticated: false });
   },
 

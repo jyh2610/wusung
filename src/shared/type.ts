@@ -35,3 +35,15 @@ export interface EduContent {
   createdAt: string; // ISO 문자열
   updatedAt: string; // ISO 문자열
 }
+
+export interface phoneVerificationDTO {
+  code: string;
+  phoneNum: string;
+}
+export interface IManager {
+  name: string;
+  jobGrade: string;
+  address: string;
+  email: string;
+  phoneVerificationDTO: phoneVerificationDTO;
+}

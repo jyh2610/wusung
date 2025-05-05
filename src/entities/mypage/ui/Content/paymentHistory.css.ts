@@ -7,7 +7,8 @@ export const container = style({
   margin: '0 auto',
   display: 'flex',
   flexDirection: 'column',
-  gap: '20px'
+  gap: '20px',
+  backgroundColor: colors.gray_scale.default
 });
 
 export const header = style({

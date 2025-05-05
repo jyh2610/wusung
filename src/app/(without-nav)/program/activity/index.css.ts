@@ -141,5 +141,6 @@ export const activityCard = style({
   boxSizing: 'border-box', // Ensure padding and margin are included in width
   textAlign: 'center',
   height: '421px',
-  border: `1px solid ${colors.gray_scale[200]}`
+  border: `1px solid ${colors.gray_scale[200]}`,
+  cursor: 'pointer'
 });

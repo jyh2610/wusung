@@ -1,10 +1,20 @@
 import { colors } from '@/design-tokens';
 import TemporaryDrawer from '@/entities/program/menu/DrawerMenu';
 import { ProgramNav } from '@/entities/program/programNav';
+import { getRole } from '@/shared/api/common';
+import { cookies } from 'next/headers';
+import { redirect } from 'next/navigation';
 
 const drawerWidth = 300; // 사이드바 너비
 
-function ProgramNavlayout({ children }: { children: React.ReactNode }) {
+async function ProgramNavlayout({ children }: { children: React.ReactNode }) {
+  const cookie = cookies().get('token')?.value ?? null;
+
+  const hasPermission = await getRole(cookie);
+  // if (hasPermission?.data === 'UNKNOWN') {
+  //   redirect('/');
+  // }
+  console.log(hasPermission);
   return (
     <div
       style={{

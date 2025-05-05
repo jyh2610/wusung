@@ -7,6 +7,7 @@ export function cn(...inputs: ClassValue[]) {
 // utils/scheduleConverter.ts
 import { CategoryNode, IContent } from '@/entities/program/type.dto';
 import { Schedule } from '@/entities/program/type.dto';
+import { QueryClient } from '@tanstack/react-query';
 export function convertToSchedule(
   data: any,
   allActivities: IContent[]
@@ -108,3 +109,7 @@ export const handleCurrentPathRoute = (id: string, pathname: string) => {
   const currentPath = pathname.replace(/\/$/, '');
   return `${currentPath}/${id}`;
 };
+
+export function getQueryClient() {
+  return new QueryClient();
+}

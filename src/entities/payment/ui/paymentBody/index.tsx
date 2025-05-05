@@ -22,7 +22,7 @@ export function PaymentBody() {
   return (
     <div className={container}>
       <SelectPayment />
-      <PaymentMethod />
+      {/* <PaymentMethod /> */}
     </div>
   );
 }
