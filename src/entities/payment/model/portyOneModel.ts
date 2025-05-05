@@ -79,6 +79,11 @@ export function usePayment() {
           status: 'FAILED',
           message: payment.message ?? '결제 오류 발생' // 오류 메시지 사용
         });
+        await postAfterValidator({
+          paymentId: data.data.paymentId,
+          txId: payment?.txId || '',
+          failReason: payment.message ?? '결제 오류'
+        });
       }
 
       const completeResponse = await postAfterValidator({
