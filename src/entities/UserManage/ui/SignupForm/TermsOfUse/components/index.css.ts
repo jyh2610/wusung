@@ -6,7 +6,8 @@ export const title = style({
   fontSize: '28px',
   fontWeight: 500,
   lineHeight: '33.41px',
-  color: colors.gray_scale[800]
+  color: colors.gray_scale[800],
+  marginBottom: '32px'
 });
 
 export const termsModalBody = style({

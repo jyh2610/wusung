@@ -44,7 +44,8 @@ import { Button } from '@/shared/ui';
 
 interface PaymentPageProps {
   productName: string;
-  price: number | string;
+  price: number;
+  productId: number;
   onClose: () => void;
 }
 
@@ -58,6 +59,7 @@ export interface userDTO {
 export default function PaymentPage({
   onClose,
   productName,
+  productId,
   price
 }: PaymentPageProps) {
   const { requestPayment, paymentStatus, resData } = usePayment();
@@ -119,9 +121,9 @@ export default function PaymentPage({
     setIsSubmitting(true);
     try {
       const prepare = (await getvaildtorItem({
-        productId: 1,
-        amount: 1000,
-        productName: '12개월 이용권',
+        productId: productId,
+        amount: price,
+        productName: productName,
         name: formData.name,
         email: formData.email,
         phoneNum: formData.phone
@@ -249,7 +251,7 @@ export default function PaymentPage({
                       <span className={radioIcon}>💳</span> 카드 결제
                     </label>
                   </div>
-                  <div className={radioItem}>
+                  {/* <div className={radioItem}>
                     <input
                       id="bank"
                       name="paymentMethod"
@@ -262,7 +264,7 @@ export default function PaymentPage({
                     <label htmlFor="bank" className={radioLabel}>
                       <span className={radioIcon}>🏦</span> 무통장 입금
                     </label>
-                  </div>
+                  </div> */}
                 </div>
                 {errors.paymentMethod && (
                   <p className={errorMessage}>{errors.paymentMethod}</p>

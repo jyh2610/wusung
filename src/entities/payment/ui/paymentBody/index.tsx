@@ -12,9 +12,6 @@ import {
   beforePrice,
   price,
   paymentPrice,
-  payment,
-  defaultPaymentTheme,
-  selectedPaymentTheme,
   lookAccept
 } from './index.css';
 import { productListDTO } from '../../types';

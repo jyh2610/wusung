@@ -63,7 +63,7 @@ export function RefundModal({ isRefundModal, setIsRefundModal }: IProps) {
           style={{
             width: '200px',
             height: '56px',
-            margin: '20px auto'
+            margin: '20px auto 0 auto'
           }}
         >
           <Button

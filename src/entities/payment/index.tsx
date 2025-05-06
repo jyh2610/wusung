@@ -11,6 +11,7 @@ import { useQuery } from '@tanstack/react-query';
 import { getProductList } from './api';
 import { productListDTO } from './types';
 import { calculateDiscount } from './utils';
+import { toast } from 'react-toastify';
 // MUI Modal 내용 중앙 정렬을 위한 스타일
 const modalContentStyle = {
   position: 'absolute' as 'absolute', // 타입 단언
@@ -35,6 +36,7 @@ export function PaymentComponent() {
   };
 
   const handleOpenModal = () => {
+    if (!selectedPayment) return toast.info('상품을 선택해 주세요.');
     setIsModalOpen(true);
   };
 
@@ -46,7 +48,6 @@ export function PaymentComponent() {
     queryFn: () => getProductList({ page, size })
   });
 
-  if (isLoading) return <div>로딩 중...</div>;
   if (isError) return <div>에러가 발생했습니다.</div>;
 
   return (
@@ -93,6 +94,7 @@ export function PaymentComponent() {
           <PaymentModal
             onClose={handleCloseModal}
             productName={selectedPayment?.name!}
+            productId={selectedPayment?.productId!}
             price={calculateDiscount({
               amount: selectedPayment?.price!,
               rate: selectedPayment?.discountRate!
