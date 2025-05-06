@@ -316,14 +316,27 @@ export default function PaymentPage({
             <InfoRow
               label="영수증"
               value={
-                <a
-                  href={resData.data.receiptUrl}
-                  target="_blank"
-                  rel="noopener noreferrer"
-                  style={{ color: '#3b82f6', textDecoration: 'underline' }}
+                <div
+                  style={{
+                    maxWidth: '300px', // 원하는 너비로 조절
+                    whiteSpace: 'nowrap',
+                    overflow: 'hidden',
+                    textOverflow: 'ellipsis'
+                  }}
+                  title={resData.data.receiptUrl} // 툴팁으로 전체 URL 표시
                 >
-                  영수증 보기 →
-                </a>
+                  <a
+                    href={resData.data.receiptUrl}
+                    target="_blank"
+                    rel="noopener noreferrer"
+                    style={{
+                      color: '#3b82f6',
+                      textDecoration: 'underline'
+                    }}
+                  >
+                    영수증 보기
+                  </a>
+                </div>
               }
             />
           </div>

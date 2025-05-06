@@ -1,7 +1,7 @@
 'use client';
 
 import { useState } from 'react';
-import { useQuery } from '@tanstack/react-query';
+import { useQuery, useQueryClient } from '@tanstack/react-query';
 import { Button, SkeletonList } from '@/shared/ui';
 import { HorizontalLine } from '@/shared/ui/VerticalLine';
 import { colors } from '@/design-tokens';
@@ -20,6 +20,7 @@ import {
   paymentBtn,
   paymentContent,
   payPerMonth,
+  refundBtn,
   selectedPaymentBtn
 } from './paymentHistory.css';
 import { formatKoreanDate } from '@/lib/utils';
@@ -30,7 +31,7 @@ import { getRefundandCancel } from '../../model/payment';
 export function PaymentHistory() {
   const [selectedPayment, setSelectedPayment] = useState('전체');
   const [currentPage, setCurrentPage] = useState(0); // Track current page
-  const pageSize = 10; // Number of items per page
+  const pageSize = 6; // Number of items per page
 
   const {
     data: payments,
@@ -128,61 +129,47 @@ const PaymentList = ({
   payment: paymentListDTO;
 }) => {
   const className = [label, isCompleted ? completeText : ''].join(' ').trim();
+  const queryClient = useQueryClient();
+
+  const handleInvalidate = () => {
+    queryClient.invalidateQueries({ queryKey: ['paymentList'] });
+  };
+
+  const reqRefund = async () => {
+    await getRefundandCancel({
+      id: payment.paymentId,
+      kind: payment.canRefund ? 'refund' : payment.canCancel ? 'cancel' : '',
+      status: payment.canRefund
+        ? payment.canRefund
+        : payment.canCancel
+          ? payment.canCancel
+          : false
+    })
+      .then(handleInvalidate)
+      .catch(() => console.log('error'));
+  };
 
   const renderActionButton = () => {
     return (
       <div style={{ display: 'flex', gap: '8px' }}>
-        <button
-          style={{
-            backgroundColor: payment.canCancel
-              ? colors.brand[300]
-              : colors.gray_scale[300],
-            color: '#fff',
-            padding: '4px 8px',
-            border: 'none',
-            borderRadius: '4px',
-            fontSize: '12px',
-            marginBottom: '8px',
-            alignSelf: 'flex-start',
-            cursor: 'pointer'
-          }}
-          onClick={() => {
-            getRefundandCancel({
-              id: payment.paymentId,
-              kind: 'cancel',
-              status: payment.canCancel
-            });
-          }}
-          disabled={!payment.canCancel}
-        >
-          취소
-        </button>
+        {(payment.canRefund || payment.canCancel) && (
+          <button className={refundBtn} onClick={reqRefund}>
+            {payment.canRefund
+              ? '환불'
+              : payment.canCancel
+                ? '취소'
+                : '취소 및 환불 불가'}
+          </button>
+        )}
 
-        <button
-          style={{
-            backgroundColor: payment.canRefund
-              ? colors.brand[300]
-              : colors.gray_scale[300],
-            color: '#fff',
-            padding: '4px 8px',
-            border: 'none',
-            borderRadius: '4px',
-            fontSize: '12px',
-            marginBottom: '8px',
-            alignSelf: 'flex-start',
-            cursor: 'pointer'
-          }}
-          disabled={!payment.canRefund}
-          onClick={() => {
-            getRefundandCancel({
-              id: payment.paymentId,
-              kind: 'refund',
-              status: payment.canRefund
-            });
-          }}
+        <a
+          className={refundBtn}
+          href={payment.receiptUrl}
+          target="_blank"
+          rel="noopener noreferrer"
         >
-          환불
-        </button>
+          영수증
+        </a>
       </div>
     );
   };
@@ -199,14 +186,22 @@ const PaymentList = ({
           >
             <span>{formatKoreanDate(payment.paidAt)}</span>
             <span className={className}>
-              {isCompleted ? '결제 취소' : '결제 완료'}
+              {payment.status === 'CANCELLED'
+                ? '결제 취소'
+                : payment.status === 'PAID'
+                  ? '결제 완료'
+                  : payment.status === 'PENDING'
+                    ? '결제 대기'
+                    : ''}
             </span>
           </div>
           {renderActionButton()}
         </div>
         <div className={paymentContent}>
-          <span className={month}>
-            {payment.period_months}개월권 (~{formatKoreanDate(payment.endDate)})
+          <span>
+            {payment.period_months}개월권
+            {payment.status !== 'PENDING' &&
+              ` ( ${formatKoreanDate(payment.startDate)} ~ ${formatKoreanDate(payment.endDate)} )`}
           </span>
           <span className={payPerMonth}>
             {payment.amountPaid.toLocaleString()}

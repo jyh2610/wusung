@@ -1,6 +1,6 @@
 export interface paymentListDTO {
   tradeId: number;
-  status: 'PAID' | 'CANCELLED' | 'FAILED'; // 필요한 상태 더 추가 가능
+  status: 'PAID' | 'CANCELLED' | 'FAILED' | 'PENDING'; // 필요한 상태 더 추가 가능
   paymentId: string;
   paymentMethod: 'CARD' | 'KAKAOPAY' | 'BANK' | string; // 확장 가능
   amountPaid: number;

@@ -184,3 +184,17 @@ export const date = style({
   display: 'flex',
   justifyContent: 'center'
 });
+
+export const refundBtn = style({
+  width: '80px',
+  height: '38px',
+  borderRadius: '200px',
+  padding: '10px 20px',
+  backgroundColor: 'transparent', // 기본 배경색
+  border: `1px solid ${colors.gray_scale[600]}`,
+  color: colors.gray_scale[700],
+  cursor: 'pointer',
+  transition: 'all 0.3s ease',
+  fontSize: '14px',
+  textDecoration: 'none'
+});
