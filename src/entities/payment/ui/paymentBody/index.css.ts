@@ -123,3 +123,9 @@ export const payment = style({
   cursor: 'pointer',
   borderRadius: '12px'
 });
+export const lookAccept = style({
+  display: 'flex',
+  alignItems: 'center',
+  color: colors.brand[500],
+  cursor: 'pointer'
+});

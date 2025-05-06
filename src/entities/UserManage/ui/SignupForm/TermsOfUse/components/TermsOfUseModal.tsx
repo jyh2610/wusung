@@ -6,7 +6,7 @@ import { modalContainer, termsModalBody, title } from './index.css';
 interface IProps {
   isTermOfUse: boolean;
   setIsTermOfUse: React.Dispatch<React.SetStateAction<boolean>>;
-  setTermsValue: () => void;
+  setTermsValue?: () => void;
 }
 export function TermsOfUseModal({
   isTermOfUse,
@@ -37,7 +37,7 @@ export function TermsOfUseModal({
         >
           <Button
             onClick={() => {
-              setTermsValue();
+              setTermsValue && setTermsValue();
               setIsTermOfUse(false);
             }}
             type={'brand'}

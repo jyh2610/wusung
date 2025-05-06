@@ -1,7 +1,6 @@
 'use client';
 
 import { Dispatch, SetStateAction, useState } from 'react';
-import { paymentList } from '../../const';
 import {
   container,
   head,
@@ -15,10 +14,18 @@ import {
   paymentPrice,
   payment,
   defaultPaymentTheme,
-  selectedPaymentTheme
+  selectedPaymentTheme,
+  lookAccept
 } from './index.css';
 import { productListDTO } from '../../types';
 import { calculateDiscount } from '../../utils';
+import { colors } from '@/design-tokens';
+import {
+  TermsOfUseModal,
+  PersonalInformationProcessing,
+  RefundModal
+} from '@/entities/UserManage/ui/SignupForm';
+import { IoIosArrowForward } from 'react-icons/io';
 interface ISelectProps {
   data: productListDTO[] | undefined;
   selectedPayment: productListDTO | undefined;
@@ -30,6 +37,10 @@ export function PaymentBody({
   selectedPayment,
   setSelectedPayment
 }: ISelectProps) {
+  const [isTermOfUse, setIsTermOfUse] = useState(false);
+  const [isModal, setIsModal] = useState(false);
+  const [isRefundModal, setIsRefundModal] = useState(false);
+
   return (
     <div className={container}>
       <SelectPayment
@@ -37,7 +48,45 @@ export function PaymentBody({
         selectedPayment={selectedPayment}
         setSelectedPayment={setSelectedPayment}
       />
-      <PaymentMethod selectedPayment={selectedPayment} />
+      {selectedPayment && <PaymentMethod selectedPayment={selectedPayment} />}
+
+      <div
+        style={{
+          display: 'flex',
+          flexDirection: 'column',
+          gap: '12px'
+        }}
+      >
+        <div className={head}>
+          <span>이용 약관</span>
+        </div>
+        <div className={lookAccept} onClick={() => setIsTermOfUse(true)}>
+          <span>약관보기</span>
+          <IoIosArrowForward />
+        </div>
+        <TermsOfUseModal
+          isTermOfUse={isTermOfUse}
+          setIsTermOfUse={setIsTermOfUse}
+        />
+
+        <div className={lookAccept} onClick={() => setIsModal(true)}>
+          <span>개인정보 처리방침</span>
+          <IoIosArrowForward />
+        </div>
+        <PersonalInformationProcessing
+          isModal={isModal}
+          setIsModal={setIsModal}
+        />
+
+        <div className={lookAccept} onClick={() => setIsRefundModal(true)}>
+          <span>환불 규정</span>
+          <IoIosArrowForward />
+          <RefundModal
+            isRefundModal={isRefundModal}
+            setIsRefundModal={setIsRefundModal}
+          />
+        </div>
+      </div>
     </div>
   );
 }

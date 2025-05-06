@@ -11,7 +11,7 @@ import {
 interface IProps {
   isModal: boolean;
   setIsModal: React.Dispatch<React.SetStateAction<boolean>>;
-  setPersonalValue: () => void;
+  setPersonalValue?: () => void;
 }
 
 export function PersonalInformationProcessing({
@@ -78,7 +78,7 @@ export function PersonalInformationProcessing({
         >
           <Button
             onClick={() => {
-              setPersonalValue();
+              setPersonalValue && setPersonalValue();
               setIsModal(false);
             }}
             type={'brand'}
