@@ -113,3 +113,36 @@ export const handleCurrentPathRoute = (id: string, pathname: string) => {
 export function getQueryClient() {
   return new QueryClient();
 }
+export const formatKoreanDate = (isoString: string) => {
+  // isoString이 null 또는 undefined인 경우 빈 문자열 반환
+  if (!isoString) {
+    return '';
+  }
+
+  try {
+    // 'T'를 기준으로 날짜 부분만 추출 (예: "2025-05-05")
+    const datePart = isoString.split('T')[0];
+
+    // 날짜 부분을 Date 객체로 파싱
+    // 'YYYY-MM-DD' 형식은 Date 생성자 또는 Date.parse()로 잘 파싱됩니다.
+    const date = new Date(datePart);
+
+    // Date 객체에서 년, 월, 일을 가져옵니다.
+    // getMonth()는 0부터 시작하므로 1을 더해야 합니다.
+    const year = date.getFullYear();
+    const month = date.getMonth() + 1; // 월은 0부터 시작하므로 +1
+    const day = date.getDate();
+
+    // 원하는 "YYYY년 MM월 DD일" 형식으로 조합
+    // 월과 일은 10 미만일 경우 앞에 0을 붙여 두 자리로 만들 수 있습니다. (선택 사항)
+    const formattedMonth = month < 10 ? `0${month}` : month;
+    const formattedDay = day < 10 ? `0${day}` : day;
+
+    return `${year}년 ${formattedMonth}월 ${formattedDay}일`;
+    // 또는 앞에 0을 붙이지 않고 싶다면:
+    // return `${year}년 ${month}월 ${day}일`;
+  } catch (error) {
+    console.error('날짜 형식 변환 오류:', error);
+    return '잘못된 날짜 형식'; // 파싱 실패 시 오류 메시지 반환
+  }
+};

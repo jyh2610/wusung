@@ -9,7 +9,7 @@ export function Footer() {
         <p>
           {companyInfo.name} | 대표 : {companyInfo.representName} |
           사업자등록번호: {companyInfo.businessNumber} | Tel. :
-          {companyInfo.phone}
+          {companyInfo.phone} | 통신판매번호 : {companyInfo.paymentNumber}
         </p>
         <p>주소 : {companyInfo.address}</p>
         <p>Copyright © 2020 - 2024 {companyInfo.name} All rights reserved.</p>

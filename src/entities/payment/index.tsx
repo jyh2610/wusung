@@ -7,6 +7,10 @@ import { useState } from 'react';
 import { Box, Modal } from '@mui/material';
 import PaymentModal from './ui/paymentModal';
 import { useAuthStore } from '@/shared/stores/useAuthStore';
+import { useQuery } from '@tanstack/react-query';
+import { getProductList } from './api';
+import { productListDTO } from './types';
+import { calculateDiscount } from './utils';
 // MUI Modal 내용 중앙 정렬을 위한 스타일
 const modalContentStyle = {
   position: 'absolute' as 'absolute', // 타입 단언
@@ -22,6 +26,9 @@ const modalContentStyle = {
 
 export function PaymentComponent() {
   const [isModalOpen, setIsModalOpen] = useState(false); // 모달 열림/닫힘 상태 변수명 변경
+  const [selectedPayment, setSelectedPayment] = useState<
+    productListDTO | undefined
+  >(undefined);
 
   const handleCloseModal = () => {
     setIsModalOpen(false);
@@ -30,6 +37,17 @@ export function PaymentComponent() {
   const handleOpenModal = () => {
     setIsModalOpen(true);
   };
+
+  const page = 0;
+  const size = 6;
+
+  const { data, isLoading, isError } = useQuery({
+    queryKey: ['productList', page, size],
+    queryFn: () => getProductList({ page, size })
+  });
+
+  if (isLoading) return <div>로딩 중...</div>;
+  if (isError) return <div>에러가 발생했습니다.</div>;
 
   return (
     <>
@@ -48,7 +66,11 @@ export function PaymentComponent() {
         </div>
         <div>
           <Benefit />
-          <PaymentBody />
+          <PaymentBody
+            data={data?.data.content}
+            selectedPayment={selectedPayment}
+            setSelectedPayment={setSelectedPayment}
+          />
           <div
             style={{
               width: '240px',
@@ -70,8 +92,11 @@ export function PaymentComponent() {
         <Box sx={modalContentStyle}>
           <PaymentModal
             onClose={handleCloseModal}
-            productName={'3개월'}
-            price={'40000'}
+            productName={selectedPayment?.name!}
+            price={calculateDiscount({
+              amount: selectedPayment?.price!,
+              rate: selectedPayment?.discountRate!
+            })}
           />
         </Box>
       </Modal>

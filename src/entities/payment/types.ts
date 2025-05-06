@@ -49,3 +49,13 @@ export type PaymentStatus =
   | { status: 'PENDING' }
   | { status: 'FAILED'; message: string }
   | { status: 'PAID' };
+
+export interface productListDTO {
+  productId: number;
+  name: string;
+  periodMonths: number;
+  price: number;
+  description: string;
+  imageUrl: string | null;
+  discountRate: number;
+}

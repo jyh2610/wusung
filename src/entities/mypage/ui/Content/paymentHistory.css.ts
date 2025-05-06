@@ -8,7 +8,7 @@ export const container = style({
   display: 'flex',
   flexDirection: 'column',
   gap: '20px',
-  backgroundColor: colors.gray_scale.default
+  borderRadius: '20px'
 });
 
 export const header = style({
@@ -54,7 +54,8 @@ export const listDate = style({
   color: colors.gray_scale[900],
   display: 'flex',
   gap: '6px',
-  alignItems: 'center'
+  alignItems: 'center',
+  justifyContent: 'space-between'
 });
 
 export const label = style({

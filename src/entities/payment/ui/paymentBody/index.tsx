@@ -1,6 +1,6 @@
 'use client';
 
-import { useState } from 'react';
+import { Dispatch, SetStateAction, useState } from 'react';
 import { paymentList } from '../../const';
 import {
   container,
@@ -17,21 +17,36 @@ import {
   defaultPaymentTheme,
   selectedPaymentTheme
 } from './index.css';
+import { productListDTO } from '../../types';
+import { calculateDiscount } from '../../utils';
+interface ISelectProps {
+  data: productListDTO[] | undefined;
+  selectedPayment: productListDTO | undefined;
+  setSelectedPayment: Dispatch<SetStateAction<productListDTO | undefined>>;
+}
 
-export function PaymentBody() {
+export function PaymentBody({
+  data,
+  selectedPayment,
+  setSelectedPayment
+}: ISelectProps) {
   return (
     <div className={container}>
-      <SelectPayment />
-      {/* <PaymentMethod /> */}
+      <SelectPayment
+        data={data}
+        selectedPayment={selectedPayment}
+        setSelectedPayment={setSelectedPayment}
+      />
+      <PaymentMethod selectedPayment={selectedPayment} />
     </div>
   );
 }
 
-export const SelectPayment = () => {
-  const [selectedPayment, setSelectedPayment] = useState<string | null>(null);
-
-  const payments = Object.keys(paymentList) as Array<keyof typeof paymentList>;
-
+export const SelectPayment = ({
+  data,
+  selectedPayment,
+  setSelectedPayment
+}: ISelectProps) => {
   return (
     <div
       style={{
@@ -44,24 +59,24 @@ export const SelectPayment = () => {
         <span>요금 선택</span>
       </div>
       <div className={body}>
-        {payments.map((payment, index) => {
+        {data?.map((payment, index) => {
           const isSelected = selectedPayment === payment;
           return (
             <div
-              key={payment}
+              key={payment.productId}
               className={`${content} ${isSelected ? selectedTheme : defaultTheme}`}
               onClick={() => setSelectedPayment(payment)}
             >
               <div className={contentBody}>
-                <span>{cardTitle(payment)}</span>
+                <span>{payment.name}</span>
                 <div className={price}>
-                  {typeof paymentList[payment][1] === 'number' && (
-                    <span className={beforePrice}>
-                      {paymentList[payment][1].toLocaleString()} 원
-                    </span>
-                  )}
+                  <span className={beforePrice}>{payment.price} 원</span>
                   <span className={paymentPrice}>
-                    {paymentList[payment][0].toLocaleString()} 원
+                    {calculateDiscount({
+                      amount: payment.price,
+                      rate: payment.discountRate
+                    })}
+                    원
                   </span>
                 </div>
               </div>
@@ -73,9 +88,11 @@ export const SelectPayment = () => {
   );
 };
 
-export const PaymentMethod = () => {
-  const [selectedPayment, setSelectedPayment] = useState<string | null>(null);
+interface IMethodProps {
+  selectedPayment: productListDTO | undefined;
+}
 
+export const PaymentMethod = ({ selectedPayment }: IMethodProps) => {
   return (
     <div
       style={{
@@ -85,7 +102,7 @@ export const PaymentMethod = () => {
       }}
     >
       <div className={head}>
-        <span>요금 선택</span>
+        <span>제품 설명</span>
       </div>
       <div
         style={{
@@ -93,27 +110,8 @@ export const PaymentMethod = () => {
           gap: '10px'
         }}
       >
-        <div
-          className={`${payment} ${selectedPayment === 'bank' ? selectedPaymentTheme : defaultPaymentTheme}`}
-          onClick={() => setSelectedPayment('bank')}
-        >
-          무통장입금
-        </div>
-        <div
-          className={`${payment} ${selectedPayment === 'card' ? selectedPaymentTheme : defaultPaymentTheme}`}
-          onClick={() => setSelectedPayment('card')}
-        >
-          카드
-        </div>
+        <div>{selectedPayment?.description}</div>
       </div>
     </div>
   );
-};
-
-const cardTitle = (data: 'threeMonth' | 'sixMonth' | 'oneYear') => {
-  return data === 'threeMonth'
-    ? '3개월'
-    : data === 'sixMonth'
-      ? '6개월'
-      : '12개월';
 };
