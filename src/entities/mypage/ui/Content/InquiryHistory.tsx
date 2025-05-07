@@ -18,7 +18,7 @@ import {
   completeRowStyle,
   date,
   tableContainer
-} from './paymentHistory.css';
+} from './payment/paymentHistory.css';
 
 export function InquiryHistory() {
   const payments = [

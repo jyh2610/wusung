@@ -1,10 +1,10 @@
 // payment/ActionButton.tsx
 import { refundBtn } from './paymentHistory.css';
-import { paymentListDTO } from '../../type';
+import { paymentListDTO } from '../../../type';
 import { useQueryClient } from '@tanstack/react-query';
-import { getRefundandCancel } from '../../model/payment';
-import { buttonLabel, getStatus } from '../../utils';
-import { useRefund } from './hooks/useRefund';
+import { getRefundandCancel } from '../../../model/payment';
+import { buttonLabel, getStatus } from '../../../utils';
+import { useRefund } from '../hooks/useRefund';
 
 export const ActionButton = ({ payment }: { payment: paymentListDTO }) => {
   const { requestRefundOrCancel } = useRefund();

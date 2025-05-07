@@ -7,9 +7,9 @@ import { HorizontalLine } from '@/shared/ui/VerticalLine';
 import { colors } from '@/design-tokens';
 import { FilterBar } from './FilterBar';
 import { PaymentList } from './PaymentList';
-import { PaymentFilter, filterOptions } from './const';
-import { useInfinitePayments } from './hooks/useInfinitePayments';
-import { container, header, list } from './paymentHistory.css';
+import { PaymentFilter, filterOptions } from '../const';
+import { useInfinitePayments } from '../hooks/useInfinitePayments';
+import { container, emptyStyle, header, list } from './paymentHistory.css';
 
 export function PaymentHistory() {
   const [selectedFilter, setSelectedFilter] = useState<PaymentFilter>(
@@ -65,15 +65,11 @@ export function PaymentHistory() {
         {isFetching && !isFetchingNextPage ? (
           <SkeletonList />
         ) : isError ? (
-          <div style={{ textAlign: 'center', padding: '24px 0' }}>
+          <div className={emptyStyle}>
             결제 내역을 불러오는 데 실패했습니다.
           </div>
         ) : payments.length === 0 ? (
-          <div
-            style={{ textAlign: 'center', padding: '40px 0', color: '#888' }}
-          >
-            결제 내역이 없습니다.
-          </div>
+          <div className={emptyStyle}>결제 내역이 없습니다.</div>
         ) : (
           payments.map((payment, i) => (
             <div

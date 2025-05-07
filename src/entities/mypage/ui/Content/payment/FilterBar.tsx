@@ -1,4 +1,5 @@
-import { PaymentFilter, filterOptions } from './const';
+import { colors } from '@/design-tokens';
+import { PaymentFilter, filterOptions } from '../const';
 import { paymentBtn, selectedPaymentBtn } from './paymentHistory.css';
 import { VerticalLine } from '@/shared/ui/VerticalLine';
 
@@ -19,7 +20,11 @@ export const FilterBar = ({ selected, onSelect }: Props) => {
         </button>
       ))}
       <div style={{ margin: 'auto' }}>
-        <VerticalLine height="48px" thickness="1px" />
+        <VerticalLine
+          height="48px"
+          thickness="1px"
+          color={colors.gray_scale['300']}
+        />
       </div>
       <button
         className={`${paymentBtn} ${

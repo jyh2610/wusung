@@ -44,19 +44,19 @@ export const selectedPaymentBtn = style({
 export const list = style({
   backgroundColor: colors.gray_scale.default,
   borderRadius: '20px',
-  padding: '40px',
-  maxHeight: '1000px',
-  overflowY: 'auto', // 수직 스크롤만 필요하다면 overflowY 사용
+  padding: '40px'
+  // maxHeight: '1000px',
+  // overflowY: 'auto', // 수직 스크롤만 필요하다면 overflowY 사용
 
-  selectors: {
-    '&::-webkit-scrollbar': {
-      display: 'none' // 또는 width: '0px' / height: '0px'
-    }
-  },
+  // selectors: {
+  //   '&::-webkit-scrollbar': {
+  //     display: 'none' // 또는 width: '0px' / height: '0px'
+  //   }
+  // },
 
-  scrollbarWidth: 'none',
+  // scrollbarWidth: 'none',
 
-  msOverflowStyle: 'none'
+  // msOverflowStyle: 'none'
 });
 
 export const listDate = style({
@@ -271,4 +271,13 @@ export const statusText = recipe({
   defaultVariants: {
     status: 'disabled'
   }
+});
+
+export const emptyStyle = style({
+  display: 'flex',
+  justifyContent: 'center',
+  alignItems: 'center',
+  height: '400px',
+  padding: '40px 0',
+  color: '#888'
 });
