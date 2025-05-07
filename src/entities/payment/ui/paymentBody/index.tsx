@@ -156,7 +156,11 @@ export const PaymentMethod = ({ selectedPayment }: IMethodProps) => {
           gap: '10px'
         }}
       >
-        <div>{selectedPayment?.description}</div>
+        <div
+          dangerouslySetInnerHTML={{
+            __html: selectedPayment?.description.replace(/\/n/g, '<br />') || ''
+          }}
+        />
       </div>
     </div>
   );

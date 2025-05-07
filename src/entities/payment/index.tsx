@@ -85,8 +85,8 @@ export function PaymentComponent() {
       </div>
 
       <Modal
-        open={isModalOpen} // 모달 열림 상태 전달
-        onClose={handleCloseModal} // 외부 클릭 또는 Escape 키 눌렀을 때 호출될 함수 전달
+        open={isModalOpen}
+        onClose={handleCloseModal}
         aria-labelledby="payment-modal-title"
         aria-describedby="payment-modal-description"
       >

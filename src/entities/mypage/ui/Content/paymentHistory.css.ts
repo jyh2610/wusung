@@ -1,6 +1,7 @@
 // styles/paymentHistory.css.ts
 import { style } from '@vanilla-extract/css';
 import { colors } from '@/design-tokens';
+import { recipe } from '@vanilla-extract/recipes';
 
 export const container = style({
   width: '100%',
@@ -44,7 +45,18 @@ export const list = style({
   backgroundColor: colors.gray_scale.default,
   borderRadius: '20px',
   padding: '40px',
-  overflow: 'auto'
+  maxHeight: '1000px',
+  overflowY: 'auto', // 수직 스크롤만 필요하다면 overflowY 사용
+
+  selectors: {
+    '&::-webkit-scrollbar': {
+      display: 'none' // 또는 width: '0px' / height: '0px'
+    }
+  },
+
+  scrollbarWidth: 'none',
+
+  msOverflowStyle: 'none'
 });
 
 export const listDate = style({
@@ -185,16 +197,78 @@ export const date = style({
   justifyContent: 'center'
 });
 
-export const refundBtn = style({
-  width: '80px',
-  height: '38px',
-  borderRadius: '200px',
-  padding: '10px 20px',
-  backgroundColor: 'transparent', // 기본 배경색
-  border: `1px solid ${colors.gray_scale[600]}`,
-  color: colors.gray_scale[700],
-  cursor: 'pointer',
-  transition: 'all 0.3s ease',
-  fontSize: '14px',
-  textDecoration: 'none'
+export const refundBtn = recipe({
+  base: {
+    width: '100%',
+    height: '56px',
+    borderRadius: '12px',
+    padding: '10px 20px',
+    cursor: 'pointer',
+    transition: 'all 0.3s ease',
+    fontSize: '20px',
+    fontWeight: '500',
+    letterSpacing: '-2.5%',
+    textDecoration: 'none',
+    display: 'flex',
+    alignItems: 'center',
+    justifyContent: 'center'
+  },
+  variants: {
+    status: {
+      refundable: {
+        backgroundColor: 'transparent',
+        border: `1px solid ${colors.brand[400]}`,
+        color: colors.brand[400]
+      },
+      cancelable: {
+        backgroundColor: '#FFEBEB',
+        color: '#F22B2B'
+      },
+      refunded: {
+        border: `1px solid ${colors.gray_scale['400']}`,
+        color: colors.gray_scale[600]
+      }
+    }
+  },
+  defaultVariants: {
+    status: 'refundable'
+  }
+});
+
+export const statusText = recipe({
+  base: {
+    width: '90px',
+    height: '41px',
+    fontSize: '18px',
+    fontWeight: '500',
+    letterSpacing: '-2.5%',
+    lineHeight: '25px',
+    display: 'flex',
+    alignItems: 'center',
+    justifyContent: 'center',
+    borderRadius: '8px'
+  },
+  variants: {
+    status: {
+      refundable: {
+        color: colors.gray_scale[600],
+        backgroundColor: colors.gray_scale[100]
+      },
+      cancelable: {
+        color: colors.brand[400],
+        backgroundColor: colors.brand[0]
+      },
+      refunded: {
+        color: '#F22B2B',
+        backgroundColor: '#FFEBEB'
+      },
+      disabled: {
+        color: colors.gray_scale[600],
+        backgroundColor: colors.gray_scale[100]
+      }
+    }
+  },
+  defaultVariants: {
+    status: 'disabled'
+  }
 });

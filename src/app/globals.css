@@ -22,3 +22,29 @@ body {
   overflow-x: hidden;
   font-family: 'Pretendard', sans-serif;
 }
+/* 기본 요소 초기화 */
+ul,
+ol {
+  list-style: none;
+}
+
+a {
+  color: inherit;
+  text-decoration: none;
+}
+
+button,
+input,
+textarea,
+select {
+  background: none;
+  border: none;
+  outline: none;
+}
+
+img,
+video {
+  max-width: 100%;
+  display: block;
+  height: auto;
+}

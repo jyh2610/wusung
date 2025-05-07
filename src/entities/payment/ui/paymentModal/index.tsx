@@ -1,10 +1,8 @@
 'use client';
 
 import type React from 'react';
-
 import { useState, type FormEvent } from 'react';
 
-// Vanilla Extract 스타일 임포트 (변경 없음)
 import {
   container,
   card,
@@ -28,7 +26,6 @@ import {
   toastContent,
   toastTitle,
   toastDescription,
-  // 반응형 스타일 임포트 (변경 없음)
   cardHeaderResponsive,
   cardContentResponsive,
   cardTitleResponsive,
@@ -36,11 +33,16 @@ import {
   productNameStyle,
   priceStyle,
   productSummaryContainer
-} from './index.css'; // ★ CSS 파일 경로 확인 및 수정
+} from './index.css';
+
 import { usePayment } from '../../model/portyOneModel';
-import { getvaildtorItem } from '../../api';
-import { PreparePaymentRequestDTO, PreparePaymentResDTO } from '../../types';
+import {
+  BankTransferPaymentResDTO,
+  getPaymentBank,
+  getvaildtorItem
+} from '../../api';
 import { Button } from '@/shared/ui';
+import { PreparePaymentResDTO } from '../../types';
 
 interface PaymentPageProps {
   productName: string;
@@ -72,6 +74,11 @@ export default function PaymentPage({
   const [errors, setErrors] = useState<Record<string, string>>({});
   const [isSubmitting, setIsSubmitting] = useState(false);
   const [showToast, setShowToast] = useState(false);
+  const [bankData, setBankData] = useState<BankTransferPaymentResDTO | null>(
+    null
+  );
+
+  const account = process.env.NEXT_PUBLIC_ACCOUNT;
 
   const validateForm = () => {
     const newErrors: Record<string, string> = {};
@@ -98,12 +105,7 @@ export default function PaymentPage({
 
   const handleInputChange = (e: React.ChangeEvent<HTMLInputElement>) => {
     const { name, value } = e.target;
-
-    let newValue = value; // 일단 현재 값을 가져옴
-
-    if (name === 'phone') {
-      newValue = value.replace(/\D/g, '');
-    }
+    let newValue = name === 'phone' ? value.replace(/\D/g, '') : value;
 
     setFormData({
       ...formData,
@@ -115,6 +117,29 @@ export default function PaymentPage({
 
     if (!validateForm()) {
       console.log('클라이언트 유효성 검사 실패');
+      return;
+    }
+
+    if (formData.paymentMethod === 'bank') {
+      try {
+        const res = await getPaymentBank({
+          productId,
+          amount: price,
+          buyerName: formData.name,
+          buyerEmail: formData.email,
+          phoneNum: formData.phone
+        });
+
+        if (!res) {
+          console.error('무통장 입금 요청 실패');
+          return;
+        }
+
+        setBankData(res.data); // 여기서 accountNumber만 있다고 가정
+      } catch (err) {
+        console.error('무통장 입금 처리 실패', err);
+      }
+
       return;
     }
 
@@ -158,7 +183,55 @@ export default function PaymentPage({
 
   return (
     <div className={container}>
-      {resData === null ? (
+      {/* 카드 결제 완료 화면 */}
+      {resData ? (
+        <ResultCard
+          title="결제가 완료되었습니다"
+          description="아래는 결제 정보입니다. 영수증을 확인하거나 이용을 시작하세요."
+          onClose={onClose}
+        >
+          <InfoRow label="상품명" value={resData.data.productName} />
+          <InfoRow label="결제 금액" value={`${resData.data.amount} 원`} />
+          <InfoRow label="이용 가능 기간" value={`~ ${resData.data.endDate}`} />
+          <InfoRow
+            label="영수증"
+            value={
+              <div
+                style={{
+                  maxWidth: '300px',
+                  whiteSpace: 'nowrap',
+                  overflow: 'hidden',
+                  textOverflow: 'ellipsis'
+                }}
+                title={resData.data.receiptUrl}
+              >
+                <a
+                  href={resData.data.receiptUrl}
+                  target="_blank"
+                  rel="noopener noreferrer"
+                  style={{ color: '#3b82f6', textDecoration: 'underline' }}
+                >
+                  영수증 보기
+                </a>
+              </div>
+            }
+          />
+        </ResultCard>
+      ) : bankData ? (
+        // 무통장 입금 완료 화면
+        <ResultCard
+          title="무통장 입금 신청이 완료되었습니다"
+          description="아래 계좌번호로 입금해주세요. 입금 확인 후 이용이 가능합니다."
+          onClose={onClose}
+        >
+          <InfoRow label="상품명" value={productName} />
+          <InfoRow label="결제 금액" value={`${price} 원`} />
+          <InfoRow label="은행" value={'농협'} />
+          <InfoRow label="입금 계좌번호" value={account} />
+          <InfoRow label="" value={'이정희(우성인지펜)'} />
+        </ResultCard>
+      ) : (
+        // 결제 폼
         <div className={card}>
           <div className={`${cardHeader} ${cardHeaderResponsive}`}>
             <h1 className={`${cardTitle} ${cardTitleResponsive}`}>결제하기</h1>
@@ -168,117 +241,82 @@ export default function PaymentPage({
           </div>
 
           <div className={`${cardContent} ${cardContentResponsive}`}>
-            {/* 결제할 상품 정보 섹션 표시 */}
             <div className={productSummaryContainer}>
               <p className={productNameStyle}>상품명: {productName}</p>
               <p className={priceStyle}>가격: {price} 원</p>
             </div>
 
-            {/* ★ 결제 실패 메시지 표시 영역 */}
             {paymentStatus.status === 'FAILED' && (
               <p
                 className={errorMessage}
                 style={{ textAlign: 'center', marginBottom: '16px' }}
               >
-                {paymentStatus.status === 'FAILED' && paymentStatus.message}
+                {paymentStatus.message}
               </p>
             )}
 
             <form onSubmit={handleSubmit} className={form}>
-              {/* 이름 필드 */}
-              <div className={formGroup}>
-                <label htmlFor="name" className={label}>
-                  이름
-                </label>
-                <input
-                  id="name"
-                  name="name"
-                  type="text"
-                  placeholder="홍길동"
-                  className={input}
-                  value={formData.name}
-                  onChange={handleInputChange}
-                />
-                {errors.name && <p className={errorMessage}>{errors.name}</p>}
-              </div>
-              {/* 이메일 필드 */}
-              <div className={formGroup}>
-                <label htmlFor="email" className={label}>
-                  이메일
-                </label>
-                <input
-                  id="email"
-                  name="email"
-                  type="email"
-                  placeholder="example@example.com"
-                  className={input}
-                  value={formData.email}
-                  onChange={handleInputChange}
-                />
-                {errors.email && <p className={errorMessage}>{errors.email}</p>}
-              </div>
-              {/* 전화번호 필드 */}
-              <div className={formGroup}>
-                <label htmlFor="phone" className={label}>
-                  전화번호
-                </label>
-                <input
-                  id="phone"
-                  name="phone"
-                  type="tel"
-                  placeholder="01012345678"
-                  className={input}
-                  value={formData.phone}
-                  onChange={handleInputChange}
-                />
-                {errors.phone && <p className={errorMessage}>{errors.phone}</p>}
-              </div>
-              {/* 결제 방법 라디오 */}
+              {/* 이름 */}
+              <FormField
+                label="이름"
+                name="name"
+                value={formData.name}
+                onChange={handleInputChange}
+                error={errors.name}
+                placeholder="홍길동"
+              />
+              {/* 이메일 */}
+              <FormField
+                label="이메일"
+                name="email"
+                value={formData.email}
+                onChange={handleInputChange}
+                error={errors.email}
+                placeholder="example@example.com"
+              />
+              {/* 전화번호 */}
+              <FormField
+                label="전화번호"
+                name="phone"
+                value={formData.phone}
+                onChange={handleInputChange}
+                error={errors.phone}
+                placeholder="01012345678"
+              />
+              {/* 결제 방법 */}
               <div className={formGroup}>
                 <label className={label}>결제 방법</label>
                 <div className={radioGroup}>
-                  <div className={radioItem}>
-                    <input
-                      id="card"
-                      name="paymentMethod"
-                      type="radio"
-                      value="card"
-                      className={radioInput}
-                      onChange={handleInputChange}
-                      checked={formData.paymentMethod === 'card'}
-                    />
-                    <label htmlFor="card" className={radioLabel}>
-                      <span className={radioIcon}>💳</span> 카드 결제
-                    </label>
-                  </div>
-                  {/* <div className={radioItem}>
-                    <input
-                      id="bank"
-                      name="paymentMethod"
-                      type="radio"
-                      value="bank"
-                      className={radioInput}
-                      onChange={handleInputChange}
-                      checked={formData.paymentMethod === 'bank'}
-                    />
-                    <label htmlFor="bank" className={radioLabel}>
-                      <span className={radioIcon}>🏦</span> 무통장 입금
-                    </label>
-                  </div> */}
+                  {['card', 'bank'].map(method => (
+                    <div className={radioItem} key={method}>
+                      <input
+                        id={method}
+                        name="paymentMethod"
+                        type="radio"
+                        value={method}
+                        className={radioInput}
+                        onChange={handleInputChange}
+                        checked={formData.paymentMethod === method}
+                      />
+                      <label htmlFor={method} className={radioLabel}>
+                        <span className={radioIcon}>
+                          {method === 'card' ? '💳' : '🏦'}
+                        </span>{' '}
+                        {method === 'card' ? '카드 결제' : '무통장 입금'}
+                      </label>
+                    </div>
+                  ))}
                 </div>
                 {errors.paymentMethod && (
                   <p className={errorMessage}>{errors.paymentMethod}</p>
                 )}
               </div>
 
-              {/* ★ 제출 버튼 상태 및 텍스트 변경 */}
               <button
                 type="submit"
                 className={`${button} ${buttonResponsive}`}
-                // ★ paymentStatus.status가 PENDING일 때 비활성화
                 disabled={paymentStatus.status === 'PENDING'}
               >
-                {/* ★ paymentStatus 상태에 따라 버튼 텍스트 변경 */}
                 {paymentStatus.status === 'PENDING'
                   ? '결제 처리 중...'
                   : '결제하기'}
@@ -288,77 +326,45 @@ export default function PaymentPage({
 
           <div className={cardFooter}>결제 정보는 안전하게 보호됩니다.</div>
         </div>
-      ) : (
-        <div className={card}>
-          <div className={`${cardHeader} ${cardHeaderResponsive}`}>
-            <h1 className={`${cardTitle} ${cardTitleResponsive}`}>
-              결제가 완료되었습니다
-            </h1>
-            <p className={cardDescription}>
-              아래는 결제 정보입니다. 영수증을 확인하거나 이용을 시작하세요.
-            </p>
-          </div>
-
-          <div
-            style={{
-              padding: '24px',
-              display: 'flex',
-              flexDirection: 'column',
-              gap: '24px',
-              backgroundColor: '#f9fafb',
-              borderRadius: '8px'
-            }}
-          >
-            <InfoRow label="상품명" value={resData.data.productName} />
-            <InfoRow label="결제 금액" value={`${resData.data.amount} 원`} />
-            <InfoRow
-              label="이용 가능 기간"
-              value={`~ ${resData.data.endDate}`}
-            />
-            <InfoRow
-              label="영수증"
-              value={
-                <div
-                  style={{
-                    maxWidth: '300px', // 원하는 너비로 조절
-                    whiteSpace: 'nowrap',
-                    overflow: 'hidden',
-                    textOverflow: 'ellipsis'
-                  }}
-                  title={resData.data.receiptUrl} // 툴팁으로 전체 URL 표시
-                >
-                  <a
-                    href={resData.data.receiptUrl}
-                    target="_blank"
-                    rel="noopener noreferrer"
-                    style={{
-                      color: '#3b82f6',
-                      textDecoration: 'underline'
-                    }}
-                  >
-                    영수증 보기
-                  </a>
-                </div>
-              }
-            />
-          </div>
-
-          <div
-            style={{
-              marginTop: '24px',
-              textAlign: 'center',
-              width: '200px',
-              height: '56px',
-              margin: '40px auto'
-            }}
-          >
-            <Button type="brand" content="확인" onClick={onClose} />
-          </div>
-        </div>
       )}
     </div>
   );
 }
+
+function FormField({
+  label: labelText,
+  name,
+  value,
+  onChange,
+  error,
+  placeholder
+}: {
+  label: string;
+  name: string;
+  value: string;
+  onChange: (e: React.ChangeEvent<HTMLInputElement>) => void;
+  error?: string;
+  placeholder?: string;
+}) {
+  return (
+    <div className={formGroup}>
+      <label htmlFor={name} className={label}>
+        {labelText}
+      </label>
+      <input
+        id={name}
+        name={name}
+        type="text"
+        placeholder={placeholder}
+        className={input}
+        value={value}
+        onChange={onChange}
+      />
+      {error && <p className={errorMessage}>{error}</p>}
+    </div>
+  );
+}
+
 function InfoRow({ label, value }: { label: string; value: React.ReactNode }) {
   return (
     <div
@@ -371,6 +377,52 @@ function InfoRow({ label, value }: { label: string; value: React.ReactNode }) {
     >
       <span style={{ fontWeight: 600 }}>{label}</span>
       <span>{value}</span>
+    </div>
+  );
+}
+
+function ResultCard({
+  title,
+  description,
+  onClose,
+  children
+}: {
+  title: string;
+  onClose: () => void;
+  description: string;
+  children: React.ReactNode;
+}) {
+  return (
+    <div className={card}>
+      <div className={`${cardHeader} ${cardHeaderResponsive}`}>
+        <h1 className={`${cardTitle} ${cardTitleResponsive}`}>{title}</h1>
+        <p className={cardDescription}>{description}</p>
+      </div>
+
+      <div
+        style={{
+          padding: '24px',
+          display: 'flex',
+          flexDirection: 'column',
+          gap: '24px',
+          backgroundColor: '#f9fafb',
+          borderRadius: '8px'
+        }}
+      >
+        {children}
+      </div>
+
+      <div
+        style={{
+          marginTop: '24px',
+          textAlign: 'center',
+          width: '200px',
+          height: '56px',
+          margin: '40px auto'
+        }}
+      >
+        <Button type="brand" content="확인" onClick={onClose} />
+      </div>
     </div>
   );
 }

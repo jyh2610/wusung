@@ -59,3 +59,11 @@ export interface productListDTO {
   imageUrl: string | null;
   discountRate: number;
 }
+
+export interface BankTransferPaymentRequestDTO {
+  buyerName: string;
+  buyerEmail: string;
+  productId: number;
+  amount: number;
+  phoneNum: string;
+}

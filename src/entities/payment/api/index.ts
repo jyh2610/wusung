@@ -1,5 +1,6 @@
 import request from '@/shared/api/axiosInstance';
 import {
+  BankTransferPaymentRequestDTO,
   Item,
   PreparePaymentRequestDTO,
   PreparePaymentResDTO,
@@ -49,6 +50,25 @@ export const getProductList = async ({
   try {
     const res = await request<ApiResponse<PaginatedResponse<productListDTO>>>({
       url: '/api/common/product/list'
+    });
+    return res.data;
+  } catch (error) {
+    console.log('사전검증 요청 실패', error);
+  }
+};
+
+export interface BankTransferPaymentResDTO {
+  paymentId: '46d72090-2377-4c45-9a9c-d305dcb91385';
+}
+
+export const getPaymentBank = async (
+  payload: BankTransferPaymentRequestDTO
+) => {
+  try {
+    const res = await request<ApiResponse<BankTransferPaymentResDTO>>({
+      url: '/api/payment/bank-transfer',
+      method: 'POST',
+      data: payload
     });
     return res.data;
   } catch (error) {

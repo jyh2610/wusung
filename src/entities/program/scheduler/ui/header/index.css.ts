@@ -11,7 +11,8 @@ export const titleStyle = style({
   fontWeight: '500',
   fontSize: '32px',
   lineHeight: '100%',
-  letterSpacing: '0%'
+  letterSpacing: '0%',
+  width: '180px'
 });
 
 export const printButton = style({

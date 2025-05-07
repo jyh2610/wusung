@@ -8,3 +8,14 @@ export const container = style({
   borderRadius: '20px',
   padding: '20px 24px'
 });
+export const scrollHidden = style({
+  overflowY: 'auto',
+  scrollbarWidth: 'none', // Firefox
+  msOverflowStyle: 'none', // IE, Edge
+
+  selectors: {
+    '&::-webkit-scrollbar': {
+      display: 'none' // Chrome, Safari
+    }
+  }
+});

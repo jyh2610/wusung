@@ -113,7 +113,7 @@ export function Control({ isAdmin }: { isAdmin: boolean }) {
               }}
               onClick={() => openModal('etc')}
             >
-              <button type="button">기타자료</button>
+              <div>기타자료</div>
 
               <div
                 style={{
@@ -156,7 +156,7 @@ export function Control({ isAdmin }: { isAdmin: boolean }) {
               }}
               onClick={() => openModal('cover')}
             >
-              <button type="button">커버</button>
+              <div>커버</div>
 
               <div
                 style={{

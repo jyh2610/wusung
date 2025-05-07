@@ -189,18 +189,27 @@ function Header({
 
   return (
     <div className={headerContainer}>
-      <button type="button" onClick={handlePrevMonth}>
-        <IoIosArrowBack size={20} />
-      </button>
+      <div style={{ display: 'flex', gap: '32px' }}>
+        <button
+          style={{ cursor: 'pointer' }}
+          type="button"
+          onClick={handlePrevMonth}
+        >
+          <IoIosArrowBack size={30} />
+        </button>
 
-      <div className={titleStyle}>
-        {year}년 {month}월
+        <div className={titleStyle}>
+          {year}년 {month}월
+        </div>
+
+        <button
+          style={{ cursor: 'pointer' }}
+          type="button"
+          onClick={handleNextMonth}
+        >
+          <IoIosArrowForward size={30} />
+        </button>
       </div>
-
-      <button type="button" onClick={handleNextMonth}>
-        <IoIosArrowForward size={20} />
-      </button>
-
       {!isAdmin ? (
         <button
           className={printButton}

@@ -1,7 +1,6 @@
 import { useState } from 'react';
 import { colors } from '@/design-tokens';
 import { Button } from '@/shared/ui';
-import { paymentState } from './const';
 import {
   completeText,
   header,
@@ -43,11 +42,11 @@ export function InquiryHistory() {
           }}
         >
           <span>문의내역</span>
-          <div style={{ width: '160px', height: '50px' }}>
+          {/* <div style={{ width: '160px', height: '50px' }}>
             <Button content="인증서발급" type="borderBrand" />
-          </div>
+          </div> */}
         </div>
-        <div style={{ display: 'flex', gap: '10px', justifyContent: 'center' }}>
+        {/* <div style={{ display: 'flex', gap: '10px', justifyContent: 'center' }}>
           {paymentState.map(state => (
             <button
               key={state}
@@ -57,7 +56,7 @@ export function InquiryHistory() {
               {state}
             </button>
           ))}
-        </div>
+        </div> */}
       </div>
 
       <div className={tableContainer}>

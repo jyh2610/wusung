@@ -1,5 +1,7 @@
 import { reqRefund } from '../api';
 import { toast } from 'react-toastify';
+import { paymentListDTO } from '../type';
+import { PaymentFilter, paymentFilters } from '../ui/Content/const';
 
 export const getRefundandCancel = async ({
   id,
@@ -22,5 +24,23 @@ export const getRefundandCancel = async ({
     }
   } catch (error) {
     console.log(error);
+  }
+};
+
+export const filterPayments = (
+  payments: paymentListDTO[] = [],
+  selected: PaymentFilter
+): paymentListDTO[] => {
+  switch (selected) {
+    case paymentFilters.PAID_ONLY:
+      return payments.filter(p => p.status === 'PAID');
+    case paymentFilters.MONTH_3:
+    case paymentFilters.MONTH_6:
+    case paymentFilters.MONTH_12:
+      const month = parseInt(selected.replace('개월', ''));
+      return payments.filter(p => p.period_months === month);
+    case paymentFilters.ALL:
+    default:
+      return payments;
   }
 };

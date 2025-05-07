@@ -1,64 +1,47 @@
+// payment/PaymentHistory.tsx
 'use client';
 
-import { useState } from 'react';
-import { useQuery, useQueryClient } from '@tanstack/react-query';
+import { useState, useCallback, useRef } from 'react';
 import { Button, SkeletonList } from '@/shared/ui';
 import { HorizontalLine } from '@/shared/ui/VerticalLine';
 import { colors } from '@/design-tokens';
-import { getPaymentList, reqRefund } from '../../api';
-import { paymentListDTO } from '../../type';
-import { paymentState } from './const';
-import {
-  completeText,
-  container,
-  currency,
-  header,
-  label,
-  list,
-  listDate,
-  month,
-  paymentBtn,
-  paymentContent,
-  payPerMonth,
-  refundBtn,
-  selectedPaymentBtn
-} from './paymentHistory.css';
-import { formatKoreanDate } from '@/lib/utils';
-import { ApiResponse, PaginatedResponse } from '@/shared/type';
-import { Pageable } from '@/shared/ui/Pageable';
-import { getRefundandCancel } from '../../model/payment';
+import { FilterBar } from './FilterBar';
+import { PaymentList } from './PaymentList';
+import { PaymentFilter, filterOptions } from './const';
+import { useInfinitePayments } from './hooks/useInfinitePayments';
+import { container, header, list } from './paymentHistory.css';
 
 export function PaymentHistory() {
-  const [selectedPayment, setSelectedPayment] = useState('전체');
-  const [currentPage, setCurrentPage] = useState(0); // Track current page
-  const pageSize = 6; // Number of items per page
-
+  const [selectedFilter, setSelectedFilter] = useState<PaymentFilter>(
+    filterOptions[0]
+  );
   const {
-    data: payments,
-    isLoading,
+    data,
+    fetchNextPage,
+    hasNextPage,
+    isFetching,
+    isFetchingNextPage,
     isError
-  } = useQuery<ApiResponse<PaginatedResponse<paymentListDTO>>, Error>({
-    queryKey: ['paymentList', currentPage],
-    queryFn: () => getPaymentList(currentPage, pageSize) // Pass currentPage and pageSize to API
-  });
-  const filteredPayments = payments?.data?.content?.filter(payment => {
-    switch (selectedPayment) {
-      case '전체':
-        return true;
-      case '결제 완료':
-        return payment.status === 'PAID';
-      case '결제 취소':
-        return payment.status === 'CANCELLED';
-      default:
-        return true;
-    }
-  });
+  } = useInfinitePayments(selectedFilter);
 
-  const totalPages = payments?.data?.totalPages || 1;
+  const observer = useRef<IntersectionObserver>();
+  const lastItemRef = useCallback(
+    (node: HTMLDivElement | null) => {
+      if (isFetchingNextPage) return;
+      if (observer.current) observer.current.disconnect();
 
-  const handlePageChange = (page: number) => {
-    setCurrentPage(page);
-  };
+      observer.current = new IntersectionObserver(entries => {
+        if (entries[0].isIntersecting && hasNextPage) {
+          fetchNextPage();
+        }
+      });
+
+      if (node) observer.current.observe(node);
+    },
+    [isFetchingNextPage, hasNextPage, fetchNextPage]
+  );
+
+  const payments = data?.pages.flatMap(page => page.data.content) || [];
 
   return (
     <div className={container}>
@@ -76,34 +59,35 @@ export function PaymentHistory() {
           </div>
         </div>
 
-        <div style={{ display: 'flex', gap: '10px', justifyContent: 'center' }}>
-          {paymentState.map(state => (
-            <button
-              key={state}
-              className={`${paymentBtn} ${selectedPayment === state ? selectedPaymentBtn : ''}`}
-              onClick={() => setSelectedPayment(state)}
-            >
-              {state}
-            </button>
-          ))}
-        </div>
+        <FilterBar selected={selectedFilter} onSelect={setSelectedFilter} />
       </div>
-
-      <div className={list}>
-        {isLoading ? (
+      <div className={list} style={{ marginTop: '24px', minHeight: '400px' }}>
+        {isFetching && !isFetchingNextPage ? (
           <SkeletonList />
         ) : isError ? (
-          <ErrorState />
-        ) : filteredPayments && filteredPayments.length === 0 ? (
-          <EmptyState />
+          <div style={{ textAlign: 'center', padding: '24px 0' }}>
+            결제 내역을 불러오는 데 실패했습니다.
+          </div>
+        ) : payments.length === 0 ? (
+          <div
+            style={{ textAlign: 'center', padding: '40px 0', color: '#888' }}
+          >
+            결제 내역이 없습니다.
+          </div>
         ) : (
-          filteredPayments?.map((payment, index) => (
-            <div key={payment.paymentId}>
+          payments.map((payment, i) => (
+            <div
+              style={{
+                maxHeight: '1000px'
+              }}
+              key={payment.paymentId}
+            >
               <PaymentList
-                isCompleted={payment.status !== 'PAID'}
                 payment={payment}
+                isLast={i === payments.length - 1}
+                observe={lastItemRef}
               />
-              {index !== filteredPayments.length - 1 && (
+              {i !== payments.length - 1 && (
                 <div style={{ margin: '32px 0' }}>
                   <HorizontalLine width="100%" color={colors.brand[0]} />
                 </div>
@@ -111,118 +95,8 @@ export function PaymentHistory() {
             </div>
           ))
         )}
-        <Pageable
-          currentPage={currentPage}
-          totalPages={totalPages}
-          handlePageChange={handlePageChange}
-        />
+        {isFetchingNextPage && <SkeletonList />}
       </div>
     </div>
   );
 }
-
-const PaymentList = ({
-  isCompleted,
-  payment
-}: {
-  isCompleted: boolean;
-  payment: paymentListDTO;
-}) => {
-  const className = [label, isCompleted ? completeText : ''].join(' ').trim();
-  const queryClient = useQueryClient();
-
-  const handleInvalidate = () => {
-    queryClient.invalidateQueries({ queryKey: ['paymentList'] });
-  };
-
-  const reqRefund = async () => {
-    await getRefundandCancel({
-      id: payment.paymentId,
-      kind: payment.canRefund ? 'refund' : payment.canCancel ? 'cancel' : '',
-      status: payment.canRefund
-        ? payment.canRefund
-        : payment.canCancel
-          ? payment.canCancel
-          : false
-    })
-      .then(handleInvalidate)
-      .catch(() => console.log('error'));
-  };
-
-  const renderActionButton = () => {
-    return (
-      <div style={{ display: 'flex', gap: '8px' }}>
-        {(payment.canRefund || payment.canCancel) && (
-          <button className={refundBtn} onClick={reqRefund}>
-            {payment.canRefund
-              ? '환불'
-              : payment.canCancel
-                ? '취소'
-                : '취소 및 환불 불가'}
-          </button>
-        )}
-
-        <a
-          className={refundBtn}
-          href={payment.receiptUrl}
-          target="_blank"
-          rel="noopener noreferrer"
-        >
-          영수증
-        </a>
-      </div>
-    );
-  };
-  return (
-    <div>
-      <div style={{ display: 'flex', flexDirection: 'column', gap: '20px' }}>
-        <div className={listDate}>
-          <div
-            style={{
-              display: 'flex',
-              gap: '6px',
-              alignItems: 'center'
-            }}
-          >
-            <span>{formatKoreanDate(payment.paidAt)}</span>
-            <span className={className}>
-              {payment.status === 'CANCELLED'
-                ? '결제 취소'
-                : payment.status === 'PAID'
-                  ? '결제 완료'
-                  : payment.status === 'PENDING'
-                    ? '결제 대기'
-                    : ''}
-            </span>
-          </div>
-          {renderActionButton()}
-        </div>
-        <div className={paymentContent}>
-          <span>
-            {payment.period_months}개월권
-            {payment.status !== 'PENDING' &&
-              ` ( ${formatKoreanDate(payment.startDate)} ~ ${formatKoreanDate(payment.endDate)} )`}
-          </span>
-          <span className={payPerMonth}>
-            {payment.amountPaid.toLocaleString()}
-            <span className={currency}>원</span>
-          </span>
-        </div>
-      </div>
-    </div>
-  );
-};
-
-// 🔻 에러 상태 컴포넌트
-const ErrorState = () => (
-  <div style={{ textAlign: 'center', padding: '24px 0' }}>
-    결제 내역을 불러오는 데 실패했습니다.
-  </div>
-);
-
-// 🔻 빈 상태 컴포넌트
-const EmptyState = () => (
-  <div style={{ textAlign: 'center', padding: '40px 0', color: '#888' }}>
-    결제 내역이 없습니다.
-  </div>
-);

@@ -8,6 +8,7 @@ import { useDragAndDrop } from './scheduler/model/useDragAndDrop';
 import { SchedulerLayout } from './scheduler';
 import { useIsAdmin } from '@/components/hooks/useIsAdmin';
 import { useScheduleStore } from '@/shared/stores/useScheduleStore';
+import { scrollHidden } from './scheduler/index.css';
 
 export function ProgramComponent() {
   const isAdmin = useIsAdmin();
@@ -33,12 +34,18 @@ export function ProgramComponent() {
     <DragDropContext onDragEnd={onDragEnd} onDragUpdate={onDragUpdate}>
       <div
         style={{
-          height: '100vh',
           display: 'flex',
           flexDirection: 'column'
         }}
       >
-        <div style={{ flexGrow: 1, overflowY: 'auto' }}>
+        <div
+          style={{
+            flexGrow: 1,
+            maxHeight: '1800px',
+            position: 'relative',
+            overflowY: 'auto'
+          }}
+        >
           <ActivityList
             isAdmin={isAdmin}
             activities={activities}
