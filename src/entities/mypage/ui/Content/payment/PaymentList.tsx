@@ -6,7 +6,8 @@ import {
   DialogTitle,
   DialogContent,
   DialogActions,
-  Button as MuiButton
+  Button as MuiButton,
+  Alert
 } from '@mui/material';
 import { useQueryClient } from '@tanstack/react-query';
 import { formatKoreanDate } from '@/lib/utils';
@@ -28,6 +29,10 @@ import {
   currency,
   refundBtn
 } from './paymentHistory.css';
+import { Button } from '@/shared/ui';
+import { AlertDescription } from '@/components/ui/alert';
+import { DialogHeader } from '@/components/ui/dialog';
+import { AlertCircle } from 'lucide-react';
 
 export const PaymentList = ({
   payment,
@@ -76,11 +81,11 @@ export const PaymentList = ({
         status: payment.canRefund || payment.canCancel || false
       })
         .then(() =>
-          queryClient.invalidateQueries({ queryKey: ['paymentList'] })
+          queryClient.invalidateQueries({
+            predicate: query => query.queryKey[0] === 'paymentList'
+          })
         )
         .catch(() => console.log('error'));
-
-      queryClient.invalidateQueries({ queryKey: ['paymentList'] });
     } catch (e) {
       console.error('환불/취소 요청 실패');
     } finally {
@@ -133,22 +138,41 @@ export const PaymentList = ({
 
       {/* ✅ MUI 모달 */}
       <Dialog open={isModalOpen} onClose={handleCloseModal}>
-        <DialogTitle>
-          정말 {modalType === 'refund' ? '환불' : '취소'}하시겠어요?
-        </DialogTitle>
         <DialogContent>
-          이 작업은 되돌릴 수 없습니다. 계속 진행하시겠습니까?
-        </DialogContent>
-        <DialogActions>
-          <MuiButton onClick={handleCloseModal}>취소</MuiButton>
-          <MuiButton
-            onClick={handleConfirm}
-            color="primary"
-            variant="contained"
+          <DialogHeader>
+            <DialogTitle>정말로 결제를 취소하시겠습니까?</DialogTitle>
+          </DialogHeader>
+
+          <Alert variant="standard" className="mt-2 border-red-200 bg-red-50">
+            <AlertDescription className="ml-2">
+              결제 취소 시 현재 이용 중인 서비스가 즉시 중단되며, 이미 사용한
+              기간에 대한 환불은 불가능합니다.
+            </AlertDescription>
+          </Alert>
+
+          <div
+            style={{
+              paddingTop: '12px'
+            }}
           >
-            확인
-          </MuiButton>
-        </DialogActions>
+            <p className="text-sm text-gray-500">
+              구독을 취소하면 현재 결제 주기가 끝날 때까지 서비스를 계속 이용할
+              수 있습니다. 다음 결제 주기에는 자동으로 갱신되지 않습니다. [^1]
+            </p>
+          </div>
+
+          <DialogActions>
+            <MuiButton onClick={handleCloseModal}>취소</MuiButton>
+            <div
+              style={{
+                width: '80px',
+                height: '32px'
+              }}
+            >
+              <Button content="확인" type="brand" onClick={handleConfirm} />
+            </div>
+          </DialogActions>
+        </DialogContent>
       </Dialog>
     </div>
   );

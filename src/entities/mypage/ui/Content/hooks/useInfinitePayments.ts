@@ -17,9 +17,6 @@ export const useInfinitePayments = (selectedFilter: PaymentFilter) => {
   >({
     queryKey: ['paymentList', selectedFilter] as const, // Use 'as const' for better key typing
     queryFn: ({ pageParam }) => {
-      // pageParam은 첫 호출 시 undefined일 수 있으며, getNextPageParam에서 number를 반환
-      // 하지만 initialPageParam을 설정했으므로 첫 호출 시에도 number일 것입니다.
-      // 안전하게 사용하기 위해 여전히 확인 로직을 두는 것은 나쁘지 않습니다.
       const page = typeof pageParam === 'number' ? pageParam : 0; // 이 라인은 initialPageParam 덕분에 첫 호출에선 0이 될 것입니다.
       return getPaymentList(page, pageSize);
     },
@@ -29,11 +26,9 @@ export const useInfinitePayments = (selectedFilter: PaymentFilter) => {
       const currentPage = lastPage.data.number;
       const totalPages = lastPage.data.totalPages;
 
-      // 다음 페이지 번호 (0-indexed)가 전체 페이지 수보다 작으면 다음 페이지 번호를 반환
       return currentPage + 1 < totalPages ? currentPage + 1 : undefined;
     },
     select: data => {
-      // data는 InfiniteData<ApiResponse<PaginatedResponse<paymentListDTO>>, number> 타입
       return {
         ...data, // InfiniteData 구조 유지
         pages: data.pages.map(page => ({
@@ -45,8 +40,7 @@ export const useInfinitePayments = (selectedFilter: PaymentFilter) => {
         }))
       };
     },
-    // *** 추가된 부분: initialPageParam ***
-    // 첫 번째 페이지 요청 시 사용할 페이지 매개변수 값을 설정
+
     initialPageParam: 0 // API가 0부터 페이지를 시작하는 경우
   });
 };
