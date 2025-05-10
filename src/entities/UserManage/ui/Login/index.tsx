@@ -53,6 +53,7 @@ export function LoginModal() {
     try {
       // 로그인 요청
       const res = await login(id, password);
+
       // id와 password 초기화
       setValue('id', '');
       setValue('password', '');

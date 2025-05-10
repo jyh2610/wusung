@@ -7,7 +7,7 @@ export const login_code = async ({
   password,
   code
 }: ILoginWithCode) => {
-  const res = await request<ApiResponse<ILoginRes>>({
+  const res = await request<ILoginRes>({
     method: 'POST',
     url: '/api/login/code',
     data: {
@@ -20,7 +20,7 @@ export const login_code = async ({
 };
 
 export const login = async ({ userName, password }: ILoginData) => {
-  const res = await request<ApiResponse<ILoginRes>>({
+  const res = await request<ILoginRes>({
     method: 'POST',
     url: '/api/login',
     data: {
@@ -28,6 +28,7 @@ export const login = async ({ userName, password }: ILoginData) => {
       password: password
     }
   });
+
   return res.data;
 };
 

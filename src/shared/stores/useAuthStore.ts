@@ -33,31 +33,43 @@ export const useAuthStore = create<AuthState>((set, get) => ({
   // 1차 로그인 시도
   login: async (id: string, password: string) => {
     try {
-      const res = await login({ userName: id, password });
+      console.log(0);
 
-      const userSub = await getSubscription(res.data.accessToken);
+      const res = await login({ userName: id, password });
+      console.log(res);
+
+      console.log(1);
+
+      const userSub = await getSubscription(res.accessToken);
+      console.log(2);
 
       localStorage.setItem(
         'userInfo',
         JSON.stringify({
-          token: res.data.accessToken,
-          username: res.data.username,
+          token: res.accessToken,
+          username: res.username,
           endDate: userSub?.data.endDate,
           isVip: userSub?.data.isVip
         })
       );
-      document.cookie = `token=${res.data.accessToken}; path=/;`;
-      document.cookie = `username=${res.data.username}; path=/;`;
+      console.log(3);
+
+      document.cookie = `token=${res?.accessToken}; path=/;`;
+      document.cookie = `username=${res?.username}; path=/;`;
+
+      console.log(4);
 
       set({
-        token: res.data.accessToken,
-        username: res.data.username,
+        token: res.accessToken,
+        username: res.username,
         endDate: userSub?.data.endDate,
         isVip: userSub?.data.isVip,
         isAuthenticated: true,
         requires2FA: false,
         tempUser: null
       });
+      console.log(5);
+
       return true;
     } catch (error: any) {
       const errorRes = error?.response?.data;
@@ -88,23 +100,23 @@ export const useAuthStore = create<AuthState>((set, get) => ({
         code
       });
 
-      const userSub = await getSubscription(res.data.accessToken);
+      const userSub = await getSubscription(res.accessToken);
 
       localStorage.setItem(
         'userInfo',
         JSON.stringify({
-          token: res.data.accessToken,
-          username: res.data.username,
+          token: res.accessToken,
+          username: res.username,
           endDate: userSub?.data.endDate,
           isVip: userSub?.data.isVip
         })
       );
-      document.cookie = `token=${res.data.accessToken}; path=/;`;
-      document.cookie = `username=${res.data.username}; path=/;`;
+      document.cookie = `token=${res.accessToken}; path=/;`;
+      document.cookie = `username=${res.username}; path=/;`;
 
       set({
-        token: res.data.accessToken,
-        username: res.data.username,
+        token: res.accessToken,
+        username: res.username,
         endDate: userSub?.data.endDate,
         isVip: userSub?.data.isVip,
         isAuthenticated: true,
