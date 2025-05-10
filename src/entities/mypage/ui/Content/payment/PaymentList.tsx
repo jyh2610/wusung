@@ -27,7 +27,8 @@ import {
   paymentContent,
   payPerMonth,
   currency,
-  refundBtn
+  refundBtn,
+  receipt
 } from './paymentHistory.css';
 import { Button } from '@/shared/ui';
 import { AlertDescription } from '@/components/ui/alert';
@@ -93,6 +94,8 @@ export const PaymentList = ({
     }
   };
 
+  console.log(payment);
+
   return (
     <div style={{ overflowY: 'auto' }} ref={isLast ? observe : undefined}>
       <div style={{ display: 'flex', flexDirection: 'column', gap: '20px' }}>
@@ -126,7 +129,7 @@ export const PaymentList = ({
             {buttonLabel(payment)}
           </button>
           <a
-            className={refundBtn({ status: 'refundable' })}
+            className={receipt}
             href={payment.receiptUrl}
             target="_blank"
             rel="noopener noreferrer"

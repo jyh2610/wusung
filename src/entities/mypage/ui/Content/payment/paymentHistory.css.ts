@@ -218,13 +218,17 @@ export const refundBtn = recipe({
       refundable: {
         backgroundColor: 'transparent',
         border: `1px solid ${colors.brand[400]}`,
-        color: colors.brand[400]
+        color: colors.brand[600]
       },
       cancelable: {
         backgroundColor: '#FFEBEB',
         color: '#F22B2B'
       },
       refunded: {
+        border: `1px solid ${colors.gray_scale['400']}`,
+        color: colors.gray_scale[600]
+      },
+      paid: {
         border: `1px solid ${colors.gray_scale['400']}`,
         color: colors.gray_scale[600]
       }
@@ -251,8 +255,8 @@ export const statusText = recipe({
   variants: {
     status: {
       refundable: {
-        color: colors.gray_scale[600],
-        backgroundColor: colors.gray_scale[100]
+        color: '#F22B2B',
+        backgroundColor: '#FFEBEB'
       },
       cancelable: {
         color: colors.brand[400],
@@ -261,6 +265,10 @@ export const statusText = recipe({
       refunded: {
         color: '#F22B2B',
         backgroundColor: '#FFEBEB'
+      },
+      paid: {
+        color: colors.gray_scale[600],
+        backgroundColor: colors.gray_scale[100]
       },
       disabled: {
         color: colors.gray_scale[600],
@@ -280,4 +288,21 @@ export const emptyStyle = style({
   height: '400px',
   padding: '40px 0',
   color: '#888'
+});
+export const receipt = style({
+  width: '100%',
+  height: '56px',
+  borderRadius: '12px',
+  padding: '10px 20px',
+  cursor: 'pointer',
+  transition: 'all 0.3s ease',
+  fontSize: '20px',
+  fontWeight: '500',
+  letterSpacing: '-2.5%',
+  textDecoration: 'none',
+  display: 'flex',
+  alignItems: 'center',
+  justifyContent: 'center',
+  color: colors.brand[600],
+  border: `1px solid ${colors.brand['400']}`
 });

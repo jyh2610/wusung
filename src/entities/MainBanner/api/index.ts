@@ -1,14 +1,31 @@
 import request from '@/shared/api/axiosInstance';
-import { ILoginData, ILoginRes, ILogoutData } from '../type';
+import { ILoginData, ILoginRes, ILoginWithCode, ILogoutData } from '../type';
+import { ApiResponse } from '@/shared/type';
 
-export const login = async ({ userName, password }: ILoginData) => {
-  const res = await request<ILoginRes>({
+export const login_code = async ({
+  userName,
+  password,
+  code
+}: ILoginWithCode) => {
+  const res = await request<ApiResponse<ILoginRes>>({
     method: 'POST',
     url: '/api/login/code',
     data: {
       username: userName,
       password: password,
-      code: '000000'
+      code: code
+    }
+  });
+  return res.data;
+};
+
+export const login = async ({ userName, password }: ILoginData) => {
+  const res = await request<ApiResponse<ILoginRes>>({
+    method: 'POST',
+    url: '/api/login',
+    data: {
+      username: userName,
+      password: password
     }
   });
   return res.data;

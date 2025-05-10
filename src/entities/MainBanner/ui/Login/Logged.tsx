@@ -1,5 +1,8 @@
+'use client';
+
+import { useEffect, useState } from 'react';
 import { Button } from '@/shared/ui';
-import { useAuthStore } from '@/shared/stores/useAuthStore'; // Zustand store import
+import { useAuthStore } from '@/shared/stores/useAuthStore';
 import { logout } from '../../api';
 import {
   LoginStyles,
@@ -14,29 +17,60 @@ import { toast } from 'react-toastify';
 import { useRouter } from 'next/navigation';
 
 function Logged() {
-  const { username, logout: logoutAction } = useAuthStore(); // Zustand에서 username과 logout 액션 가져오기
+  const { logout: logoutAction } = useAuthStore();
   const router = useRouter();
+
+  const [userInfo, setUserInfo] = useState({
+    username: '',
+    endDate: '',
+    isVip: false
+  });
+
+  useEffect(() => {
+    if (typeof window !== 'undefined') {
+      const userInfoString = localStorage.getItem('userInfo');
+      if (userInfoString) {
+        try {
+          const { username, endDate, isVip } = JSON.parse(userInfoString);
+          setUserInfo({ username, endDate, isVip });
+        } catch (error) {
+          console.error('userInfo 파싱 에러:', error);
+        }
+      } else {
+        console.log('localStorage에 userInfo가 없습니다.');
+      }
+    }
+  }, []);
+
   const logOut = async () => {
     try {
-      await logoutAction(); // Zustand의 logout 액션 호출
+      logoutAction();
       toast.success('로그아웃 성공');
     } catch (error) {
       console.error(error);
     }
   };
 
+  const { username, endDate } = userInfo;
+
   return (
     <div>
       <div className={LoginStyles}>
         <div className={LoginHeaderStyles}>
-          <p>{username ? `${username}님,` : '로그인된 사용자 없음'}</p>{' '}
-          {/* 사용자 이름 표시 */}
+          <p>{username ? `${username}님,` : '로그인된 사용자 없음'}</p>
           <p>오늘도 좋은 하루 되세요!</p>
         </div>
         <div className={`${LoginBodyStyles} ${LogedOutStyles}`}>
-          <p>우성인지펜 사용중</p>
-          <p style={{ color: colors.brand[300] }}>기한: </p>
+          {endDate ? (
+            <>
+              <p>우성인지펜 사용중</p>
+              <p style={{ color: colors.brand[300] }}>기한: {endDate}</p>
+            </>
+          ) : (
+            <p>이용 중이 아닙니다</p>
+          )}
         </div>
+
         <div className={LoginBottomStyles}>
           <Button
             onClick={() => router.push('/program')}

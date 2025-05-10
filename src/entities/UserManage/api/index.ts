@@ -1,5 +1,6 @@
 import request from '@/shared/api/axiosInstance';
-import { IForm, ILoginData, IPostCheckIdRes } from '../type';
+import { IForm, ILoginData, IPostCheckIdRes, userSub } from '../type';
+import { ApiResponse } from '@/shared/type';
 
 export const checkUserName = async (userName: string) => {
   const res = await request<IPostCheckIdRes>({
@@ -77,4 +78,20 @@ export const individualSignup = async (form: IForm) => {
   });
   console.log(res.data);
   return res.data;
+};
+
+export const getSubscription = async (token: string) => {
+  try {
+    const res = await request<ApiResponse<userSub>>({
+      method: 'GET',
+      url: '/api/program/use/subscription',
+      headers: {
+        Authorization: `Bearer ${token}`
+      }
+    });
+
+    return res.data;
+  } catch (error) {
+    console.log('구독 잔여기간 조회 실패');
+  }
 };

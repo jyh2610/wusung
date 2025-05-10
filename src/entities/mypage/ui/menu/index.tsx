@@ -22,6 +22,7 @@ import {
   useDateTitle
 } from './index.css';
 import { ListComponent } from './ListComponent';
+import Logged from '@/entities/MainBanner/ui/Login/Logged';
 export function MypageMenu({
   selectedMenu,
   setSelectedMenu
@@ -33,7 +34,7 @@ export function MypageMenu({
   const limitDate = '2022-01-01';
   return (
     <div className={container}>
-      <div className={menuContainer}>
+      {/* <div className={menuContainer}>
         <div className={infoBox}>
           <span
             style={{
@@ -57,7 +58,9 @@ export function MypageMenu({
         <div style={{ paddingTop: '8px' }}>
           <Button content="로그아웃" type="default" />
         </div>
-      </div>
+      </div> */}
+
+      <Logged />
 
       {/* 사이드 메뉴 */}
       <div className={menuListContainer}>

@@ -2,7 +2,7 @@ import { style } from '@vanilla-extract/css';
 
 export const layoutContainer = style({
   width: '100%',
-  // minHeight: '100vh',
+  // height: '90vh',
   display: 'flex',
   justifyContent: 'center',
   gap: '112px',

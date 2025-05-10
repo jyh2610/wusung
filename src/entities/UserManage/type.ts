@@ -23,3 +23,8 @@ export interface IForm {
   email: string;
   termOfUse: [boolean, boolean];
 }
+
+export interface userSub {
+  endDate: string;
+  isVip: boolean;
+}

@@ -18,7 +18,8 @@ import {
   paymentContent,
   payPerMonth,
   currency,
-  refundBtn
+  refundBtn,
+  receipt
 } from './paymentHistory.css'; // 경로 확인
 
 // 확인 모달 컴포넌트 (예시)
@@ -198,23 +199,11 @@ export const PaymentList = ({
           </button>
           {/* receiptUrl이 유효한 URL일 때만 링크 활성화/표시 고려 필요 */}
           <a
-            className={refundBtn({ status: 'refundable' })} // 'refundable' 상태 클래스가 영수증 버튼에도 적합한지 확인 필요
+            className={receipt} // 'refundable' 상태 클래스가 영수증 버튼에도 적합한지 확인 필요
             href={payment.receiptUrl}
             target="_blank"
             rel="noopener noreferrer"
             // 영수증 URL이 없으면 링크 비활성화 또는 숨기기
-            style={{
-              pointerEvents: payment.receiptUrl ? 'auto' : 'none',
-              opacity: payment.receiptUrl ? 1 : 0.5,
-              // 버튼처럼 보이게 하려면 추가 스타일 필요
-              display: 'inline-block', // a 태그를 인라인 블록으로
-              padding: '8px 12px', // 버튼과 동일한 패딩
-              textAlign: 'center', // 텍스트 중앙 정렬
-              textDecoration: 'none', // 밑줄 제거
-              color: payment.receiptUrl ? 'inherit' : '#888', // 비활성 색상
-              border: '1px solid #ccc', // 테두리 (버튼 스타일과 맞추기)
-              borderRadius: '4px' // 모서리 둥글게 (버튼 스타일과 맞추기)
-            }}
           >
             영수증
           </a>

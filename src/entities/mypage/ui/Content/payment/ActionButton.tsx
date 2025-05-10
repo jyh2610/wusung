@@ -8,6 +8,7 @@ import { useRefund } from '../hooks/useRefund';
 
 export const ActionButton = ({ payment }: { payment: paymentListDTO }) => {
   const { requestRefundOrCancel } = useRefund();
+  console.log(payment.receiptUrl);
 
   return (
     <div style={{ display: 'flex', gap: '8px' }}>
@@ -20,10 +21,9 @@ export const ActionButton = ({ payment }: { payment: paymentListDTO }) => {
       </button>
 
       <a
-        className={refundBtn({ status: 'refundable' })}
+        className={refundBtn({ status: 'receipt' })}
         href={payment.receiptUrl}
         target="_blank"
-        rel="noopener noreferrer"
       >
         영수증
       </a>
