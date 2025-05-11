@@ -20,6 +20,13 @@ import {
   regBtn,
   inputBox
 } from './index.css';
+import { DaumAddressSearchButton } from '@/shared/ui/AddressSearchButton';
+import {
+  fixUserInfo,
+  verificationCode,
+  verificationNum
+} from '@/entities/mypage/api';
+import { IManager } from '@/shared/type';
 
 // 이메일 도메인 옵션 (IEmail 타입 사용)
 // react-select의 options 형식 ({ value: string | number, label: string })과 일치합니다.
@@ -40,7 +47,10 @@ export const emailOptions: IEmail[] = [
     value: 'daum.net'
   }
 ];
-
+interface ManagerFormProps {
+  onCancel: () => void;
+  initialData?: IManager; // optional
+}
 // 폼 데이터 상태를 위한 인터페이스 정의 (변경 없음)
 interface ManagerFormData {
   name: string;
@@ -53,18 +63,24 @@ interface ManagerFormData {
   verificationCode: string; // 휴대폰 인증번호 필드
 }
 
-export function ManagerForm({ onCancel }: { onCancel: () => void }) {
+export function ManagerForm({ onCancel, initialData }: ManagerFormProps) {
+  const address = initialData?.address || ''; // 전체 주소
+  const [address1, address2] = address.split(','); // 쉼표로 기본주소와 상세주소 나누기
+  const email = initialData?.email || ''; // 이메일 주소
+  const [emailPrefix, emailDomain] = email.split('@');
+
   // 폼 데이터 상태 선언 및 초기화
   const [formData, setFormData] = useState<ManagerFormData>({
-    name: '',
-    position: '',
-    address1: '',
-    address2: '',
-    emailPrefix: '',
-    emailDomain: '', // ★ 초기값을 빈 문자열로 설정하여 react-select의 플레이스홀더가 보이도록 함
-    phoneNumber: '',
-    verificationCode: ''
+    name: initialData?.name || '',
+    position: initialData?.jobGrade || '',
+    address1: address1 || '',
+    address2: address2,
+    emailPrefix: emailPrefix,
+    emailDomain: emailDomain, // ★ 초기값을 빈 문자열로 설정하여 react-select의 플레이스홀더가 보이도록 함
+    phoneNumber: initialData?.phoneVerificationDTO.phoneNum || '',
+    verificationCode: initialData?.phoneVerificationDTO.code || ''
   });
+  const [isVerified, setIsVerified] = useState(false);
 
   // 입력 필드 값이 변경될 때 상태를 업데이트하는 범용 핸들러 (변경 없음)
   const handleInputChange = (field: keyof ManagerFormData, value: string) => {
@@ -85,15 +101,33 @@ export function ManagerForm({ onCancel }: { onCancel: () => void }) {
   };
 
   // 폼 제출 핸들러 (변경 없음)
-  const handleSubmit = (e: React.FormEvent) => {
-    e.preventDefault(); // 브라우저의 기본 폼 제출 동작 방지
+  const handleSubmit = async (e: React.FormEvent) => {
+    e.preventDefault();
 
-    console.log('폼 데이터:', formData);
+    if (!isFormValid()) {
+      alert('모든 필드를 올바르게 입력하고 휴대폰 인증을 완료해주세요.');
+      return;
+    }
 
-    // TODO:
-    // 1. 폼 유효성 검사 (필수 필드 확인 등)
-    // 2. API 호출 또는 데이터 처리 로직 추가
-    // 3. 제출 성공/실패 처리
+    // 🔁 formData → 서버 전송용 데이터로 변환
+    const submitData = {
+      name: formData.name,
+      jobGrade: formData.position, // position → jobGrade 로 이름 변경
+      address: `${formData.address1} ${formData.address2}`.trim(), // 주소 합치기
+      email: `${formData.emailPrefix}@${formData.emailDomain}`,
+      phoneVerificationDTO: {
+        code: formData.verificationCode,
+        phoneNum: formData.phoneNumber
+      }
+    };
+
+    try {
+      const res = await fixUserInfo(submitData);
+      alert('등록이 완료되었습니다.');
+    } catch (err) {
+      alert('등록에 실패했습니다.');
+      console.error(err);
+    }
   };
 
   // react-select의 value prop에 전달할 '선택된 옵션 객체' 찾기
@@ -101,6 +135,65 @@ export function ManagerForm({ onCancel }: { onCancel: () => void }) {
   const selectedEmailOption = emailOptions.find(
     option => option.value === formData.emailDomain
   );
+  const isFormValid = () => {
+    const {
+      name,
+      position,
+      address1,
+      address2,
+      emailPrefix,
+      emailDomain,
+      phoneNumber,
+      verificationCode
+    } = formData;
+
+    // 필수 항목 모두 채워져 있고 인증 완료되었는지 확인
+    return (
+      name.trim() &&
+      address1.trim() &&
+      address2.trim() &&
+      emailPrefix.trim() &&
+      emailDomain.trim() &&
+      phoneNumber.trim() &&
+      verificationCode.trim() &&
+      isVerified
+    );
+  };
+
+  const sendVerificationNum = async (
+    e: React.MouseEvent<HTMLButtonElement>
+  ) => {
+    e.preventDefault();
+    if (!formData.phoneNumber.trim()) {
+      alert('휴대폰 번호를 입력해주세요.');
+      return;
+    }
+
+    try {
+      await verificationNum(formData.phoneNumber);
+      alert('인증번호가 발송되었습니다.');
+    } catch {
+      console.log('인증번호 전송 실패');
+      alert('인증번호 전송에 실패했습니다.');
+    }
+  };
+
+  const verifiyCode = async (e: React.MouseEvent<HTMLButtonElement>) => {
+    e.preventDefault();
+
+    try {
+      const res = await verificationCode({
+        code: formData.verificationCode,
+        phoneNum: formData.phoneNumber
+      });
+
+      setIsVerified(true);
+      alert('인증이 완료되었습니다.');
+    } catch (error) {
+      setIsVerified(false);
+      alert('인증번호가 유효하지 않습니다.');
+    }
+  };
 
   return (
     <div className={container}>
@@ -112,11 +205,7 @@ export function ManagerForm({ onCancel }: { onCancel: () => void }) {
           <NomalInput
             placeholder="이름을 입력해주세요"
             inputSize="medium"
-            label={
-              <div className={labelContainer}>
-                이름 <span className={starSpan}>*</span>
-              </div>
-            }
+            label={<div className={labelContainer}>이름</div>}
             value={formData.name}
             onChange={(e: React.ChangeEvent<HTMLInputElement>) =>
               handleInputChange('name', e.target.value)
@@ -137,25 +226,23 @@ export function ManagerForm({ onCancel }: { onCancel: () => void }) {
           />
         </div>
 
-        <div>
+        <div style={{ display: 'flex', flexDirection: 'column', gap: '12px' }}>
           <div className={inputBox}>
             <NomalInput
               placeholder="주소를 입력해주세요"
               inputSize="medium"
-              label={
-                <div className={labelContainer}>
-                  주소 <span className={starSpan}>*</span>
-                </div>
-              }
+              label={<div className={labelContainer}>주소</div>}
               value={formData.address1}
               onChange={(e: React.ChangeEvent<HTMLInputElement>) =>
                 handleInputChange('address1', e.target.value)
               }
+              readOnly
             />
             <div className={regBtn}>
-              <Button
-                type="borderBrand"
-                content="주소검색" /* onClick 핸들러 추가 (상태와 연결하여 인증번호 발송 로직 구현) */
+              <DaumAddressSearchButton
+                onAddressSelect={address =>
+                  handleInputChange('address1', address)
+                }
               />
             </div>
           </div>
@@ -174,11 +261,7 @@ export function ManagerForm({ onCancel }: { onCancel: () => void }) {
           <NomalInput
             placeholder="이메일을 입력해주세요"
             inputSize="medium"
-            label={
-              <div className={labelContainer}>
-                이메일 <span className={starSpan}>*</span>
-              </div>
-            }
+            label={<div className={labelContainer}>이메일</div>}
             value={formData.emailPrefix}
             onChange={(e: React.ChangeEvent<HTMLInputElement>) =>
               handleInputChange('emailPrefix', e.target.value)
@@ -214,16 +297,12 @@ export function ManagerForm({ onCancel }: { onCancel: () => void }) {
           />
         </div>
 
-        <div>
+        <div style={{ display: 'flex', flexDirection: 'column', gap: '12px' }}>
           <div className={inputBox}>
             <NomalInput
               placeholder="번호를 입력해주세요"
               inputSize="medium"
-              label={
-                <div className={labelContainer}>
-                  휴대폰 번호 <span className={starSpan}>*</span>
-                </div>
-              }
+              label={<div className={labelContainer}>휴대폰 번호</div>}
               value={formData.phoneNumber}
               onChange={(e: React.ChangeEvent<HTMLInputElement>) =>
                 handleInputChange('phoneNumber', e.target.value)
@@ -231,13 +310,15 @@ export function ManagerForm({ onCancel }: { onCancel: () => void }) {
             />
             <div className={regBtn}>
               <Button
+                onClick={sendVerificationNum}
+                btnType="button"
                 type="borderBrand"
                 content="인증번호 받기" /* onClick 핸들러 추가 (상태와 연결하여 인증번호 발송 로직 구현) */
               />
             </div>
           </div>
           {/* 인증번호 관련 그룹 */}
-          <div>
+          <div className={inputBox}>
             <NomalInput
               placeholder="인증번호를 입력해주세요"
               inputSize="medium"
@@ -249,6 +330,8 @@ export function ManagerForm({ onCancel }: { onCancel: () => void }) {
             />
             <div className={regBtn}>
               <Button
+                onClick={verifiyCode}
+                btnType="button"
                 type="borderBrand"
                 content="인증" /* onClick 핸들러 추가 (상태와 연결하여 인증번호 발송 로직 구현) */
               />
@@ -269,7 +352,12 @@ export function ManagerForm({ onCancel }: { onCancel: () => void }) {
           }}
         >
           <Button type="borderBrand" content="취소하기" onClick={onCancel} />
-          <Button type="brand" content="추가하기" btnType="submit" />
+          <Button
+            type="brand"
+            content="수정하기"
+            btnType="submit"
+            // disabled={isFormValid() ? true : false}
+          />
         </div>
       </form>
     </div>

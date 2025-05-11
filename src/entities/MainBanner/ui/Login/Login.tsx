@@ -1,33 +1,37 @@
 'use client';
 
+import { useEffect, useState } from 'react';
 import { BeforeLogIn } from './BeforeLogIn';
 import Logged from './Logged';
-import { useAuthStore } from '@/shared/stores/useAuthStore'; // 로그인 상태 관리 store import
+import { useAuthStore } from '@/shared/stores/useAuthStore';
 import { bannerContentsStyle } from './Login.css';
-import { useEffect } from 'react';
 import { ConsultationInquiry } from './ ConsultationInquiry';
+import { LoginSkeleton } from './LoginSkeleton';
 
 export function Login() {
-  // 로그인 상태 가져오기,
   const { isAuthenticated, checkAuthentication } = useAuthStore(state => ({
     isAuthenticated: state.isAuthenticated,
     checkAuthentication: state.checkAuthentication
   }));
 
-  // 앱 로드 시 로그인 상태 확인
+  const [loading, setLoading] = useState(true);
+
   useEffect(() => {
     checkAuthentication();
-  }, []); // 의존성 배열을 빈 배열로 설정하여 마운트 시 한 번만 실행되도록
+    // 상태 확인 후 로딩 false
+    setTimeout(() => {
+      setLoading(false);
+    }, 200); // 아주 짧은 시간 후 전환 (Zustand 상태 갱신 기다리기)
+  }, []);
 
   return (
     <div className={bannerContentsStyle}>
-      {/* 로그인 상태에 따라 컴포넌트 조건부 렌더링 */}
-      {isAuthenticated ? (
+      {loading ? (
+        <LoginSkeleton />
+      ) : isAuthenticated ? (
         <Logged />
       ) : (
-        <>
-          <BeforeLogIn />
-        </>
+        <BeforeLogIn />
       )}
       <ConsultationInquiry />
     </div>

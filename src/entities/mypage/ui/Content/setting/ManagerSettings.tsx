@@ -12,11 +12,13 @@ import {
   noData
 } from './index.css';
 import { ManagerForm } from './Manage';
-
-// 담당자 추가 폼 컴포넌트 (별도 작성 필요)
+import { IManager } from '@/shared/type';
 
 export function ManagerSettings() {
   const [isCreating, setIsCreating] = useState(false);
+  const [selectedManager, setSelectedManager] = useState<IManager | undefined>(
+    undefined
+  );
 
   const { data, isLoading, error } = useQuery({
     queryKey: ['managers'],
@@ -26,7 +28,15 @@ export function ManagerSettings() {
   if (isLoading) return <div>로딩 중...</div>;
 
   if (isCreating) {
-    return <ManagerForm onCancel={() => setIsCreating(false)} />;
+    return (
+      <ManagerForm
+        onCancel={() => {
+          setIsCreating(false);
+          setSelectedManager(undefined);
+        }}
+        initialData={selectedManager}
+      />
+    );
   }
 
   const isEmpty = error || !data || data.length === 0;
@@ -37,7 +47,7 @@ export function ManagerSettings() {
         <h1 className={header}>담당자 관리 페이지</h1>
         <div className={headerBtn}>
           <Button
-            content={'담당자 추가'}
+            content={'담당자 정보수정'}
             type="borderBrand"
             onClick={() => setIsCreating(true)}
           />
@@ -48,7 +58,18 @@ export function ManagerSettings() {
         {isEmpty ? (
           <div className={noData}>담당자 정보가 없습니다.</div>
         ) : (
-          data.map(manager => <div key={manager.email}>{manager.name}</div>)
+          data.map((manager: any) => (
+            <div
+              key={manager.email}
+              onClick={() => {
+                setSelectedManager(manager);
+                setIsCreating(true);
+              }}
+              style={{ cursor: 'pointer', padding: '8px 0' }}
+            >
+              {manager.name}
+            </div>
+          ))
         )}
       </div>
     </div>

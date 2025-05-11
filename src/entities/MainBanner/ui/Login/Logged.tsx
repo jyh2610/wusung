@@ -14,7 +14,7 @@ import {
 } from './Login.css';
 import { colors } from '@/design-tokens';
 import { toast } from 'react-toastify';
-import { useRouter } from 'next/navigation';
+import { redirect, useRouter } from 'next/navigation';
 
 function Logged() {
   const { logout: logoutAction } = useAuthStore();
@@ -46,6 +46,7 @@ function Logged() {
     try {
       logoutAction();
       toast.success('로그아웃 성공');
+      redirect('/');
     } catch (error) {
       console.error(error);
     }

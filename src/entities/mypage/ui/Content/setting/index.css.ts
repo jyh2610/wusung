@@ -69,4 +69,4 @@ export const regBtn = style({
   height: '56px'
 });
 
-export const inputBox = style({ display: 'flex' });
+export const inputBox = style({ display: 'flex', gap: '12px' });

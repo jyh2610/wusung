@@ -7,6 +7,7 @@ interface ButtonType {
   onClick?: (e: any) => void;
   btnType?: 'button' | 'submit' | 'reset' | undefined;
   content: string;
+  disabled?: boolean;
 }
 
 export const Button = ({
@@ -14,10 +15,12 @@ export const Button = ({
   content,
   type = 'default',
   onClick,
+  disabled = false,
   ...props
 }: ButtonType) => {
   return (
     <button
+      disabled={disabled}
       onClick={onClick}
       className={`${buttonBase} ${buttonVariants[type]}`}
       {...props}

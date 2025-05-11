@@ -7,3 +7,4 @@ export { SelectBox } from './SelectBox';
 export type { IEmail } from './types';
 export { DashBoard } from './dashboard/index';
 export { SkeletonList } from './SkeletonList';
+export { DaumAddressSearchButton } from './AddressSearchButton/index';

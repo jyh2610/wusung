@@ -9,6 +9,7 @@ interface AuthState {
   endDate: string | null;
   isVip: boolean;
   requires2FA: boolean;
+  isHydrated: boolean;
   tempUser: { id: string; password: string } | null;
 
   login: (id: string, password: string) => Promise<boolean>;
@@ -29,19 +30,14 @@ export const useAuthStore = create<AuthState>((set, get) => ({
   isVip: false,
   requires2FA: false,
   tempUser: null,
+  isHydrated: false,
 
   // 1차 로그인 시도
   login: async (id: string, password: string) => {
     try {
-      console.log(0);
-
       const res = await login({ userName: id, password });
-      console.log(res);
-
-      console.log(1);
 
       const userSub = await getSubscription(res.accessToken);
-      console.log(2);
 
       localStorage.setItem(
         'userInfo',
@@ -52,12 +48,9 @@ export const useAuthStore = create<AuthState>((set, get) => ({
           isVip: userSub?.data.isVip
         })
       );
-      console.log(3);
 
       document.cookie = `token=${res?.accessToken}; path=/;`;
       document.cookie = `username=${res?.username}; path=/;`;
-
-      console.log(4);
 
       set({
         token: res.accessToken,
@@ -68,7 +61,6 @@ export const useAuthStore = create<AuthState>((set, get) => ({
         requires2FA: false,
         tempUser: null
       });
-      console.log(5);
 
       return true;
     } catch (error: any) {
@@ -168,7 +160,8 @@ export const useAuthStore = create<AuthState>((set, get) => ({
         username: parsed.username,
         endDate: parsed.endDate,
         isVip: parsed.isVip,
-        isAuthenticated: true
+        isAuthenticated: true,
+        isHydrated: true
       });
     }
   }

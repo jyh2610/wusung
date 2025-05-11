@@ -1,5 +1,5 @@
 // payment/ActionButton.tsx
-import { refundBtn } from './paymentHistory.css';
+import { receipt, refundBtn } from './paymentHistory.css';
 import { paymentListDTO } from '../../../type';
 import { useQueryClient } from '@tanstack/react-query';
 import { getRefundandCancel } from '../../../model/payment';
@@ -20,11 +20,7 @@ export const ActionButton = ({ payment }: { payment: paymentListDTO }) => {
         {buttonLabel(payment)}
       </button>
 
-      <a
-        className={refundBtn({ status: 'receipt' })}
-        href={payment.receiptUrl}
-        target="_blank"
-      >
+      <a className={receipt} href={payment.receiptUrl} target="_blank">
         영수증
       </a>
     </div>
