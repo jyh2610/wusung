@@ -3,7 +3,7 @@
 import { useForm } from 'react-hook-form';
 import { colors } from '@/design-tokens';
 import { CommonSignupInput, LocationInfo } from '@/entities';
-import { Button } from '@/shared/ui';
+import { Button, IEmail } from '@/shared/ui';
 import { individualSignup } from '../api';
 import { IForm } from '../type';
 import { CompanyForm } from '../ui/SignupForm/Company';
@@ -15,38 +15,38 @@ import {
   subTitle,
   title
 } from './index.css';
+import { useState } from 'react';
+import { IdPw } from '../ui/form';
+import { UserInfo } from '../ui/form/UserInfo';
 
 export function Company() {
-  const {
-    register,
-    handleSubmit,
-    watch,
-    setValue,
-    trigger,
-    formState: { errors }
-  } = useForm<IForm>({
-    mode: 'onChange',
-    defaultValues: {
-      id: '',
-      password: '',
-      passwordConfirm: '',
-      representativeName: '',
-      companyName: '',
-      corporateNumber: '',
-      openingDate: '',
-      address: '',
-      detailAddress: '',
-      phone: '',
-      email: '',
-      termOfUse: [false, false]
-    }
+  const [formData, setFormData] = useState<IForm>({
+    id: '',
+    password: '',
+    passwordConfirm: '',
+    representativeName: '',
+    companyName: '',
+    corporateNumber: '',
+    openingDate: '',
+    name: '',
+    address: '',
+    detailAddress: '',
+    phone: '',
+    phoneCode: '',
+    email: '',
+    termOfUse: [false, false],
+    verificationCode: '',
+    emailDomain: ''
   });
+
   const onSubmit = async (data: IForm) => {
     console.log(data);
     await individualSignup(data);
   };
 
-  console.log('📌 현재 폼 상태:', watch());
+  function handleInputChange(field: string, value: string): void {
+    throw new Error('Function not implemented.');
+  }
 
   return (
     <div className={inputContainer}>
@@ -74,8 +74,8 @@ export function Company() {
           </span>
         </p>
       </div>
-      <form className={inputContainer} onSubmit={handleSubmit(onSubmit)}>
-        <CommonSignupInput register={register} errors={errors} watch={watch} />
+      <form className={inputContainer}>
+        {/* <CommonSignupInput register={register} errors={errors} watch={watch} />
         <CompanyForm register={register} errors={errors} />
         <LocationInfo
           setValue={setValue}
@@ -83,15 +83,18 @@ export function Company() {
           errors={errors}
           watch={watch}
         />
-        <TermsOfUse setValue={setValue} watch={watch} />
+        <TermsOfUse setValue={setValue} watch={watch} /> */}
+
+        <IdPw formData={formData} handleInputChange={handleInputChange} />
+        <UserInfo formData={formData} handleInputChange={handleInputChange} />
         <div className={submitButton}>
           <Button
             btnType="submit"
             type={'beforeSelection'}
             content={'가입하기'}
-            onClick={() => {
-              handleSubmit(onSubmit);
-            }}
+            // onClick={() => {
+            //   handleSubmit(onSubmit);
+            // }}
           />
         </div>
       </form>

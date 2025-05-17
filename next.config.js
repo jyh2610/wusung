@@ -1,8 +1,10 @@
 /** @type {import('next').NextConfig} */
-import { createVanillaExtractPlugin } from '@vanilla-extract/next-plugin';
+const { createVanillaExtractPlugin } = require('@vanilla-extract/next-plugin');
+
 const withVanillaExtract = createVanillaExtractPlugin({
   identifiers: ({ hash }) => `prefix_${hash}`
 });
+
 const nextConfig = {
   images: {
     domains: ['dwkcd9qfwbc4t.cloudfront.net']
@@ -17,4 +19,4 @@ const nextConfig = {
   }
 };
 
-export default withVanillaExtract(nextConfig);
+module.exports = withVanillaExtract(nextConfig);

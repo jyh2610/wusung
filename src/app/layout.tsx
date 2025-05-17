@@ -1,4 +1,3 @@
-import localFont from '@next/font/local';
 import type { Metadata } from 'next';
 import './globals.css';
 import { colors } from '@/design-tokens';

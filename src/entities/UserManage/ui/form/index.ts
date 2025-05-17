@@ -1,0 +1,1 @@
+export { IdPw } from './commonInput';

@@ -9,6 +9,7 @@ export interface ILoginData {
 }
 
 export interface IForm {
+  verificationCode: string | undefined;
   id: string;
   password: string;
   passwordConfirm: string;
@@ -20,8 +21,10 @@ export interface IForm {
   address: string;
   detailAddress: string;
   phone: string;
+  phoneCode: string;
   email: string;
   termOfUse: [boolean, boolean];
+  emailDomain: string;
 }
 
 export interface userSub {
