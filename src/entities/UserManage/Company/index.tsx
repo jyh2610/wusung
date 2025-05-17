@@ -1,10 +1,8 @@
 'use client';
 
-import { useForm } from 'react-hook-form';
 import { colors } from '@/design-tokens';
-import { CommonSignupInput, LocationInfo } from '@/entities';
-import { Button, IEmail } from '@/shared/ui';
-import { IFormCompany, IFormIndividual } from '../type';
+import { Button } from '@/shared/ui';
+import { IFormCompany } from '../type';
 import { TermsOfUse } from '../ui/SignupForm/TermsOfUse';
 import {
   info,
@@ -15,7 +13,6 @@ import {
 } from './index.css';
 import { useEffect, useState } from 'react';
 import { IdPw } from '../ui/form';
-import { UserInfo } from '../ui/form/UserInfo';
 import { CompanyInfo } from '../ui/form/companyInfo';
 import { toast } from 'react-toastify';
 import 'react-toastify/dist/ReactToastify.css';

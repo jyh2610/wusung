@@ -11,14 +11,9 @@ import {
   title
 } from '../Company/index.css';
 import { IFormIndividual } from '../type';
-import {
-  CommonSignupInput,
-  LocationInfo
-} from '../ui/SignupForm/CommonSignupInput';
 import { TermsOfUse } from '../ui/SignupForm/TermsOfUse';
 import { IdPw } from '../ui/form';
 import { UserInfo } from '../ui/form/UserInfo';
-import { watch } from 'fs';
 import { useState, useEffect } from 'react';
 import { individualSignup } from '../api';
 import { toast } from 'react-toastify';
