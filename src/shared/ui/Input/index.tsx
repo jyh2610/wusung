@@ -133,7 +133,7 @@ export const NomalInput: React.FC<InputProps> = ({
           style={{
             top: '68px',
             left: '10px',
-            color: 'red',
+            color: error?.includes('사용 가능') ? '#1AA93E' : 'red',
             position: 'absolute'
           }}
         >

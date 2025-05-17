@@ -10,35 +10,92 @@ import {
   submitButton,
   title
 } from '../Company/index.css';
-import { IForm } from '../type';
+import { IFormIndividual } from '../type';
 import {
   CommonSignupInput,
   LocationInfo
 } from '../ui/SignupForm/CommonSignupInput';
 import { TermsOfUse } from '../ui/SignupForm/TermsOfUse';
+import { IdPw } from '../ui/form';
+import { UserInfo } from '../ui/form/UserInfo';
+import { watch } from 'fs';
+import { useState, useEffect } from 'react';
+import { individualSignup } from '../api';
+import { toast } from 'react-toastify';
 
 export function IndividualComponent() {
-  const {
-    register,
-    handleSubmit,
-    watch,
-    setValue,
-    formState: { errors }
-  } = useForm<IForm>({
-    defaultValues: {
-      id: '',
-      password: '',
-      passwordConfirm: '',
-      name: '',
-      address: '',
-      phone: '',
-      email: '',
-      termOfUse: [false, false]
+  const [formData, setFormData] = useState<IFormIndividual>({
+    id: '',
+    password: '',
+    passwordConfirm: '',
+    name: '',
+    address: '',
+    detailAddress: '',
+    phone: '',
+    phoneCode: '',
+    email: '',
+    termOfUse: [false, false],
+    verificationCode: '',
+    emailDomain: '',
+    birth: {
+      year: '',
+      month: '',
+      day: ''
     }
   });
-  const onSubmit = (data: unknown) => {
-    console.log(data);
+
+  const [showVerification, setShowVerification] = useState(false);
+  const [timeLeft, setTimeLeft] = useState(120); // 2분을 초 단위로
+
+  useEffect(() => {
+    let timer: NodeJS.Timeout;
+    if (showVerification && timeLeft > 0) {
+      timer = setInterval(() => {
+        setTimeLeft(prev => prev - 1);
+      }, 1000);
+    } else if (timeLeft === 0) {
+      setShowVerification(false);
+      setTimeLeft(120);
+    }
+    return () => clearInterval(timer);
+  }, [showVerification, timeLeft]);
+
+  const handleSendVerification = () => {
+    setShowVerification(true);
+    setTimeLeft(120);
   };
+
+  const onSubmit = async (e: React.FormEvent<HTMLFormElement>) => {
+    e.preventDefault();
+
+    try {
+      const formattedData: IFormIndividual = {
+        ...formData,
+        id: formData.id,
+        passwordConfirm: formData.passwordConfirm,
+        detailAddress: formData.detailAddress,
+        verificationCode: formData.verificationCode,
+        emailDomain: formData.emailDomain,
+        phoneCode: formData.phoneCode,
+        termOfUse: formData.termOfUse
+      };
+
+      const res = await individualSignup(formattedData);
+      toast.success(res.data.message);
+    } catch (error: any) {
+      toast.error(error.response.data.message);
+    }
+  };
+
+  function handleInputChange(
+    field: keyof IFormIndividual,
+    value: string | { year: string; month: string; day: string }
+  ): void {
+    setFormData(prev => ({
+      ...prev,
+      [field]: value
+    }));
+  }
 
   return (
     <div className={inputContainer}>
@@ -66,22 +123,21 @@ export function IndividualComponent() {
           </span>
         </p>
       </div>
-      <form className={inputContainer} onSubmit={handleSubmit(onSubmit)}>
-        <CommonSignupInput register={register} errors={errors} watch={watch} />
-        <LocationInfo
-          type={'indivisual'}
-          register={register}
-          setValue={setValue}
-          errors={errors}
-          watch={watch}
+      <form className={inputContainer} onSubmit={onSubmit}>
+        <IdPw formData={formData} handleInputChange={handleInputChange} />
+        <UserInfo
+          formData={formData}
+          handleInputChange={handleInputChange}
+          showVerification={showVerification}
+          timeLeft={timeLeft}
+          onSendVerification={handleSendVerification}
         />
-        <TermsOfUse watch={watch} setValue={setValue} />
+        <TermsOfUse formData={formData} handleInputChange={handleInputChange} />
         <div className={submitButton}>
           <Button
             btnType="submit"
             type={'beforeSelection'}
             content={'가입하기'}
-            onClick={() => handleSubmit(onSubmit)}
           />
         </div>
       </form>

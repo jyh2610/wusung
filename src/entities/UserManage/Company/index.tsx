@@ -4,9 +4,7 @@ import { useForm } from 'react-hook-form';
 import { colors } from '@/design-tokens';
 import { CommonSignupInput, LocationInfo } from '@/entities';
 import { Button, IEmail } from '@/shared/ui';
-import { individualSignup } from '../api';
-import { IForm } from '../type';
-import { CompanyForm } from '../ui/SignupForm/Company';
+import { IFormCompany, IFormIndividual } from '../type';
 import { TermsOfUse } from '../ui/SignupForm/TermsOfUse';
 import {
   info,
@@ -15,12 +13,22 @@ import {
   subTitle,
   title
 } from './index.css';
-import { useState } from 'react';
+import { useEffect, useState } from 'react';
 import { IdPw } from '../ui/form';
 import { UserInfo } from '../ui/form/UserInfo';
+import { CompanyInfo } from '../ui/form/companyInfo';
+import { toast } from 'react-toastify';
+import 'react-toastify/dist/ReactToastify.css';
+import {
+  checkAuthenticationNumber,
+  SignupCompanyRequest,
+  verifyPhoneNum
+} from '../api';
+import { CompanyLocation } from '../ui/form/companyLocation';
+import { companySignup } from '../api';
 
 export function Company() {
-  const [formData, setFormData] = useState<IForm>({
+  const [formData, setFormData] = useState<IFormCompany>({
     id: '',
     password: '',
     passwordConfirm: '',
@@ -28,7 +36,6 @@ export function Company() {
     companyName: '',
     corporateNumber: '',
     openingDate: '',
-    name: '',
     address: '',
     detailAddress: '',
     phone: '',
@@ -39,14 +46,94 @@ export function Company() {
     emailDomain: ''
   });
 
-  const onSubmit = async (data: IForm) => {
-    console.log(data);
-    await individualSignup(data);
+  const [showVerification, setShowVerification] = useState(false);
+  const [timeLeft, setTimeLeft] = useState(120);
+
+  useEffect(() => {
+    let timer: NodeJS.Timeout;
+    if (showVerification && timeLeft > 0) {
+      timer = setInterval(() => {
+        setTimeLeft(prev => prev - 1);
+      }, 1000);
+    } else if (timeLeft === 0) {
+      setShowVerification(false);
+      setTimeLeft(120);
+    }
+    return () => clearInterval(timer);
+  }, [showVerification, timeLeft]);
+
+  const onSubmit = async (e: React.FormEvent<HTMLFormElement>) => {
+    e.preventDefault();
+
+    // 필수 항목 검증
+    if (
+      !formData.id ||
+      !formData.password ||
+      !formData.passwordConfirm ||
+      !formData.address ||
+      !formData.email ||
+      !formData.emailDomain ||
+      !formData.verificationCode ||
+      !formData.phone ||
+      !formData.corporateNumber ||
+      !formData.openingDate ||
+      !formData.representativeName ||
+      !formData.companyName
+    ) {
+      toast.error('필수 항목을 모두 입력해주세요.');
+      return;
+    }
+
+    try {
+      const formattedData: SignupCompanyRequest = {
+        username: formData.id,
+        password: formData.password,
+        passwordCheck: formData.passwordConfirm,
+        address: formData.address,
+        email: `${formData.email}@${formData.emailDomain}`,
+        phoneVerificationDTO: {
+          code: formData.verificationCode,
+          phoneNum: formData.phone
+        },
+        corporateVerificationDTO: {
+          b_no: formData.corporateNumber,
+          start_dt: formData.openingDate,
+          p_nm: formData.representativeName,
+          b_nm: formData.companyName
+        }
+      };
+
+      const res = await companySignup(formattedData);
+      toast.success(res.data.message);
+    } catch (error: any) {
+      toast.error(error.response?.data?.message || '회원가입에 실패했습니다.');
+    }
   };
 
-  function handleInputChange(field: string, value: string): void {
-    throw new Error('Function not implemented.');
+  function handleInputChange(
+    field: keyof IFormCompany,
+    value: string | { year: string; month: string; day: string }
+  ): void {
+    setFormData(prev => ({
+      ...prev,
+      [field]: value
+    }));
   }
+
+  const handleSendVerification = async () => {
+    if (!formData.phone) {
+      toast.error('휴대폰 번호를 입력해주세요');
+      return;
+    }
+    try {
+      const response = await verifyPhoneNum(formData.phone);
+      toast.info(response.message);
+      setShowVerification(true);
+      setTimeLeft(120);
+    } catch (error) {
+      toast.error('인증번호 발송 중 오류가 발생했습니다');
+    }
+  };
 
   return (
     <div className={inputContainer}>
@@ -74,27 +161,26 @@ export function Company() {
           </span>
         </p>
       </div>
-      <form className={inputContainer}>
-        {/* <CommonSignupInput register={register} errors={errors} watch={watch} />
-        <CompanyForm register={register} errors={errors} />
-        <LocationInfo
-          setValue={setValue}
-          register={register}
-          errors={errors}
-          watch={watch}
-        />
-        <TermsOfUse setValue={setValue} watch={watch} /> */}
-
+      <form onSubmit={onSubmit} className={inputContainer}>
         <IdPw formData={formData} handleInputChange={handleInputChange} />
-        <UserInfo formData={formData} handleInputChange={handleInputChange} />
+        <CompanyInfo
+          formData={formData}
+          handleInputChange={handleInputChange}
+        />
+        <CompanyLocation
+          formData={formData}
+          handleInputChange={handleInputChange}
+          onSendVerification={handleSendVerification}
+          showVerification={showVerification}
+          timeLeft={timeLeft}
+          setShowVerification={setShowVerification}
+        />
+        <TermsOfUse formData={formData} handleInputChange={handleInputChange} />
         <div className={submitButton}>
           <Button
             btnType="submit"
             type={'beforeSelection'}
             content={'가입하기'}
-            // onClick={() => {
-            //   handleSubmit(onSubmit);
-            // }}
           />
         </div>
       </form>

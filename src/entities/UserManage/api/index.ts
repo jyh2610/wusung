@@ -1,5 +1,11 @@
 import request from '@/shared/api/axiosInstance';
-import { IForm, ILoginData, IPostCheckIdRes, userSub } from '../type';
+import {
+  IFormCompany,
+  IFormIndividual,
+  ILoginData,
+  IPostCheckIdRes,
+  userSub
+} from '../type';
 import { ApiResponse } from '@/shared/type';
 
 export const checkUserName = async (userName: string) => {
@@ -57,7 +63,7 @@ export const verifyCoporate = async ({
   p_nm,
   b_nm
 }: ICheckCorporate) => {
-  const res = await request<IPostCheckIdRes>({
+  const res = await request<ApiResponse<{}>>({
     method: 'POST',
     url: '/api/common/signup/corporate/verification',
     data: {
@@ -70,14 +76,63 @@ export const verifyCoporate = async ({
   return res.data;
 };
 
-export const individualSignup = async (form: IForm) => {
-  const res = await request<ILoginData>({
-    method: 'POST',
-    url: '/api/common/signup/individual',
-    data: form
-  });
-  console.log(res.data);
-  return res.data;
+export const individualSignup = async (form: IFormIndividual) => {
+  try {
+    const res = await request<ApiResponse<ILoginData>>({
+      method: 'POST',
+      url: '/api/common/signup/individual',
+      data: form
+    });
+    return res;
+  } catch (error: any) {
+    throw {
+      response: {
+        data: {
+          message: error.response?.data?.message || '회원가입에 실패했습니다.'
+        }
+      }
+    };
+  }
+};
+export interface PhoneVerificationDTO {
+  code: string;
+  phoneNum: string;
+}
+
+export interface CorporateVerificationDTO {
+  b_no: string; // 사업자등록번호
+  start_dt: string; // 개업일자
+  p_nm: string; // 대표자명
+  b_nm: string; // 회사명
+}
+
+export interface SignupCompanyRequest {
+  username: string;
+  password: string;
+  passwordCheck: string;
+  address: string;
+  email: string;
+  phoneVerificationDTO: PhoneVerificationDTO;
+  corporateVerificationDTO: CorporateVerificationDTO;
+}
+
+export const companySignup = async (form: SignupCompanyRequest) => {
+  try {
+    const res = await request<ApiResponse<ILoginData>>({
+      method: 'POST',
+      url: '/api/common/signup/company',
+      data: form
+    });
+    return res;
+  } catch (error: any) {
+    throw {
+      response: {
+        data: {
+          message: error.response?.data?.message || '회원가입에 실패했습니다.'
+        }
+      }
+    };
+  }
 };
 
 export const getSubscription = async (token: string) => {

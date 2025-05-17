@@ -6,24 +6,31 @@ import { IEmail } from '../types';
 
 // IProps 인터페이스 정의
 interface IProps {
-  options: IEmail[];
+  options: { value: string; label: string }[];
   placeholder: string;
+  value?: string;
+  onChange: (value: string) => void;
   isSearchable?: boolean;
 }
 
 export function SelectBox({
   options,
   placeholder,
+  value,
+  onChange,
   isSearchable = true
 }: IProps) {
-  const [selectedOption, setSelectedOption] = useState<IEmail | null>(null);
-  const handleChange = (newValue: SingleValue<IEmail>, actionMeta: unknown) => {
-    setSelectedOption(newValue);
+  const handleChange = (
+    newValue: SingleValue<{ value: string; label: string }>
+  ) => {
+    if (newValue) {
+      onChange(newValue.value);
+    }
   };
 
   return (
     <Select
-      value={selectedOption}
+      value={options.find(option => option.value === value)}
       onChange={handleChange}
       isDisabled={false}
       options={options}

@@ -5,8 +5,8 @@ import React, { useState } from 'react';
 import { UseFormSetValue, UseFormWatch } from 'react-hook-form';
 import { IoIosArrowForward, IoIosCheckmarkCircle } from 'react-icons/io';
 import { colors } from '@/design-tokens';
-import { IForm } from '@/entities/UserManage/type';
-import { inputContainer } from '../index.css';
+import { IFormIndividual, IFormCompany } from '@/entities/UserManage/type';
+import { inputContainer, starSpan } from '../index.css';
 import { PersonalInformationProcessing } from './components/PersonalInformationProcessing';
 import { TermsOfUseModal } from './components/TermsOfUseModal';
 import {
@@ -19,35 +19,49 @@ import {
   selectContainer
 } from './index.css';
 
-export function TermsOfUse({
-  setValue,
-  watch
-}: {
-  watch: UseFormWatch<IForm>;
-  setValue: UseFormSetValue<IForm>;
-}) {
+interface IProps {
+  formData: IFormIndividual | IFormCompany;
+  handleInputChange: (
+    field: keyof (IFormIndividual | IFormCompany),
+    value: any
+  ) => void;
+}
+
+export function TermsOfUse({ formData, handleInputChange }: IProps) {
   const [isTermOfUse, setIsTermOfUse] = useState(false);
   const [isModal, setIsModal] = useState(false);
 
-  const termsChecked = watch('termOfUse.0');
-  const personalChecked = watch('termOfUse.1');
+  const termsChecked = formData.termOfUse[0];
+  const personalChecked = formData.termOfUse[1];
   const isAllTrue =
-    termsChecked && termsChecked ? colors.gray_scale[300] : colors.brand[500];
+    termsChecked && personalChecked
+      ? colors.brand[500]
+      : colors.gray_scale[300];
 
-  const toggleTermsValue = () => setValue('termOfUse.0', !termsChecked);
-  const togglePersonalValue = () => setValue('termOfUse.1', !personalChecked);
+  const toggleTermsValue = () => {
+    const newTermOfUse = [...formData.termOfUse];
+    newTermOfUse[0] = !termsChecked;
+    handleInputChange('termOfUse', newTermOfUse);
+  };
+
+  const togglePersonalValue = () => {
+    const newTermOfUse = [...formData.termOfUse];
+    newTermOfUse[1] = !personalChecked;
+    handleInputChange('termOfUse', newTermOfUse);
+  };
 
   const toggleAllAgree = () => {
     const newValue = !(termsChecked && personalChecked);
-    setValue('termOfUse.0', newValue);
-    setValue('termOfUse.1', newValue);
+    handleInputChange('termOfUse', [newValue, newValue]);
   };
 
   return (
     <div className={inputContainer}>
       <div className={selectContainer}>
         <div className={labelContainer}>
-          <span>이용약관동의</span>
+          <span>
+            이용약관동의 <span className={starSpan}>*</span>
+          </span>
         </div>
         <div>
           <div
@@ -75,7 +89,7 @@ export function TermsOfUse({
               <div className={select}>
                 <IoIosCheckmarkCircle
                   color={
-                    termsChecked ? colors.gray_scale[300] : colors.brand[500]
+                    termsChecked ? colors.brand[500] : colors.gray_scale[300]
                   }
                   size={25}
                 />
@@ -105,7 +119,7 @@ export function TermsOfUse({
               <div className={select}>
                 <IoIosCheckmarkCircle
                   color={
-                    personalChecked ? colors.gray_scale[300] : colors.brand[500]
+                    personalChecked ? colors.brand[500] : colors.gray_scale[300]
                   }
                   size={25}
                 />

@@ -8,8 +8,8 @@ export interface ILoginData {
   password: string;
 }
 
-export interface IForm {
-  verificationCode: string | undefined;
+export interface IFormCompany {
+  verificationCode: string;
   id: string;
   password: string;
   passwordConfirm: string;
@@ -17,6 +17,20 @@ export interface IForm {
   companyName: string;
   corporateNumber: string;
   openingDate: string;
+  address: string;
+  detailAddress: string;
+  phone: string;
+  phoneCode: string;
+  email: string;
+  termOfUse: [boolean, boolean];
+  emailDomain: string;
+}
+
+export interface IFormIndividual {
+  verificationCode: string;
+  id: string;
+  password: string;
+  passwordConfirm: string;
   name: string;
   address: string;
   detailAddress: string;
@@ -25,6 +39,11 @@ export interface IForm {
   email: string;
   termOfUse: [boolean, boolean];
   emailDomain: string;
+  birth: {
+    year: string;
+    month: string;
+    day: string;
+  };
 }
 
 export interface userSub {
