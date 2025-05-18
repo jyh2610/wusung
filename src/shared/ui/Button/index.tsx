@@ -20,6 +20,7 @@ export const Button = ({
 }: ButtonType) => {
   return (
     <button
+      type={btnType}
       disabled={disabled}
       onClick={onClick}
       className={`${buttonBase} ${buttonVariants[type]}`}
@@ -38,6 +39,7 @@ export const BorderButton = ({
 }: ButtonType) => {
   return (
     <button
+      type={btnType}
       className={`${borderButtonBase} ${buttonVariants[type]}`}
       {...props}
     >

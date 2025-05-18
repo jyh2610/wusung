@@ -1,7 +1,15 @@
+import React, { Dispatch, SetStateAction, useState } from 'react';
+import Select, { SingleValue } from 'react-select';
+import { toast } from 'react-toastify';
+
 import { NomalInput } from '@/shared/ui/Input';
-import React, { useState } from 'react';
-import { labelContainer, starSpan } from '../SignupForm/index.css';
+import { Button, DaumAddressSearchButton, IEmail } from '@/shared/ui';
 import { SelectBox } from '@/shared';
+
+import { validateBirthDate } from '@/lib/vaildatrion';
+import { checkAuthenticationNumber, verifyPhoneNum } from '../../api';
+
+import { labelContainer, starSpan } from '../SignupForm/index.css';
 import {
   birthContainer,
   birthLabelBox,
@@ -9,17 +17,15 @@ import {
   birthDropdown,
   emailBox
 } from '../SignupForm/CommonSignupInput/index.css';
+import { regBtn } from '@/entities/mypage/ui/Content/setting/index.css';
+import { container, inputBox } from './index.css';
+
 import {
   generateYears,
   generateMonths,
   generateDays
 } from '../SignupForm/utils';
-import { regBtn } from '@/entities/mypage/ui/Content/setting/index.css';
-import { Button, DaumAddressSearchButton, IEmail } from '@/shared/ui';
-import Select, { SingleValue } from 'react-select';
-import { container, inputBox } from './index.css';
 import { IFormIndividual } from '../../type';
-import { validateBirthDate } from '@/lib/vaildatrion';
 
 interface IProps {
   formData: IFormIndividual;
@@ -30,21 +36,13 @@ interface IProps {
   showVerification: boolean;
   timeLeft: number;
   onSendVerification: () => void;
+  setShowVerification: Dispatch<SetStateAction<boolean>>;
 }
 
 export const emailOptions: IEmail[] = [
-  {
-    label: 'naver.com', // 드롭다운에 표시될 텍스트
-    value: 'naver.com' // 선택 시 실제 값
-  },
-  {
-    label: 'google.com',
-    value: 'google.com'
-  },
-  {
-    label: 'daum.net',
-    value: 'daum.net'
-  }
+  { label: 'naver.com', value: 'naver.com' },
+  { label: 'google.com', value: 'google.com' },
+  { label: 'daum.net', value: 'daum.net' }
 ];
 
 export const UserInfo = ({
@@ -52,14 +50,14 @@ export const UserInfo = ({
   handleInputChange,
   showVerification,
   timeLeft,
-  onSendVerification
+  onSendVerification,
+  setShowVerification
 }: IProps) => {
   const [birthError, setBirthError] = useState<string>('');
 
   const yearList = generateYears();
   const monthList = generateMonths();
-  const dayList = generateDays(2025, 1);
-  console.log(formData);
+  const dayList = generateDays(2025, 1); // TODO: 실제 날짜 계산 로직으로 개선 가능
 
   const formatTime = (seconds: number) => {
     const minutes = Math.floor(seconds / 60);
@@ -67,24 +65,17 @@ export const UserInfo = ({
     return `${minutes}:${remainingSeconds.toString().padStart(2, '0')}`;
   };
 
-  function handleEmailDomainChange(selectedOption: SingleValue<IEmail>): void {
-    if (selectedOption) {
-      handleInputChange('emailDomain', selectedOption.value);
-    }
-  }
-
   const handleBirthChange = (
     field: 'year' | 'month' | 'day',
     value: string
   ) => {
-    const newBirth = {
-      ...formData.birth,
-      [field]: value
-    };
-
+    let formattedValue = value;
+    if (field !== 'year' && value.length === 1) {
+      formattedValue = `0${value}`;
+    }
+    const newBirth = { ...formData.birth, [field]: formattedValue };
     handleInputChange('birth', newBirth);
 
-    // 모든 필드가 입력되었을 때만 유효성 검사
     if (newBirth.year && newBirth.month && newBirth.day) {
       const validation = validateBirthDate(newBirth);
       setBirthError(validation.message);
@@ -93,13 +84,47 @@ export const UserInfo = ({
     }
   };
 
+  const handleEmailDomainChange = (selected: SingleValue<IEmail>) => {
+    if (selected) {
+      handleInputChange('emailDomain', selected.value);
+    }
+  };
+
+  const handlePhoneVerificationSend = async (
+    e: React.MouseEvent<HTMLButtonElement>
+  ) => {
+    e.preventDefault();
+    try {
+      await verifyPhoneNum(formData.phone);
+      toast.success('인증번호가 발송되었습니다.');
+      onSendVerification();
+    } catch (error: any) {
+      toast.error(
+        error.response?.data?.message || '인증번호 발송에 실패했습니다.'
+      );
+    }
+  };
+
+  const handleCodeVerify = async (e: React.MouseEvent<HTMLButtonElement>) => {
+    e.preventDefault();
+    try {
+      const res = await checkAuthenticationNumber({
+        code: formData.verificationCode,
+        phoneNum: formData.phone
+      });
+      toast.info(res.message);
+      setShowVerification(false);
+    } catch (error) {
+      toast.error('인증 처리 중 오류가 발생했습니다');
+    }
+  };
+
   return (
     <div className={container}>
+      {/* 이름 */}
       <NomalInput
         placeholder="이름을 입력해주세요"
-        onChange={(e: React.ChangeEvent<HTMLInputElement>) =>
-          handleInputChange('name', e.target.value)
-        }
+        onChange={e => handleInputChange('name', e.target.value)}
         inputSize="medium"
         label={
           <div className={labelContainer}>
@@ -107,31 +132,33 @@ export const UserInfo = ({
           </div>
         }
       />
+
+      {/* 생년월일 */}
       <div className={birthContainer}>
         <label className={birthLabelBox}>생년월일</label>
         <div className={birthBox}>
           <div className={birthDropdown}>
             <SelectBox
               options={yearList}
-              placeholder={'년'}
+              placeholder="년"
               value={formData.birth?.year}
-              onChange={(value: string) => handleBirthChange('year', value)}
+              onChange={val => handleBirthChange('year', val)}
             />
           </div>
           <div className={birthDropdown}>
             <SelectBox
               options={monthList}
-              placeholder={'월'}
+              placeholder="월"
               value={formData.birth?.month}
-              onChange={(value: string) => handleBirthChange('month', value)}
+              onChange={val => handleBirthChange('month', val)}
             />
           </div>
           <div className={birthDropdown}>
             <SelectBox
               options={dayList}
-              placeholder={'일'}
+              placeholder="일"
               value={formData.birth?.day}
-              onChange={(value: string) => handleBirthChange('day', value)}
+              onChange={val => handleBirthChange('day', val)}
             />
           </div>
         </div>
@@ -148,33 +175,33 @@ export const UserInfo = ({
         )}
       </div>
 
+      {/* 주소 */}
       <div className={inputBox}>
         <NomalInput
           placeholder="주소를 입력해주세요"
           inputSize="medium"
           label={<div className={labelContainer}>주소</div>}
           value={formData.address}
-          onChange={(e: React.ChangeEvent<HTMLInputElement>) =>
-            handleInputChange('address', e.target.value)
-          }
+          onChange={e => handleInputChange('address', e.target.value)}
           readOnly
         />
         <div className={regBtn}>
           <DaumAddressSearchButton
-            onAddressSelect={address => handleInputChange('address', address)}
+            onAddressSelect={addr => handleInputChange('address', addr)}
           />
         </div>
       </div>
+
+      {/* 상세주소 */}
       <NomalInput
         inputSize="medium"
         placeholder="상세 주소를 입력해주세요"
         label={<div className={labelContainer}></div>}
         value={formData.detailAddress}
-        onChange={(e: React.ChangeEvent<HTMLInputElement>) =>
-          handleInputChange('detailAddress', e.target.value)
-        }
+        onChange={e => handleInputChange('detailAddress', e.target.value)}
       />
 
+      {/* 휴대폰 및 인증 */}
       <div style={{ display: 'flex', gap: '8px' }}>
         <NomalInput
           placeholder="번호를 입력해주세요"
@@ -185,13 +212,11 @@ export const UserInfo = ({
             </div>
           }
           value={formData.phone}
-          onChange={(e: React.ChangeEvent<HTMLInputElement>) =>
-            handleInputChange('phone', e.target.value)
-          }
+          onChange={e => handleInputChange('phone', e.target.value)}
         />
         <div className={regBtn}>
           <Button
-            onClick={onSendVerification}
+            onClick={handlePhoneVerificationSend}
             btnType="button"
             type="borderBrand"
             content="인증번호 발송"
@@ -204,22 +229,18 @@ export const UserInfo = ({
           <NomalInput
             placeholder="인증번호를 입력해주세요"
             inputSize="medium"
-            label={
-              <div className={labelContainer}>
-                인증번호{' '}
-                <span style={{ color: 'red' }}>({formatTime(timeLeft)})</span>
-              </div>
-            }
+            label={<div className={labelContainer}>인증번호</div>}
             value={formData.verificationCode}
-            onChange={(e: React.ChangeEvent<HTMLInputElement>) =>
+            onChange={e =>
               handleInputChange('verificationCode', e.target.value)
+            }
+            rightElement={
+              <span style={{ color: 'red' }}>({formatTime(timeLeft)})</span>
             }
           />
           <div className={regBtn}>
             <Button
-              onClick={() => {
-                /* 인증 로직 */
-              }}
+              onClick={handleCodeVerify}
               btnType="button"
               type="borderBrand"
               content="인증"
@@ -228,45 +249,35 @@ export const UserInfo = ({
         </div>
       )}
 
+      {/* 이메일 */}
       <div className={emailBox}>
         <NomalInput
           placeholder="이메일을 입력해주세요"
           inputSize="medium"
           label={<div className={labelContainer}>이메일</div>}
           value={formData.email}
-          onChange={(e: React.ChangeEvent<HTMLInputElement>) =>
-            handleInputChange('email', e.target.value)
-          }
+          onChange={e => handleInputChange('email', e.target.value)}
         />
-
         <span style={{ fontSize: '18px', color: '#333' }}>@</span>
         <Select
           options={emailOptions}
-          placeholder={'선택'}
+          placeholder="선택"
           value={
             formData.emailDomain
               ? { label: formData.emailDomain, value: formData.emailDomain }
               : null
           }
-          onChange={(newValue: SingleValue<IEmail>) => {
-            if (newValue) {
-              handleInputChange('emailDomain', newValue.value);
-            }
-          }}
+          onChange={handleEmailDomainChange}
           styles={{
             control: (provided, state) => ({
               ...provided,
               height: '57px',
-              minHeight: '57px',
               width: '200px',
               borderRadius: '12px',
               border: state.isFocused
                 ? '1px solid #1AA93E'
                 : '1px solid #BFBFBF',
-              boxShadow: state.isFocused ? '0 0 0 1px #1AA93E' : 'none',
-              '&:hover': {
-                border: '1px solid #1AA93E'
-              }
+              boxShadow: state.isFocused ? '0 0 0 1px #1AA93E' : 'none'
             }),
             valueContainer: provided => ({
               ...provided,
@@ -274,11 +285,6 @@ export const UserInfo = ({
               padding: '0 8px',
               display: 'flex',
               alignItems: 'center'
-            }),
-            input: provided => ({
-              ...provided,
-              margin: '0',
-              padding: '0'
             }),
             indicatorsContainer: provided => ({
               ...provided,
@@ -308,11 +314,7 @@ export const UserInfo = ({
                   : 'white',
               color: state.isSelected ? 'white' : '#333',
               fontSize: '16px',
-              padding: '12px 8px',
-              cursor: 'pointer',
-              '&:hover': {
-                backgroundColor: state.isSelected ? '#1AA93E' : '#E6F7EA'
-              }
+              padding: '12px 8px'
             })
           }}
         />

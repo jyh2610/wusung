@@ -17,6 +17,7 @@ interface InputProps extends React.InputHTMLAttributes<HTMLInputElement> {
   rules?: object;
   error?: string;
   value?: string;
+  rightElement?: React.ReactNode;
 }
 
 export const Input: React.FC<InputProps> = ({
@@ -33,6 +34,7 @@ export const Input: React.FC<InputProps> = ({
   error,
   onChange,
   value,
+  rightElement,
   ...props
 }) => {
   const isVertical = labelPosition === 'vertical';
@@ -67,6 +69,18 @@ export const Input: React.FC<InputProps> = ({
           {...(register ? register : {})}
           {...props}
         />
+        {rightElement && (
+          <div
+            style={{
+              position: 'absolute',
+              right: '12px',
+              top: '50%',
+              transform: 'translateY(-50%)'
+            }}
+          >
+            {rightElement}
+          </div>
+        )}
         <p
           style={{
             top: '68px',
@@ -95,6 +109,7 @@ export const NomalInput: React.FC<InputProps> = ({
   error,
   onChange,
   value,
+  rightElement,
   ...props
 }) => {
   const isVertical = labelPosition === 'vertical';
@@ -129,6 +144,18 @@ export const NomalInput: React.FC<InputProps> = ({
           className={`${inputClass} ${inputSizeClass[inputSize]}`}
           {...props}
         />
+        {rightElement && (
+          <div
+            style={{
+              position: 'absolute',
+              right: '12px',
+              top: '50%',
+              transform: 'translateY(-50%)'
+            }}
+          >
+            {rightElement}
+          </div>
+        )}
         <p
           style={{
             top: '68px',

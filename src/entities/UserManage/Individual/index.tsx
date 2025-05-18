@@ -1,6 +1,5 @@
 'use client';
 
-import { Path, PathValue, useForm } from 'react-hook-form';
 import { colors } from '@/design-tokens';
 import { Button } from '@/shared/ui';
 import {
@@ -15,8 +14,9 @@ import { TermsOfUse } from '../ui/SignupForm/TermsOfUse';
 import { IdPw } from '../ui/form';
 import { UserInfo } from '../ui/form/UserInfo';
 import { useState, useEffect } from 'react';
-import { individualSignup } from '../api';
+import { individualSignup, IndividualSignUpDTO } from '../api';
 import { toast } from 'react-toastify';
+import { redirect } from 'next/navigation';
 
 export function IndividualComponent() {
   const [formData, setFormData] = useState<IFormIndividual>({
@@ -27,7 +27,6 @@ export function IndividualComponent() {
     address: '',
     detailAddress: '',
     phone: '',
-    phoneCode: '',
     email: '',
     termOfUse: [false, false],
     verificationCode: '',
@@ -38,6 +37,7 @@ export function IndividualComponent() {
       day: ''
     }
   });
+  console.log(formData);
 
   const [showVerification, setShowVerification] = useState(false);
   const [timeLeft, setTimeLeft] = useState(120); // 2분을 초 단위로
@@ -64,19 +64,23 @@ export function IndividualComponent() {
     e.preventDefault();
 
     try {
-      const formattedData: IFormIndividual = {
-        ...formData,
-        id: formData.id,
-        passwordConfirm: formData.passwordConfirm,
-        detailAddress: formData.detailAddress,
-        verificationCode: formData.verificationCode,
-        emailDomain: formData.emailDomain,
-        phoneCode: formData.phoneCode,
-        termOfUse: formData.termOfUse
+      const formattedData: IndividualSignUpDTO = {
+        username: formData.id,
+        password: formData.password,
+        passwordCheck: formData.passwordConfirm,
+        name: formData.name,
+        birth: `${formData.birth.year}${formData.birth.month}${formData.birth.day}`,
+        address: formData.address + formData.detailAddress,
+        email: formData.email + '@' + formData.emailDomain,
+        phoneVerificationDTO: {
+          code: formData.verificationCode,
+          phoneNum: formData.phone
+        }
       };
 
       const res = await individualSignup(formattedData);
       toast.success(res.data.message);
+      redirect('/signin');
     } catch (error: any) {
       toast.error(error.response.data.message);
     }
@@ -124,6 +128,7 @@ export function IndividualComponent() {
           formData={formData}
           handleInputChange={handleInputChange}
           showVerification={showVerification}
+          setShowVerification={setShowVerification}
           timeLeft={timeLeft}
           onSendVerification={handleSendVerification}
         />

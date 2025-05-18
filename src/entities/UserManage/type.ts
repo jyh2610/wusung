@@ -35,7 +35,6 @@ export interface IFormIndividual {
   address: string;
   detailAddress: string;
   phone: string;
-  phoneCode: string;
   email: string;
   termOfUse: [boolean, boolean];
   emailDomain: string;

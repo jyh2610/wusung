@@ -96,7 +96,10 @@ export const CompanyInfo = ({ formData, handleInputChange }: IProps) => {
           btnType="button"
           type="borderBrand"
           content="기관인증"
-          onClick={handleVerifyCorporate}
+          onClick={e => {
+            e.preventDefault();
+            handleVerifyCorporate();
+          }}
         />
       </div>
     </div>

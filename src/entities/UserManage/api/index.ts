@@ -76,7 +76,23 @@ export const verifyCoporate = async ({
   return res.data;
 };
 
-export const individualSignup = async (form: IFormIndividual) => {
+export interface PhoneVerificationDTO {
+  code: string;
+  phoneNum: string;
+}
+
+export interface IndividualSignUpDTO {
+  username: string;
+  password: string;
+  passwordCheck: string;
+  name: string;
+  birth?: string; // 선택적 필드로 지정
+  address?: string; // 선택적 필드로 지정
+  email: string; // 정규식 패턴은 런타임 유효성 검사 시 적용
+  phoneVerificationDTO: PhoneVerificationDTO;
+}
+
+export const individualSignup = async (form: IndividualSignUpDTO) => {
   try {
     const res = await request<ApiResponse<ILoginData>>({
       method: 'POST',
