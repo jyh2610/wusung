@@ -26,7 +26,7 @@ import {
   generateDays
 } from '../SignupForm/utils';
 import { IFormIndividual } from '../../type';
-
+import { formatTime } from '@/lib/utils';
 interface IProps {
   formData: IFormIndividual;
   handleInputChange: (
@@ -58,12 +58,6 @@ export const UserInfo = ({
   const yearList = generateYears();
   const monthList = generateMonths();
   const dayList = generateDays(2025, 1); // TODO: 실제 날짜 계산 로직으로 개선 가능
-
-  const formatTime = (seconds: number) => {
-    const minutes = Math.floor(seconds / 60);
-    const remainingSeconds = seconds % 60;
-    return `${minutes}:${remainingSeconds.toString().padStart(2, '0')}`;
-  };
 
   const handleBirthChange = (
     field: 'year' | 'month' | 'day',

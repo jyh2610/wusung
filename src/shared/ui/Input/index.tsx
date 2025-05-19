@@ -18,6 +18,7 @@ interface InputProps extends React.InputHTMLAttributes<HTMLInputElement> {
   error?: string;
   value?: string;
   rightElement?: React.ReactNode;
+  height?: number;
 }
 
 export const Input: React.FC<InputProps> = ({
@@ -35,6 +36,7 @@ export const Input: React.FC<InputProps> = ({
   onChange,
   value,
   rightElement,
+  height,
   ...props
 }) => {
   const isVertical = labelPosition === 'vertical';
@@ -61,7 +63,9 @@ export const Input: React.FC<InputProps> = ({
         }}
       >
         <input
-          style={{}}
+          style={{
+            height: height ? `${height}px` : undefined
+          }}
           type={type}
           value={value}
           placeholder={placeholder}
@@ -110,6 +114,7 @@ export const NomalInput: React.FC<InputProps> = ({
   onChange,
   value,
   rightElement,
+  height,
   ...props
 }) => {
   const isVertical = labelPosition === 'vertical';
@@ -136,7 +141,9 @@ export const NomalInput: React.FC<InputProps> = ({
         }}
       >
         <input
-          style={{}}
+          style={{
+            height: height ? `${height}px` : undefined
+          }}
           type={type}
           value={value}
           placeholder={placeholder}

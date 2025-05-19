@@ -2,8 +2,7 @@
 import { useParams } from 'next/navigation';
 import React from 'react';
 import { pageContainer } from '@/app/(with-nav)/signup/index.css';
-import { FindAccounts } from '@/entities';
-
+import { FindInfoComponent } from '@/entities';
 function Find() {
   const params = useParams();
   const { type } = params; // "id" 또는 "password"
@@ -13,7 +12,7 @@ function Find() {
   }
   return (
     <div className={pageContainer}>
-      <FindAccounts type={type} />
+      <FindInfoComponent type={type} />
     </div>
   );
 }

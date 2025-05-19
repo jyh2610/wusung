@@ -2,7 +2,10 @@ import { style } from '@vanilla-extract/css';
 import { colors } from '@/design-tokens';
 
 export const container = style({
-  width: '600px'
+  width: '600px',
+  display: 'flex',
+  flexDirection: 'column',
+  gap: '12px'
 });
 
 export const inputContainer = style({

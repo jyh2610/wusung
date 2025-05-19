@@ -16,7 +16,7 @@ import { UserInfo } from '../ui/form/UserInfo';
 import { useState, useEffect } from 'react';
 import { individualSignup, IndividualSignUpDTO } from '../api';
 import { toast } from 'react-toastify';
-import { redirect } from 'next/navigation';
+import { useRouter } from 'next/navigation';
 
 export function IndividualComponent() {
   const [formData, setFormData] = useState<IFormIndividual>({
@@ -37,7 +37,8 @@ export function IndividualComponent() {
       day: ''
     }
   });
-  console.log(formData);
+
+  const router = useRouter();
 
   const [showVerification, setShowVerification] = useState(false);
   const [timeLeft, setTimeLeft] = useState(120); // 2분을 초 단위로
@@ -80,9 +81,9 @@ export function IndividualComponent() {
 
       const res = await individualSignup(formattedData);
       toast.success(res.data.message);
-      redirect('/signin');
+      router.push('/signin');
     } catch (error: any) {
-      toast.error(error.response.data.message);
+      console.log(error);
     }
   };
 

@@ -64,3 +64,22 @@ export const validatePhoneNumber = (
 
   return { isValid: true, message: '' };
 };
+
+export const validatePassword = (password: string) => {
+  if (password.length < 8 || password.length > 20) {
+    return '비밀번호는 8~20자 길이여야 합니다.';
+  }
+  if (!/[A-Z]/.test(password)) {
+    return '비밀번호는 대문자를 포함해야 합니다.';
+  }
+  if (!/[a-z]/.test(password)) {
+    return '비밀번호는 소문자를 포함해야 합니다.';
+  }
+  if (!/[0-9]/.test(password)) {
+    return '비밀번호는 숫자를 포함해야 합니다.';
+  }
+  if (!/[!@#$%^&*(),.?":{}|<>]/.test(password)) {
+    return '비밀번호는 특수문자를 포함해야 합니다.';
+  }
+  return '';
+};

@@ -23,6 +23,7 @@ import {
 } from '../api';
 import { CompanyLocation } from '../ui/form/companyLocation';
 import { companySignup } from '../api';
+import { useRouter } from 'next/navigation';
 
 export function Company() {
   const [formData, setFormData] = useState<IFormCompany>({
@@ -45,7 +46,7 @@ export function Company() {
 
   const [showVerification, setShowVerification] = useState(false);
   const [timeLeft, setTimeLeft] = useState(120);
-
+  const router = useRouter();
   useEffect(() => {
     let timer: NodeJS.Timeout;
     if (showVerification && timeLeft > 0) {
@@ -62,24 +63,24 @@ export function Company() {
   const onSubmit = async (e: React.FormEvent<HTMLFormElement>) => {
     e.preventDefault();
 
-    // 필수 항목 검증
-    if (
-      !formData.id ||
-      !formData.password ||
-      !formData.passwordConfirm ||
-      !formData.address ||
-      !formData.email ||
-      !formData.emailDomain ||
-      !formData.verificationCode ||
-      !formData.phone ||
-      !formData.corporateNumber ||
-      !formData.openingDate ||
-      !formData.representativeName ||
-      !formData.companyName
-    ) {
-      toast.error('필수 항목을 모두 입력해주세요.');
-      return;
-    }
+    // // 필수 항목 검증
+    // if (
+    //   !formData.id ||
+    //   !formData.password ||
+    //   !formData.passwordConfirm ||
+    //   !formData.address ||
+    //   !formData.email ||
+    //   !formData.emailDomain ||
+    //   !formData.verificationCode ||
+    //   !formData.phone ||
+    //   !formData.corporateNumber ||
+    //   !formData.openingDate ||
+    //   !formData.representativeName ||
+    //   !formData.companyName
+    // ) {
+    //   toast.error('필수 항목을 모두 입력해주세요.');
+    //   return;
+    // }
 
     try {
       const formattedData: SignupCompanyRequest = {
@@ -102,6 +103,7 @@ export function Company() {
 
       const res = await companySignup(formattedData);
       toast.success(res.data.message);
+      router.push('/signin');
     } catch (error: any) {
       toast.error(error.response?.data?.message || '회원가입에 실패했습니다.');
     }

@@ -14,6 +14,7 @@ import Select, { SingleValue } from 'react-select';
 import { IFormCompany } from '../../type';
 import { checkAuthenticationNumber } from '../../api';
 import { emailOptions } from './UserInfo';
+import { formatTime } from '@/lib/utils';
 
 interface IProps {
   formData: IFormCompany;
@@ -35,12 +36,6 @@ export const CompanyLocation = ({
   timeLeft,
   setShowVerification
 }: IProps) => {
-  const formatTime = (seconds: number) => {
-    const minutes = Math.floor(seconds / 60);
-    const secs = seconds % 60;
-    return `${minutes}:${secs.toString().padStart(2, '0')}`;
-  };
-
   const handleVerifyCode = async () => {
     if (!formData.verificationCode) {
       toast.error('인증번호를 입력해주세요');
@@ -121,11 +116,9 @@ export const CompanyLocation = ({
           <NomalInput
             placeholder="인증번호를 입력해주세요"
             inputSize="medium"
-            label={
-              <div className={labelContainer}>
-                인증번호{' '}
-                <span style={{ color: 'red' }}>({formatTime(timeLeft)}초)</span>
-              </div>
+            label={<div className={labelContainer}>인증번호 </div>}
+            rightElement={
+              <span style={{ color: 'red' }}>({formatTime(timeLeft)})</span>
             }
             value={formData.verificationCode}
             onChange={(e: React.ChangeEvent<HTMLInputElement>) =>

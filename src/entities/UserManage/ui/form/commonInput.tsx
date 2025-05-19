@@ -1,9 +1,13 @@
+'use client';
+
 import { NomalInput } from '@/shared/ui/Input';
-import React, { useState } from 'react';
+import React, { useEffect, useState } from 'react';
 import { labelContainer, starSpan } from '../SignupForm/index.css';
 import { container } from './index.css';
 import { IFormCompany, IFormIndividual } from '../../type';
 import { checkUserName } from '@/entities/UserManage/api';
+import { validatePasswordMatch } from '@/lib/utils'; // 유틸 함수 임포트
+import { validatePassword } from '@/lib/vaildatrion';
 
 interface IProps<T extends IFormIndividual | IFormCompany> {
   formData: T;
@@ -19,6 +23,8 @@ export const IdPw = <T extends IFormIndividual | IFormCompany>({
 }: IProps<T>) => {
   const [isIdValid, setIsIdValid] = useState<boolean | null>(null);
   const [idError, setIdError] = useState<string>('');
+  const [pwError, setPwError] = useState<string>('');
+  const [pwConfirmError, setPwConfirmError] = useState<string>('');
 
   const handleIdChange = async (e: React.ChangeEvent<HTMLInputElement>) => {
     const value = e.target.value;
@@ -34,7 +40,7 @@ export const IdPw = <T extends IFormIndividual | IFormCompany>({
             ? '사용 가능한 아이디입니다.'
             : '이미 사용 중인 아이디입니다.'
         );
-      } catch (error) {
+      } catch {
         setIsIdValid(false);
         setIdError('아이디 중복 확인 중 오류가 발생했습니다.');
       }
@@ -44,54 +50,65 @@ export const IdPw = <T extends IFormIndividual | IFormCompany>({
     }
   };
 
+  // ✅ 실시간 비밀번호 유효성 + 일치 검사
+  useEffect(() => {
+    // 1. 유효성 체크
+    const passwordValidationMessage = validatePassword(formData.password);
+    setPwError(passwordValidationMessage);
+
+    // 2. 일치 여부 체크
+    const { isValid, message } = validatePasswordMatch(
+      formData.password,
+      formData.passwordConfirm
+    );
+    setPwConfirmError(isValid ? '' : message);
+  }, [formData.password, formData.passwordConfirm]);
+
   return (
     <div className={container}>
-      <div>
-        <NomalInput
-          placeholder="사용하실 아이디를 입력해주세요"
-          inputSize="medium"
-          label={
-            <div className={labelContainer}>
-              아이디 <span className={starSpan}>*</span>
-            </div>
-          }
-          value={formData.id}
-          onChange={handleIdChange}
-          error={idError}
-        />
-      </div>
-      <div>
-        <NomalInput
-          placeholder="사용하실 비밀번호를 입력해주세요"
-          inputSize="medium"
-          type="password"
-          label={
-            <div className={labelContainer}>
-              비밀번호 <span className={starSpan}>*</span>
-            </div>
-          }
-          value={formData.password}
-          onChange={(e: React.ChangeEvent<HTMLInputElement>) =>
-            handleInputChange('password', e.target.value)
-          }
-        />
-      </div>
-      <div>
-        <NomalInput
-          placeholder="비밀번호를 다시 한 번 입력해주세요"
-          inputSize="medium"
-          type="password"
-          label={
-            <div className={labelContainer}>
-              비밀번호 확인 <span className={starSpan}>*</span>
-            </div>
-          }
-          value={formData.passwordConfirm}
-          onChange={(e: React.ChangeEvent<HTMLInputElement>) =>
-            handleInputChange('passwordConfirm', e.target.value)
-          }
-        />
-      </div>
+      {/* 아이디 */}
+      <NomalInput
+        placeholder="사용하실 아이디를 입력해주세요"
+        inputSize="medium"
+        label={
+          <div className={labelContainer}>
+            아이디 <span className={starSpan}>*</span>
+          </div>
+        }
+        value={formData.id}
+        onChange={handleIdChange}
+        error={idError}
+      />
+
+      {/* 비밀번호 */}
+      <NomalInput
+        placeholder="사용하실 비밀번호를 입력해주세요"
+        inputSize="medium"
+        type="password"
+        label={
+          <div className={labelContainer}>
+            비밀번호 <span className={starSpan}>*</span>
+          </div>
+        }
+        value={formData.password}
+        onChange={e => handleInputChange('password', e.target.value)}
+        error={pwError}
+      />
+
+      {/* 비밀번호 확인 */}
+      <NomalInput
+        placeholder="비밀번호를 다시 한 번 입력해주세요"
+        inputSize="medium"
+        type="password"
+        label={
+          <div className={labelContainer}>
+            비밀번호 확인 <span className={starSpan}>*</span>
+          </div>
+        }
+        value={formData.passwordConfirm}
+        onChange={e => handleInputChange('passwordConfirm', e.target.value)}
+        error={pwConfirmError}
+      />
     </div>
   );
 };

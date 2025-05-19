@@ -146,3 +146,40 @@ export const formatKoreanDate = (isoString: string) => {
     return '잘못된 날짜 형식'; // 파싱 실패 시 오류 메시지 반환
   }
 };
+
+export interface PasswordValidationResult {
+  isValid: boolean;
+  message: string;
+}
+
+/**
+ * 비밀번호와 확인 값의 일치 여부를 확인합니다.
+ */
+export function validatePasswordMatch(
+  password: string,
+  confirm: string
+): PasswordValidationResult {
+  if (password !== confirm) {
+    return {
+      isValid: false,
+      message: '비밀번호가 일치하지 않습니다.'
+    };
+  }
+
+  return {
+    isValid: true,
+    message: ''
+  };
+}
+
+export const formatTime = (seconds: number) => {
+  const minutes = Math.floor(seconds / 60);
+  const secs = seconds % 60;
+  return `${minutes}:${secs.toString().padStart(2, '0')}`;
+};
+export function maskLastThree(str: string): string {
+  if (str.length <= 3) {
+    return '***';
+  }
+  return str.slice(0, -3) + '***';
+}
