@@ -35,5 +35,6 @@ export const modalTitle = style({
   fontWeight: '400',
   lineHeight: '40px',
   letterSpacing: '-2.5%',
-  color: colors.gray_scale['400']
+  color: colors.gray_scale['800'],
+  textAlign: 'center'
 });

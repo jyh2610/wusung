@@ -11,12 +11,12 @@ export const selectTypeStyle = style({
   alignItems: 'center',
   gap: '33.5px',
   borderRadius: '40px',
-  backgroundClip: 'white'
+  backgroundClip: 'white',
+  cursor: 'pointer'
 });
 
 export const selectedStyle = style({
   backgroundColor: colors.brand['0'],
   border: '1px solid #E33A9F',
-  color: colors.brand[500],
-  cursor: 'pointer'
+  color: colors.brand[500]
 });

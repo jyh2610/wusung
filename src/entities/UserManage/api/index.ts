@@ -136,7 +136,7 @@ export const companySignup = async (form: SignupCompanyRequest) => {
   try {
     const res = await request<ApiResponse<ILoginData>>({
       method: 'POST',
-      url: '/api/common/signup/company',
+      url: '/api/common/signup/corporate',
       data: form
     });
     return res;

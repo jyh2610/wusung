@@ -40,7 +40,8 @@ export const IdPw = <T extends IFormIndividual | IFormCompany>({
             ? '사용 가능한 아이디입니다.'
             : '이미 사용 중인 아이디입니다.'
         );
-      } catch {
+      } catch (error) {
+        console.error(error);
         setIsIdValid(false);
         setIdError('아이디 중복 확인 중 오류가 발생했습니다.');
       }

@@ -47,7 +47,7 @@ const findId = async (payload: {
 const findPassword = async (payload: {
   code: string;
   phoneNum: string;
-  username: string;
+  name: string;
 }) => {
   const res = await request<ApiResponse<unknown>>({
     method: 'POST',
@@ -57,10 +57,26 @@ const findPassword = async (payload: {
       phoneNum: payload.phoneNum
     },
     params: {
-      username: payload.username
+      username: payload.name
     }
   });
   return res;
 };
 
-export { findId, findPassword, sendCode };
+const resetPassword = async (payload: {
+  newPassword: string;
+  newPasswordConfirm: string;
+}) => {
+  const res = await request<ApiResponse<unknown>>({
+    method: 'PUT',
+    url: `/api/account/after/auth/change/password`,
+    params: {
+      newPassword: payload.newPassword,
+      newPasswordConfirm: payload.newPasswordConfirm
+    }
+  });
+
+  return res;
+};
+
+export { findId, findPassword, sendCode, resetPassword };

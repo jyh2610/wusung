@@ -54,7 +54,8 @@ export const label = style({
   fontWeight: 500,
   lineHeight: '25px',
   letterSpacing: '-2.5%',
-  color: colors.gray_scale['700']
+  color: colors.gray_scale['700'],
+  cursor: 'pointer'
 });
 
 export const findAccountSpan = style({

@@ -90,7 +90,8 @@ export const Input: React.FC<InputProps> = ({
             top: '68px',
             left: '10px',
             color: 'red',
-            position: 'absolute'
+            position: 'absolute',
+            fontSize: '12px'
           }}
         >
           {error}
@@ -168,7 +169,8 @@ export const NomalInput: React.FC<InputProps> = ({
             top: '68px',
             left: '10px',
             color: error?.includes('사용 가능') ? '#1AA93E' : 'red',
-            position: 'absolute'
+            position: 'absolute',
+            fontSize: '12px'
           }}
         >
           {error}
