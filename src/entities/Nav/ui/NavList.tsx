@@ -1,4 +1,3 @@
-import React from 'react';
 import { INaviList } from '../const';
 import { listFontStyle } from './NavList.css';
 import { useRouter } from 'next/navigation';

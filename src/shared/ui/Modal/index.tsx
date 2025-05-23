@@ -1,4 +1,5 @@
 'use client';
+import React, { CSSProperties } from 'react';
 
 import { Dialog, DialogPanel } from '@headlessui/react';
 import { Dispatch, SetStateAction } from 'react';
@@ -8,7 +9,7 @@ interface ModalProps {
   children: JSX.Element;
   isOpen: boolean;
   setIsOpen: Dispatch<SetStateAction<boolean>>;
-  modalSize: { width: string; height: string; borderRadius: string };
+  modalSize: CSSProperties;
 }
 
 export function Modal({ children, isOpen, setIsOpen, modalSize }: ModalProps) {

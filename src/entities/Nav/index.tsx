@@ -41,7 +41,7 @@ export function Nav() {
                   setIsNavHover(true);
                 }}
               >
-                <NavList list={list} />
+                <NavList list={list} isNavHover={isNavHover} />
               </div>
             ))}
           </div>

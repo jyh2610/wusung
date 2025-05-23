@@ -22,7 +22,7 @@ export const CompleteId = ({ id }: { id: string[] }) => {
       <div className={title}>고객님의 아이디를 찾았습니다!</div>
       <div className={idContainer}>
         {id.map(Id => (
-          <div className={idItem}>
+          <div key={Id} className={idItem}>
             <div style={{ backgroundColor: '#FFFFFF' }}>
               <FaFaceSmile
                 color={colors.gray_scale['700']}
