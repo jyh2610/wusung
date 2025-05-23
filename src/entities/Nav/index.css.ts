@@ -1,30 +1,29 @@
-// index.css 파일에서 스타일을 수정
 import { style } from '@vanilla-extract/css';
 import { colors } from '@/design-tokens';
 
 export const NavStyle = style({
-  width: '100vw',
-  height: '11%',
+  width: '100%',
+  zIndex: 99,
   position: 'fixed',
-  top: '0',
-  display: 'flex',
-  justifyContent: 'center',
-  alignItems: 'center',
-  backgroundColor: colors.brand[100],
-  zIndex: '99'
+  top: 0,
+  backgroundColor: colors.brand[100]
 });
 
-export const ListContainerStyle = style({
-  width: '90%',
-  maxWidth: '1360px',
-  height: '62px',
+export const NavInnerContainerStyle = style({
   display: 'flex',
-  justifyContent: 'center',
-  alignItems: 'center',
-  gap: '5%'
+  flexDirection: 'column',
+  justifyContent: 'center'
+});
+
+export const TopBarStyle = style({
+  width: '100vw',
+  display: 'flex',
+  justifyContent: 'space-around',
+  alignItems: 'center'
 });
 
 export const LogoStyle = style({
+  flex: '0 0 200px',
   width: '13%',
   height: '85px',
   position: 'relative',
@@ -37,10 +36,51 @@ export const LogoStyle = style({
   }
 });
 
-export const NavListStyle = style({
-  width: '70%',
+export const NavItemWrapperStyle = style({
+  minWidth: '120px',
+  textAlign: 'center',
+  flex: 1,
   display: 'flex',
-  justifyContent: 'space-between',
+  flexDirection: 'column',
+  justifyContent: 'flex-start',
   alignItems: 'center',
-  paddingTop: '11.5px'
+  height: '48px'
+});
+
+export const SubMenuBarStyle = style({
+  width: '100vw',
+  background: '#fff',
+  display: 'flex',
+  justifyContent: 'space-around',
+  padding: '8px 0 16px 0',
+  borderBottom: '1px solid #eee'
+});
+
+export const SubMenuSpacerStyle = style({
+  flex: '0 0 200px'
+});
+
+export const SubMenuItemStyle = style({
+  cursor: 'pointer',
+  fontSize: '24px',
+  color: colors.gray_scale[800],
+  margin: '0',
+  lineHeight: '100%',
+  height: '24px',
+  display: 'flex',
+  alignItems: 'center',
+  justifyContent: 'center',
+  marginBottom: '20px',
+  selectors: {
+    '&:last-child': {
+      marginBottom: 0
+    }
+  }
+});
+export const NavContentBoxStyle = style({
+  width: '1360px',
+  display: 'flex',
+  justifyContent: 'center',
+  alignItems: 'center',
+  padding: '25px 0'
 });

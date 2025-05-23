@@ -2,15 +2,7 @@ import React from 'react';
 import { fullButton } from '../Id/index.css';
 import { Button } from '@/shared/ui';
 import { maskLastThree } from '@/lib/utils';
-import {
-  title,
-  idFont,
-  idContainer,
-  idItem,
-  completeContainer,
-  iconContainer,
-  buttonContainer
-} from './index.css';
+import { title, idFont, idContainer, idItem } from './index.css';
 import { useRouter } from 'next/navigation';
 import { FaFaceSmile } from 'react-icons/fa6';
 import Image from 'next/image';
@@ -26,26 +18,26 @@ export const CompleteId = ({ id }: { id: string[] }) => {
   const router = useRouter();
 
   return (
-    <div className={completeContainer}>
+    <div>
       <div className={title}>고객님의 아이디를 찾았습니다!</div>
       <div className={idContainer}>
         {id.map(Id => (
-          <div className={idItem} key={Id}>
-            <div>
-              <div className={iconContainer}>
-                <FaFaceSmile
-                  color={colors.gray_scale['700']}
-                  width={56}
-                  height={56}
-                />
-              </div>
+          <div className={idItem}>
+            <div style={{ backgroundColor: '#FFFFFF' }}>
+              <FaFaceSmile
+                color={colors.gray_scale['700']}
+                width={56}
+                height={56}
+              />
             </div>
-            <span className={idFont}>{maskLastThree(Id)}</span>
+            <span className={idFont} key={Id}>
+              {maskLastThree(Id)}
+            </span>
           </div>
         ))}
       </div>
 
-      <div className={buttonContainer}>
+      <div>
         <div className={fullButton}>
           <Button
             content="비밀번호 찾기"
