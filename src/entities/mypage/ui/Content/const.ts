@@ -5,7 +5,7 @@ export const paymentFilters = {
   MONTH_3: '3개월',
   MONTH_6: '6개월',
   MONTH_12: '12개월',
-  PAID_ONLY: '결제완료만 보기'
+  PAID_ONLY: '결제완료'
 } as const;
 
 export const filterOptions = [

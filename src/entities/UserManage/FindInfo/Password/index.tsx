@@ -16,8 +16,11 @@ import { formatTime } from '@/lib/utils';
 import { CompleteId } from '../complete';
 import { container, title } from '../index.css';
 import { ResetPw } from './ResetPw';
+import { useSearchParams } from 'next/navigation';
 const TIME_LEFT = 300;
 export const Password = () => {
+  const searchParams = useSearchParams();
+  const type = searchParams.get('type');
   const [name, setName] = useState('');
   const [phoneNum, setPhone] = useState('');
   const [code, setCode] = useState('');
@@ -70,13 +73,15 @@ export const Password = () => {
     }
   };
 
-  if (!resetPw) {
+  if (resetPw) {
     return <ResetPw />;
   }
 
   return (
     <>
-      <div className={title}>비밀번호 찾기</div>
+      <div className={title}>
+        {type === 'change' ? '비밀번호 재설정' : '비밀번호 찾기'}
+      </div>
       <div className={container}>
         <div className={inputContainer}>
           <NomalInput

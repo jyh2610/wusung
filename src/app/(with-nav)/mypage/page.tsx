@@ -15,7 +15,7 @@ async function Mypage() {
   const roleRes = await getRole(token);
   console.log(roleRes);
 
-  if (!roleRes || roleRes.data === 'UNKNOWN') {
+  if (!roleRes) {
     redirect('/'); // ✅ 3. UNKNOWN이면 홈으로 이동
   }
 

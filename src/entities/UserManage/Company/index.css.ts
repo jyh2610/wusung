@@ -48,3 +48,12 @@ export const submitButton = style({
   height: '56px',
   margin: '0 auto'
 });
+
+export const formContainer = style({
+  display: 'flex',
+  flexDirection: 'column',
+  gap: '40px',
+  backgroundColor: colors.gray_scale['default'],
+  borderRadius: '40px',
+  padding: '80px'
+});

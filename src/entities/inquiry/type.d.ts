@@ -5,3 +5,10 @@ export interface IForm {
   content: string;
   files: File[];
 }
+
+export interface IInquiryResponse {
+  id: number;
+  name: string;
+  email: string;
+  phone: string;
+}

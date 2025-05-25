@@ -28,6 +28,7 @@ import {
   previewImageBox, // 개별 이미지 스타일 추가
   previewImage
 } from './index.css';
+import { regInquiry } from '../api';
 
 const MAX_LENGTH = 5000;
 const MAX_FILE_SIZE = 30 * 1024 * 1024; // 30MB
@@ -96,8 +97,9 @@ export function Personal() {
     }
   };
 
-  const onSubmit = (data: IForm) => {
-    console.log('폼 데이터:', data);
+  const onSubmit = async (data: IForm) => {
+    const res = await regInquiry(data);
+    console.log(res);
     alert('폼이 제출되었습니다!');
     router.push('/inquiry-complete');
   };

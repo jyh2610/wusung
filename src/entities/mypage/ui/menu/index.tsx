@@ -34,32 +34,6 @@ export function MypageMenu({
   const limitDate = '2022-01-01';
   return (
     <div className={container}>
-      {/* <div className={menuContainer}>
-        <div className={infoBox}>
-          <span
-            style={{
-              fontWeight: '600',
-              fontSize: '24px',
-              lineHeight: '28.64px',
-              letterSpacing: '-2.5%',
-              color: '#444444'
-            }}
-          >
-            {id}
-          </span>
-          님,
-          <br />
-          오늘도 좋은 하루 되세요!
-        </div>
-        <div className={useDateBox}>
-          <p className={useDateTitle}>우성인지펜 사용 중</p>
-          <p className={useDateDuration}>사용기한:~{limitDate}</p>
-        </div>
-        <div style={{ paddingTop: '8px' }}>
-          <Button content="로그아웃" type="default" />
-        </div>
-      </div> */}
-
       <Logged />
 
       {/* 사이드 메뉴 */}

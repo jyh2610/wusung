@@ -3,6 +3,7 @@
 import { colors } from '@/design-tokens';
 import { Button } from '@/shared/ui';
 import {
+  formContainer,
   info,
   inputContainer,
   subTitle,
@@ -124,15 +125,19 @@ export function IndividualComponent() {
         </p>
       </div>
       <form className={inputContainer} onSubmit={onSubmit}>
-        <IdPw formData={formData} handleInputChange={handleInputChange} />
-        <UserInfo
-          formData={formData}
-          handleInputChange={handleInputChange}
-          showVerification={showVerification}
-          setShowVerification={setShowVerification}
-          timeLeft={timeLeft}
-          onSendVerification={handleSendVerification}
-        />
+        <div className={formContainer}>
+          <IdPw formData={formData} handleInputChange={handleInputChange} />
+        </div>
+        <div className={formContainer}>
+          <UserInfo
+            formData={formData}
+            handleInputChange={handleInputChange}
+            showVerification={showVerification}
+            setShowVerification={setShowVerification}
+            timeLeft={timeLeft}
+            onSendVerification={handleSendVerification}
+          />
+        </div>
         <TermsOfUse formData={formData} handleInputChange={handleInputChange} />
         <div className={submitButton}>
           <Button

@@ -42,7 +42,7 @@ export const CompleteId = ({ id }: { id: string[] }) => {
           <Button
             content="비밀번호 찾기"
             type="borderBrand"
-            onClick={() => router.push('/signin/find/pw')}
+            onClick={() => router.push('/signin/find/password')}
           />
         </div>
         <div className={fullButton}>

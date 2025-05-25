@@ -6,8 +6,7 @@ export const container = style({
   flexDirection: 'column',
   gap: '40px',
   backgroundColor: colors.gray_scale['default'],
-  borderRadius: '40px',
-  padding: '80px'
+  borderRadius: '40px'
 });
 
 export const inputBox = style({

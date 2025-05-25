@@ -13,9 +13,12 @@ export const container = style({
 export const imgContainer = style({
   position: 'relative',
   padding: '0 , 45px',
-  width: '100%',
+  margin: '0 auto',
+  width: '798px',
+  height: '478px',
   display: 'flex',
-  justifyContent: 'center'
+  justifyContent: 'center',
+  alignItems: 'center'
 });
 
 export const content = style({

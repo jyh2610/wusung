@@ -1,4 +1,4 @@
-import { Image } from '@nextui-org/react';
+import Image from 'next/image';
 import { colors } from '@/design-tokens';
 import { container, content, imgContainer } from './page.css';
 
@@ -19,7 +19,11 @@ function Greeting() {
       </div>
       <div className={container}>
         <div className={imgContainer}>
-          <Image src={'/images/greeting.png'} alt={'completeCheck image'} />
+          <Image
+            fill
+            src={'/images/greeting.png'}
+            alt={'completeCheck image'}
+          />
         </div>
         <div className={content}>
           <span>

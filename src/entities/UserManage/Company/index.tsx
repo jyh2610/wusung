@@ -5,6 +5,7 @@ import { Button } from '@/shared/ui';
 import { IFormCompany } from '../type';
 import { TermsOfUse } from '../ui/SignupForm/TermsOfUse';
 import {
+  formContainer,
   info,
   inputContainer,
   submitButton,
@@ -161,19 +162,25 @@ export function Company() {
         </p>
       </div>
       <form onSubmit={onSubmit} className={inputContainer}>
-        <IdPw formData={formData} handleInputChange={handleInputChange} />
-        <CompanyInfo
-          formData={formData}
-          handleInputChange={handleInputChange}
-        />
-        <CompanyLocation
-          formData={formData}
-          handleInputChange={handleInputChange}
-          onSendVerification={handleSendVerification}
-          showVerification={showVerification}
-          timeLeft={timeLeft}
-          setShowVerification={setShowVerification}
-        />
+        <div className={formContainer}>
+          <IdPw formData={formData} handleInputChange={handleInputChange} />
+        </div>
+        <div className={formContainer}>
+          <CompanyInfo
+            formData={formData}
+            handleInputChange={handleInputChange}
+          />
+        </div>
+        <div className={formContainer}>
+          <CompanyLocation
+            formData={formData}
+            handleInputChange={handleInputChange}
+            onSendVerification={handleSendVerification}
+            showVerification={showVerification}
+            timeLeft={timeLeft}
+            setShowVerification={setShowVerification}
+          />
+        </div>
         <TermsOfUse formData={formData} handleInputChange={handleInputChange} />
         <div className={submitButton}>
           <Button

@@ -52,7 +52,7 @@ export function PaymentComponent() {
 
   return (
     <>
-      <div style={{ width: '888px', margin: '0 auto' }}>
+      <div style={{ width: '888px' }}>
         <div>
           <h1
             style={{

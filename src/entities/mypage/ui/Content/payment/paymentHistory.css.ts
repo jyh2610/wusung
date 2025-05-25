@@ -29,10 +29,14 @@ export const paymentBtn = style({
   border: `1px solid ${colors.gray_scale[600]}`, // 기본 테두리 색
   borderRadius: '200px',
   padding: '10px 20px',
-  color: colors.gray_scale[900], // 기본 글자 색
+  color: colors.gray_scale[600], // 기본 글자 색
   backgroundColor: 'transparent', // 기본 배경색
   cursor: 'pointer',
-  transition: 'all 0.3s ease'
+  transition: 'all 0.3s ease',
+  fontSize: '20px',
+  fontWeight: '500',
+  letterSpacing: '-2.5%',
+  lineHeight: '100%'
 });
 
 // 선택된 버튼 스타일
