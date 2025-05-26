@@ -88,7 +88,7 @@ export function Company() {
         username: formData.id,
         password: formData.password,
         passwordCheck: formData.passwordConfirm,
-        address: formData.address,
+        address: formData.address + '|' + formData.detailAddress,
         email: `${formData.email}@${formData.emailDomain}`,
         phoneVerificationDTO: {
           code: formData.verificationCode,

@@ -72,7 +72,7 @@ export function IndividualComponent() {
         passwordCheck: formData.passwordConfirm,
         name: formData.name,
         birth: `${formData.birth.year}${formData.birth.month}${formData.birth.day}`,
-        address: formData.address + formData.detailAddress,
+        address: formData.address + '|' + formData.detailAddress,
         email: formData.email + '@' + formData.emailDomain,
         phoneVerificationDTO: {
           code: formData.verificationCode,

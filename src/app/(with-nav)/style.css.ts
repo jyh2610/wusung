@@ -1,3 +1,4 @@
+import { colors } from '@/design-tokens';
 import {
   createTheme,
   createThemeContract,
@@ -22,7 +23,8 @@ export const themeVars = createThemeContract({
 export const MainStyles = style({
   display: 'flex',
   flexDirection: 'column',
-  justifyContent: 'center'
+  justifyContent: 'center',
+  position: 'relative'
 });
 
 export const layout = style({
