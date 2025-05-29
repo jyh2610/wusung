@@ -4,7 +4,8 @@ import { colors } from '@/design-tokens/colors';
 export const bannerContentsStyle = style({
   height: '505px',
   marginTop: '80.5px',
-  marginLeft: '68%'
+  marginLeft: '68%',
+  zIndex: 1
 });
 
 export const LoginStyles = style({
