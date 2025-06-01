@@ -38,7 +38,7 @@ input,
 textarea,
 select {
   background: none;
-  border: none;
+  /* border: none; */
   outline: none;
 }
 

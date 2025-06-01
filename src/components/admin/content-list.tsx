@@ -64,7 +64,7 @@ export function ContentList() {
   };
 
   return (
-    <div className="rounded-md border">
+    <div className="rounded-md border bg-[#FFFFFF]">
       <Table>
         <TableHeader>
           <TableRow>

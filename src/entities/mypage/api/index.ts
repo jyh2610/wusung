@@ -1,6 +1,6 @@
 import request from '@/shared/api/axiosInstance';
 import { ApiResponse, IManager, PaginatedResponse } from '@/shared/type';
-import { paymentListDTO } from '../type';
+import { IInquiry, paymentListDTO } from '../type';
 
 export const getManager = async () => {
   try {
@@ -101,6 +101,37 @@ export const fixUserInfo = async (data: IManager) => {
     return res.data;
   } catch (error) {
     console.error('인증 실패:', error);
+    throw error;
+  }
+};
+
+export const getCertificate = async () => {
+  try {
+    const res = await request({
+      method: 'GET',
+      url: '/api/my-page/account/certificate',
+      responseType: 'blob'
+    });
+    return res;
+  } catch (error) {
+    console.error('인증서 조회 실패:', error);
+    throw error;
+  }
+};
+
+export const personalInquiry = async (page: number, size: number) => {
+  try {
+    const res = await request<ApiResponse<PaginatedResponse<IInquiry[]>>>({
+      method: 'GET',
+      url: '/api/inquiry/list',
+      params: {
+        page,
+        size
+      }
+    });
+    return res.data;
+  } catch (error) {
+    console.error('개인문의 조회 실패:', error);
     throw error;
   }
 };

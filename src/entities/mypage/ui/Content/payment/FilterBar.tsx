@@ -1,5 +1,5 @@
 import { colors } from '@/design-tokens';
-import { PaymentFilter, filterOptions } from '../const';
+import { filterOptions, PaymentFilter } from '../const';
 import { paymentBtn, selectedPaymentBtn } from './paymentHistory.css';
 import { VerticalLine } from '@/shared/ui/VerticalLine';
 

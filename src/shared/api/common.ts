@@ -1,4 +1,6 @@
 import { NextResponse } from 'next/server';
+import request from './axiosInstance';
+import { ApiResponse, PaginatedResponse } from '../type';
 
 export interface roleResDTO {
   data: 'ADMIN' | 'USER' | 'UNKNOWN';
@@ -31,3 +33,68 @@ export async function getRole(
     return null;
   }
 }
+
+interface IAnnouncementResponse {
+  announcementId: number;
+  title: string;
+  content: string;
+  createdAt: string;
+  updatedAt: string;
+}
+
+interface IPopupResponse {
+  popupId: number;
+  title: string;
+  content: string;
+  createdAt: string;
+  updatedAt: string;
+}
+
+interface IPartResponse {
+  partId: number;
+  name: string;
+  createdAt: string;
+  updatedAt: string;
+}
+
+export const getAnnouncementList = async ({
+  page,
+  size
+}: {
+  page: number;
+  size: number;
+}) => {
+  const res = request<ApiResponse<PaginatedResponse<IAnnouncementResponse>>>({
+    method: 'GET',
+    url: '/api/common/main/announcement/list',
+    params: {
+      page: page,
+      size: size
+    }
+  });
+  return res;
+};
+
+export const getAnnouncementDetail = async (announcementId: number) => {
+  const res = request<ApiResponse<IAnnouncementResponse>>({
+    method: 'GET',
+    url: `/api/common/main/announcement/${announcementId}`
+  });
+  return res;
+};
+
+export const popupList = async () => {
+  const res = request<ApiResponse<IPopupResponse>>({
+    method: 'GET',
+    url: '/api/common/main/popup/list'
+  });
+  return res;
+};
+
+export const partList = async () => {
+  const res = request<ApiResponse<IPartResponse>>({
+    method: 'GET',
+    url: '/api/common/main/part/list'
+  });
+  return res;
+};

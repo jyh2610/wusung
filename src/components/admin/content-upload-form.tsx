@@ -31,6 +31,14 @@ interface Rectangle {
   width: number;
   height: number;
 }
+
+interface ImageEditorProps {
+  image: string;
+  coordinates: Rectangle[]; // 1차원 배열
+  setCoordinates: (coordinates: Rectangle[]) => void;
+  handleImageUpload: (e: React.ChangeEvent<HTMLInputElement>) => void;
+}
+
 const customStyles = {
   option: (provided: any, state: { isSelected: any }) => ({
     ...provided,
@@ -114,7 +122,7 @@ export function ContentUploadForm() {
     if (selectedImageIndex !== null) {
       const updatedCoordinates =
         form?.overlays && form?.overlays[selectedImageIndex]
-          ? [form?.overlays[selectedImageIndex]] // 'IOverlay[]'를 'IOverlay[][]'로 만들어줌
+          ? [form?.overlays[selectedImageIndex]]
           : [];
       setImageCoordinates([updatedCoordinates]);
     }
@@ -163,11 +171,9 @@ export function ContentUploadForm() {
   const handleImageUpload = (e: React.ChangeEvent<HTMLInputElement>) => {
     const uploadedFiles = e.target.files ? Array.from(e.target.files) : [];
     if (uploadedFiles.length > 0) {
-      // 기존 파일에 새 파일 추가
       const newFiles = [...files, ...uploadedFiles];
       setFiles(newFiles);
 
-      // 이미지 미리보기 생성
       const previews = uploadedFiles.map(file => {
         return new Promise<string>(resolve => {
           const reader = new FileReader();
@@ -182,7 +188,7 @@ export function ContentUploadForm() {
         const updatedPreviews = [...filePreviews, ...newImages];
         setFilePreviews(updatedPreviews);
 
-        // 새 이미지에 대한 좌표 배열 초기화
+        // 새 이미지에 대한 좌표 배열 초기화 (빈 배열 추가)
         const newCoordinates = [...imageCoordinates];
         newImages.forEach(() => newCoordinates.push([]));
         setImageCoordinates(newCoordinates);
@@ -208,12 +214,10 @@ export function ContentUploadForm() {
     newCoordinates.splice(index, 1);
     setImageCoordinates(newCoordinates);
 
-    // Add the file ID to the deleted list (if it's defined)
     if (fileId !== undefined) {
       setDeletedFileIds(prev => [...prev, fileId]);
     }
 
-    // Handle selected image index
     if (selectedImageIndex === index) {
       if (newPreviews.length > 0) {
         setSelectedImageIndex(0);
@@ -225,21 +229,18 @@ export function ContentUploadForm() {
     }
   };
 
-  // 이미지별 좌표 정보 업데이트 함수
+  // 이미지별 좌표 정보 업데이트 함수 (2차원 배열 유지)
   const updateImageCoordinates = (index: number, coordinates: Rectangle[]) => {
     const updatedCoordinates = [...imageCoordinates];
-
-    // 'coordinates'는 Rectangle[]이므로, 이를 IOverlay[] 형식으로 변환하여 상태 업데이트
     updatedCoordinates[index] = coordinates.map(rectangle => ({
       ...rectangle,
-      fileIndex: index, // fileIndex 추가
+      fileIndex: index,
       alignment: 'center',
       type: 'image',
       fixedText: ''
     }));
-
-    setImageCoordinates(updatedCoordinates); // IOverlay[][] 형식으로 상태 업데이트
-    handleChange('overlays', updatedCoordinates); // 폼 데이터에 반영
+    setImageCoordinates(updatedCoordinates);
+    handleChange('overlays', updatedCoordinates); // 폼 데이터에도 반영
   };
 
   const convertOverlayToRectangle = (overlay: IOverlay): Rectangle => {
@@ -252,7 +253,7 @@ export function ContentUploadForm() {
   };
   return (
     <form onSubmit={handleSubmit}>
-      <div className="grid gap-6">
+      <div className="grid gap-6 bg-[#FFFFFF] p-6 rounded-md">
         <div className="grid gap-3">
           <Label htmlFor="title">제목</Label>
           <Input
@@ -382,11 +383,7 @@ export function ContentUploadForm() {
               {selectedImageIndex !== null && filePreviews.length > 0 ? (
                 <ImageEditor
                   image={filePreviews[selectedImageIndex]}
-                  coordinates={
-                    imageCoordinates[selectedImageIndex]?.map(
-                      convertOverlayToRectangle
-                    ) || []
-                  }
+                  coordinates={imageCoordinates[selectedImageIndex] || []}
                   setCoordinates={coordinates =>
                     updateImageCoordinates(selectedImageIndex, coordinates)
                   }

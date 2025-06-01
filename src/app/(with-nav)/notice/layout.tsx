@@ -6,7 +6,7 @@ export const menuList: MenuList = {
   title: '공지 및 문의',
   subTitle: {
     dashboard: '공지사항',
-    inquiry: 'FAQ',
+    inquiry: '자주 묻는 질문',
     'personal-inquiry': '1:1문의'
   }
 };

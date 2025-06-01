@@ -14,11 +14,10 @@ interface Rectangle {
 
 interface ImageEditorProps {
   image: string;
-  coordinates: Rectangle[];
+  coordinates: Rectangle[]; // 1차원 배열
   setCoordinates: (coordinates: Rectangle[]) => void;
   handleImageUpload: (e: React.ChangeEvent<HTMLInputElement>) => void;
 }
-
 export default function ImageEditor({
   image,
   coordinates,
@@ -83,13 +82,20 @@ export default function ImageEditor({
     if (!startRef.current || !currentRect || !isEditing || !imageSize) return;
 
     // 최소 크기 검사 (너무 작은 좌표 영역은 무시)
-    if (currentRect.width < 5 || currentRect.height < 5) {
+    if (
+      currentRect.width === undefined ||
+      currentRect.height === undefined ||
+      currentRect.x === undefined ||
+      currentRect.y === undefined ||
+      currentRect.width < 5 ||
+      currentRect.height < 5
+    ) {
       startRef.current = null;
       setCurrentRect(null);
       return;
     }
 
-    // 퍼센트로 변환된 좌표 추가
+    // 좌표값이 모두 유효할 때만 저장
     const newRect = {
       x: (currentRect.x / imageSize.width) * 100,
       y: (currentRect.y / imageSize.height) * 100,
@@ -97,7 +103,17 @@ export default function ImageEditor({
       height: (currentRect.height / imageSize.height) * 100
     };
 
-    // 상위 컴포넌트의 좌표 상태 업데이트
+    if (
+      isNaN(newRect.x) ||
+      isNaN(newRect.y) ||
+      isNaN(newRect.width) ||
+      isNaN(newRect.height)
+    ) {
+      startRef.current = null;
+      setCurrentRect(null);
+      return;
+    }
+
     setCoordinates([...coordinates, newRect]);
     setSelectedRectIndex(coordinates.length);
 

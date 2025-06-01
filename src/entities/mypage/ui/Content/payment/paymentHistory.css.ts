@@ -140,7 +140,8 @@ export const tableStyle = style({
 export const trStyle = style({
   display: 'grid',
   gridTemplateColumns: '2fr 1fr 1fr', // 2:1:1 비율 설정
-  width: '100%'
+  width: '100%',
+  cursor: 'pointer'
 });
 
 export const thStyle = style({

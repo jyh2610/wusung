@@ -1,6 +1,6 @@
 // payment/utils/paymentUtils.ts
 
-import { paymentListDTO } from './type';
+import { IInquiry, paymentListDTO } from './type';
 
 export const getStatus = (payment: paymentListDTO) => {
   if (payment.isRefunded) return 'refunded';
@@ -27,4 +27,20 @@ export const getStatusType = (payment: paymentListDTO) => {
   if (payment.canCancel) return 'cancelable';
   if (payment.canRefund) return 'refundable';
   return 'paid';
+};
+
+export const filterInquiries = (
+  inquiries: IInquiry[],
+  selected: string
+): IInquiry[] => {
+  if (selected === '전체') return inquiries;
+  const monthsMap: Record<string, number> = {
+    '3개월전': 3,
+    '6개월전': 6,
+    '12개월전': 12
+  };
+  const months = monthsMap[selected] || 0;
+  const cutoffDate = new Date();
+  cutoffDate.setMonth(cutoffDate.getMonth() - months);
+  return inquiries.filter(inquiry => new Date(inquiry.updatedAt) >= cutoffDate);
 };
