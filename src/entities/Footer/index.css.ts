@@ -8,9 +8,7 @@ export const footerStyle = style({
   fontWeight: '400',
   lineHeight: '22px',
   letterSpacing: '-2.5%',
-  color: colors.gray_scale[700],
-  // position: 'absolute',
-  bottom: '0'
+  color: colors.gray_scale[700]
 });
 
 export const footerContentStyle = style({

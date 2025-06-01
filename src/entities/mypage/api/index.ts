@@ -1,6 +1,7 @@
 import request from '@/shared/api/axiosInstance';
 import { ApiResponse, IManager, PaginatedResponse } from '@/shared/type';
 import { IInquiry, paymentListDTO } from '../type';
+import { PaymentFilter } from '../ui/Content/const';
 
 export const getManager = async () => {
   try {
@@ -14,16 +15,20 @@ export const getManager = async () => {
   }
 };
 
-export const getPaymentList = async (page: number, size: number) => {
+export const getPaymentList = async (
+  filter: PaymentFilter,
+  page: number,
+  size: number
+) => {
   try {
     const res = await request<ApiResponse<PaginatedResponse<paymentListDTO>>>({
       url: '/api/payment/list',
       params: {
-        page, // The current page number
-        size // The number of items per page
+        filter,
+        page,
+        size
       }
     });
-
     return res.data;
   } catch (error) {
     console.error('결제 목록 조회 실패:', error);

@@ -1,54 +1,44 @@
 // payment/PaymentHistory.tsx
 'use client';
 
-import { useState, useCallback, useRef } from 'react';
+import { useState } from 'react';
 import { Button, SkeletonList } from '@/shared/ui';
 import { HorizontalLine } from '@/shared/ui/VerticalLine';
 import { colors } from '@/design-tokens';
 import { FilterBar } from './FilterBar';
 import { PaymentList } from './PaymentList';
 import { PaymentFilter, filterOptions } from '../const';
-import { useInfinitePayments } from '../hooks/useInfinitePayments';
+import { useQuery } from '@tanstack/react-query';
+import { getPaymentList, getCertificate } from '@/entities/mypage/api';
 import { container, emptyStyle, header, list } from './paymentHistory.css';
-import { getCertificate } from '@/entities/mypage/api';
+import { ApiResponse, PaginatedResponse } from '@/shared/type';
+import { paymentListDTO } from '@/entities/mypage/type';
+
+const PAGE_SIZE = 4;
 
 export function PaymentHistory() {
   const [selectedFilter, setSelectedFilter] = useState<PaymentFilter>(
     filterOptions[0]
   );
-  const {
-    data,
-    fetchNextPage,
-    hasNextPage,
-    isFetching,
-    isFetchingNextPage,
-    isError
-  } = useInfinitePayments(selectedFilter);
+  const [page, setPage] = useState(1);
 
-  const observer = useRef<IntersectionObserver>();
-  const lastItemRef = useCallback(
-    (node: HTMLDivElement | null) => {
-      if (isFetchingNextPage) return;
-      if (observer.current) observer.current.disconnect();
+  const { data, isLoading, isError } = useQuery<
+    ApiResponse<PaginatedResponse<paymentListDTO>>,
+    Error
+  >({
+    queryKey: ['paymentList', selectedFilter, page],
+    queryFn: () => getPaymentList(selectedFilter, page - 1, PAGE_SIZE)
+    // keepPreviousData: true // (tanstack v4 이상에서만 지원, 필요시 주석 해제)
+  });
 
-      observer.current = new IntersectionObserver(entries => {
-        if (entries[0].isIntersecting && hasNextPage) {
-          fetchNextPage();
-        }
-      });
-
-      if (node) observer.current.observe(node);
-    },
-    [isFetchingNextPage, hasNextPage, fetchNextPage]
-  );
-
-  const payments = data?.pages.flatMap(page => page.data.content) || [];
+  const payments: paymentListDTO[] = data?.data.content || [];
+  const totalElements = data?.data.totalElements || 0;
+  const totalPages = Math.ceil(totalElements / PAGE_SIZE);
 
   const certificate = async () => {
     const res = await getCertificate();
     const blob = res.data as Blob;
     const url = window.URL.createObjectURL(blob);
-
     const a = document.createElement('a');
     a.href = url;
     a.download = '우성인지펜_인증서.pdf';
@@ -77,11 +67,16 @@ export function PaymentHistory() {
             />
           </div>
         </div>
-
-        <FilterBar selected={selectedFilter} onSelect={setSelectedFilter} />
+        <FilterBar
+          selected={selectedFilter}
+          onSelect={option => {
+            setSelectedFilter(option);
+            setPage(1);
+          }}
+        />
       </div>
       <div className={list} style={{ marginTop: '24px', minHeight: '400px' }}>
-        {isFetching && !isFetchingNextPage ? (
+        {isLoading ? (
           <SkeletonList />
         ) : isError ? (
           <div className={emptyStyle}>
@@ -91,17 +86,8 @@ export function PaymentHistory() {
           <div className={emptyStyle}>결제 내역이 없습니다.</div>
         ) : (
           payments.map((payment, i) => (
-            <div
-              style={{
-                maxHeight: '1000px'
-              }}
-              key={payment.paymentId}
-            >
-              <PaymentList
-                payment={payment}
-                isLast={i === payments.length - 1}
-                observe={lastItemRef}
-              />
+            <div key={payment.paymentId}>
+              <PaymentList payment={payment} />
               {i !== payments.length - 1 && (
                 <div style={{ margin: '32px 0' }}>
                   <HorizontalLine width="100%" color={colors.brand[0]} />
@@ -110,8 +96,39 @@ export function PaymentHistory() {
             </div>
           ))
         )}
-        {isFetchingNextPage && <SkeletonList />}
       </div>
+      {/* 페이지네이션 */}
+      {totalPages > 1 && (
+        <div
+          style={{
+            display: 'flex',
+            justifyContent: 'center',
+            margin: '32px 0 0 0',
+            gap: 8
+          }}
+        >
+          {Array.from({ length: totalPages }).map((_, idx) => (
+            <button
+              key={idx + 1}
+              onClick={() => setPage(idx + 1)}
+              style={{
+                minWidth: 36,
+                height: 36,
+                borderRadius: 8,
+                border: '1px solid #ddd',
+                background: page === idx + 1 ? '#e1007b' : '#fff',
+                color: page === idx + 1 ? '#fff' : '#222',
+                fontWeight: page === idx + 1 ? 700 : 400,
+                fontSize: 18,
+                cursor: 'pointer',
+                transition: 'background 0.2s, color 0.2s'
+              }}
+            >
+              {idx + 1}
+            </button>
+          ))}
+        </div>
+      )}
     </div>
   );
 }

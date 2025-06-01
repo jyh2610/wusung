@@ -18,7 +18,7 @@ export const useInfinitePayments = (selectedFilter: PaymentFilter) => {
     queryKey: ['paymentList', selectedFilter] as const, // Use 'as const' for better key typing
     queryFn: ({ pageParam }) => {
       const page = typeof pageParam === 'number' ? pageParam : 0; // 이 라인은 initialPageParam 덕분에 첫 호출에선 0이 될 것입니다.
-      return getPaymentList(page, pageSize);
+      return getPaymentList(selectedFilter, page, pageSize);
     },
     getNextPageParam: lastPage => {
       if (!lastPage.data) return undefined;
