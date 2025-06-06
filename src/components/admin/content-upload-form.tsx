@@ -236,7 +236,7 @@ export function ContentUploadForm() {
   };
 
   return (
-    <form onSubmit={handleSubmit}>
+    <form className="bg-white p-6 rounded-lg" onSubmit={handleSubmit}>
       <div className="grid gap-6">
         <div className="grid gap-3">
           <Label htmlFor="title">제목</Label>
@@ -335,6 +335,7 @@ export function ContentUploadForm() {
           onValueChange={value => handleChange('isUsed', value === 'true')}
           className="flex items-center space-x-6"
         >
+          <Label htmlFor="isUsed">사용 여부</Label>
           <div className="flex items-center space-x-2">
             <RadioGroupItem value="true" id="isUsed-true" />
             <Label htmlFor="isUsed-true" className="cursor-pointer">
