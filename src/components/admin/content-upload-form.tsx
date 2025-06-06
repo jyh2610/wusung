@@ -17,13 +17,34 @@ import {
   SelectValue
 } from '@/components/ui/select';
 import ImageEditor from './ImageEditor';
-import { IContent, IOverlay } from '@/entities/program/type.dto';
-import { eduContentReg, putEduContent } from '@/entities/program/api';
+import { IContent } from '@/entities/program/type.dto';
+import { eduContentReg } from '@/entities/program/api';
 import { X } from 'lucide-react';
 import { getCategoryList } from './api';
-import { EduContent, ICategory, IRes } from '@/shared/type';
+import { ICategory, IRes } from '@/shared/type';
 import request from '@/shared/api/axiosInstance';
 
+export interface EduContentFile {
+  fileId: number;
+  fileName: string;
+  fileUrl: string;
+}
+
+export interface EduContent {
+  eduContentId: number;
+  title: string;
+  description: string;
+  categoryId: number;
+  difficultyLevel: number;
+  files: EduContentFile[];
+  overlayLocations: [];
+  isUsed: boolean;
+  viewCount: number;
+  year: number;
+  month: number;
+  createdAt: string; // ISO 문자열
+  updatedAt: string; // ISO 문자열
+}
 // 좌표 타입 정의
 interface Rectangle {
   x: number;
@@ -31,14 +52,6 @@ interface Rectangle {
   width: number;
   height: number;
 }
-
-interface ImageEditorProps {
-  image: string;
-  coordinates: Rectangle[]; // 1차원 배열
-  setCoordinates: (coordinates: Rectangle[]) => void;
-  handleImageUpload: (e: React.ChangeEvent<HTMLInputElement>) => void;
-}
-
 const customStyles = {
   option: (provided: any, state: { isSelected: any }) => ({
     ...provided,
@@ -61,8 +74,6 @@ export function ContentUploadForm() {
   const searchParams = useSearchParams();
 
   const id = searchParams.get('id');
-  console.log(id);
-
   const router = useRouter();
   const [category, setCategory] = useState<ICategory[]>([]);
   const [form, setForm] = useState<IContent>({
@@ -75,15 +86,6 @@ export function ContentUploadForm() {
     isUsed: true,
     overlays: []
   });
-
-  const [files, setFiles] = useState<File[]>([]);
-  const [filePreviews, setFilePreviews] = useState<string[]>([]);
-  const [imageCoordinates, setImageCoordinates] = useState<IOverlay[][]>([]);
-  const [selectedImageIndex, setSelectedImageIndex] = useState<number | null>(
-    null
-  );
-  const [isUploading, setIsUploading] = useState(false);
-  const [deletedFileIds, setDeletedFileIds] = useState<number[]>([]);
 
   useEffect(() => {
     const fetchContent = async () => {
@@ -107,9 +109,13 @@ export function ContentUploadForm() {
           isUsed: obj.isUsed,
           overlays: obj.overlayLocations
         });
-        const processedFiles: string[] = obj.files.map(file => file.fileUrl);
 
+        const processedFiles: string[] = obj.files.map(file => file.fileUrl);
         setFilePreviews(processedFiles);
+
+        // 각 이미지별 좌표 초기화
+        const initialCoordinates = processedFiles.map(() => []);
+        setImageCoordinates(initialCoordinates);
       } catch (error) {
         console.error(error);
       }
@@ -118,15 +124,15 @@ export function ContentUploadForm() {
     fetchContent();
   }, []);
 
-  useEffect(() => {
-    if (selectedImageIndex !== null) {
-      const updatedCoordinates =
-        form?.overlays && form?.overlays[selectedImageIndex]
-          ? [form?.overlays[selectedImageIndex]]
-          : [];
-      setImageCoordinates([updatedCoordinates]);
-    }
-  }, [selectedImageIndex, form?.overlays]);
+  const [files, setFiles] = useState<File[]>([]);
+  const [filePreviews, setFilePreviews] = useState<string[]>([]);
+  const [imageCoordinates, setImageCoordinates] = useState<Array<Rectangle[]>>(
+    []
+  );
+  const [selectedImageIndex, setSelectedImageIndex] = useState<number | null>(
+    null
+  );
+  const [isUploading, setIsUploading] = useState(false);
 
   useEffect(() => {
     const fetchCategories = async () => {
@@ -147,16 +153,9 @@ export function ContentUploadForm() {
     e.preventDefault();
     setIsUploading(true);
 
-    if (files.length > 0 || id !== null) {
+    if (files.length > 0) {
       try {
-        id !== null
-          ? await putEduContent({
-              eduContentId: Number(id),
-              content: form,
-              deletedFileIds: deletedFileIds,
-              imageFiles: files
-            })
-          : await eduContentReg(form, files);
+        await eduContentReg(form, files);
         setIsUploading(false);
         router.push('/admin/content');
       } catch (error) {
@@ -171,9 +170,11 @@ export function ContentUploadForm() {
   const handleImageUpload = (e: React.ChangeEvent<HTMLInputElement>) => {
     const uploadedFiles = e.target.files ? Array.from(e.target.files) : [];
     if (uploadedFiles.length > 0) {
+      // 기존 파일에 새 파일 추가
       const newFiles = [...files, ...uploadedFiles];
       setFiles(newFiles);
 
+      // 이미지 미리보기 생성
       const previews = uploadedFiles.map(file => {
         return new Promise<string>(resolve => {
           const reader = new FileReader();
@@ -188,7 +189,7 @@ export function ContentUploadForm() {
         const updatedPreviews = [...filePreviews, ...newImages];
         setFilePreviews(updatedPreviews);
 
-        // 새 이미지에 대한 좌표 배열 초기화 (빈 배열 추가)
+        // 새 이미지에 대한 좌표 배열 초기화
         const newCoordinates = [...imageCoordinates];
         newImages.forEach(() => newCoordinates.push([]));
         setImageCoordinates(newCoordinates);
@@ -201,7 +202,7 @@ export function ContentUploadForm() {
     }
   };
 
-  const removeImage = (index: number, fileId: number | undefined) => {
+  const removeImage = (index: number) => {
     const newFiles = [...files];
     newFiles.splice(index, 1);
     setFiles(newFiles);
@@ -214,10 +215,7 @@ export function ContentUploadForm() {
     newCoordinates.splice(index, 1);
     setImageCoordinates(newCoordinates);
 
-    if (fileId !== undefined) {
-      setDeletedFileIds(prev => [...prev, fileId]);
-    }
-
+    // 선택된 이미지가 삭제된 경우 처리
     if (selectedImageIndex === index) {
       if (newPreviews.length > 0) {
         setSelectedImageIndex(0);
@@ -225,35 +223,21 @@ export function ContentUploadForm() {
         setSelectedImageIndex(null);
       }
     } else if (selectedImageIndex !== null && selectedImageIndex > index) {
+      // 선택된 이미지 앞의 이미지가 삭제된 경우 인덱스 조정
       setSelectedImageIndex(selectedImageIndex - 1);
     }
   };
 
-  // 이미지별 좌표 정보 업데이트 함수 (2차원 배열 유지)
-  const updateImageCoordinates = (index: number, coordinates: Rectangle[]) => {
-    const updatedCoordinates = [...imageCoordinates];
-    updatedCoordinates[index] = coordinates.map(rectangle => ({
-      ...rectangle,
-      fileIndex: index,
-      alignment: 'center',
-      type: 'image',
-      fixedText: ''
-    }));
-    setImageCoordinates(updatedCoordinates);
-    handleChange('overlays', updatedCoordinates); // 폼 데이터에도 반영
+  // 이미지별 좌표 정보 업데이트 함수
+  const updateImageCoordinates = (coordinates: Rectangle[][]) => {
+    setImageCoordinates(coordinates);
+    // form state의 overlays도 함께 업데이트
+    handleChange('overlays', coordinates);
   };
 
-  const convertOverlayToRectangle = (overlay: IOverlay): Rectangle => {
-    return {
-      x: overlay.x,
-      y: overlay.y,
-      width: overlay.width,
-      height: overlay.height
-    };
-  };
   return (
     <form onSubmit={handleSubmit}>
-      <div className="grid gap-6 bg-[#FFFFFF] p-6 rounded-md">
+      <div className="grid gap-6">
         <div className="grid gap-3">
           <Label htmlFor="title">제목</Label>
           <Input
@@ -383,11 +367,10 @@ export function ContentUploadForm() {
               {selectedImageIndex !== null && filePreviews.length > 0 ? (
                 <ImageEditor
                   image={filePreviews[selectedImageIndex]}
-                  coordinates={imageCoordinates[selectedImageIndex] || []}
-                  setCoordinates={coordinates =>
-                    updateImageCoordinates(selectedImageIndex, coordinates)
-                  }
+                  coordinates={imageCoordinates}
+                  setCoordinates={updateImageCoordinates}
                   handleImageUpload={handleImageUpload}
+                  imageIndex={selectedImageIndex}
                 />
               ) : (
                 <ImageEditor
@@ -395,6 +378,7 @@ export function ContentUploadForm() {
                   coordinates={[]}
                   setCoordinates={() => {}}
                   handleImageUpload={handleImageUpload}
+                  imageIndex={0}
                 />
               )}
 
@@ -426,7 +410,7 @@ export function ContentUploadForm() {
                             size={16}
                             onClick={e => {
                               e.stopPropagation();
-                              removeImage(index, selectedImageIndex!);
+                              removeImage(index);
                             }}
                           />
                         </div>
