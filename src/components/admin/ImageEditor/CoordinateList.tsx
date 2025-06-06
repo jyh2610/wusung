@@ -24,7 +24,8 @@ export const CoordinateList = ({
           onClick={() => onRectClick(i)}
         >
           <span>
-            #{i + 1} X:{rect.x}, Y:{rect.y}, W:{rect.width}, H:{rect.height}
+            #{i + 1} X:{rect.x.toFixed(4)}%, Y:{rect.y.toFixed(4)}%, W:
+            {rect.width.toFixed(4)}%, H:{rect.height.toFixed(4)}%
           </span>
           <Button
             variant="outline"

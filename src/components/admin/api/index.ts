@@ -1,6 +1,7 @@
 import { IContent } from '@/entities/program/type.dto';
 import request from '@/shared/api/axiosInstance';
-import { ICategory } from '@/shared/type';
+import { ApiResponse, ICategory, PaginatedResponse } from '@/shared/type';
+import { IMemberDetail, Member, MemberListParams } from '../tpye';
 
 interface CategoryResponse {
   data: ICategory[];
@@ -54,7 +55,7 @@ interface ContentListResponse {
 }
 
 // API 응답 전체 타입
-interface ApiResponse {
+interface IApiResponse {
   data: ContentListResponse;
   message: string;
 }
@@ -70,7 +71,7 @@ interface ContentListParams {
 // getContentList 함수의 수정된 타입
 export const getContentList = async (params: ContentListParams) => {
   try {
-    const res = await request<ApiResponse>({
+    const res = await request<IApiResponse>({
       method: 'GET',
       url: '/api/admin/edu-content/list',
       params
@@ -90,7 +91,7 @@ export const getUserContentList = async ({
   difficultyLevel: number;
 }): Promise<IContent[] | undefined> => {
   try {
-    const res = await request<ApiResponse>({
+    const res = await request<IApiResponse>({
       method: 'GET',
       url: `/api/program/use/${categoryId}/${difficultyLevel}` // URL 수정 (category/list가 아닌 edu-content/list)
     });
@@ -103,7 +104,7 @@ export const getUserContentList = async ({
 
 export const deleteCategory = async (categoryId: number) => {
   try {
-    const res = await request<ApiResponse>({
+    const res = await request<IApiResponse>({
       method: 'DELETE',
       url: `/api/admin/edu-content/${categoryId}`
     });
@@ -124,3 +125,29 @@ export interface CategoryTreeResponse {
   data: Category[];
   message: string;
 }
+
+export const getMemberList = async (params: MemberListParams) => {
+  try {
+    const res = await request<ApiResponse<PaginatedResponse<Member>>>({
+      method: 'GET',
+      url: '/api/admin/member/list',
+      params
+    });
+    return res.data.data;
+  } catch (error) {
+    console.error(error);
+    return undefined;
+  }
+};
+
+export const getMemberDetail = async (memberId: number) => {
+  try {
+    const res = await request<ApiResponse<IMemberDetail>>({
+      method: 'GET',
+      url: `/api/admin/member/${memberId}`
+    });
+    return res.data.data;
+  } catch (error) {
+    return undefined;
+  }
+};

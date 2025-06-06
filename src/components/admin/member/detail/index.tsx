@@ -1,0 +1,229 @@
+'use client';
+
+import React, { useState } from 'react';
+import { Card, Form, Input, DatePicker, Button, message, Modal } from 'antd';
+import dayjs from 'dayjs';
+import relativeTime from 'dayjs/plugin/relativeTime';
+import 'dayjs/locale/ko';
+import { useQuery } from '@tanstack/react-query';
+import request from '@/shared/api/axiosInstance';
+import { ApiResponse } from '@/shared/type';
+import { IMemberDetail } from '@/components/admin/tpye';
+
+dayjs.extend(relativeTime);
+dayjs.locale('ko');
+
+interface MemberDetailProps {
+  memberId: number;
+}
+
+const getMemberDetail = async (memberId: number) => {
+  const response = await request<ApiResponse<IMemberDetail>>({
+    method: 'GET',
+    url: `/api/admin/member/${memberId}`
+  });
+  return response.data.data;
+};
+
+export const MemberDetail: React.FC<MemberDetailProps> = ({ memberId }) => {
+  const [form] = Form.useForm();
+  const [loading, setLoading] = useState(false);
+  const [isPasswordModalVisible, setIsPasswordModalVisible] = useState(false);
+  const [isSubscriptionModalVisible, setIsSubscriptionModalVisible] =
+    useState(false);
+
+  const { data, isLoading, refetch } = useQuery({
+    queryKey: ['member', memberId],
+    queryFn: () => getMemberDetail(memberId)
+  });
+
+  const handlePasswordSubmit = async (values: { password: string }) => {
+    try {
+      setLoading(true);
+      await request({
+        method: 'PUT',
+        url: `/api/admin/member/${memberId}/password`,
+        data: values
+      });
+      message.success('비밀번호가 성공적으로 변경되었습니다.');
+      setIsPasswordModalVisible(false);
+      form.resetFields(['password']);
+    } catch (error) {
+      message.error('비밀번호 변경 중 오류가 발생했습니다.');
+    } finally {
+      setLoading(false);
+    }
+  };
+
+  const handleSubscriptionSubmit = async (values: {
+    subscriptionEndDate: string;
+  }) => {
+    try {
+      setLoading(true);
+      await request({
+        method: 'PUT',
+        url: `/api/admin/member/${memberId}/subscription`,
+        data: values
+      });
+      message.success('구독 종료일이 성공적으로 변경되었습니다.');
+      setIsSubscriptionModalVisible(false);
+      form.resetFields(['subscriptionEndDate']);
+      refetch();
+    } catch (error) {
+      message.error('구독 종료일 변경 중 오류가 발생했습니다.');
+    } finally {
+      setLoading(false);
+    }
+  };
+
+  if (isLoading) {
+    return <div>로딩 중...</div>;
+  }
+
+  if (!data) {
+    return <div>회원 정보를 찾을 수 없습니다.</div>;
+  }
+
+  return (
+    <div className="p-8">
+      <Card title="회원 상세 정보" className="mb-6">
+        <div className="grid grid-cols-2 gap-8">
+          <div className="space-y-6">
+            <div className="space-y-4">
+              <p className="text-lg">
+                <strong>회원 ID:</strong> {data.memberId}
+              </p>
+              <p className="text-lg">
+                <strong>아이디:</strong> {data.username}
+              </p>
+              <p className="text-lg">
+                <strong>이름:</strong> {data.name}
+              </p>
+              <p className="text-lg">
+                <strong>전화번호:</strong> {data.phoneNumber}
+              </p>
+              <p className="text-lg">
+                <strong>이메일:</strong> {data.email}
+              </p>
+            </div>
+            <div className="pt-4 border-t">
+              <div className="flex items-center justify-between">
+                <span className="text-lg font-semibold">비밀번호</span>
+                <Button
+                  type="primary"
+                  onClick={() => setIsPasswordModalVisible(true)}
+                >
+                  비밀번호 변경
+                </Button>
+              </div>
+            </div>
+          </div>
+          <div className="space-y-6">
+            <div className="space-y-4">
+              <p className="text-lg">
+                <strong>회원 유형:</strong> {data.userType}
+              </p>
+              <p className="text-lg">
+                <strong>역할:</strong> {data.role}
+              </p>
+              <p className="text-lg">
+                <strong>주소:</strong> {data.address}
+              </p>
+              <p className="text-lg">
+                <strong>생년월일/설립일:</strong>{' '}
+                {dayjs(data.birthOrEstablishmentDate).format('YYYY-MM-DD')}
+              </p>
+              <p className="text-lg">
+                <strong>가입일:</strong>{' '}
+                {dayjs(data.createdAt).format('YYYY-MM-DD HH:mm')}
+              </p>
+              <p className="text-lg">
+                <strong>탈퇴 여부:</strong> {data.isWithdrawn ? '탈퇴' : '활성'}
+              </p>
+              {data.isWithdrawn && (
+                <p className="text-lg">
+                  <strong>탈퇴일:</strong>{' '}
+                  {dayjs(data.withdrawAt).format('YYYY-MM-DD HH:mm')}
+                </p>
+              )}
+            </div>
+            <div className="pt-4 border-t">
+              <div className="flex items-center justify-between">
+                <div className="flex items-center gap-2">
+                  <span className="text-lg font-semibold">구독 종료일</span>
+                  {data.subscriptionEndDate && (
+                    <span className="text-sm text-gray-500">
+                      {dayjs(data.subscriptionEndDate).format('YYYY-MM-DD')}
+                    </span>
+                  )}
+                </div>
+                <Button
+                  type="primary"
+                  onClick={() => setIsSubscriptionModalVisible(true)}
+                >
+                  구독 종료일 변경
+                </Button>
+              </div>
+            </div>
+          </div>
+        </div>
+      </Card>
+
+      <Modal
+        title="비밀번호 변경"
+        open={isPasswordModalVisible}
+        onCancel={() => setIsPasswordModalVisible(false)}
+        footer={null}
+      >
+        <Form form={form} onFinish={handlePasswordSubmit} layout="vertical">
+          <Form.Item
+            name="password"
+            label="새 비밀번호"
+            rules={[
+              { required: true, message: '새 비밀번호를 입력해주세요' },
+              { min: 8, message: '비밀번호는 8자 이상이어야 합니다' }
+            ]}
+          >
+            <Input.Password
+              placeholder="새 비밀번호를 입력하세요"
+              className="h-12 text-lg"
+            />
+          </Form.Item>
+          <div className="flex justify-end gap-2">
+            <Button onClick={() => setIsPasswordModalVisible(false)}>
+              취소
+            </Button>
+            <Button type="primary" htmlType="submit" loading={loading}>
+              변경
+            </Button>
+          </div>
+        </Form>
+      </Modal>
+
+      <Modal
+        title="구독 종료일 변경"
+        open={isSubscriptionModalVisible}
+        onCancel={() => setIsSubscriptionModalVisible(false)}
+        footer={null}
+      >
+        <Form form={form} onFinish={handleSubscriptionSubmit} layout="vertical">
+          <Form.Item name="subscriptionEndDate" label="구독 종료일">
+            <DatePicker
+              placeholder="구독 종료일을 선택하세요"
+              format="YYYY-MM-DD"
+              className="h-12 text-lg w-full"
+            />
+          </Form.Item>
+          <div className="flex justify-end gap-2">
+            <Button onClick={() => setIsSubscriptionModalVisible(false)}>
+              취소
+            </Button>
+            <Button type="primary" htmlType="submit" loading={loading}>
+              변경
+            </Button>
+          </div>
+        </Form>
+      </Modal>
+    </div>
+  );
+};

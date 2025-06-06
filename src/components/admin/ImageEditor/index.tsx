@@ -116,8 +116,11 @@ export default function ImageEditor({
 
     if (x < 0 || x > imageSize.width || y < 0 || y > imageSize.height) return;
 
-    startRef.current = { x, y };
-    setCurrentRect({ x, y, width: 0, height: 0 });
+    const xPercent = (x / imageSize.width) * 100;
+    const yPercent = (y / imageSize.height) * 100;
+
+    startRef.current = { x: xPercent, y: yPercent };
+    setCurrentRect({ x: xPercent, y: yPercent, width: 0, height: 0 });
   };
 
   const handleMouseMove = (e: React.MouseEvent) => {
@@ -131,11 +134,19 @@ export default function ImageEditor({
     const clampedX = Math.max(0, Math.min(x, imageSize.width));
     const clampedY = Math.max(0, Math.min(y, imageSize.height));
 
+    const xPercent = (clampedX / imageSize.width) * 100;
+    const yPercent = (clampedY / imageSize.height) * 100;
+
+    const yStart = startRef.current.y;
+    const yEnd = yPercent;
+    const top = Math.min(yStart, yEnd);
+    const height = Math.abs(yStart - yEnd);
+
     setCurrentRect({
-      x: Math.min(startRef.current.x, clampedX),
-      y: Math.min(startRef.current.y, clampedY),
-      width: Math.abs(startRef.current.x - clampedX),
-      height: Math.abs(startRef.current.y - clampedY)
+      x: Math.min(startRef.current.x, xPercent),
+      y: top,
+      width: Math.abs(startRef.current.x - xPercent),
+      height: height
     });
   };
 

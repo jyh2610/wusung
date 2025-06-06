@@ -45,10 +45,10 @@ export const ImagePreview = ({
             selectedRectIndex === i ? 'border-red-500' : 'border-blue-500'
           } bg-blue-400 bg-opacity-20`}
           style={{
-            left: `${rect.x}px`,
-            top: `${rect.y}px`,
-            width: `${rect.width}px`,
-            height: `${rect.height}px`
+            left: `${rect.x}%`,
+            top: `${rect.y}%`,
+            width: `${rect.width}%`,
+            height: `${rect.height}%`
           }}
         />
       ))}

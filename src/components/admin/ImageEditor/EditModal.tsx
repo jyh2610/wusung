@@ -1,6 +1,6 @@
 import { Rectangle, ImageSize } from './types';
 import { Button } from '@/components/ui/button';
-import { useState, useEffect } from 'react';
+import { useState, useEffect, useRef } from 'react';
 import { Input } from '@/components/ui/input';
 
 interface EditModalProps {
@@ -49,6 +49,32 @@ export const EditModal = ({
   >(null);
   const [customText, setCustomText] = useState('');
   const [selectedRect, setSelectedRect] = useState<Rectangle | null>(null);
+  const imgRef = useRef<HTMLImageElement>(null);
+  const [imgRect, setImgRect] = useState({
+    left: 0,
+    top: 0,
+    width: 0,
+    height: 0
+  });
+
+  useEffect(() => {
+    if (imgRef.current && imageSize) {
+      const containerW = imageSize.width;
+      const containerH = imageSize.height;
+      const img = imgRef.current;
+      const naturalW = img.naturalWidth;
+      const naturalH = img.naturalHeight;
+      const ratio = Math.min(containerW / naturalW, containerH / naturalH);
+      const displayW = naturalW * ratio;
+      const displayH = naturalH * ratio;
+      setImgRect({
+        left: (containerW - displayW) / 2,
+        top: (containerH - displayH) / 2,
+        width: displayW,
+        height: displayH
+      });
+    }
+  }, [image, imageSize]);
 
   useEffect(() => {
     if (currentRect && currentRect.width > 5 && currentRect.height > 5) {
@@ -159,51 +185,55 @@ export const EditModal = ({
             height: `${imageSize.height}px`,
             maxWidth: '100%',
             maxHeight: 'calc(90vh - 200px)',
-            backgroundImage: `url(${image})`,
-            backgroundSize: 'contain',
-            backgroundRepeat: 'no-repeat',
-            backgroundPosition: 'center'
+            position: 'relative'
           }}
           onMouseDown={onMouseDown}
           onMouseMove={onMouseMove}
           onMouseUp={handleMouseUp}
         >
+          <img
+            ref={imgRef}
+            src={image}
+            alt="편집 이미지"
+            style={{
+              width: '100%',
+              height: '100%',
+              objectFit: 'contain',
+              display: 'block',
+              position: 'absolute',
+              left: 0,
+              top: 0,
+              zIndex: 0
+            }}
+            onLoad={() => {
+              // 위 useEffect에서 계산됨
+            }}
+          />
           {originalCoordinates.map((rect, i) => (
-            <div key={i} className="relative">
-              <div
-                className={`absolute border-2 ${
-                  selectedRectIndex === i ? 'border-red-500' : 'border-blue-500'
-                } bg-blue-400 bg-opacity-20`}
-                style={{
-                  left: `${rect.x}px`,
-                  top: `${rect.y}px`,
-                  width: `${rect.width}px`,
-                  height: `${rect.height}px`
-                }}
-                onClick={() => handleRectClick(i)}
-              />
-              {rect.fixedText && (
-                <div
-                  className="absolute bg-white px-2 py-1 rounded text-sm shadow-sm"
-                  style={{
-                    left: `${rect.x + rect.width + 5}px`,
-                    top: `${rect.y}px`
-                  }}
-                >
-                  텍스트: {rect.fixedText}
-                </div>
-              )}
-            </div>
+            <div
+              key={i}
+              style={{
+                position: 'absolute',
+                left: `${imgRect.left + (rect.x / 100) * imgRect.width}px`,
+                top: `${imgRect.top + (rect.y / 100) * imgRect.height}px`,
+                width: `${(rect.width / 100) * imgRect.width}px`,
+                height: `${(rect.height / 100) * imgRect.height}px`,
+                border: '2px solid red',
+                background: 'rgba(255,0,0,0.2)',
+                zIndex: 1
+              }}
+              onClick={() => handleRectClick(i)}
+            />
           ))}
 
           {currentRect && (
             <div
               className="absolute border-2 border-red-500 bg-red-300 bg-opacity-30"
               style={{
-                left: `${currentRect.x}px`,
-                top: `${currentRect.y}px`,
-                width: `${currentRect.width}px`,
-                height: `${currentRect.height}px`
+                left: `${currentRect.x}%`,
+                top: `${currentRect.y}%`,
+                width: `${currentRect.width}%`,
+                height: `${currentRect.height}%`
               }}
             />
           )}
@@ -214,15 +244,19 @@ export const EditModal = ({
             <h3 className="text-sm font-medium mb-2">좌표 정보</h3>
             <div className="grid grid-cols-2 gap-4 mb-4">
               <div>
-                <p className="text-sm text-gray-500">X: {selectedRect.x}px</p>
-                <p className="text-sm text-gray-500">Y: {selectedRect.y}px</p>
+                <p className="text-sm text-gray-500">
+                  X: {selectedRect.x.toFixed(2)}%
+                </p>
+                <p className="text-sm text-gray-500">
+                  Y: {selectedRect.y.toFixed(2)}%
+                </p>
               </div>
               <div>
                 <p className="text-sm text-gray-500">
-                  너비: {selectedRect.width}px
+                  너비: {selectedRect.width.toFixed(2)}%
                 </p>
                 <p className="text-sm text-gray-500">
-                  높이: {selectedRect.height}px
+                  높이: {selectedRect.height.toFixed(2)}%
                 </p>
               </div>
             </div>
