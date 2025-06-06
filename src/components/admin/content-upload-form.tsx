@@ -17,7 +17,7 @@ import {
   SelectValue
 } from '@/components/ui/select';
 import { IContent } from '@/entities/program/type.dto';
-import { eduContentReg } from '@/entities/program/api';
+import { eduContentReg, putEduContent } from '@/entities/program/api';
 import { X } from 'lucide-react';
 import { getCategoryList } from './api';
 import { ICategory, IRes } from '@/shared/type';
@@ -44,6 +44,11 @@ export interface EduContent {
   month: number;
   createdAt: string; // ISO 문자열
   updatedAt: string; // ISO 문자열
+  existName: boolean;
+  existMonth: boolean;
+  existDay: boolean;
+  existDayOfWeek: boolean;
+  existElderName: boolean;
 }
 // 좌표 타입 정의
 interface Rectangle {
@@ -84,7 +89,12 @@ export function ContentUploadForm() {
     month: new Date().getMonth() + 1,
     description: '',
     isUsed: true,
-    overlays: []
+    overlays: [],
+    existName: false,
+    existMonth: false,
+    existDay: false,
+    existDayOfWeek: false,
+    existElderName: false
   });
 
   useEffect(() => {
@@ -107,7 +117,12 @@ export function ContentUploadForm() {
           month: obj.month,
           description: obj.description,
           isUsed: obj.isUsed,
-          overlays: obj.overlayLocations
+          overlays: obj.overlayLocations,
+          existName: obj.existName,
+          existMonth: obj.existMonth,
+          existDay: obj.existDay,
+          existDayOfWeek: obj.existDayOfWeek,
+          existElderName: obj.existElderName
         });
 
         const processedFiles: string[] = obj.files.map(file => file.fileUrl);
@@ -153,16 +168,23 @@ export function ContentUploadForm() {
     e.preventDefault();
     setIsUploading(true);
 
-    if (files.length > 0) {
-      try {
+    try {
+      if (id) {
+        // 수정인 경우
+        await putEduContent({
+          eduContentId: Number(id),
+          content: form,
+          deletedFileIds: [], // 삭제된 파일 ID 목록 (필요한 경우 구현)
+          imageFiles: files
+        });
+      } else {
+        // 새로 등록하는 경우
         await eduContentReg(form, files);
-        setIsUploading(false);
-        router.push('/admin/content');
-      } catch (error) {
-        console.error('업로드 중 오류 발생:', error);
-        setIsUploading(false);
       }
-    } else {
+      setIsUploading(false);
+      router.push('/admin/content');
+    } catch (error) {
+      console.error('업로드 중 오류 발생:', error);
       setIsUploading(false);
     }
   };
@@ -372,6 +394,20 @@ export function ContentUploadForm() {
                   setCoordinates={updateImageCoordinates}
                   handleImageUpload={handleImageUpload}
                   imageIndex={selectedImageIndex}
+                  existName={form.existName}
+                  existMonth={form.existMonth}
+                  existDay={form.existDay}
+                  existDayOfWeek={form.existDayOfWeek}
+                  existElderName={form.existElderName}
+                  setExistName={value => handleChange('existName', value)}
+                  setExistMonth={value => handleChange('existMonth', value)}
+                  setExistDay={value => handleChange('existDay', value)}
+                  setExistDayOfWeek={value =>
+                    handleChange('existDayOfWeek', value)
+                  }
+                  setExistElderName={value =>
+                    handleChange('existElderName', value)
+                  }
                 />
               ) : (
                 <ImageEditor
@@ -380,6 +416,20 @@ export function ContentUploadForm() {
                   setCoordinates={() => {}}
                   handleImageUpload={handleImageUpload}
                   imageIndex={0}
+                  existName={form.existName}
+                  existMonth={form.existMonth}
+                  existDay={form.existDay}
+                  existDayOfWeek={form.existDayOfWeek}
+                  existElderName={form.existElderName}
+                  setExistName={value => handleChange('existName', value)}
+                  setExistMonth={value => handleChange('existMonth', value)}
+                  setExistDay={value => handleChange('existDay', value)}
+                  setExistDayOfWeek={value =>
+                    handleChange('existDayOfWeek', value)
+                  }
+                  setExistElderName={value =>
+                    handleChange('existElderName', value)
+                  }
                 />
               )}
 

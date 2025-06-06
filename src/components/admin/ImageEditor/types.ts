@@ -3,7 +3,14 @@ export interface Rectangle {
   y: number;
   width: number;
   height: number;
+  type?: 'fixedText';
   fixedText?: string;
+  alignment?: 'left' | 'center' | 'right';
+  existName?: boolean;
+  existMonth?: boolean;
+  existDay?: boolean;
+  existDayOfWeek?: boolean;
+  existElderName?: boolean;
 }
 
 export interface ImageSize {
@@ -17,6 +24,16 @@ export interface ImageEditorProps {
   setCoordinates: (coordinates: Rectangle[][]) => void;
   handleImageUpload: (e: React.ChangeEvent<HTMLInputElement>) => void;
   imageIndex: number;
+  existName: boolean;
+  existMonth: boolean;
+  existDay: boolean;
+  existDayOfWeek: boolean;
+  existElderName: boolean;
+  setExistName: (value: boolean) => void;
+  setExistMonth: (value: boolean) => void;
+  setExistDay: (value: boolean) => void;
+  setExistDayOfWeek: (value: boolean) => void;
+  setExistElderName: (value: boolean) => void;
 }
 
 export const PREDEFINED_COORDINATES = {

@@ -27,8 +27,9 @@ export const CoordinateList = ({
             #{i + 1} X:{rect.x}, Y:{rect.y}, W:{rect.width}, H:{rect.height}
           </span>
           <Button
-            variant="ghost"
+            variant="outline"
             size="sm"
+            type="button"
             className="text-red-500"
             onClick={e => onDelete(i, e)}
           >

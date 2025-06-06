@@ -18,15 +18,15 @@ export interface IContent {
   month: number;
   viewCount?: number;
   thumbnailUrl?: string;
-  description?: string;
-  isUsed?: boolean;
-  existName?: boolean;
-  existMonth?: boolean;
-  existDay?: boolean;
-  existDayOfWeek?: boolean;
-  existElderName?: boolean;
+  description: string;
+  isUsed: boolean;
+  existName: boolean;
+  existMonth: boolean;
+  existDay: boolean;
+  existDayOfWeek: boolean;
+  existElderName: boolean;
   createdAt?: string;
-  overlays?: IOverlay[];
+  overlays: IOverlay[];
 }
 
 export interface ScheduleItem {

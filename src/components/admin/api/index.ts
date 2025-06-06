@@ -68,23 +68,14 @@ interface ContentListParams {
 }
 
 // getContentList 함수의 수정된 타입
-export const getContentList = async (
-  params: ContentListParams
-): Promise<IContent[] | undefined> => {
+export const getContentList = async (params: ContentListParams) => {
   try {
     const res = await request<ApiResponse>({
       method: 'GET',
-      url: 'api/admin/edu-content/list', // URL 수정 (category/list가 아닌 edu-content/list)
-      params: {
-        categoryId: params.categoryId,
-        difficultyLevel: params.difficultyLevel,
-        year: params.year,
-        month: params.month,
-        page: params.page || 0,
-        size: params.size
-      }
+      url: '/api/admin/edu-content/list',
+      params
     });
-    return res.data.data.content;
+    return res.data.data;
   } catch (error) {
     console.error(error);
     return undefined;
@@ -109,3 +100,27 @@ export const getUserContentList = async ({
     return undefined;
   }
 };
+
+export const deleteCategory = async (categoryId: number) => {
+  try {
+    const res = await request<ApiResponse>({
+      method: 'DELETE',
+      url: `/api/admin/edu-content/${categoryId}`
+    });
+  } catch (error) {
+    console.error(error);
+  }
+};
+
+export interface Category {
+  categoryId: number;
+  parentId: number | null;
+  name: string;
+  isUsed: boolean;
+  children: Category[];
+}
+
+export interface CategoryTreeResponse {
+  data: Category[];
+  message: string;
+}

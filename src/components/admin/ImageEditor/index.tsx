@@ -13,13 +13,24 @@ import {
 import { ImagePreview } from './ImagePreview';
 import { CoordinateList } from './CoordinateList';
 import { EditModal } from './EditModal';
+import { Input } from '@/components/ui/input';
 
 export default function ImageEditor({
   image,
   coordinates,
   setCoordinates,
   handleImageUpload,
-  imageIndex
+  imageIndex,
+  existName,
+  existMonth,
+  existDay,
+  existDayOfWeek,
+  existElderName,
+  setExistName,
+  setExistMonth,
+  setExistDay,
+  setExistDayOfWeek,
+  setExistElderName
 }: ImageEditorProps) {
   const fileInputRef = useRef<HTMLInputElement | null>(null);
   const canvasRef = useRef<HTMLDivElement | null>(null);
@@ -63,21 +74,37 @@ export default function ImageEditor({
     setCoordinates(newCoordinates);
   };
 
-  const addPredefinedCoordinate = (
-    type: keyof typeof PREDEFINED_COORDINATES,
-    fixedText?: string
-  ) => {
-    if (!imageSize) return;
+  const handleToggleExist = (type: 'name' | 'date' | 'elderName') => {
+    switch (type) {
+      case 'name':
+        setExistName(!existName);
+        break;
+      case 'date':
+        setExistMonth(!existMonth);
+        setExistDay(!existDay);
+        setExistDayOfWeek(!existDayOfWeek);
+        break;
+      case 'elderName':
+        setExistElderName(!existElderName);
+        break;
+    }
+  };
 
-    const newOriginal = [
-      ...originalCoordinates,
-      {
-        ...PREDEFINED_COORDINATES[type],
-        fixedText: fixedText || ''
-      }
+  const handleAddCustomCoordinate = (rect: Rectangle, text: string) => {
+    const newCoordinate: Rectangle = {
+      ...rect,
+      type: 'fixedText',
+      fixedText: text,
+      alignment: 'center'
+    };
+
+    const newCoordinates = [...coordinates];
+    newCoordinates[imageIndex] = [
+      ...(newCoordinates[imageIndex] || []),
+      newCoordinate
     ];
-    updateCoordinates(newOriginal);
-    setSelectedRectIndex(newOriginal.length - 1);
+    setCoordinates(newCoordinates);
+    setCurrentRect(null);
   };
 
   const handleMouseDown = (e: React.MouseEvent) => {
@@ -119,11 +146,6 @@ export default function ImageEditor({
       startRef.current = null;
       return;
     }
-
-    const newOriginal = [...originalCoordinates, currentRect];
-    updateCoordinates(newOriginal);
-    setSelectedRectIndex(newOriginal.length - 1);
-    setCurrentRect(null);
     startRef.current = null;
   };
 
@@ -217,8 +239,14 @@ export default function ImageEditor({
               onMouseMove={handleMouseMove}
               onMouseUp={handleMouseUp}
               onRectClick={setSelectedRectIndex}
-              onAddPredefinedCoordinate={addPredefinedCoordinate}
+              onToggleExist={handleToggleExist}
               onClose={() => setIsEditing(false)}
+              existName={existName}
+              existMonth={existMonth}
+              existDay={existDay}
+              existDayOfWeek={existDayOfWeek}
+              existElderName={existElderName}
+              onAddCustomCoordinate={handleAddCustomCoordinate}
             />
           )}
         </>

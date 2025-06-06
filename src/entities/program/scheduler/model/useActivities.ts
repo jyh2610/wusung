@@ -23,7 +23,13 @@ export function useActivities({
           ? await getContentList(params)
           : await getUserContentList(params);
 
-        setActivities(response || []);
+        if (Array.isArray(response)) {
+          setActivities(response);
+        } else if (response && Array.isArray(response.content)) {
+          setActivities(response.content);
+        } else {
+          setActivities([]);
+        }
       } catch (error) {
         console.error('콘텐츠 목록 조회 실패:', error);
       }

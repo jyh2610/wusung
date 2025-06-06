@@ -8,7 +8,6 @@ export default function ContentPage() {
       <div className="flex items-center justify-between">
         <h1 className="text-3xl font-bold tracking-tight">콘텐츠 관리</h1>
       </div>
-      <ContentFilters />
       <ContentList />
     </div>
   );
