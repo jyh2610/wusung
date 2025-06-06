@@ -137,6 +137,7 @@ export default function ImageEditor({
     else if (selectedRectIndex && selectedRectIndex > index)
       setSelectedRectIndex(selectedRectIndex - 1);
   };
+
   const handleFileChange = (e: React.ChangeEvent<HTMLInputElement>) => {
     const files = e.target.files ? Array.from(e.target.files) : [];
 
@@ -149,6 +150,67 @@ export default function ImageEditor({
       target: { files }
     } as unknown as React.ChangeEvent<HTMLInputElement>);
   };
+
+  const addNameCoordinate = () => {
+    if (!imageSize) return;
+
+    const nameCoordinate: Rectangle = {
+      x: 248.48782348632812,
+      y: 8.116302490234375,
+      width: 170,
+      height: 22
+    };
+
+    const newOriginal = [...originalCoordinates, nameCoordinate];
+    setOriginalCoordinates(newOriginal);
+
+    const newCoordinates = [...coordinates];
+    newCoordinates[imageIndex] = newOriginal;
+    setCoordinates(newCoordinates);
+
+    setSelectedRectIndex(newOriginal.length - 1);
+  };
+
+  const addDateCoordinate = () => {
+    if (!imageSize) return;
+
+    const dateCoordinate: Rectangle = {
+      x: 60.340240478515625,
+      y: 8.116302490234375,
+      width: 135,
+      height: 23
+    };
+
+    const newOriginal = [...originalCoordinates, dateCoordinate];
+    setOriginalCoordinates(newOriginal);
+
+    const newCoordinates = [...coordinates];
+    newCoordinates[imageIndex] = newOriginal;
+    setCoordinates(newCoordinates);
+
+    setSelectedRectIndex(newOriginal.length - 1);
+  };
+
+  const addDifficultyCoordinate = () => {
+    if (!imageSize) return;
+
+    const difficultyCoordinate: Rectangle = {
+      x: 62.340240478515625,
+      y: 56.116302490234375,
+      width: 133,
+      height: 30
+    };
+
+    const newOriginal = [...originalCoordinates, difficultyCoordinate];
+    setOriginalCoordinates(newOriginal);
+
+    const newCoordinates = [...coordinates];
+    newCoordinates[imageIndex] = newOriginal;
+    setCoordinates(newCoordinates);
+
+    setSelectedRectIndex(newOriginal.length - 1);
+  };
+
   return (
     <div className="w-full">
       {/* ✅ 항상 존재하는 파일 input */}
@@ -170,6 +232,7 @@ export default function ImageEditor({
               <p className="text-xs text-muted">최대 100MB</p>
               <Button
                 variant="outline"
+                type="button"
                 onClick={() => fileInputRef.current?.click()}
               >
                 이미지 선택
@@ -222,9 +285,23 @@ export default function ImageEditor({
             </Button>
             <Button
               variant="outline"
+              type="button"
               onClick={() => fileInputRef.current?.click()}
             >
               다른 이미지 업로드
+            </Button>
+            <Button variant="outline" type="button" onClick={addNameCoordinate}>
+              이름
+            </Button>
+            <Button variant="outline" type="button" onClick={addDateCoordinate}>
+              날짜
+            </Button>
+            <Button
+              variant="outline"
+              type="button"
+              onClick={addDifficultyCoordinate}
+            >
+              난이도
             </Button>
           </div>
 
@@ -257,9 +334,10 @@ export default function ImageEditor({
               <div
                 className="bg-white rounded-lg shadow-xl p-6 relative"
                 style={{
-                  width: `${imageSize?.width || 800}px`,
-                  height: `${(imageSize?.height || 600) + 120}px`,
-                  maxWidth: '95vw'
+                  width: '90vw',
+                  maxWidth: '1200px',
+                  height: 'auto',
+                  maxHeight: '90vh'
                 }}
               >
                 <h2 className="text-lg font-bold mb-2">좌표 선택</h2>
@@ -269,14 +347,16 @@ export default function ImageEditor({
 
                 <div
                   ref={canvasRef}
-                  className="relative border cursor-crosshair"
+                  className="relative border cursor-crosshair mx-auto"
                   style={{
                     width: `${imageSize?.width}px`,
                     height: `${imageSize?.height}px`,
+                    maxWidth: '100%',
+                    maxHeight: 'calc(90vh - 200px)',
                     backgroundImage: `url(${image})`,
-                    backgroundSize: '100% 100%',
+                    backgroundSize: 'contain',
                     backgroundRepeat: 'no-repeat',
-                    backgroundPosition: 'top left'
+                    backgroundPosition: 'center'
                   }}
                   onMouseDown={handleMouseDown}
                   onMouseMove={handleMouseMove}
@@ -298,6 +378,7 @@ export default function ImageEditor({
                       }}
                     />
                   ))}
+
                   {currentRect && (
                     <div
                       className="absolute border-2 border-red-500 bg-red-300 bg-opacity-30"
