@@ -1,5 +1,7 @@
 import { Rectangle, ImageSize, PREDEFINED_COORDINATES } from './types';
 import { Button } from '@/components/ui/button';
+import { Input } from '@/components/ui/input';
+import { useState, useEffect } from 'react';
 
 interface EditModalProps {
   image: string;
@@ -13,7 +15,8 @@ interface EditModalProps {
   onMouseUp: () => void;
   onRectClick: (index: number) => void;
   onAddPredefinedCoordinate: (
-    type: keyof typeof PREDEFINED_COORDINATES
+    type: keyof typeof PREDEFINED_COORDINATES,
+    fixedText?: string
   ) => void;
   onClose: () => void;
 }
@@ -32,7 +35,48 @@ export const EditModal = ({
   onAddPredefinedCoordinate,
   onClose
 }: EditModalProps) => {
-  if (!imageSize) return null;
+  const [selectedPreset, setSelectedPreset] = useState<
+    keyof typeof PREDEFINED_COORDINATES | null
+  >(null);
+  const [fixedText, setFixedText] = useState('');
+
+  useEffect(() => {
+    console.log('EditModal 마운트됨');
+  }, []);
+
+  useEffect(() => {
+    console.log('selectedPreset 변경:', selectedPreset);
+  }, [selectedPreset]);
+
+  useEffect(() => {
+    console.log('fixedText 변경:', fixedText);
+  }, [fixedText]);
+
+  const handlePresetClick = (type: keyof typeof PREDEFINED_COORDINATES) => {
+    console.log('handlePresetClick 실행:', type);
+    if (type === 'name') {
+      setSelectedPreset(type);
+      setFixedText('');
+    } else {
+      onAddPredefinedCoordinate(type);
+    }
+  };
+
+  const handleAddPreset = () => {
+    console.log('handleAddPreset 실행');
+    if (selectedPreset && fixedText.trim()) {
+      onAddPredefinedCoordinate(selectedPreset, fixedText);
+      setSelectedPreset(null);
+      setFixedText('');
+    }
+  };
+
+  if (!imageSize) {
+    console.log('imageSize가 없음');
+    return null;
+  }
+
+  console.log('렌더링 시점:', { selectedPreset, fixedText });
 
   return (
     <div className="fixed inset-0 bg-black/60 z-50 flex items-center justify-center">
@@ -45,38 +89,61 @@ export const EditModal = ({
           maxHeight: '90vh'
         }}
       >
-        <h2 className="text-lg font-bold mb-2">좌표 선택</h2>
-        <p className="text-sm text-gray-500 mb-4">
-          마우스로 영역을 드래그하여 선택하거나 아래 버튼을 사용하세요.
-        </p>
+        <div className="flex justify-between items-center mb-4">
+          <h2 className="text-xl font-bold">좌표 편집</h2>
+          <Button variant="ghost" onClick={onClose} className="text-gray-500">
+            ✕
+          </Button>
+        </div>
 
-        <div className="flex gap-2 mb-4">
-          <Button
-            variant="outline"
-            type="button"
-            onClick={() => onAddPredefinedCoordinate('name')}
-          >
-            이름
-          </Button>
-          <Button
-            variant="outline"
-            type="button"
-            onClick={() => onAddPredefinedCoordinate('date')}
-          >
-            날짜
-          </Button>
-          <Button
-            variant="outline"
-            type="button"
-            onClick={() => onAddPredefinedCoordinate('difficulty')}
-          >
-            난이도
-          </Button>
+        <div className="space-y-4">
+          <div className="flex gap-2 items-center">
+            <Button
+              variant={selectedPreset === 'name' ? 'default' : 'outline'}
+              type="button"
+              onClick={() => handlePresetClick('name')}
+            >
+              이름
+            </Button>
+            {selectedPreset === 'name' && (
+              <>
+                <Input
+                  type="text"
+                  value={fixedText}
+                  onChange={e => setFixedText(e.target.value)}
+                  placeholder="이름을 입력하세요"
+                  autoFocus
+                  className="w-[200px]"
+                />
+                <Button onClick={handleAddPreset} disabled={!fixedText.trim()}>
+                  확인
+                </Button>
+              </>
+            )}
+            <Button
+              variant="outline"
+              type="button"
+              onClick={() => handlePresetClick('date')}
+            >
+              날짜
+            </Button>
+            <Button
+              variant="outline"
+              type="button"
+              onClick={() => handlePresetClick('difficulty')}
+            >
+              난이도
+            </Button>
+          </div>
+
+          <p className="text-sm text-gray-500">
+            마우스로 영역을 드래그하여 선택하거나 위 버튼을 사용하세요.
+          </p>
         </div>
 
         <div
           ref={canvasRef}
-          className="relative border cursor-crosshair mx-auto"
+          className="relative border cursor-crosshair mx-auto mt-4"
           style={{
             width: `${imageSize.width}px`,
             height: `${imageSize.height}px`,

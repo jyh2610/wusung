@@ -16,13 +16,13 @@ import {
   SelectTrigger,
   SelectValue
 } from '@/components/ui/select';
-import ImageEditor from './ImageEditor';
 import { IContent } from '@/entities/program/type.dto';
 import { eduContentReg } from '@/entities/program/api';
 import { X } from 'lucide-react';
 import { getCategoryList } from './api';
 import { ICategory, IRes } from '@/shared/type';
 import request from '@/shared/api/axiosInstance';
+import ImageEditor from './ImageEditor/index';
 
 export interface EduContentFile {
   fileId: number;

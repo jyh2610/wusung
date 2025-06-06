@@ -64,11 +64,18 @@ export default function ImageEditor({
   };
 
   const addPredefinedCoordinate = (
-    type: keyof typeof PREDEFINED_COORDINATES
+    type: keyof typeof PREDEFINED_COORDINATES,
+    fixedText?: string
   ) => {
     if (!imageSize) return;
 
-    const newOriginal = [...originalCoordinates, PREDEFINED_COORDINATES[type]];
+    const newOriginal = [
+      ...originalCoordinates,
+      {
+        ...PREDEFINED_COORDINATES[type],
+        fixedText: fixedText || ''
+      }
+    ];
     updateCoordinates(newOriginal);
     setSelectedRectIndex(newOriginal.length - 1);
   };

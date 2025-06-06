@@ -3,6 +3,7 @@ export interface Rectangle {
   y: number;
   width: number;
   height: number;
+  fixedText?: string;
 }
 
 export interface ImageSize {
