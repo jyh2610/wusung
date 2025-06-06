@@ -112,55 +112,43 @@ export const putEduContent = async ({
   }
 };
 
-export const eduContentReg = async (
-  content: IContent,
-  imageFiles: File[] // Multiple image files
-) => {
+export const eduContentReg = async (content: IContent, imageFiles: File[]) => {
   try {
-    // Create FormData object for sending the request
     const formData = new FormData();
 
     // 좌표 정보를 서버 형식에 맞게 변환
-    const processedOverlays: {
-      fileIndex: number;
-      x: any;
-      y: any;
-      width: any;
-      height: any;
-      alignment: string; // 기본값 설정
-      type: string; // 기본값 설정
-      fixedText: string; // 기본값 설정
-    }[] = [];
+    const processedOverlays =
+      content.overlays
+        ?.map((coordinates, fileIndex) => {
+          if (!Array.isArray(coordinates)) return [];
 
-    // imageCoordinates 배열에서 각 이미지의 좌표 정보를 변환
-    if (Array.isArray(content.overlays)) {
-      content.overlays.forEach((coordinates, fileIndex) => {
-        if (Array.isArray(coordinates)) {
-          coordinates.forEach(rect => {
-            processedOverlays.push({
-              fileIndex: fileIndex,
-              x: rect.x,
-              y: rect.y,
-              width: rect.width,
-              height: rect.height,
-              alignment: 'center', // 기본값 설정
-              type: 'image', // 기본값 설정
-              fixedText: '' // 기본값 설정
-            });
-          });
-        }
-      });
-    }
+          return coordinates.map(rect => ({
+            fileIndex,
+            x: rect.x,
+            y: rect.y,
+            width: rect.width,
+            height: rect.height,
+            alignment: rect.alignment || 'M',
+            type: rect.type || 'fixedText',
+            fixedText: rect.fixedText || ''
+          }));
+        })
+        .flat() || [];
 
-    // Prepare eduContentRegisterDTO with dynamic values
+    // eduContentRegisterDTO 준비
     const eduContentRegisterDTO = {
       title: content.title,
       difficultyLevel: content.difficultyLevel,
       categoryId: content.categoryId,
       year: content.year || 0,
       month: content.month || 0,
-      description: content.description,
-      isUsed: content.isUsed,
+      description: content.description || '',
+      isUsed: content.isUsed || false,
+      existName: [content.existName || false],
+      existMonth: [content.existMonth || false],
+      existDay: [content.existDay || false],
+      existDayOfWeek: [content.existDayOfWeek || false],
+      existElderName: [content.existElderName || false],
       overlays:
         processedOverlays.length > 0
           ? processedOverlays
@@ -171,35 +159,27 @@ export const eduContentReg = async (
                 y: 0,
                 width: 0,
                 height: 0,
-                alignment: 'center',
-                type: 'image',
+                alignment: 'M',
+                type: 'fixedText',
                 fixedText: ''
               }
             ]
     };
 
-    // Append eduContentRegisterDTO as a JSON string to FormData
+    // FormData에 DTO 추가
     formData.append(
       'eduContentRegisterDTO',
       JSON.stringify(eduContentRegisterDTO)
     );
 
     // 이미지 파일 추가
-    imageFiles.forEach((file, index) => {
+    imageFiles.forEach(file => {
       formData.append('files', file);
     });
-
-    // 디버깅 로그
-    console.log(
-      'FormData DTO:',
-      JSON.stringify(eduContentRegisterDTO, null, 2)
-    );
-    console.log('Files count:', imageFiles.length);
 
     const userInfo = getLocalStorageValue('userInfo');
     const token = userInfo ? JSON.parse(userInfo).token : '';
 
-    // 요청 보내기
     const res = await request({
       method: 'POST',
       url: '/api/admin/edu-content/register',

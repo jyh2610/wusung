@@ -1,44 +1,18 @@
 'use client';
 
 import React, { useState, useRef, useEffect } from 'react';
-import { Upload, Plus, Trash2 } from 'lucide-react';
+import { Upload, Plus } from 'lucide-react';
 import { Button } from '@/components/ui/button';
 import { Card, CardContent } from '@/components/ui/card';
-import { Rectangle } from './tpye';
-
-interface ImageEditorProps {
-  image: string;
-  coordinates: Rectangle[][];
-  setCoordinates: (coordinates: Rectangle[][]) => void;
-  handleImageUpload: (e: React.ChangeEvent<HTMLInputElement>) => void;
-  imageIndex: number;
-}
-
-interface ImageSize {
-  width: number;
-  height: number;
-}
-
-const PREDEFINED_COORDINATES = {
-  name: {
-    x: 248.48782348632812,
-    y: 8.116302490234375,
-    width: 170,
-    height: 22
-  },
-  date: {
-    x: 60.340240478515625,
-    y: 8.116302490234375,
-    width: 135,
-    height: 23
-  },
-  difficulty: {
-    x: 62.340240478515625,
-    y: 56.116302490234375,
-    width: 133,
-    height: 30
-  }
-} as const;
+import {
+  ImageEditorProps,
+  Rectangle,
+  ImageSize,
+  PREDEFINED_COORDINATES
+} from './types';
+import { ImagePreview } from './ImagePreview';
+import { CoordinateList } from './CoordinateList';
+import { EditModal } from './EditModal';
 
 export default function ImageEditor({
   image,
@@ -166,165 +140,6 @@ export default function ImageEditor({
     } as unknown as React.ChangeEvent<HTMLInputElement>);
   };
 
-  const renderImagePreview = () => (
-    <div
-      className="relative border rounded overflow-hidden"
-      style={{
-        width: `${imageSize?.width}px`,
-        height: `${imageSize?.height}px`,
-        margin: '0 auto',
-        position: 'relative'
-      }}
-    >
-      <img
-        src={image}
-        alt="미리보기"
-        style={{
-          width: `${imageSize?.width}px`,
-          height: `${imageSize?.height}px`,
-          objectFit: 'contain',
-          display: 'block'
-        }}
-      />
-      {originalCoordinates.map((rect, i) => (
-        <div
-          key={i}
-          onClick={() => setSelectedRectIndex(i)}
-          className={`absolute border-2 ${
-            selectedRectIndex === i ? 'border-red-500' : 'border-blue-500'
-          } bg-blue-400 bg-opacity-20`}
-          style={{
-            left: `${rect.x}px`,
-            top: `${rect.y}px`,
-            width: `${rect.width}px`,
-            height: `${rect.height}px`
-          }}
-        />
-      ))}
-    </div>
-  );
-
-  const renderCoordinateList = () => (
-    <div className="mt-4 space-y-2 max-h-[180px] overflow-auto border rounded p-2">
-      {originalCoordinates.map((rect, i) => (
-        <div
-          key={i}
-          className="flex justify-between items-center text-sm p-1 border rounded"
-          onClick={() => setSelectedRectIndex(i)}
-        >
-          <span>
-            #{i + 1} X:{rect.x}, Y:{rect.y}, W:{rect.width}, H:{rect.height}
-          </span>
-          <Button
-            variant="ghost"
-            size="sm"
-            className="text-red-500"
-            onClick={e => deleteRectangle(i, e)}
-          >
-            <Trash2 className="w-4 h-4" />
-          </Button>
-        </div>
-      ))}
-    </div>
-  );
-
-  const renderEditModal = () => (
-    <div className="fixed inset-0 bg-black/60 z-50 flex items-center justify-center">
-      <div
-        className="bg-white rounded-lg shadow-xl p-6 relative"
-        style={{
-          width: '90vw',
-          maxWidth: '1200px',
-          height: 'auto',
-          maxHeight: '90vh'
-        }}
-      >
-        <h2 className="text-lg font-bold mb-2">좌표 선택</h2>
-        <p className="text-sm text-gray-500 mb-4">
-          마우스로 영역을 드래그하여 선택하거나 아래 버튼을 사용하세요.
-        </p>
-
-        <div className="flex gap-2 mb-4">
-          <Button
-            variant="outline"
-            type="button"
-            onClick={() => addPredefinedCoordinate('name')}
-          >
-            이름
-          </Button>
-          <Button
-            variant="outline"
-            type="button"
-            onClick={() => addPredefinedCoordinate('date')}
-          >
-            날짜
-          </Button>
-          <Button
-            variant="outline"
-            type="button"
-            onClick={() => addPredefinedCoordinate('difficulty')}
-          >
-            난이도
-          </Button>
-        </div>
-
-        <div
-          ref={canvasRef}
-          className="relative border cursor-crosshair mx-auto"
-          style={{
-            width: `${imageSize?.width}px`,
-            height: `${imageSize?.height}px`,
-            maxWidth: '100%',
-            maxHeight: 'calc(90vh - 200px)',
-            backgroundImage: `url(${image})`,
-            backgroundSize: 'contain',
-            backgroundRepeat: 'no-repeat',
-            backgroundPosition: 'center'
-          }}
-          onMouseDown={handleMouseDown}
-          onMouseMove={handleMouseMove}
-          onMouseUp={handleMouseUp}
-        >
-          {originalCoordinates.map((rect, i) => (
-            <div
-              key={i}
-              className={`absolute border-2 ${
-                selectedRectIndex === i ? 'border-red-500' : 'border-blue-500'
-              } bg-blue-400 bg-opacity-20`}
-              style={{
-                left: `${rect.x}px`,
-                top: `${rect.y}px`,
-                width: `${rect.width}px`,
-                height: `${rect.height}px`
-              }}
-            />
-          ))}
-
-          {currentRect && (
-            <div
-              className="absolute border-2 border-red-500 bg-red-300 bg-opacity-30"
-              style={{
-                left: `${currentRect.x}px`,
-                top: `${currentRect.y}px`,
-                width: `${currentRect.width}px`,
-                height: `${currentRect.height}px`
-              }}
-            />
-          )}
-        </div>
-
-        <div className="flex justify-end mt-4">
-          <Button
-            onClick={() => setIsEditing(false)}
-            className="bg-blue-500 text-white"
-          >
-            확인
-          </Button>
-        </div>
-      </div>
-    </div>
-  );
-
   return (
     <div className="w-full">
       <input
@@ -355,7 +170,13 @@ export default function ImageEditor({
         </Card>
       ) : (
         <>
-          {renderImagePreview()}
+          <ImagePreview
+            image={image}
+            imageSize={imageSize}
+            originalCoordinates={originalCoordinates}
+            selectedRectIndex={selectedRectIndex}
+            onRectClick={setSelectedRectIndex}
+          />
 
           <div className="flex gap-2 mt-4">
             <Button onClick={() => setIsEditing(true)}>
@@ -370,8 +191,29 @@ export default function ImageEditor({
             </Button>
           </div>
 
-          {renderCoordinateList()}
-          {isEditing && renderEditModal()}
+          <CoordinateList
+            coordinates={originalCoordinates}
+            selectedRectIndex={selectedRectIndex}
+            onRectClick={setSelectedRectIndex}
+            onDelete={deleteRectangle}
+          />
+
+          {isEditing && (
+            <EditModal
+              image={image}
+              imageSize={imageSize}
+              originalCoordinates={originalCoordinates}
+              selectedRectIndex={selectedRectIndex}
+              currentRect={currentRect}
+              canvasRef={canvasRef}
+              onMouseDown={handleMouseDown}
+              onMouseMove={handleMouseMove}
+              onMouseUp={handleMouseUp}
+              onRectClick={setSelectedRectIndex}
+              onAddPredefinedCoordinate={addPredefinedCoordinate}
+              onClose={() => setIsEditing(false)}
+            />
+          )}
         </>
       )}
     </div>
