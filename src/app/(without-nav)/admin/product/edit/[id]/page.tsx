@@ -1,7 +1,7 @@
 'use client';
 
 import React, { useEffect, useState } from 'react';
-import { useParams, useRouter } from 'next/navigation';
+import { useParams, useRouter, useSearchParams } from 'next/navigation';
 import { Button } from '@/components/ui/button';
 import { Input } from '@/components/ui/input';
 import { Label } from '@/components/ui/label';
@@ -17,6 +17,7 @@ import {
 const Page = () => {
   const params = useParams();
   const router = useRouter();
+  const searchParams = useSearchParams();
   const queryClient = useQueryClient();
   const [isLoading, setIsLoading] = useState(true);
   const [isUpdating, setIsUpdating] = useState(false);
@@ -32,14 +33,24 @@ const Page = () => {
   useEffect(() => {
     const fetchProduct = async () => {
       try {
+        const dataParam = searchParams.get('data');
+        if (dataParam) {
+          const parsedData = JSON.parse(
+            decodeURIComponent(dataParam)
+          ) as IRegProduct;
+          setProduct(parsedData);
+          setIsLoading(false);
+          return;
+        }
+
         const data = await getProductDetail(Number(params.id));
         if (data) {
           setProduct({
             name: data.name,
             periodMonths: data.periodMonths,
-            price: data.currentPrice,
-            description: '',
-            discountRate: 0,
+            price: data.price,
+            description: data.description,
+            discountRate: data.discountRate,
             active: data.active
           });
         }
@@ -52,7 +63,7 @@ const Page = () => {
     };
 
     fetchProduct();
-  }, [params.id, router]);
+  }, [params.id, router, searchParams]);
 
   const handleSubmit = async () => {
     try {

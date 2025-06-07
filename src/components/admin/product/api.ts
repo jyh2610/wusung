@@ -1,6 +1,6 @@
 import request from '@/shared/api/axiosInstance';
 import { ApiResponse, PaginatedResponse } from '@/shared/type';
-import { IProduct, IRegProduct } from './type';
+import { IProduct, IProductDetail, IRegProduct } from './type';
 
 export const getProduct = async (page: number, size: number) => {
   try {
@@ -65,7 +65,7 @@ export const deleteProduct = async (productId: number) => {
 
 export const getProductDetail = async (productId: number) => {
   try {
-    const response = await request<ApiResponse<IProduct>>({
+    const response = await request<ApiResponse<IProductDetail>>({
       method: 'GET',
       url: `/api/admin/product/${productId}`
     });

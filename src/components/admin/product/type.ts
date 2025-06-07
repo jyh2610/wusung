@@ -14,3 +14,17 @@ export interface IProduct {
   currentPrice: number;
   active: boolean;
 }
+
+export interface IProductDetail {
+  productId: number;
+  name: string;
+  periodMonths: number;
+  price: number;
+  description: string;
+  imageUrl: string | null;
+  isDeleted: boolean;
+  discountRate: number;
+  createdAt: string;
+  updatedAt: string;
+  active: boolean;
+}

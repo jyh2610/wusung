@@ -6,6 +6,7 @@ import { IProduct } from '../type';
 import { Table } from 'antd';
 import type { ColumnsType } from 'antd/es/table';
 import { format } from 'date-fns';
+import { useRouter } from 'next/navigation';
 
 interface ListProps {
   products: IProduct[];
@@ -30,6 +31,12 @@ export const List = ({
   onDelete,
   isLoading
 }: ListProps) => {
+  const router = useRouter();
+
+  const handleEdit = (product: IProduct) => {
+    router.push(`/admin/product/${product.productId}`);
+  };
+
   const columns: ColumnsType<IProduct> = [
     {
       title: '상품명',
@@ -59,8 +66,12 @@ export const List = ({
       key: 'action',
       render: (_, record) => (
         <div className="space-x-2">
-          <Button variant="outline" size="sm" onClick={() => onEdit(record)}>
-            수정
+          <Button
+            variant="outline"
+            size="sm"
+            onClick={() => handleEdit(record)}
+          >
+            상세보기
           </Button>
           <Button
             variant="destructive"
