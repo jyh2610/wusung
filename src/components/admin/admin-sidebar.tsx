@@ -9,7 +9,8 @@ import {
   Upload,
   Settings,
   LogOut,
-  Users
+  Users,
+  ListIcon
 } from 'lucide-react';
 import { cn } from '@/lib/utils';
 import { Button } from '@/components/ui/button';
@@ -47,6 +48,12 @@ export default function AdminSidebar() {
       icon: Users,
       href: '/admin/member',
       active: pathname === '/admin/member'
+    },
+    {
+      label: '카테고리 관리',
+      icon: ListIcon,
+      href: '/admin/category',
+      active: pathname === '/admin/category'
     }
     // {
     //   label: "설정",

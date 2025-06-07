@@ -1,7 +1,13 @@
 import { IContent } from '@/entities/program/type.dto';
 import request from '@/shared/api/axiosInstance';
 import { ApiResponse, ICategory, PaginatedResponse } from '@/shared/type';
-import { IMemberDetail, IpList, Member, MemberListParams } from '../tpye';
+import {
+  IMemberDetail,
+  IpList,
+  Member,
+  MemberListParams,
+  RegCategory
+} from '../tpye';
 
 interface CategoryResponse {
   data: ICategory[];
@@ -13,6 +19,50 @@ export const getCategoryList = async (): Promise<ICategory[] | undefined> => {
     const res = await request<CategoryResponse>({
       method: 'GET',
       url: 'api/admin/category/list'
+    });
+    return res.data.data;
+  } catch (error) {
+    console.error(error);
+    return undefined;
+  }
+};
+
+export const regCategory = async (category: RegCategory) => {
+  try {
+    const res = await request<ApiResponse<null>>({
+      method: 'POST',
+      url: '/api/admin/category',
+      data: category
+    });
+    return res.data.data;
+  } catch (error) {
+    console.error(error);
+    return undefined;
+  }
+};
+
+export const updateCategory = async (
+  categoryId: number,
+  category: RegCategory
+) => {
+  try {
+    const res = await request<ApiResponse<null>>({
+      method: 'PUT',
+      url: `/api/admin/category/${categoryId}`,
+      data: category
+    });
+    return res.data.data;
+  } catch (error) {
+    console.error(error);
+    return undefined;
+  }
+};
+
+export const deleteCategory = async (categoryId: number) => {
+  try {
+    const res = await request<ApiResponse<null>>({
+      method: 'DELETE',
+      url: `/api/admin/category/${categoryId}`
     });
     return res.data.data;
   } catch (error) {
@@ -99,17 +149,6 @@ export const getUserContentList = async ({
   } catch (error) {
     console.error(error);
     return undefined;
-  }
-};
-
-export const deleteCategory = async (categoryId: number) => {
-  try {
-    const res = await request<IApiResponse>({
-      method: 'DELETE',
-      url: `/api/admin/edu-content/${categoryId}`
-    });
-  } catch (error) {
-    console.error(error);
   }
 };
 

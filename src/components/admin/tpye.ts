@@ -52,3 +52,9 @@ export interface IpList {
   updatedAt: string;
   operationType: string;
 }
+
+export interface RegCategory {
+  name: string;
+  parentId: number | null;
+  isUsed: boolean;
+}
