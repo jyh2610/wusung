@@ -10,7 +10,9 @@ import {
   Settings,
   LogOut,
   Users,
-  ListIcon
+  ListIcon,
+  Bell,
+  Package
 } from 'lucide-react';
 import { cn } from '@/lib/utils';
 import { Button } from '@/components/ui/button';
@@ -19,12 +21,18 @@ export default function AdminSidebar() {
   const pathname = usePathname();
 
   const routes = [
-    // {
-    //   label: "대시보드",
-    //   icon: LayoutDashboard,
-    //   href: "/admin",
-    //   active: pathname === "/admin",
-    // },
+    {
+      label: '상품 관리',
+      icon: Package,
+      href: '/admin/product',
+      active: pathname === '/admin/product'
+    },
+    {
+      label: '카테고리 관리',
+      icon: ListIcon,
+      href: '/admin/category',
+      active: pathname === '/admin/category'
+    },
     {
       label: '콘텐츠 관리',
       icon: FileText,
@@ -37,6 +45,7 @@ export default function AdminSidebar() {
       href: '/admin/content/upload',
       active: pathname === '/admin/content/upload'
     },
+
     {
       label: '스케줄 관리',
       icon: Calendar,
@@ -50,17 +59,17 @@ export default function AdminSidebar() {
       active: pathname === '/admin/member'
     },
     {
-      label: '카테고리 관리',
-      icon: ListIcon,
-      href: '/admin/category',
-      active: pathname === '/admin/category'
+      label: '공지사항 관리',
+      icon: Bell,
+      href: '/admin/dashboard',
+      active: pathname === '/admin/dashboard'
+    },
+    {
+      label: '팝업 관리',
+      icon: Bell,
+      href: '/admin/popup',
+      active: pathname === '/admin/popup'
     }
-    // {
-    //   label: "설정",
-    //   icon: Settings,
-    //   href: "/admin/settings",
-    //   active: pathname === "/admin/settings",
-    // },
   ];
 
   return (
