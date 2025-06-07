@@ -1,7 +1,7 @@
 import { IContent } from '@/entities/program/type.dto';
 import request from '@/shared/api/axiosInstance';
 import { ApiResponse, ICategory, PaginatedResponse } from '@/shared/type';
-import { IMemberDetail, Member, MemberListParams } from '../tpye';
+import { IMemberDetail, IpList, Member, MemberListParams } from '../tpye';
 
 interface CategoryResponse {
   data: ICategory[];
@@ -140,6 +140,19 @@ export const getMemberList = async (params: MemberListParams) => {
   }
 };
 
+export const getMemberSortList = async () => {
+  try {
+    const res = await request<ApiResponse<string[]>>({
+      method: 'GET',
+      url: '/api/admin/member/list/sort-columns'
+    });
+    return res.data.data;
+  } catch (error) {
+    console.error(error);
+    return undefined;
+  }
+};
+
 export const getMemberDetail = async (memberId: number) => {
   try {
     const res = await request<ApiResponse<IMemberDetail>>({
@@ -148,6 +161,92 @@ export const getMemberDetail = async (memberId: number) => {
     });
     return res.data.data;
   } catch (error) {
+    return undefined;
+  }
+};
+
+export const withdrawMember = async (memberId: number) => {
+  try {
+    const res = await request<ApiResponse<null>>({
+      method: 'POST',
+      url: `/api/admin/member/${memberId}/withdraw`
+    });
+    return res.data.data;
+  } catch (error) {
+    console.error(error);
+    return undefined;
+  }
+};
+
+export const restoreMember = async (memberId: number) => {
+  try {
+    const res = await request<ApiResponse<null>>({
+      method: 'POST',
+      url: `/api/admin/member/${memberId}/restore`
+    });
+    return res.data.data;
+  } catch (error) {
+    console.error(error);
+    return undefined;
+  }
+};
+
+export const changeSubscriptionEndDate = async ({
+  memberId,
+  newEndDate,
+  isVip
+}: {
+  memberId: number;
+  newEndDate: string;
+  isVip: boolean;
+}) => {
+  try {
+    const res = await request<ApiResponse<null>>({
+      method: 'PUT',
+      url: `/api/admin/member/${memberId}/subscription`,
+      params: {
+        newEndDate,
+        isVip
+      }
+    });
+    return res.data.data;
+  } catch (error) {
+    console.error(error);
+    return undefined;
+  }
+};
+
+export const changePassword = async ({
+  memberId,
+  newPassword,
+  confirmPassword
+}: {
+  memberId: number;
+  newPassword: string;
+  confirmPassword: string;
+}) => {
+  try {
+    const res = await request<ApiResponse<null>>({
+      method: 'PUT',
+      url: `/api/admin/member/${memberId}/password`,
+      params: { newPassword, confirmPassword }
+    });
+    return res.data.data;
+  } catch (error) {
+    console.error(error);
+    return undefined;
+  }
+};
+
+export const getIpList = async (memberId: number) => {
+  try {
+    const res = await request<ApiResponse<PaginatedResponse<IpList>>>({
+      method: 'GET',
+      url: `/api/admin/member/${memberId}/ip-list`
+    });
+    return res.data.data;
+  } catch (error) {
+    console.error(error);
     return undefined;
   }
 };

@@ -8,7 +8,8 @@ import {
   Calendar,
   Upload,
   Settings,
-  LogOut
+  LogOut,
+  Users
 } from 'lucide-react';
 import { cn } from '@/lib/utils';
 import { Button } from '@/components/ui/button';
@@ -40,6 +41,12 @@ export default function AdminSidebar() {
       icon: Calendar,
       href: '/admin/schedule',
       active: pathname === '/admin/schedule'
+    },
+    {
+      label: '회원 관리',
+      icon: Users,
+      href: '/admin/member',
+      active: pathname === '/admin/member'
     }
     // {
     //   label: "설정",

@@ -45,3 +45,10 @@ export interface IMemberDetail {
   isVip: boolean | null;
   subscriptionEndDate: string | null;
 }
+
+export interface IpList {
+  memberId: number;
+  ipAddress: string;
+  updatedAt: string;
+  operationType: string;
+}

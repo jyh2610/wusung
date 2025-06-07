@@ -1,14 +1,31 @@
 'use client';
 
 import React, { useState } from 'react';
-import { Card, Form, Input, DatePicker, Button, message, Modal } from 'antd';
+import {
+  Card,
+  Form,
+  Input,
+  DatePicker,
+  Button,
+  message,
+  Modal,
+  Switch,
+  Table
+} from 'antd';
 import dayjs from 'dayjs';
 import relativeTime from 'dayjs/plugin/relativeTime';
 import 'dayjs/locale/ko';
 import { useQuery } from '@tanstack/react-query';
 import request from '@/shared/api/axiosInstance';
 import { ApiResponse } from '@/shared/type';
-import { IMemberDetail } from '@/components/admin/tpye';
+import { IMemberDetail, IpList } from '@/components/admin/tpye';
+import {
+  withdrawMember,
+  restoreMember,
+  changeSubscriptionEndDate,
+  changePassword,
+  getIpList
+} from '@/components/admin/api';
 
 dayjs.extend(relativeTime);
 dayjs.locale('ko');
@@ -31,23 +48,32 @@ export const MemberDetail: React.FC<MemberDetailProps> = ({ memberId }) => {
   const [isPasswordModalVisible, setIsPasswordModalVisible] = useState(false);
   const [isSubscriptionModalVisible, setIsSubscriptionModalVisible] =
     useState(false);
+  const [isWithdrawModalVisible, setIsWithdrawModalVisible] = useState(false);
 
   const { data, isLoading, refetch } = useQuery({
     queryKey: ['member', memberId],
     queryFn: () => getMemberDetail(memberId)
   });
 
-  const handlePasswordSubmit = async (values: { password: string }) => {
+  const { data: ipListData } = useQuery({
+    queryKey: ['member-ip-list', memberId],
+    queryFn: () => getIpList(memberId)
+  });
+
+  const handlePasswordSubmit = async (values: {
+    password: string;
+    confirmPassword: string;
+  }) => {
     try {
       setLoading(true);
-      await request({
-        method: 'PUT',
-        url: `/api/admin/member/${memberId}/password`,
-        data: values
+      await changePassword({
+        memberId,
+        newPassword: values.password,
+        confirmPassword: values.confirmPassword
       });
       message.success('비밀번호가 성공적으로 변경되었습니다.');
       setIsPasswordModalVisible(false);
-      form.resetFields(['password']);
+      form.resetFields(['password', 'confirmPassword']);
     } catch (error) {
       message.error('비밀번호 변경 중 오류가 발생했습니다.');
     } finally {
@@ -60,10 +86,10 @@ export const MemberDetail: React.FC<MemberDetailProps> = ({ memberId }) => {
   }) => {
     try {
       setLoading(true);
-      await request({
-        method: 'PUT',
-        url: `/api/admin/member/${memberId}/subscription`,
-        data: values
+      await changeSubscriptionEndDate({
+        memberId,
+        newEndDate: values.subscriptionEndDate,
+        isVip: data?.isVip || false
       });
       message.success('구독 종료일이 성공적으로 변경되었습니다.');
       setIsSubscriptionModalVisible(false);
@@ -76,6 +102,47 @@ export const MemberDetail: React.FC<MemberDetailProps> = ({ memberId }) => {
     }
   };
 
+  const handleWithdraw = async () => {
+    try {
+      setLoading(true);
+      if (data?.isWithdrawn) {
+        await restoreMember(memberId);
+        message.success('회원이 성공적으로 복구되었습니다.');
+      } else {
+        await withdrawMember(memberId);
+        message.success('회원이 성공적으로 탈퇴되었습니다.');
+      }
+      setIsWithdrawModalVisible(false);
+      refetch();
+    } catch (error) {
+      message.error('회원 상태 변경 중 오류가 발생했습니다.');
+    } finally {
+      setLoading(false);
+    }
+  };
+
+  const ipListColumns = [
+    {
+      title: 'IP 주소',
+      dataIndex: 'ipAddress',
+      key: 'ipAddress',
+      width: '40%'
+    },
+    {
+      title: '작업 유형',
+      dataIndex: 'operationType',
+      key: 'operationType',
+      width: '30%'
+    },
+    {
+      title: '업데이트 시간',
+      dataIndex: 'updatedAt',
+      key: 'updatedAt',
+      width: '30%',
+      render: (date: string) => dayjs(date).format('YYYY-MM-DD HH:mm:ss')
+    }
+  ];
+
   if (isLoading) {
     return <div>로딩 중...</div>;
   }
@@ -85,14 +152,11 @@ export const MemberDetail: React.FC<MemberDetailProps> = ({ memberId }) => {
   }
 
   return (
-    <div className="p-8">
+    <div className="p-8 space-y-6">
       <Card title="회원 상세 정보" className="mb-6">
         <div className="grid grid-cols-2 gap-8">
           <div className="space-y-6">
             <div className="space-y-4">
-              <p className="text-lg">
-                <strong>회원 ID:</strong> {data.memberId}
-              </p>
               <p className="text-lg">
                 <strong>아이디:</strong> {data.username}
               </p>
@@ -106,8 +170,8 @@ export const MemberDetail: React.FC<MemberDetailProps> = ({ memberId }) => {
                 <strong>이메일:</strong> {data.email}
               </p>
             </div>
-            <div className="pt-4 border-t">
-              <div className="flex items-center justify-between">
+            <div className="pt-4">
+              <div className="flex items-center gap-3">
                 <span className="text-lg font-semibold">비밀번호</span>
                 <Button
                   type="primary"
@@ -147,8 +211,8 @@ export const MemberDetail: React.FC<MemberDetailProps> = ({ memberId }) => {
                 </p>
               )}
             </div>
-            <div className="pt-4 border-t">
-              <div className="flex items-center justify-between">
+            <div className="pt-4">
+              <div className="flex items-center gap-3">
                 <div className="flex items-center gap-2">
                   <span className="text-lg font-semibold">구독 종료일</span>
                   {data.subscriptionEndDate && (
@@ -160,13 +224,42 @@ export const MemberDetail: React.FC<MemberDetailProps> = ({ memberId }) => {
                 <Button
                   type="primary"
                   onClick={() => setIsSubscriptionModalVisible(true)}
+                  disabled={!data.subscriptionEndDate}
                 >
                   구독 종료일 변경
                 </Button>
               </div>
             </div>
+            <div className="pt-4">
+              <div className="flex items-center gap-3">
+                <span className="text-lg font-semibold">회원 상태</span>
+                <Button
+                  type={data.isWithdrawn ? 'primary' : 'default'}
+                  danger={!data.isWithdrawn}
+                  onClick={() => setIsWithdrawModalVisible(true)}
+                >
+                  {data.isWithdrawn ? '회원 복구' : '회원 탈퇴'}
+                </Button>
+              </div>
+            </div>
           </div>
         </div>
+      </Card>
+
+      <Card title="IP 접속 기록">
+        <Table
+          columns={ipListColumns}
+          dataSource={ipListData?.content}
+          rowKey={record => `${record.ipAddress}-${record.updatedAt}`}
+          pagination={{
+            total: ipListData?.totalElements,
+            pageSize: ipListData?.size || 10,
+            current: ipListData?.number ? ipListData.number + 1 : 1,
+            showSizeChanger: true,
+            showTotal: total => `총 ${total}개`
+          }}
+          loading={!ipListData}
+        />
       </Card>
 
       <Modal
@@ -186,6 +279,29 @@ export const MemberDetail: React.FC<MemberDetailProps> = ({ memberId }) => {
           >
             <Input.Password
               placeholder="새 비밀번호를 입력하세요"
+              className="h-12 text-lg"
+            />
+          </Form.Item>
+          <Form.Item
+            name="confirmPassword"
+            label="비밀번호 확인"
+            dependencies={['password']}
+            rules={[
+              { required: true, message: '비밀번호를 다시 입력해주세요' },
+              ({ getFieldValue }) => ({
+                validator(_, value) {
+                  if (!value || getFieldValue('password') === value) {
+                    return Promise.resolve();
+                  }
+                  return Promise.reject(
+                    new Error('비밀번호가 일치하지 않습니다')
+                  );
+                }
+              })
+            ]}
+          >
+            <Input.Password
+              placeholder="비밀번호를 다시 입력하세요"
               className="h-12 text-lg"
             />
           </Form.Item>
@@ -223,6 +339,32 @@ export const MemberDetail: React.FC<MemberDetailProps> = ({ memberId }) => {
             </Button>
           </div>
         </Form>
+      </Modal>
+
+      <Modal
+        title={data.isWithdrawn ? '회원 복구' : '회원 탈퇴'}
+        open={isWithdrawModalVisible}
+        onCancel={() => setIsWithdrawModalVisible(false)}
+        footer={[
+          <Button key="cancel" onClick={() => setIsWithdrawModalVisible(false)}>
+            취소
+          </Button>,
+          <Button
+            key="submit"
+            type="primary"
+            danger={!data.isWithdrawn}
+            onClick={handleWithdraw}
+            loading={loading}
+          >
+            {data.isWithdrawn ? '복구' : '탈퇴'}
+          </Button>
+        ]}
+      >
+        <p>
+          {data.isWithdrawn
+            ? '해당 회원을 복구하시겠습니까?'
+            : '해당 회원을 탈퇴 처리하시겠습니까?'}
+        </p>
       </Modal>
     </div>
   );
