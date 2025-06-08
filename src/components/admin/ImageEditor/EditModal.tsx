@@ -125,7 +125,8 @@ export const EditModal = ({
           width: '90vw',
           maxWidth: '1200px',
           height: 'auto',
-          maxHeight: '90vh'
+          maxHeight: '90vh',
+          overflowY: 'auto'
         }}
       >
         <div className="flex justify-between items-center mb-4">
@@ -187,11 +188,14 @@ export const EditModal = ({
           ref={canvasRef}
           className="relative border cursor-crosshair mx-auto mt-4"
           style={{
-            width: `${imageSize.width}px`,
+            width: '100%',
+            maxWidth: '800px',
             height: `${imageSize.height}px`,
-            maxWidth: '100%',
-            maxHeight: 'calc(90vh - 200px)',
-            position: 'relative'
+            maxHeight: '60vh',
+            minWidth: '200px',
+            minHeight: '100px',
+            position: 'relative',
+            overflow: 'auto'
           }}
           onMouseDown={onMouseDown}
           onMouseMove={onMouseMove}
@@ -221,7 +225,7 @@ export const EditModal = ({
               style={{
                 position: 'absolute',
                 left: `${imgRect.left + (rect.x / 100) * imgRect.width}px`,
-                top: `${imgRect.top + (rect.y / 100) * imgRect.height}px`,
+                top: `${imgRect.top + ((100 - rect.y - rect.height) / 100) * imgRect.height}px`,
                 width: `${(rect.width / 100) * imgRect.width}px`,
                 height: `${(rect.height / 100) * imgRect.height}px`,
                 border: '2px solid red',
@@ -237,7 +241,7 @@ export const EditModal = ({
               className="absolute border-2 border-red-500 bg-red-300 bg-opacity-30"
               style={{
                 left: `${currentRect.x}%`,
-                top: `${currentRect.y}%`,
+                top: `${100 - currentRect.y - currentRect.height}%`,
                 width: `${currentRect.width}%`,
                 height: `${currentRect.height}%`
               }}

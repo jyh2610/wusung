@@ -104,16 +104,28 @@ export function Control({ isAdmin }: { isAdmin: boolean }) {
               className={buttonStyle}
               style={{
                 position: 'relative',
-                backgroundColor: snapshot.isDraggingOver
-                  ? '#f0f0f0'
-                  : 'transparent',
-                transition: 'background-color 0.2s ease',
+                backgroundColor: snapshot.isDraggingOver ? '#f5f7fa' : 'white',
+                transition: 'background-color 0.2s',
                 padding: '8px',
-                width: '150px'
+                width: '150px',
+                fontSize: '16px',
+                fontWeight: 500,
+                textAlign: 'center'
               }}
               onClick={() => openModal('etc')}
             >
-              <div>기타자료</div>
+              <div
+                style={{
+                  fontSize: '16px',
+                  fontWeight: 500,
+                  textAlign: 'center',
+                  whiteSpace: 'nowrap',
+                  overflow: 'hidden',
+                  textOverflow: 'ellipsis'
+                }}
+              >
+                기타자료
+              </div>
 
               <div
                 style={{
@@ -147,16 +159,28 @@ export function Control({ isAdmin }: { isAdmin: boolean }) {
               {...provided.droppableProps}
               className={buttonStyle}
               style={{
-                backgroundColor: snapshot.isDraggingOver
-                  ? '#f0f0f0'
-                  : 'transparent',
-                transition: 'background-color 0.2s ease',
+                backgroundColor: snapshot.isDraggingOver ? '#f5f7fa' : 'white',
+                transition: 'background-color 0.2s',
                 position: 'relative',
-                width: '150px'
+                width: '150px',
+                fontSize: '16px',
+                fontWeight: 500,
+                textAlign: 'center'
               }}
               onClick={() => openModal('cover')}
             >
-              <div>커버</div>
+              <div
+                style={{
+                  fontSize: '16px',
+                  fontWeight: 500,
+                  textAlign: 'center',
+                  whiteSpace: 'nowrap',
+                  overflow: 'hidden',
+                  textOverflow: 'ellipsis'
+                }}
+              >
+                커버
+              </div>
 
               <div
                 style={{

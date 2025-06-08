@@ -25,7 +25,7 @@ import {
 } from '@/components/ui/select';
 import { Pencil, Trash2, MoreVertical, Eye } from 'lucide-react';
 import { useRouter } from 'next/navigation';
-import { deleteCategory, Category } from './api';
+import { deleteCategory, Category, deleteContent } from './api';
 import { useQuery, useMutation, useQueryClient } from '@tanstack/react-query';
 import { getCategoryList, getContentList } from './api';
 import { IContent } from '@/entities/program/type.dto';
@@ -109,7 +109,7 @@ export function ContentList() {
   });
 
   const deleteMutation = useMutation({
-    mutationFn: (id: number) => deleteCategory(id),
+    mutationFn: (id: number) => deleteContent(id),
     onSuccess: () => {
       queryClient.invalidateQueries({ queryKey: ['contents'] });
     }

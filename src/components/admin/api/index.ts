@@ -307,3 +307,16 @@ export const getIpList = async (memberId: number) => {
     return undefined;
   }
 };
+
+export const deleteContent = async (contentId: number) => {
+  try {
+    const res = await request<ApiResponse<null>>({
+      method: 'DELETE',
+      url: `/api/admin/edu-content/${contentId}`
+    });
+    return res.data.data;
+  } catch (error) {
+    console.error(error);
+    return undefined;
+  }
+};

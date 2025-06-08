@@ -17,7 +17,7 @@ import { useRouter, usePathname } from 'next/navigation';
 import { useAuthStore } from '@/shared/stores/useAuthStore';
 
 export function ProgramNav() {
-  const { username, checkAuthentication } = useAuthStore();
+  const { username, checkAuthentication, endDate } = useAuthStore();
   useEffect(() => {
     checkAuthentication();
   }, [checkAuthentication]);
@@ -133,7 +133,7 @@ export function ProgramNav() {
 
         <div className={navBtnContainer}>
           <div className={btn}>
-            <div className={textAlign}>사용기한 : ~2025.05.01</div>
+            <div className={textAlign}>사용기한 : {endDate}</div>
           </div>
         </div>
 
