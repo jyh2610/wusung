@@ -63,7 +63,9 @@ export const Category = () => {
   const [selectedCategoryId, setSelectedCategoryId] = useState<number | null>(
     null
   );
-  const [newCategory, setNewCategory] = useState<RegCategory>({
+  const [newCategory, setNewCategory] = useState<
+    RegCategory & { categoryId?: number }
+  >({
     name: '',
     parentId: 0,
     isUsed: true
@@ -74,6 +76,16 @@ export const Category = () => {
     queryKey: ['categories'],
     queryFn: getCategoryList
   });
+
+  // 모든 카테고리를 평탄화하는 함수
+  const flattenCategories = (categories: ICategory[]): ICategory[] => {
+    return categories.reduce((acc: ICategory[], category) => {
+      return [...acc, category, ...flattenCategories(category.children || [])];
+    }, []);
+  };
+
+  // 모든 카테고리 목록
+  const allCategories = categories ? flattenCategories(categories) : [];
 
   const handleAddCategory = async () => {
     try {
@@ -231,6 +243,24 @@ export const Category = () => {
     );
   };
 
+  // 재귀적으로 카테고리 옵션을 렌더링하는 컴포넌트
+  const renderCategoryOptions = (category: ICategory, depth: number = 0) => {
+    return (
+      <React.Fragment key={category.categoryId}>
+        <SelectItem
+          value={category.categoryId.toString()}
+          style={{ paddingLeft: `${depth * 20}px` }}
+          className={`${depth === 0 ? 'font-bold' : 'text-gray-700'}`}
+        >
+          {category.name}
+        </SelectItem>
+        {category.children?.map(child =>
+          renderCategoryOptions(child, depth + 1)
+        )}
+      </React.Fragment>
+    );
+  };
+
   return (
     <div className="space-y-4">
       <div className="flex items-center justify-between mb-4">
@@ -307,14 +337,9 @@ export const Category = () => {
                   <SelectValue placeholder="상위 카테고리를 선택하세요" />
                 </SelectTrigger>
                 <SelectContent>
-                  {categories?.map(category => (
-                    <SelectItem
-                      key={category.categoryId}
-                      value={category.categoryId.toString()}
-                    >
-                      {category.name}
-                    </SelectItem>
-                  ))}
+                  {categories?.map(category =>
+                    renderCategoryOptions(category, 0)
+                  )}
                 </SelectContent>
               </Select>
             </div>
