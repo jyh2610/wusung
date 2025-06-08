@@ -4,30 +4,94 @@ import { colors } from '@/design-tokens';
 import { DashBoard } from '@/shared';
 import TableCell from '@mui/material/TableCell';
 import TableRow from '@mui/material/TableRow';
+import { useEffect, useState } from 'react';
+import { getAnnouncementList } from '@/shared/api/common';
+import { format, parseISO } from 'date-fns';
+import { IAnnouncementResponse } from '@/shared/api/common';
+import { ApiResponse, PaginatedResponse } from '@/shared/type';
+import { useRouter } from 'next/navigation';
+import { Badge } from '@/components/ui/badge';
 
 function NoticeDashBoard() {
-  const rows = [
-    createData('Post 1', 'John Doe', '2025-03-01', 120),
-    createData('Post 2', 'Jane Smith', '2025-03-02', 150),
-    createData('Post 3', 'Alice Johnson', '2025-03-03', 98),
-    createData('Post 4', 'Bob Brown', '2025-03-04', 75),
-    createData('Post 5', 'Charlie Green', '2025-03-05', 220)
-    // 데이터가 없으면 빈 배열로 설정 []
-  ];
+  const router = useRouter();
+  const [announcements, setAnnouncements] = useState<IAnnouncementResponse[]>(
+    []
+  );
+  const [page, setPage] = useState(0);
+  const [rowsPerPage, setRowsPerPage] = useState(10);
+  const [totalCount, setTotalCount] = useState(0);
+
+  const fetchAnnouncements = async () => {
+    try {
+      const response = await getAnnouncementList({
+        page,
+        size: rowsPerPage
+      });
+
+      if (response.data) {
+        setAnnouncements(response.data.data.content);
+        setTotalCount(response.data.data.totalElements);
+      }
+    } catch (error) {
+      console.error('공지사항을 불러오는데 실패했습니다:', error);
+    }
+  };
+
+  useEffect(() => {
+    fetchAnnouncements();
+  }, [page, rowsPerPage]);
+
+  const handleChangePage = (newPage: number) => {
+    setPage(newPage);
+  };
+
+  const handleChangeRowsPerPage = (newRowsPerPage: number) => {
+    setRowsPerPage(newRowsPerPage);
+    setPage(0);
+  };
 
   const columns = [
-    { id: 'title', label: '제목' },
-    { id: 'author', label: '작성자' },
-    { id: 'date', label: '날짜' },
-    { id: 'views', label: '조회수' }
+    { id: 'title', label: '제목', width: '50%', align: 'left' as const },
+    {
+      id: 'topExposureTag',
+      label: '태그',
+      width: '15%',
+      align: 'left' as const
+    },
+    { id: 'views', label: '조회수', width: '10%', align: 'center' as const },
+    { id: 'updatedAt', label: '수정일', width: '25%', align: 'center' as const }
   ];
 
-  const renderRow = (row: ReturnType<typeof createData>) => (
-    <TableRow key={row.title} hover>
-      <TableCell>{row.title}</TableCell>
-      <TableCell align="right">{row.author}</TableCell>
-      <TableCell align="right">{row.date}</TableCell>
-      <TableCell align="right">{row.views}</TableCell>
+  const formatDate = (dateString: string) => {
+    try {
+      return format(parseISO(dateString), 'yyyy-MM-dd');
+    } catch (error) {
+      console.error('날짜 형식 오류:', error);
+      return '날짜 오류';
+    }
+  };
+
+  const renderRow = (row: IAnnouncementResponse) => (
+    <TableRow
+      key={row.announcementId}
+      hover
+      onClick={() => router.push(`/notice/dashboard/${row.announcementId}`)}
+      sx={{ cursor: 'pointer' }}
+    >
+      <TableCell sx={{ width: '50%' }}>{row.title}</TableCell>
+      <TableCell sx={{ width: '15%' }}>
+        {row.topExposureTag && (
+          <Badge variant="secondary" className="ml-2">
+            {row.topExposureTag}
+          </Badge>
+        )}
+      </TableCell>
+      <TableCell align="center" sx={{ width: '10%' }}>
+        {row.views}
+      </TableCell>
+      <TableCell align="center" sx={{ width: '25%' }}>
+        {formatDate(row.updatedAt)}
+      </TableCell>
     </TableRow>
   );
 
@@ -46,11 +110,15 @@ function NoticeDashBoard() {
         </h1>
       </div>
       <div>
-        <DashBoard
-          rows={rows}
+        <DashBoard<IAnnouncementResponse>
+          rows={announcements}
           columns={columns}
           renderRow={renderRow}
-          rowsPerPage={5}
+          rowsPerPage={rowsPerPage}
+          page={page}
+          totalCount={totalCount}
+          onPageChange={handleChangePage}
+          onRowsPerPageChange={handleChangeRowsPerPage}
         />
       </div>
     </div>
@@ -58,12 +126,3 @@ function NoticeDashBoard() {
 }
 
 export default NoticeDashBoard;
-
-function createData(
-  title: string,
-  author: string,
-  date: string,
-  views: number
-) {
-  return { title, author, date, views };
-}

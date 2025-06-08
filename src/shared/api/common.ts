@@ -34,12 +34,20 @@ export async function getRole(
   }
 }
 
-interface IAnnouncementResponse {
+export interface IAnnouncementResponse {
   announcementId: number;
   title: string;
   content: string;
   createdAt: string;
   updatedAt: string;
+  topExposure: boolean;
+  topExposureTag: string;
+  files: null | Array<{
+    fileId: number;
+    fileName: string;
+    fileUrl: string;
+  }>;
+  views: number;
 }
 
 interface IPopupResponse {
@@ -78,7 +86,7 @@ export const getAnnouncementList = async ({
 export const getAnnouncementDetail = async (announcementId: number) => {
   const res = request<ApiResponse<IAnnouncementResponse>>({
     method: 'GET',
-    url: `/api/common/main/announcement/${announcementId}`
+    url: `/api/announcement/${announcementId}`
   });
   return res;
 };
@@ -95,6 +103,21 @@ export const partList = async () => {
   const res = request<ApiResponse<IPartResponse>>({
     method: 'GET',
     url: '/api/common/main/part/list'
+  });
+  return res;
+};
+
+interface IPartnerResponse {
+  partnerId: number;
+  name: string;
+  createdAt: string;
+  updatedAt: string;
+}
+
+export const getPartnerList = async () => {
+  const res = request<ApiResponse<IPartnerResponse>>({
+    method: 'GET',
+    url: '/api/common/main/partner/list'
   });
   return res;
 };

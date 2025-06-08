@@ -10,6 +10,13 @@ export interface ICategory {
   isUsed: boolean;
   children: ICategory[];
 }
+
+export interface ILeafCategory {
+  categoryId: number;
+  name: string;
+  isUsed: boolean;
+}
+
 export interface IRes<T> {
   data: T;
   message: string;

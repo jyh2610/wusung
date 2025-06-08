@@ -19,8 +19,8 @@ import {
 import { IContent } from '@/entities/program/type.dto';
 import { eduContentReg, putEduContent } from '@/entities/program/api';
 import { X } from 'lucide-react';
-import { getCategoryList } from './api';
-import { ICategory, IRes } from '@/shared/type';
+import { getCategoryLeaf, getCategoryList } from './api';
+import { ICategory, ILeafCategory, IRes } from '@/shared/type';
 import request from '@/shared/api/axiosInstance';
 import ImageEditor from './ImageEditor/index';
 
@@ -80,7 +80,7 @@ export function ContentUploadForm() {
 
   const id = searchParams.get('id');
   const router = useRouter();
-  const [category, setCategory] = useState<ICategory[]>([]);
+  const [category, setCategory] = useState<ILeafCategory[]>([]);
   const [form, setForm] = useState<IContent>({
     title: '',
     difficultyLevel: 1,
@@ -151,7 +151,7 @@ export function ContentUploadForm() {
 
   useEffect(() => {
     const fetchCategories = async () => {
-      const res = await getCategoryList();
+      const res = await getCategoryLeaf();
       if (res) {
         setCategory(res);
       }

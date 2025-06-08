@@ -27,10 +27,16 @@ export function BeforeLogIn() {
   const navigate = useRouter();
 
   const sendLogin = async () => {
-    const { login } = useAuthStore.getState();
+    const { login, set2FAState } = useAuthStore.getState();
     try {
       // 로그인 요청
-      await login(loginData.userName, loginData.password);
+      const success = await login(loginData.userName, loginData.password);
+
+      if (!success) {
+        // 로그인 실패 시 처리
+        return;
+      }
+
       // id와 password 초기화
       setLoginData({
         userName: '',

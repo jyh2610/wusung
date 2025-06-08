@@ -1,10 +1,8 @@
 'use client';
 
-import React, { useState } from 'react';
+import React, { useState, useEffect } from 'react';
 import Link from 'next/link';
 import { CustomImage } from '@/shared/ui';
-import { VerticalLine } from '@/shared/ui/VerticalLine';
-import { siteInfo } from '../const';
 import { IoIosArrowBack, IoIosArrowForward } from 'react-icons/io';
 import {
   companyContainer,
@@ -14,11 +12,31 @@ import {
   siteStyle,
   titleStyle
 } from './index.css';
+import { getFamilySiteList, IFamilyResponse } from '../api';
 
 export function Sites() {
   const [current, setCurrent] = useState(0);
-  const total = siteInfo.length;
+  const [familySites, setFamilySites] = useState<IFamilyResponse[]>([]);
   const perSlide = 2;
+
+  useEffect(() => {
+    const fetchFamilySites = async () => {
+      try {
+        const response = await getFamilySiteList();
+        if (response?.data) {
+          const sites = response.data.data as unknown as IFamilyResponse[];
+          const visibleSites = sites.filter(site => site.isVisible);
+          setFamilySites(visibleSites);
+        }
+      } catch (error) {
+        console.error('패밀리 사이트를 불러오는데 실패했습니다:', error);
+      }
+    };
+
+    fetchFamilySites();
+  }, []);
+
+  const total = familySites.length;
   const maxIndex = Math.max(0, Math.ceil(total / perSlide) - 1);
 
   if (total === 0) return null;
@@ -35,7 +53,7 @@ export function Sites() {
   // 슬라이드에 보여줄 데이터 2개씩
   const start = current * perSlide;
   const end = start + perSlide;
-  const slideData = siteInfo.slice(start, end);
+  const slideData = familySites.slice(start, end);
 
   // 페이지네이션 점 개수
   const pageCount = maxIndex + 1;
@@ -64,14 +82,14 @@ export function Sites() {
         <IoIosArrowBack />
       </button>
       {/* 기업 카드 2개씩 */}
-      {slideData.map((data, idx) => (
+      {slideData.map(data => (
         <Company
-          key={start + idx}
-          title={data.title}
-          content={data.content}
-          src={data.image}
+          key={data.partnerId}
+          title={data.name}
+          content={data.description}
+          src={data.imageUrl || '/images/logo.png'}
+          alt={data.name}
           link={data.link}
-          alt={data.alt}
         />
       ))}
       {/* 오른쪽 화살표 */}

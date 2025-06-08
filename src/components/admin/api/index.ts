@@ -1,6 +1,11 @@
 import { IContent } from '@/entities/program/type.dto';
 import request from '@/shared/api/axiosInstance';
-import { ApiResponse, ICategory, PaginatedResponse } from '@/shared/type';
+import {
+  ApiResponse,
+  ICategory,
+  ILeafCategory,
+  PaginatedResponse
+} from '@/shared/type';
 import {
   IMemberDetail,
   IpList,
@@ -19,6 +24,19 @@ export const getCategoryList = async (): Promise<ICategory[] | undefined> => {
     const res = await request<CategoryResponse>({
       method: 'GET',
       url: 'api/admin/category/list'
+    });
+    return res.data.data;
+  } catch (error) {
+    console.error(error);
+    return undefined;
+  }
+};
+
+export const getCategoryLeaf = async () => {
+  try {
+    const res = await request<ApiResponse<ILeafCategory[]>>({
+      method: 'GET',
+      url: '/api/admin/edu-content/category/leaf'
     });
     return res.data.data;
   } catch (error) {

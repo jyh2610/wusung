@@ -19,7 +19,7 @@ export default async function AdminLayout({
 
   const hasPermission = await getRole(cookie);
 
-  // console.log(hasPermission);
+  console.log(hasPermission);
 
   // if (!(hasPermission?.data === 'ADMIN')) {
   //   redirect('/');
