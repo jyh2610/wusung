@@ -177,10 +177,17 @@ export default function InquiryDetailPage({
         <h2 className="text-xl font-bold">답변 목록</h2>
         {Array.isArray(inquiry.data.comments) &&
           inquiry.data.comments.map((comment, index) => {
-            const commentId = isCommentObj(comment) ? comment.id : index;
-            const commentContent = isCommentObj(comment)
-              ? comment.content
-              : comment;
+            const commentId =
+              typeof comment === 'object' && comment !== null && 'id' in comment
+                ? (comment as { id: number }).id
+                : `comment-${index}`;
+            const commentContent =
+              typeof comment === 'object' &&
+              comment !== null &&
+              'content' in comment
+                ? (comment as { content: string }).content
+                : String(comment);
+
             return (
               <Card key={commentId} className="p-4">
                 {editingComment && editingComment.id === commentId ? (
@@ -214,7 +221,7 @@ export default function InquiryDetailPage({
                           size="sm"
                           onClick={() =>
                             setEditingComment({
-                              id: commentId,
+                              id: Number(commentId),
                               content: commentContent,
                               files: [],
                               deletedFilesIdList: []
@@ -226,7 +233,7 @@ export default function InquiryDetailPage({
                         <Button
                           variant="ghost"
                           size="sm"
-                          onClick={() => handleCommentDelete(commentId)}
+                          onClick={() => handleCommentDelete(Number(commentId))}
                         >
                           삭제
                         </Button>
