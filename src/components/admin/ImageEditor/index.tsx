@@ -158,7 +158,7 @@ export default function ImageEditor({
     if (x < 0 || x > imageSize.width || y < 0 || y > imageSize.height) return;
 
     const xPercent = (x / imageSize.width) * 100;
-    const yPercent = 100 - (y / imageSize.height) * 100;
+    const yPercent = (y / imageSize.height) * 100;
 
     startRef.current = { x: xPercent, y: yPercent };
     setCurrentRect({ x: xPercent, y: yPercent, width: 0, height: 0 });
@@ -176,7 +176,7 @@ export default function ImageEditor({
     const clampedY = Math.max(0, Math.min(y, imageSize.height));
 
     const xPercent = (clampedX / imageSize.width) * 100;
-    const yPercent = 100 - (clampedY / imageSize.height) * 100;
+    const yPercent = (clampedY / imageSize.height) * 100;
 
     const width = Math.abs(xPercent - startRef.current.x);
     const height = Math.abs(yPercent - startRef.current.y);
@@ -236,7 +236,9 @@ export default function ImageEditor({
         <Card>
           <CardContent className="p-4 flex flex-col items-center gap-4">
             <div className="border-2 border-dashed border-muted rounded-lg p-12 text-center w-full">
-              <Upload className="w-8 h-8 text-muted mb-2" />
+              <div className="flex justify-center">
+                <Upload className="w-8 h-8 text-muted mb-2" />
+              </div>
               <p className="text-sm mb-1">이미지를 업로드해주세요</p>
               <p className="text-xs text-muted">최대 100MB</p>
               <Button

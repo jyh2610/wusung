@@ -95,11 +95,11 @@ export function ContentUploadForm() {
     description: '',
     isUsed: true,
     overlays: [],
-    existName: [false],
-    existMonth: [false],
-    existDay: [false],
-    existDayOfWeek: [false],
-    existElderName: [false]
+    existName: [],
+    existMonth: [],
+    existDay: [],
+    existDayOfWeek: [],
+    existElderName: []
   });
   console.log(form);
 
@@ -208,47 +208,45 @@ export function ContentUploadForm() {
   };
 
   const handleImageUpload = (e: React.ChangeEvent<HTMLInputElement>) => {
-    const uploadedFiles = e.target.files ? Array.from(e.target.files) : [];
-    if (uploadedFiles.length > 0) {
-      const newFiles = [...files, ...uploadedFiles];
-      setFiles(newFiles);
+    const files = e.target.files ? Array.from(e.target.files) : [];
+    if (files.length === 0) return;
 
-      const previews = uploadedFiles.map(file => {
-        return new Promise<string>(resolve => {
-          const reader = new FileReader();
-          reader.onload = event => {
-            resolve(event.target?.result as string);
-          };
-          reader.readAsDataURL(file);
-        });
+    // 기존 배열 복사 후 false 추가
+    setForm(prev => ({
+      ...prev,
+      existName: [...prev.existName, false],
+      existMonth: [...prev.existMonth, false],
+      existDay: [...prev.existDay, false],
+      existDayOfWeek: [...prev.existDayOfWeek, false],
+      existElderName: [...prev.existElderName, false]
+    }));
+
+    const newFiles = [...files, ...files];
+    setFiles(newFiles);
+
+    const previews = files.map(file => {
+      return new Promise<string>(resolve => {
+        const reader = new FileReader();
+        reader.onload = event => {
+          resolve(event.target?.result as string);
+        };
+        reader.readAsDataURL(file);
       });
+    });
 
-      Promise.all(previews).then(newImages => {
-        const updatedPreviews = [...filePreviews, ...newImages];
-        setFilePreviews(updatedPreviews);
+    Promise.all(previews).then(newImages => {
+      const updatedPreviews = [...filePreviews, ...newImages];
+      setFilePreviews(updatedPreviews);
 
-        // 새 이미지에 대한 좌표 배열 초기화
-        const newCoordinates = [...imageCoordinates];
-        newImages.forEach(() => newCoordinates.push([]));
-        setImageCoordinates(newCoordinates);
+      // 새 이미지에 대한 좌표 배열 초기화
+      const newCoordinates = [...imageCoordinates];
+      newImages.forEach(() => newCoordinates.push([]));
+      setImageCoordinates(newCoordinates);
 
-        // 이미지 개수에 맞춰 항상 1차원 배열로 불리언 배열 생성
-        const imgCount = updatedPreviews.length;
-        const makeBoolArr = () => Array(imgCount).fill(false);
-        setForm(prev => ({
-          ...prev,
-          existName: makeBoolArr(),
-          existMonth: makeBoolArr(),
-          existDay: makeBoolArr(),
-          existDayOfWeek: makeBoolArr(),
-          existElderName: makeBoolArr()
-        }));
-
-        if (selectedImageIndex === null && updatedPreviews.length > 0) {
-          setSelectedImageIndex(0);
-        }
-      });
-    }
+      if (selectedImageIndex === null && updatedPreviews.length > 0) {
+        setSelectedImageIndex(0);
+      }
+    });
   };
 
   const removeImage = (index: number) => {
