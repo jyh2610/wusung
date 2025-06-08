@@ -12,7 +12,9 @@ import {
   Users,
   ListIcon,
   Bell,
-  Package
+  Package,
+  CreditCard,
+  MessageCircle
 } from 'lucide-react';
 import { cn } from '@/lib/utils';
 import { Button } from '@/components/ui/button';
@@ -26,6 +28,12 @@ export default function AdminSidebar() {
       icon: Package,
       href: '/admin/product',
       active: pathname === '/admin/product'
+    },
+    {
+      label: '결제 관리',
+      icon: CreditCard,
+      href: '/admin/payment',
+      active: pathname === '/admin/payment'
     },
     {
       label: '카테고리 관리',
@@ -69,6 +77,18 @@ export default function AdminSidebar() {
       icon: Bell,
       href: '/admin/popup',
       active: pathname === '/admin/popup'
+    },
+    {
+      label: '패밀리 사이트 관리',
+      icon: Users,
+      href: '/admin/family',
+      active: pathname === '/admin/family'
+    },
+    {
+      label: '1:1 문의 관리',
+      icon: MessageCircle,
+      href: '/admin/inquiry',
+      active: pathname === '/admin/inquiry'
     }
   ];
 
