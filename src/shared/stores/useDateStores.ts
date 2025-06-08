@@ -12,10 +12,11 @@ interface DateState {
 }
 
 const today = new Date();
+const nextMonth = new Date(today.getFullYear(), today.getMonth() + 1);
 
 export const useDateStore = create<DateState>(set => ({
-  year: today.getFullYear(),
-  month: today.getMonth() + 1,
+  year: nextMonth.getFullYear(),
+  month: nextMonth.getMonth() + 1,
   setYear: year => set({ year }),
   setMonth: month => set({ month }),
   goToPrevMonth: () =>

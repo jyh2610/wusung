@@ -3,14 +3,9 @@ export interface Rectangle {
   y: number;
   width: number;
   height: number;
-  type?: 'fixedText';
+  type?: string;
   fixedText?: string;
-  alignment?: 'left' | 'center' | 'right';
-  existName?: boolean;
-  existMonth?: boolean;
-  existDay?: boolean;
-  existDayOfWeek?: boolean;
-  existElderName?: boolean;
+  alignment?: string;
 }
 
 export interface ImageSize {
@@ -36,23 +31,16 @@ export interface ImageEditorProps {
   setExistElderName: (value: boolean) => void;
 }
 
+export interface IContent {
+  existName: boolean[];
+  existMonth: boolean[];
+  existDay: boolean[];
+  existDayOfWeek: boolean[];
+  existElderName: boolean[];
+}
+
 export const PREDEFINED_COORDINATES = {
-  name: {
-    x: 248.48782348632812,
-    y: 8.116302490234375,
-    width: 170,
-    height: 22
-  },
-  date: {
-    x: 60.340240478515625,
-    y: 8.116302490234375,
-    width: 135,
-    height: 23
-  },
-  difficulty: {
-    x: 62.340240478515625,
-    y: 56.116302490234375,
-    width: 133,
-    height: 30
-  }
-} as const;
+  name: { x: 10, y: 10, width: 80, height: 20 },
+  date: { x: 10, y: 40, width: 80, height: 20 },
+  elderName: { x: 10, y: 70, width: 80, height: 20 }
+};

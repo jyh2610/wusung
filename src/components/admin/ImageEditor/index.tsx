@@ -14,6 +14,15 @@ import { ImagePreview } from './ImagePreview';
 import { CoordinateList } from './CoordinateList';
 import { EditModal } from './EditModal';
 import { Input } from '@/components/ui/input';
+import { IContent } from '@/entities/program/type.dto';
+
+interface FormState {
+  existName: boolean[];
+  existMonth: boolean[];
+  existDay: boolean[];
+  existDayOfWeek: boolean[];
+  existElderName: boolean[];
+}
 
 export default function ImageEditor({
   image,
@@ -45,6 +54,14 @@ export default function ImageEditor({
   const [selectedRectIndex, setSelectedRectIndex] = useState<number | null>(
     null
   );
+
+  const [form, setForm] = useState<FormState>({
+    existName: [],
+    existMonth: [],
+    existDay: [],
+    existDayOfWeek: [],
+    existElderName: []
+  });
 
   useEffect(() => {
     if (image) {
@@ -78,14 +95,38 @@ export default function ImageEditor({
     switch (type) {
       case 'name':
         setExistName(!existName);
+        setForm(prev => {
+          const newExistName = [...prev.existName];
+          newExistName[imageIndex] = !existName;
+          return { ...prev, existName: newExistName };
+        });
         break;
       case 'date':
         setExistMonth(!existMonth);
         setExistDay(!existDay);
         setExistDayOfWeek(!existDayOfWeek);
+        setForm(prev => {
+          const newExistMonth = [...prev.existMonth];
+          const newExistDay = [...prev.existDay];
+          const newExistDayOfWeek = [...prev.existDayOfWeek];
+          newExistMonth[imageIndex] = !existMonth;
+          newExistDay[imageIndex] = !existDay;
+          newExistDayOfWeek[imageIndex] = !existDayOfWeek;
+          return {
+            ...prev,
+            existMonth: newExistMonth,
+            existDay: newExistDay,
+            existDayOfWeek: newExistDayOfWeek
+          };
+        });
         break;
       case 'elderName':
         setExistElderName(!existElderName);
+        setForm(prev => {
+          const newExistElderName = [...prev.existElderName];
+          newExistElderName[imageIndex] = !existElderName;
+          return { ...prev, existElderName: newExistElderName };
+        });
         break;
     }
   };
@@ -137,15 +178,15 @@ export default function ImageEditor({
     const xPercent = (clampedX / imageSize.width) * 100;
     const yPercent = (clampedY / imageSize.height) * 100;
 
-    const yStart = startRef.current.y;
-    const yEnd = yPercent;
-    const top = Math.min(yStart, yEnd);
-    const height = Math.abs(yStart - yEnd);
+    const width = Math.abs(xPercent - startRef.current.x);
+    const height = Math.abs(yPercent - startRef.current.y);
+    const left = Math.min(startRef.current.x, xPercent);
+    const top = Math.min(startRef.current.y, yPercent);
 
     setCurrentRect({
-      x: Math.min(startRef.current.x, xPercent),
+      x: left,
       y: top,
-      width: Math.abs(startRef.current.x - xPercent),
+      width: width,
       height: height
     });
   };
@@ -252,11 +293,18 @@ export default function ImageEditor({
               onRectClick={setSelectedRectIndex}
               onToggleExist={handleToggleExist}
               onClose={() => setIsEditing(false)}
-              existName={existName}
-              existMonth={existMonth}
-              existDay={existDay}
-              existDayOfWeek={existDayOfWeek}
-              existElderName={existElderName}
+              existName={form.existName[imageIndex] ?? false}
+              existMonth={form.existMonth[imageIndex] ?? false}
+              existDay={form.existDay[imageIndex] ?? false}
+              existDayOfWeek={form.existDayOfWeek[imageIndex] ?? false}
+              existElderName={form.existElderName[imageIndex] ?? false}
+              setExistName={value => {
+                setForm((prev: FormState) => {
+                  const arr = [...prev.existName];
+                  arr[imageIndex] = value;
+                  return { ...prev, existName: arr };
+                });
+              }}
               onAddCustomCoordinate={handleAddCustomCoordinate}
             />
           )}

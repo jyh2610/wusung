@@ -7,7 +7,7 @@ const withVanillaExtract = createVanillaExtractPlugin({
 
 const nextConfig = {
   images: {
-    domains: ['dwkcd9qfwbc4t.cloudfront.net']
+    domains: ['dwkcd9qfwbc4t.cloudfront.net', 'dc4jgoljm3ewc.cloudfront.net']
   },
   async rewrites() {
     return [

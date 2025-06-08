@@ -81,21 +81,27 @@ export function ContentUploadForm() {
   const id = searchParams.get('id');
   const router = useRouter();
   const [category, setCategory] = useState<ILeafCategory[]>([]);
+  const now = new Date();
+  const nextMonth = now.getMonth() + 2 > 12 ? 1 : now.getMonth() + 2;
+  const nextYear =
+    now.getMonth() + 2 > 12 ? now.getFullYear() + 1 : now.getFullYear();
+
   const [form, setForm] = useState<IContent>({
     title: '',
     difficultyLevel: 1,
     categoryId: 0,
-    year: new Date().getFullYear(),
-    month: new Date().getMonth() + 1,
+    year: nextYear,
+    month: nextMonth,
     description: '',
     isUsed: true,
     overlays: [],
-    existName: false,
-    existMonth: false,
-    existDay: false,
-    existDayOfWeek: false,
-    existElderName: false
+    existName: [false],
+    existMonth: [false],
+    existDay: [false],
+    existDayOfWeek: [false],
+    existElderName: [false]
   });
+  console.log(form);
 
   useEffect(() => {
     const fetchContent = async () => {
@@ -118,11 +124,19 @@ export function ContentUploadForm() {
           description: obj.description,
           isUsed: obj.isUsed,
           overlays: obj.overlayLocations,
-          existName: obj.existName,
-          existMonth: obj.existMonth,
-          existDay: obj.existDay,
-          existDayOfWeek: obj.existDayOfWeek,
-          existElderName: obj.existElderName
+          existName: Array.isArray(obj.existName)
+            ? obj.existName
+            : [obj.existName],
+          existMonth: Array.isArray(obj.existMonth)
+            ? obj.existMonth
+            : [obj.existMonth],
+          existDay: Array.isArray(obj.existDay) ? obj.existDay : [obj.existDay],
+          existDayOfWeek: Array.isArray(obj.existDayOfWeek)
+            ? obj.existDayOfWeek
+            : [obj.existDayOfWeek],
+          existElderName: Array.isArray(obj.existElderName)
+            ? obj.existElderName
+            : [obj.existElderName]
         });
 
         const processedFiles: string[] = obj.files.map(file => file.fileUrl);
@@ -164,22 +178,26 @@ export function ContentUploadForm() {
     setForm(prev => ({ ...prev, [field]: value }));
   };
 
-  const handleSubmit = async (e: React.FormEvent) => {
-    e.preventDefault();
+  const handleSubmit = async () => {
     setIsUploading(true);
 
     try {
+      // form 데이터를 1차원 배열로 변환
+      const formData = {
+        ...form
+      };
+
       if (id) {
         // 수정인 경우
         await putEduContent({
           eduContentId: Number(id),
-          content: form,
+          content: formData,
           deletedFileIds: [], // 삭제된 파일 ID 목록 (필요한 경우 구현)
           imageFiles: files
         });
       } else {
         // 새로 등록하는 경우
-        await eduContentReg(form, files);
+        await eduContentReg(formData, files);
       }
       setIsUploading(false);
       router.push('/admin/content');
@@ -192,11 +210,9 @@ export function ContentUploadForm() {
   const handleImageUpload = (e: React.ChangeEvent<HTMLInputElement>) => {
     const uploadedFiles = e.target.files ? Array.from(e.target.files) : [];
     if (uploadedFiles.length > 0) {
-      // 기존 파일에 새 파일 추가
       const newFiles = [...files, ...uploadedFiles];
       setFiles(newFiles);
 
-      // 이미지 미리보기 생성
       const previews = uploadedFiles.map(file => {
         return new Promise<string>(resolve => {
           const reader = new FileReader();
@@ -216,7 +232,18 @@ export function ContentUploadForm() {
         newImages.forEach(() => newCoordinates.push([]));
         setImageCoordinates(newCoordinates);
 
-        // 첫 번째 이미지가 업로드되면 자동으로 선택
+        // 이미지 개수에 맞춰 항상 1차원 배열로 불리언 배열 생성
+        const imgCount = updatedPreviews.length;
+        const makeBoolArr = () => Array(imgCount).fill(false);
+        setForm(prev => ({
+          ...prev,
+          existName: makeBoolArr(),
+          existMonth: makeBoolArr(),
+          existDay: makeBoolArr(),
+          existDayOfWeek: makeBoolArr(),
+          existElderName: makeBoolArr()
+        }));
+
         if (selectedImageIndex === null && updatedPreviews.length > 0) {
           setSelectedImageIndex(0);
         }
@@ -237,7 +264,16 @@ export function ContentUploadForm() {
     newCoordinates.splice(index, 1);
     setImageCoordinates(newCoordinates);
 
-    // 선택된 이미지가 삭제된 경우 처리
+    // 불리언 배열에서도 해당 이미지의 데이터 제거
+    setForm(prev => ({
+      ...prev,
+      existName: prev.existName.filter((_, i) => i !== index),
+      existMonth: prev.existMonth.filter((_, i) => i !== index),
+      existDay: prev.existDay.filter((_, i) => i !== index),
+      existDayOfWeek: prev.existDayOfWeek.filter((_, i) => i !== index),
+      existElderName: prev.existElderName.filter((_, i) => i !== index)
+    }));
+
     if (selectedImageIndex === index) {
       if (newPreviews.length > 0) {
         setSelectedImageIndex(0);
@@ -245,7 +281,6 @@ export function ContentUploadForm() {
         setSelectedImageIndex(null);
       }
     } else if (selectedImageIndex !== null && selectedImageIndex > index) {
-      // 선택된 이미지 앞의 이미지가 삭제된 경우 인덱스 조정
       setSelectedImageIndex(selectedImageIndex - 1);
     }
   };
@@ -258,7 +293,7 @@ export function ContentUploadForm() {
   };
 
   return (
-    <form className="bg-white p-6 rounded-lg" onSubmit={handleSubmit}>
+    <div className="bg-white p-6 rounded-lg">
       <div className="grid gap-6">
         <div className="grid gap-3">
           <Label htmlFor="title">제목</Label>
@@ -394,20 +429,36 @@ export function ContentUploadForm() {
                   setCoordinates={updateImageCoordinates}
                   handleImageUpload={handleImageUpload}
                   imageIndex={selectedImageIndex}
-                  existName={form.existName}
-                  existMonth={form.existMonth}
-                  existDay={form.existDay}
-                  existDayOfWeek={form.existDayOfWeek}
-                  existElderName={form.existElderName}
-                  setExistName={value => handleChange('existName', value)}
-                  setExistMonth={value => handleChange('existMonth', value)}
-                  setExistDay={value => handleChange('existDay', value)}
-                  setExistDayOfWeek={value =>
-                    handleChange('existDayOfWeek', value)
-                  }
-                  setExistElderName={value =>
-                    handleChange('existElderName', value)
-                  }
+                  existName={form.existName[selectedImageIndex]}
+                  existMonth={form.existMonth[selectedImageIndex]}
+                  existDay={form.existDay[selectedImageIndex]}
+                  existDayOfWeek={form.existDayOfWeek[selectedImageIndex]}
+                  existElderName={form.existElderName[selectedImageIndex]}
+                  setExistName={value => {
+                    const newExistName = [...form.existName];
+                    newExistName[selectedImageIndex] = value;
+                    handleChange('existName', newExistName);
+                  }}
+                  setExistMonth={value => {
+                    const newExistMonth = [...form.existMonth];
+                    newExistMonth[selectedImageIndex] = value;
+                    handleChange('existMonth', newExistMonth);
+                  }}
+                  setExistDay={value => {
+                    const newExistDay = [...form.existDay];
+                    newExistDay[selectedImageIndex] = value;
+                    handleChange('existDay', newExistDay);
+                  }}
+                  setExistDayOfWeek={value => {
+                    const newExistDayOfWeek = [...form.existDayOfWeek];
+                    newExistDayOfWeek[selectedImageIndex] = value;
+                    handleChange('existDayOfWeek', newExistDayOfWeek);
+                  }}
+                  setExistElderName={value => {
+                    const newExistElderName = [...form.existElderName];
+                    newExistElderName[selectedImageIndex] = value;
+                    handleChange('existElderName', newExistElderName);
+                  }}
                 />
               ) : (
                 <ImageEditor
@@ -416,20 +467,36 @@ export function ContentUploadForm() {
                   setCoordinates={() => {}}
                   handleImageUpload={handleImageUpload}
                   imageIndex={0}
-                  existName={form.existName}
-                  existMonth={form.existMonth}
-                  existDay={form.existDay}
-                  existDayOfWeek={form.existDayOfWeek}
-                  existElderName={form.existElderName}
-                  setExistName={value => handleChange('existName', value)}
-                  setExistMonth={value => handleChange('existMonth', value)}
-                  setExistDay={value => handleChange('existDay', value)}
-                  setExistDayOfWeek={value =>
-                    handleChange('existDayOfWeek', value)
-                  }
-                  setExistElderName={value =>
-                    handleChange('existElderName', value)
-                  }
+                  existName={form.existName[0]}
+                  existMonth={form.existMonth[0]}
+                  existDay={form.existDay[0]}
+                  existDayOfWeek={form.existDayOfWeek[0]}
+                  existElderName={form.existElderName[0]}
+                  setExistName={value => {
+                    const newExistName = [...form.existName];
+                    newExistName[0] = value;
+                    handleChange('existName', newExistName);
+                  }}
+                  setExistMonth={value => {
+                    const newExistMonth = [...form.existMonth];
+                    newExistMonth[0] = value;
+                    handleChange('existMonth', newExistMonth);
+                  }}
+                  setExistDay={value => {
+                    const newExistDay = [...form.existDay];
+                    newExistDay[0] = value;
+                    handleChange('existDay', newExistDay);
+                  }}
+                  setExistDayOfWeek={value => {
+                    const newExistDayOfWeek = [...form.existDayOfWeek];
+                    newExistDayOfWeek[0] = value;
+                    handleChange('existDayOfWeek', newExistDayOfWeek);
+                  }}
+                  setExistElderName={value => {
+                    const newExistElderName = [...form.existElderName];
+                    newExistElderName[0] = value;
+                    handleChange('existElderName', newExistElderName);
+                  }}
                 />
               )}
 
@@ -488,11 +555,11 @@ export function ContentUploadForm() {
           >
             취소
           </Button>
-          <Button type="submit" disabled={isUploading}>
+          <Button type="button" disabled={isUploading} onClick={handleSubmit}>
             {isUploading ? '업로드 중...' : '콘텐츠 저장'}
           </Button>
         </div>
       </div>
-    </form>
+    </div>
   );
 }

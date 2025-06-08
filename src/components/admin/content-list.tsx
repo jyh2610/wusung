@@ -65,7 +65,7 @@ export function ContentList() {
     new Date().getFullYear()
   );
   const [selectedMonth, setSelectedMonth] = useState<number>(
-    new Date().getMonth() + 1
+    new Date().getMonth() + 2 > 12 ? 1 : new Date().getMonth() + 2
   );
   const [selectedDifficulty, setSelectedDifficulty] = useState<number>(1);
   const [selectedCategory, setSelectedCategory] = useState<number | null>(null);
@@ -92,6 +92,17 @@ export function ContentList() {
         difficultyLevel: selectedDifficulty,
         year: selectedYear,
         month: selectedMonth
+      }).then(response => {
+        if (response?.content) {
+          return {
+            ...response,
+            content: response.content.map(content => ({
+              ...content,
+              difficultyLevel: selectedDifficulty
+            }))
+          };
+        }
+        return response;
       });
     },
     enabled: !!selectedCategory
@@ -196,9 +207,9 @@ export function ContentList() {
               <SelectValue placeholder="난이도 선택" />
             </SelectTrigger>
             <SelectContent>
-              <SelectItem value="1">하</SelectItem>
+              <SelectItem value="1">상</SelectItem>
               <SelectItem value="2">중</SelectItem>
-              <SelectItem value="3">상</SelectItem>
+              <SelectItem value="3">하</SelectItem>
             </SelectContent>
           </Select>
         </div>
@@ -228,10 +239,10 @@ export function ContentList() {
                   <TableCell>
                     <Badge variant="outline">
                       {content.difficultyLevel === 1
-                        ? '하'
+                        ? '상'
                         : content.difficultyLevel === 2
                           ? '중'
-                          : '상'}
+                          : '하'}
                     </Badge>
                   </TableCell>
                   <TableCell>

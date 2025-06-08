@@ -20,11 +20,11 @@ export interface IContent {
   thumbnailUrl?: string;
   description: string;
   isUsed: boolean;
-  existName: boolean;
-  existMonth: boolean;
-  existDay: boolean;
-  existDayOfWeek: boolean;
-  existElderName: boolean;
+  existName: boolean[];
+  existMonth: boolean[];
+  existDay: boolean[];
+  existDayOfWeek: boolean[];
+  existElderName: boolean[];
   createdAt?: string;
   overlays: IOverlay[];
 }

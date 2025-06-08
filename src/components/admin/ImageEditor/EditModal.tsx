@@ -3,7 +3,7 @@ import { Button } from '@/components/ui/button';
 import { useState, useEffect, useRef } from 'react';
 import { Input } from '@/components/ui/input';
 
-interface EditModalProps {
+export interface EditModalProps {
   image: string;
   imageSize: ImageSize | null;
   originalCoordinates: Rectangle[];
@@ -21,6 +21,7 @@ interface EditModalProps {
   existDay: boolean;
   existDayOfWeek: boolean;
   existElderName: boolean;
+  setExistName: (value: boolean) => void;
   onAddCustomCoordinate: (rect: Rectangle, text: string) => void;
 }
 
@@ -42,6 +43,7 @@ export const EditModal = ({
   existDay,
   existDayOfWeek,
   existElderName,
+  setExistName,
   onAddCustomCoordinate
 }: EditModalProps) => {
   const [selectedPreset, setSelectedPreset] = useState<
@@ -144,7 +146,9 @@ export const EditModal = ({
               variant={existName ? 'default' : 'outline'}
               type="button"
               onClick={() => handlePresetClick('name')}
-              className={existName ? 'bg-blue-500 text-white' : ''}
+              className={`${
+                existName ? 'bg-blue-500 hover:bg-blue-600 text-white' : ''
+              }`}
             >
               이름
             </Button>
@@ -154,11 +158,11 @@ export const EditModal = ({
               }
               type="button"
               onClick={() => handlePresetClick('date')}
-              className={
+              className={`${
                 existMonth || existDay || existDayOfWeek
-                  ? 'bg-blue-500 text-white'
+                  ? 'bg-blue-500 hover:bg-blue-600 text-white'
                   : ''
-              }
+              }`}
             >
               날짜
             </Button>
@@ -166,7 +170,9 @@ export const EditModal = ({
               variant={existElderName ? 'default' : 'outline'}
               type="button"
               onClick={() => handlePresetClick('elderName')}
-              className={existElderName ? 'bg-blue-500 text-white' : ''}
+              className={`${
+                existElderName ? 'bg-blue-500 hover:bg-blue-600 text-white' : ''
+              }`}
             >
               대상자명
             </Button>

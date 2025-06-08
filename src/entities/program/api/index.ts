@@ -144,11 +144,11 @@ export const eduContentReg = async (content: IContent, imageFiles: File[]) => {
       month: content.month || 0,
       description: content.description || '',
       isUsed: content.isUsed || false,
-      existName: [content.existName || false],
-      existMonth: [content.existMonth || false],
-      existDay: [content.existDay || false],
-      existDayOfWeek: [content.existDayOfWeek || false],
-      existElderName: [content.existElderName || false],
+      existName: content.existName,
+      existMonth: content.existMonth,
+      existDay: content.existDay,
+      existDayOfWeek: content.existDayOfWeek,
+      existElderName: content.existElderName,
       overlays:
         processedOverlays.length > 0
           ? processedOverlays
