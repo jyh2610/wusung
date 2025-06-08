@@ -1,12 +1,16 @@
 'use client';
 
 import React from 'react';
-import { useQuery } from '@tanstack/react-query';
-import { getPaymentDetail } from '@/components/admin/payment/api';
+import { useQuery, useQueryClient } from '@tanstack/react-query';
+import {
+  getPaymentDetail,
+  approvePayment
+} from '@/components/admin/payment/api';
 import { useRouter } from 'next/navigation';
 import { Card } from '@/components/ui/card';
 import { Button } from '@/components/ui/button';
 import { format } from 'date-fns';
+import { message, Modal } from 'antd';
 
 export default function PaymentDetailPage({
   params
@@ -14,6 +18,7 @@ export default function PaymentDetailPage({
   params: { id: string };
 }) {
   const router = useRouter();
+  const queryClient = useQueryClient();
   const { data, isLoading, error } = useQuery({
     queryKey: ['payment-detail', params.id],
     queryFn: () => getPaymentDetail(Number(params.id))
@@ -23,7 +28,28 @@ export default function PaymentDetailPage({
   if (error || !data) return <div>결제 정보를 불러올 수 없습니다.</div>;
 
   const payment = data.data;
-  const buyerId = (payment as any).buyerId;
+
+  const handleApprove = async () => {
+    try {
+      await approvePayment(Number(payment.paymentId));
+      message.success('무통장입금이 승인되었습니다.');
+      queryClient.invalidateQueries({
+        queryKey: ['payment-detail', params.id]
+      });
+    } catch (error) {
+      message.error('승인 중 오류가 발생했습니다.');
+    }
+  };
+
+  const showApproveModal = () => {
+    Modal.confirm({
+      title: '무통장입금 승인',
+      content: '정말 승인하시겠습니까?',
+      okText: '승인',
+      cancelText: '취소',
+      onOk: handleApprove
+    });
+  };
 
   return (
     <div className="p-6 space-y-6">
@@ -34,7 +60,7 @@ export default function PaymentDetailPage({
         </Button>
       </div>
       <Card className="p-6 bg-white">
-        <div className="flex justify-end mb-4">
+        <div className="flex justify-end mb-4 gap-2">
           <Button
             size="sm"
             variant="outline"
@@ -43,6 +69,12 @@ export default function PaymentDetailPage({
           >
             구매자 상세 보기
           </Button>
+          {payment.paymentMethod === 'BANK_TRANSFER' &&
+            payment.status === 'PENDING' && (
+              <Button size="sm" variant="outline" onClick={showApproveModal}>
+                무통장입금 승인
+              </Button>
+            )}
         </div>
         <div className="grid grid-cols-1 md:grid-cols-2 gap-x-8 gap-y-2 ">
           <div>
