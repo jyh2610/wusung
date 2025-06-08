@@ -31,7 +31,7 @@ export default function PaymentDetailPage({
 
   const handleApprove = async () => {
     try {
-      await approvePayment(Number(payment.paymentId));
+      await approvePayment(payment.paymentId);
       message.success('무통장입금이 승인되었습니다.');
       queryClient.invalidateQueries({
         queryKey: ['payment-detail', params.id]

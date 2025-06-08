@@ -58,7 +58,7 @@ export const getPaymentDetail = async (tradeId: number) => {
   }
 };
 
-export const approvePayment = async (paymentId: number) => {
+export const approvePayment = async (paymentId: string) => {
   try {
     const response = await request<ApiResponse<void>>({
       url: `/api/admin/payment/approve`,

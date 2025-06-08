@@ -67,7 +67,7 @@ export const Payment = () => {
       })
   });
 
-  const handleApprove = async (paymentId: number) => {
+  const handleApprove = async (paymentId: string) => {
     try {
       await approvePayment(paymentId);
       message.success('결제가 승인되었습니다.');
