@@ -8,10 +8,6 @@ import {
   updateInquiryComment,
   deleteInquiryComment
 } from '@/components/admin/personal/api';
-import {
-  IGetInquiryDetail,
-  IInquiryComment
-} from '@/components/admin/personal/type';
 import { Button } from '@/components/ui/button';
 import { Textarea } from '@/components/ui/textarea';
 import { format } from 'date-fns';
@@ -98,6 +94,18 @@ export default function InquiryDetailPage({
     }
   };
 
+  // 타입 가드 함수 추가
+  function isCommentObj(
+    comment: any
+  ): comment is { id: number; content: string } {
+    return (
+      typeof comment === 'object' &&
+      comment !== null &&
+      'id' in comment &&
+      'content' in comment
+    );
+  }
+
   if (isLoading) {
     return <div>로딩중...</div>;
   }
@@ -135,15 +143,19 @@ export default function InquiryDetailPage({
             <div>
               <Label>첨부파일</Label>
               <div className="mt-1 space-y-2">
-                {inquiry.data.files.map((file: string, index: number) => (
+                {inquiry.data.files.map((file: any, index: number) => (
                   <a
                     key={index}
-                    href={file}
+                    href={file.fileUrl || file.url || file.path || '#'}
                     target="_blank"
                     rel="noopener noreferrer"
                     className="block text-blue-600 hover:underline"
                   >
-                    {file}
+                    {file.fileName ||
+                      file.name ||
+                      file.fileUrl ||
+                      file.url ||
+                      '첨부파일'}
                   </a>
                 ))}
               </div>
@@ -163,61 +175,68 @@ export default function InquiryDetailPage({
 
       <div className="space-y-4">
         <h2 className="text-xl font-bold">답변 목록</h2>
-        {inquiry.data.comments.map((comment, index) => (
-          <Card key={index} className="p-4">
-            {editingComment?.id === index ? (
-              <div className="space-y-4">
-                <Textarea
-                  value={editingComment.content}
-                  onChange={e =>
-                    setEditingComment(prev => ({
-                      ...prev!,
-                      content: e.target.value
-                    }))
-                  }
-                />
-                <div className="flex justify-end space-x-2">
-                  <Button
-                    variant="outline"
-                    onClick={() => setEditingComment(null)}
-                  >
-                    취소
-                  </Button>
-                  <Button onClick={handleCommentUpdate}>수정</Button>
-                </div>
-              </div>
-            ) : (
-              <div className="space-y-2">
-                <div className="whitespace-pre-wrap">{comment}</div>
-                <div className="flex justify-between items-center text-sm text-gray-500">
-                  <div className="space-x-2">
-                    <Button
-                      variant="ghost"
-                      size="sm"
-                      onClick={() =>
-                        setEditingComment({
-                          id: index,
-                          content: comment,
-                          files: [],
-                          deletedFilesIdList: []
-                        })
+        {Array.isArray(inquiry.data.comments) &&
+          inquiry.data.comments.map((comment, index) => {
+            const commentId = isCommentObj(comment) ? comment.id : index;
+            const commentContent = isCommentObj(comment)
+              ? comment.content
+              : comment;
+            return (
+              <Card key={commentId} className="p-4">
+                {editingComment && editingComment.id === commentId ? (
+                  <div className="space-y-4">
+                    <Textarea
+                      value={editingComment.content ?? ''}
+                      onChange={e =>
+                        setEditingComment(prev => ({
+                          ...prev!,
+                          content: e.target.value
+                        }))
                       }
-                    >
-                      수정
-                    </Button>
-                    <Button
-                      variant="ghost"
-                      size="sm"
-                      onClick={() => handleCommentDelete(index)}
-                    >
-                      삭제
-                    </Button>
+                    />
+                    <div className="flex justify-end space-x-2">
+                      <Button
+                        variant="outline"
+                        onClick={() => setEditingComment(null)}
+                      >
+                        취소
+                      </Button>
+                      <Button onClick={handleCommentUpdate}>수정</Button>
+                    </div>
                   </div>
-                </div>
-              </div>
-            )}
-          </Card>
-        ))}
+                ) : (
+                  <div className="space-y-2">
+                    <div className="whitespace-pre-wrap">{commentContent}</div>
+                    <div className="flex justify-between items-center text-sm text-gray-500">
+                      <div className="space-x-2">
+                        <Button
+                          variant="ghost"
+                          size="sm"
+                          onClick={() =>
+                            setEditingComment({
+                              id: commentId,
+                              content: commentContent,
+                              files: [],
+                              deletedFilesIdList: []
+                            })
+                          }
+                        >
+                          수정
+                        </Button>
+                        <Button
+                          variant="ghost"
+                          size="sm"
+                          onClick={() => handleCommentDelete(commentId)}
+                        >
+                          삭제
+                        </Button>
+                      </div>
+                    </div>
+                  </div>
+                )}
+              </Card>
+            );
+          })}
 
         <div className="space-y-4">
           <h2 className="text-xl font-bold">답변 작성</h2>
