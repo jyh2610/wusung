@@ -2,7 +2,7 @@
 
 import React, { useState } from 'react';
 import { Button } from '@/components/ui/button';
-import { Table } from 'antd';
+import { Table, Tooltip } from 'antd';
 import { useQuery, useQueryClient } from '@tanstack/react-query';
 import { getPaymentList, getFilter, getSortList, approvePayment } from './api';
 import { IPayment } from './type';
@@ -18,6 +18,7 @@ import {
 } from '@/components/ui/select';
 import { Switch } from '@/components/ui/switch';
 import { format } from 'date-fns';
+import { useRouter } from 'next/navigation';
 
 export const Payment = () => {
   const [page, setPage] = useState(0);
@@ -29,6 +30,7 @@ export const Payment = () => {
   const [sort, setSort] = useState('createdAt');
   const [direction, setDirection] = useState<'ASC' | 'DESC'>('DESC');
   const queryClient = useQueryClient();
+  const router = useRouter();
 
   const { data: filterOptions } = useQuery({
     queryKey: ['payment-filter'],
@@ -80,17 +82,49 @@ export const Payment = () => {
     {
       title: '결제 ID',
       dataIndex: 'paymentId',
-      key: 'paymentId'
+      key: 'paymentId',
+      render: (id: string) => (
+        <Tooltip title={id}>
+          <span>{id.length > 10 ? `${id.slice(0, 10)}...` : id}</span>
+        </Tooltip>
+      )
     },
     {
-      title: '구매자',
-      dataIndex: 'name',
-      key: 'name'
+      title: '계정명',
+      dataIndex: 'accountName',
+      key: 'accountName'
+    },
+    {
+      title: '구매자명',
+      dataIndex: 'buyerName',
+      key: 'buyerName'
+    },
+    {
+      title: '구매자 이메일',
+      dataIndex: 'buyerEmail',
+      key: 'buyerEmail'
+    },
+    {
+      title: '구매자 연락처',
+      dataIndex: 'buyerPhone',
+      key: 'buyerPhone'
     },
     {
       title: '결제 금액',
       dataIndex: 'amountTotal',
       key: 'amountTotal',
+      render: (amount: number) => `${amount.toLocaleString()}원`
+    },
+    {
+      title: '실 결제 금액',
+      dataIndex: 'amountPaid',
+      key: 'amountPaid',
+      render: (amount: number) => `${amount.toLocaleString()}원`
+    },
+    {
+      title: '취소 금액',
+      dataIndex: 'amountCancelled',
+      key: 'amountCancelled',
       render: (amount: number) => `${amount.toLocaleString()}원`
     },
     {
@@ -118,25 +152,8 @@ export const Payment = () => {
       title: '결제일',
       dataIndex: 'createdAt',
       key: 'createdAt',
-      render: (date: string) => format(new Date(date), 'yyyy-MM-dd HH:mm:ss')
-    },
-    {
-      title: '관리',
-      key: 'action',
-      render: (_: any, record: IPayment) => (
-        <div className="space-x-2">
-          {record.status === 'PENDING' &&
-            record.paymentMethod === 'BANK_TRANSFER' && (
-              <Button
-                variant="outline"
-                size="sm"
-                onClick={() => handleApprove(record.tradeId)}
-              >
-                승인
-              </Button>
-            )}
-        </div>
-      )
+      render: (date: string) => format(new Date(date), 'yyyy-MM-dd HH:mm:ss'),
+      sorter: true
     }
   ];
 
@@ -150,21 +167,9 @@ export const Payment = () => {
         <div className="space-y-2">
           <Label>검색</Label>
           <Input
-            placeholder="구매자 이름, 이메일, 전화번호, 결제ID"
+            placeholder="계정 이름, 구매자 이름, 구매자 이메일, 구매자 전화번호, 결제 ID"
             value={search}
             onChange={e => setSearch(e.target.value)}
-          />
-        </div>
-
-        <div className="space-y-2">
-          <Label>회원 ID</Label>
-          <Input
-            type="number"
-            placeholder="회원 ID"
-            value={memberId}
-            onChange={e =>
-              setMemberId(e.target.value ? Number(e.target.value) : undefined)
-            }
           />
         </div>
 
@@ -188,7 +193,13 @@ export const Payment = () => {
         <div className="space-y-2">
           <Label>정렬</Label>
           <div className="flex space-x-2">
-            <Select value={sort} onValueChange={setSort}>
+            <Select
+              value={sort}
+              onValueChange={val => {
+                setSort(val);
+                setPage(0);
+              }}
+            >
               <SelectTrigger>
                 <SelectValue placeholder="정렬 기준" />
               </SelectTrigger>
@@ -200,7 +211,13 @@ export const Payment = () => {
                 ))}
               </SelectContent>
             </Select>
-            <Select value={direction} onValueChange={setDirection as any}>
+            <Select
+              value={direction}
+              onValueChange={val => {
+                setDirection(val as 'ASC' | 'DESC');
+                setPage(0);
+              }}
+            >
               <SelectTrigger>
                 <SelectValue placeholder="정렬 방향" />
               </SelectTrigger>
@@ -212,21 +229,23 @@ export const Payment = () => {
           </div>
         </div>
 
-        <div className="flex items-center space-x-2">
-          <Switch
-            id="isBankTransfer"
-            checked={isBankTransfer}
-            onCheckedChange={setIsBankTransfer}
-            className="bg-gray-200 data-[state=checked]:bg-blue-600"
-          />
+        <div className="space-y-2 flex flex-col justify-end">
           <Label htmlFor="isBankTransfer">무통장 입금만 보기</Label>
+          <div className="flex flex-row items-center space-x-2">
+            <Switch
+              id="isBankTransfer"
+              checked={isBankTransfer}
+              onCheckedChange={setIsBankTransfer}
+              className="bg-gray-200 data-[state=checked]:bg-blue-600"
+            />
+          </div>
         </div>
       </div>
 
       <Table
         columns={columns}
         dataSource={data?.data.content as unknown as IPayment[]}
-        rowKey="paymentId"
+        rowKey="tradeId"
         pagination={{
           total: data?.data.totalElements || 0,
           pageSize: size,
@@ -234,6 +253,17 @@ export const Payment = () => {
           onChange: page => setPage(page - 1)
         }}
         loading={isLoading}
+        onChange={(pagination, filters, sorter: any) => {
+          if (sorter && sorter.field && sorter.order) {
+            setSort(sorter.field);
+            setDirection(sorter.order === 'ascend' ? 'ASC' : 'DESC');
+            setPage(0);
+          }
+        }}
+        onRow={record => ({
+          onClick: () => router.push(`/admin/payment/${record.tradeId}`),
+          style: { cursor: 'pointer' }
+        })}
       />
     </div>
   );

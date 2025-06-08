@@ -1,6 +1,6 @@
 import request from '@/shared/api/axiosInstance';
 import { ApiResponse, PaginatedResponse } from '@/shared/type';
-import { IPayment } from './type';
+import { IPayment, IPaymentDetail } from './type';
 
 interface GetPaymentListParams {
   page: number;
@@ -47,7 +47,7 @@ export const getPaymentList = async ({
 
 export const getPaymentDetail = async (tradeId: number) => {
   try {
-    const response = await request<ApiResponse<IPayment>>({
+    const response = await request<ApiResponse<IPaymentDetail>>({
       url: `/api/admin/payment/${tradeId}`,
       method: 'GET'
     });

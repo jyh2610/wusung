@@ -1,28 +1,37 @@
 'use client';
 
-import { getLocalStorageValue, setLocalStorageValue } from '@/lib/utils';
-import axios, { AxiosError, AxiosRequestConfig, AxiosResponse } from 'axios';
+import axios, {
+  AxiosError,
+  AxiosRequestConfig,
+  AxiosResponse,
+  InternalAxiosRequestConfig
+} from 'axios';
 import https from 'https';
+import { getLocalStorageValue, setLocalStorageValue } from '@/lib/utils';
 
 const axiosInstance = axios.create({
   baseURL: process.env.NEXT_PUBLIC_API_BASE_URL,
-  withCredentials: true,
+  withCredentials: true, // 쿠키 자동 전송
   headers: {
     'Content-Type': 'application/json'
   },
   httpsAgent: new https.Agent({
-    rejectUnauthorized: false // SSL 인증서 검사 무시
+    rejectUnauthorized: false // 개발용 SSL 우회
   })
 });
 
-// 요청 인터셉터
+// 요청 인터셉터: 항상 Authorization 헤더에 access token 삽입
 axiosInstance.interceptors.request.use(
-  config => {
-    const userInfo = getLocalStorageValue('userInfo');
-    const token = userInfo ? JSON.parse(userInfo).token : '';
+  (config: InternalAxiosRequestConfig) => {
+    try {
+      const userInfo = getLocalStorageValue('userInfo');
+      const token = userInfo ? JSON.parse(userInfo).token : '';
 
-    if (token) {
-      config.headers.Authorization = `Bearer ${token}`;
+      if (token) {
+        config.headers.Authorization = `Bearer ${token}`;
+      }
+    } catch (err) {
+      console.warn('토큰 파싱 실패', err);
     }
 
     return config;
@@ -30,20 +39,27 @@ axiosInstance.interceptors.request.use(
   error => Promise.reject(error)
 );
 
-// 응답 인터셉터
+// 응답 인터셉터: 서버가 새 access token을 내려줄 경우 저장
 axiosInstance.interceptors.response.use(
   response => {
-    // ✅ 서버가 새 access token을 응답 헤더로 보내는 경우 처리
     const newAccessToken = response.headers['authorization'];
 
     if (newAccessToken) {
       const token = newAccessToken.replace('Bearer ', '');
-      const storedUserInfo = getLocalStorageValue('userInfo');
 
-      if (storedUserInfo) {
-        const parsed = JSON.parse(storedUserInfo);
-        const updatedUserInfo = { ...parsed, token };
-        setLocalStorageValue('userInfo', JSON.stringify(updatedUserInfo));
+      try {
+        const stored = getLocalStorageValue('userInfo');
+        if (stored) {
+          const parsed = JSON.parse(stored);
+          const updated = { ...parsed, token };
+          setLocalStorageValue('userInfo', JSON.stringify(updated));
+        }
+
+        if (typeof window !== 'undefined') {
+          document.cookie = `token=${token}; path=/; SameSite=Lax; Secure`;
+        }
+      } catch (err) {
+        console.warn('토큰 저장 실패', err);
       }
     }
 
@@ -54,6 +70,7 @@ axiosInstance.interceptors.response.use(
   }
 );
 
+// 401 응답 시 재시도 로직 포함
 export interface ErrorResponse {
   statusCode: number;
   message: string;
@@ -65,42 +82,48 @@ interface CustomAxiosRequestConfig extends AxiosRequestConfig {
 }
 
 const handleAxiosError = async (error: AxiosError) => {
-  console.error('Axios error:', error);
-
   const originalRequest = error.config as CustomAxiosRequestConfig;
 
   if (error.response?.status === 401 && !originalRequest._retry) {
     originalRequest._retry = true;
 
     const newAccessToken = error.response.headers['authorization'];
-
     if (newAccessToken) {
       const token = newAccessToken.replace('Bearer ', '');
-      const storedUserInfo = getLocalStorageValue('userInfo');
 
-      if (storedUserInfo) {
-        const parsed = JSON.parse(storedUserInfo);
-        const updatedUserInfo = { ...parsed, token };
-        setLocalStorageValue('userInfo', JSON.stringify(updatedUserInfo));
+      try {
+        const stored = getLocalStorageValue('userInfo');
+        if (stored) {
+          const parsed = JSON.parse(stored);
+          const updated = { ...parsed, token };
+          setLocalStorageValue('userInfo', JSON.stringify(updated));
+        }
+
+        if (typeof window !== 'undefined') {
+          document.cookie = `token=${token}; path=/; SameSite=Lax; Secure`;
+        }
+
+        // 헤더에 새로운 토큰으로 재요청
+        originalRequest.headers = {
+          ...originalRequest.headers,
+          Authorization: `Bearer ${token}`
+        };
+
+        return axiosInstance(originalRequest);
+      } catch (err) {
+        console.warn('토큰 갱신 실패', err);
       }
-
-      // 헤더에 새로운 토큰 추가 후 재시도
-      originalRequest.headers = {
-        ...originalRequest.headers,
-        Authorization: `Bearer ${token}`
-      };
-
-      return axiosInstance(originalRequest); // 요청 재시도
     }
   }
 
   return Promise.reject(error);
 };
 
+// 실제 요청 함수
 const request = async <T>(
-  param: CustomAxiosRequestConfig
+  config: CustomAxiosRequestConfig
 ): Promise<AxiosResponse<T>> => {
-  return axiosInstance(param)
+  return axiosInstance(config)
     .then((res: AxiosResponse<T>) => res)
     .catch(handleAxiosError);
 };
