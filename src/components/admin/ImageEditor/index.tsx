@@ -39,7 +39,9 @@ export default function ImageEditor({
   setExistMonth,
   setExistDay,
   setExistDayOfWeek,
-  setExistElderName
+  setExistElderName,
+  files,
+  setFiles
 }: ImageEditorProps) {
   const fileInputRef = useRef<HTMLInputElement | null>(null);
   const canvasRef = useRef<HTMLDivElement | null>(null);
@@ -134,7 +136,8 @@ export default function ImageEditor({
   const handleAddCustomCoordinate = (rect: Rectangle, text: string) => {
     const newCoordinate: Rectangle = {
       ...rect,
-      type: 'fixedText',
+      fileIndex: imageIndex,
+      type: rect.type,
       fixedText: text,
       alignment: 'center'
     };
@@ -215,7 +218,11 @@ export default function ImageEditor({
   const handleFileChange = (e: React.ChangeEvent<HTMLInputElement>) => {
     const files = e.target.files ? Array.from(e.target.files) : [];
     if (files.length === 0) return;
+
+    // 파일 선택 후 input 초기화
     e.target.value = '';
+
+    // 부모 컴포넌트의 handleImageUpload 호출
     handleImageUpload({
       target: { files }
     } as unknown as React.ChangeEvent<HTMLInputElement>);

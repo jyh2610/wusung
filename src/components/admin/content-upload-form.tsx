@@ -101,7 +101,6 @@ export function ContentUploadForm() {
     existDayOfWeek: [],
     existElderName: []
   });
-  console.log(form);
 
   useEffect(() => {
     const fetchContent = async () => {
@@ -154,6 +153,7 @@ export function ContentUploadForm() {
   }, []);
 
   const [files, setFiles] = useState<File[]>([]);
+  console.log(files);
   const [filePreviews, setFilePreviews] = useState<string[]>([]);
   const [imageCoordinates, setImageCoordinates] = useState<Array<Rectangle[]>>(
     []
@@ -182,11 +182,25 @@ export function ContentUploadForm() {
     setIsUploading(true);
 
     try {
+      // overlays 가공: type이 'fixedText'일 때만 fixedText 포함
+      const overlaysForSend = (form.overlays || []).map(overlay => {
+        if (overlay.type === 'fixedText') {
+          return {
+            ...overlay,
+            fixedText: overlay.fixedText ?? ''
+          };
+        } else {
+          const { fixedText, ...rest } = overlay;
+          return rest;
+        }
+      });
+
       // form 데이터를 1차원 배열로 변환
       const formData = {
-        ...form
+        ...form,
+        overlays: overlaysForSend
       };
-
+      console.log(formData);
       if (id) {
         // 수정인 경우
         await putEduContent({
@@ -221,9 +235,10 @@ export function ContentUploadForm() {
       existElderName: [...prev.existElderName, false]
     }));
 
-    const newFiles = [...files, ...files];
-    setFiles(newFiles);
+    // 파일 추가
+    setFiles(prev => [...prev, ...files]);
 
+    // 이미지 미리보기 생성
     const previews = files.map(file => {
       return new Promise<string>(resolve => {
         const reader = new FileReader();
@@ -235,15 +250,14 @@ export function ContentUploadForm() {
     });
 
     Promise.all(previews).then(newImages => {
-      const updatedPreviews = [...filePreviews, ...newImages];
-      setFilePreviews(updatedPreviews);
+      setFilePreviews(prev => [...prev, ...newImages]);
 
       // 새 이미지에 대한 좌표 배열 초기화
       const newCoordinates = [...imageCoordinates];
       newImages.forEach(() => newCoordinates.push([]));
       setImageCoordinates(newCoordinates);
 
-      if (selectedImageIndex === null && updatedPreviews.length > 0) {
+      if (selectedImageIndex === null && newImages.length > 0) {
         setSelectedImageIndex(0);
       }
     });
@@ -457,6 +471,8 @@ export function ContentUploadForm() {
                     newExistElderName[selectedImageIndex] = value;
                     handleChange('existElderName', newExistElderName);
                   }}
+                  files={files}
+                  setFiles={setFiles}
                 />
               ) : (
                 <ImageEditor
@@ -495,6 +511,8 @@ export function ContentUploadForm() {
                     newExistElderName[0] = value;
                     handleChange('existElderName', newExistElderName);
                   }}
+                  files={files}
+                  setFiles={setFiles}
                 />
               )}
 

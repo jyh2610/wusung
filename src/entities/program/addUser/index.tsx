@@ -1,6 +1,6 @@
 'use client';
 
-import { useState } from 'react';
+import { useState, useEffect } from 'react';
 import { Box, Modal } from '@mui/material';
 import { Button } from '@/shared/ui';
 import { NomalInput } from '@/shared/ui/Input';
@@ -46,10 +46,14 @@ const days = Array.from({ length: 31 }, (_, i) => {
 
 export function AddUser({
   open,
-  closeModal
+  closeModal,
+  defaultValue,
+  mode
 }: {
   open: boolean;
   closeModal: () => void;
+  defaultValue?: IRegUser;
+  mode?: 'add' | 'edit';
 }) {
   const [form, setForm] = useState<IRegUser>({
     name: '',
@@ -73,6 +77,26 @@ export function AddUser({
     month: '',
     day: ''
   });
+
+  useEffect(() => {
+    if (defaultValue && mode === 'edit') {
+      setForm(defaultValue);
+
+      if (defaultValue.birthDate) {
+        const [year, month, day] = defaultValue.birthDate.split('-');
+        setBirth({ year, month, day });
+      }
+      if (defaultValue.certificationStart) {
+        const [year, month, day] = defaultValue.certificationStart.split('-');
+        setValidateStartDate({ year, month, day });
+      }
+      if (defaultValue.certificationEnd) {
+        const [year, month, day] = defaultValue.certificationEnd.split('-');
+        setValidateEndDate({ year, month, day });
+      }
+    }
+    // eslint-disable-next-line
+  }, [defaultValue, mode]);
 
   const handleBirthChange = (type: 'year' | 'month' | 'day', value: string) => {
     const updated = { ...birth, [type]: value };

@@ -6,7 +6,7 @@ export interface IOverlay {
   height: number;
   alignment: string;
   type: string;
-  fixedText: string;
+  fixedText?: string;
 }
 
 export interface IContent {
@@ -64,6 +64,21 @@ export interface IUser {
   disabilityGrade: number;
   difficultyLevel: number;
   managerName: string;
+}
+
+export interface IUserDetail {
+  elderId: number;
+  memberId: number;
+  name: string;
+  birthDate: string;
+  certificationStart: string;
+  certificationEnd: string;
+  recipientNumber: string;
+  disabilityGrade: number;
+  difficultyLevel: number;
+  managerName: string;
+  createdAt: string;
+  updatedAt: string;
 }
 
 export interface CategoryNode {

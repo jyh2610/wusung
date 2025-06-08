@@ -157,11 +157,19 @@ export function Company({
   alt: string;
   link: string;
 }) {
+  // 프로토콜이 없으면 자동으로 http:// 붙이기
+  const getSafeLink = (url: string) => {
+    if (!url) return '#';
+    if (/^https?:\/\//.test(url)) return url;
+    return 'http://' + url;
+  };
+
   return (
     <Link
       className={companyStyle}
-      href={link}
-      target={link ? '_blank' : undefined}
+      href={getSafeLink(link)}
+      target="_blank"
+      rel="noopener noreferrer"
     >
       <div className={companyContainer}>
         <div>

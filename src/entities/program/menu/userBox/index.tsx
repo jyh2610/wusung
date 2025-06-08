@@ -13,15 +13,43 @@ import {
   roleBox,
   selectedOptContainer
 } from './index.css';
-import { IUser } from '../../type.dto';
+import { IRegUser, IUser, IUserDetail } from '../../type.dto';
+import { AddUser } from '../../addUser';
+import { getUserDetail } from '../../api';
+import { colors } from '@/design-tokens';
 
 interface IProps {
   user: IUser;
   isSelected: boolean;
   onSelect: () => void;
+  onDetail: (user: IUser) => void;
+  onEdit: (user: IUser) => void;
+  onDelete: (user: IUser) => void;
 }
 
-export function UserBox({ user, isSelected, onSelect }: IProps) {
+export function UserBox({
+  user,
+  isSelected,
+  onSelect,
+  onDetail,
+  onEdit,
+  onDelete
+}: IProps) {
+  const [showMenu, setShowMenu] = useState(false);
+  const [editModalOpen, setEditModalOpen] = useState(false);
+  const [editUser, setEditUser] = useState<IUserDetail | null>(null);
+
+  const convertToRegUser = (user: IUserDetail): IRegUser => ({
+    name: user.name ?? '',
+    birthDate: user.birthDate ?? '',
+    longTermNum: user.recipientNumber ?? '',
+    certificationStart: user.certificationStart ?? '',
+    certificationEnd: user.certificationEnd ?? '',
+    servicer: user.managerName ?? '',
+    difficulty: user.difficultyLevel ? String(user.difficultyLevel) : '',
+    grade: user.disabilityGrade ? String(user.disabilityGrade) : ''
+  });
+
   return (
     <div
       className={classNames(container, { [selectedContainer]: isSelected })}
@@ -47,6 +75,11 @@ export function UserBox({ user, isSelected, onSelect }: IProps) {
           className={classNames(imgBox, {
             [selectedOptContainer]: isSelected
           })}
+          onClick={e => {
+            e.stopPropagation();
+            setShowMenu(prev => !prev);
+          }}
+          style={{ position: 'relative' }}
         >
           <Image
             fill
@@ -57,6 +90,58 @@ export function UserBox({ user, isSelected, onSelect }: IProps) {
             }
             alt="유저 선택됨"
           />
+          {showMenu && (
+            <div
+              style={{
+                position: 'absolute',
+                top: '100%',
+                right: 0,
+                background: '#fff',
+                border: '1px solid #eee',
+                borderRadius: 8,
+                boxShadow: '0 2px 8px rgba(0,0,0,0.08)',
+                zIndex: 10,
+                color: colors.gray_scale[800],
+                minWidth: 100
+              }}
+            >
+              <div
+                style={{ padding: '10px 16px', cursor: 'pointer' }}
+                onClick={e => {
+                  e.stopPropagation();
+                  onDetail(user);
+                }}
+              >
+                상세
+              </div>
+              <div
+                style={{ padding: '10px 16px', cursor: 'pointer' }}
+                onClick={async e => {
+                  e.stopPropagation();
+                  const detail = await getUserDetail(user.elderId);
+                  if (detail) {
+                    setEditUser(detail);
+                    setEditModalOpen(true);
+                  }
+                }}
+              >
+                수정
+              </div>
+              <div
+                style={{
+                  padding: '10px 16px',
+                  cursor: 'pointer',
+                  color: '#e1007b'
+                }}
+                onClick={e => {
+                  e.stopPropagation();
+                  onDelete(user);
+                }}
+              >
+                삭제
+              </div>
+            </div>
+          )}
         </div>
       </div>
 
@@ -66,6 +151,13 @@ export function UserBox({ user, isSelected, onSelect }: IProps) {
         </div>
         담당자
       </div>
+
+      <AddUser
+        open={editModalOpen}
+        closeModal={() => setEditModalOpen(false)}
+        defaultValue={editUser ? convertToRegUser(editUser) : undefined}
+        mode="edit"
+      />
     </div>
   );
 }

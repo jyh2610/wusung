@@ -5,7 +5,8 @@ import {
   ICategoryLeaf,
   IContent,
   IRegUser,
-  IUser
+  IUser,
+  IUserDetail
 } from '../type.dto';
 import { EduContent, IRes } from '@/shared/type';
 import { extractLeafNodes, getLocalStorageValue } from '@/lib/utils';
@@ -115,25 +116,7 @@ export const putEduContent = async ({
 export const eduContentReg = async (content: IContent, imageFiles: File[]) => {
   try {
     const formData = new FormData();
-
-    // 좌표 정보를 서버 형식에 맞게 변환
-    const processedOverlays =
-      content.overlays
-        ?.map((coordinates, fileIndex) => {
-          if (!Array.isArray(coordinates)) return [];
-
-          return coordinates.map(rect => ({
-            fileIndex,
-            x: rect.x,
-            y: rect.y,
-            width: rect.width,
-            height: rect.height,
-            alignment: rect.alignment || 'M',
-            type: rect.type || 'fixedText',
-            fixedText: rect.fixedText || ''
-          }));
-        })
-        .flat() || [];
+    console.log(content);
 
     // eduContentRegisterDTO 준비
     const eduContentRegisterDTO = {
@@ -149,21 +132,7 @@ export const eduContentReg = async (content: IContent, imageFiles: File[]) => {
       existDay: content.existDay,
       existDayOfWeek: content.existDayOfWeek,
       existElderName: content.existElderName,
-      overlays:
-        processedOverlays.length > 0
-          ? processedOverlays
-          : [
-              {
-                fileIndex: 0,
-                x: 0,
-                y: 0,
-                width: 0,
-                height: 0,
-                alignment: 'M',
-                type: 'fixedText',
-                fixedText: ''
-              }
-            ]
+      overlays: content.overlays
     };
 
     // FormData에 DTO 추가
@@ -176,7 +145,7 @@ export const eduContentReg = async (content: IContent, imageFiles: File[]) => {
     imageFiles.forEach(file => {
       formData.append('files', file);
     });
-
+    console.log(imageFiles);
     const userInfo = getLocalStorageValue('userInfo');
     const token = userInfo ? JSON.parse(userInfo).token : '';
 
@@ -337,6 +306,42 @@ export const getUser = async () => {
     });
     return res.data.data;
   } catch {}
+};
+
+export const getUserDetail = async (elderId: number) => {
+  try {
+    const res = await request<IRes<IUserDetail>>({
+      method: 'GET',
+      url: `/api/program/elder/${elderId}`
+    });
+    return res.data.data;
+  } catch (error) {
+    console.error(error);
+  }
+};
+
+export const updateUser = async (elderId: number, form: IRegUser) => {
+  try {
+    const res = await request<IRes<IRegUser>>({
+      method: 'PUT',
+      url: `/api/program/elder/${elderId}`,
+      data: form
+    });
+    return res.data.data;
+  } catch (error) {
+    console.error(error);
+  }
+};
+
+export const deleteUser = async (elderId: number) => {
+  try {
+    await request<IRes<IUser[]>>({
+      method: 'DELETE',
+      url: `/api/program/elder/${elderId}`
+    });
+  } catch (error) {
+    console.error('유저 삭제 실패');
+  }
 };
 
 export interface IPlan {

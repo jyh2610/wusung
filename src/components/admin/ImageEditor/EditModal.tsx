@@ -25,6 +25,15 @@ export interface EditModalProps {
   onAddCustomCoordinate: (rect: Rectangle, text: string) => void;
 }
 
+const typeOptions = [
+  { label: '이름', value: 'name' },
+  { label: '월', value: 'month' },
+  { label: '일', value: 'day' },
+  { label: '요일', value: 'dayOfWeek' },
+  { label: '대상자명', value: 'elderName' },
+  { label: '직접입력', value: 'fixedText' }
+];
+
 export const EditModal = ({
   image,
   imageSize,
@@ -58,6 +67,9 @@ export const EditModal = ({
     width: 0,
     height: 0
   });
+  const [selectedType, setSelectedType] = useState<
+    'name' | 'month' | 'day' | 'dayOfWeek' | 'elderName' | 'fixedText'
+  >('name');
 
   useEffect(() => {
     if (imgRef.current && imageSize) {
@@ -102,14 +114,17 @@ export const EditModal = ({
   };
 
   const handleAddCustomText = () => {
-    if (selectedRect && customText) {
-      onAddCustomCoordinate(
-        { ...selectedRect, fixedText: customText },
-        customText
-      );
-      setCustomText('');
-      setSelectedRect(null);
-    }
+    if (!selectedRect) return;
+    if (selectedType === 'fixedText' && !customText) return;
+
+    const newRect = {
+      ...selectedRect,
+      type: selectedType,
+      fixedText: selectedType === 'fixedText' ? customText : undefined
+    };
+    onAddCustomCoordinate(newRect, customText);
+    setCustomText('');
+    setSelectedRect(null);
   };
 
   if (!imageSize) {
@@ -267,13 +282,27 @@ export const EditModal = ({
                 </p>
               </div>
             </div>
-            <div className="flex gap-2">
-              <Input
-                value={customText}
-                onChange={e => setCustomText(e.target.value)}
-                placeholder="표시할 텍스트를 입력하세요"
-                className="flex-1"
-              />
+            <div className="flex gap-2 items-center mb-2">
+              <label className="text-sm text-gray-600">type:</label>
+              <select
+                value={selectedType}
+                onChange={e => setSelectedType(e.target.value as any)}
+                className="border rounded px-2 py-1"
+              >
+                {typeOptions.map(opt => (
+                  <option key={opt.value} value={opt.value}>
+                    {opt.label}
+                  </option>
+                ))}
+              </select>
+              {selectedType === 'fixedText' && (
+                <Input
+                  value={customText}
+                  onChange={e => setCustomText(e.target.value)}
+                  placeholder="표시할 텍스트를 입력하세요"
+                  className="flex-1"
+                />
+              )}
             </div>
           </div>
         )}
@@ -282,7 +311,9 @@ export const EditModal = ({
           <Button
             type="button"
             onClick={handleAddCustomText}
-            disabled={!selectedRect || !customText}
+            disabled={
+              !selectedRect || (selectedType === 'fixedText' && !customText)
+            }
             className="bg-blue-500 text-white"
           >
             좌표 추가

@@ -3,6 +3,7 @@ export interface Rectangle {
   y: number;
   width: number;
   height: number;
+  fileIndex?: number;
   type?: string;
   fixedText?: string;
   alignment?: string;
@@ -29,6 +30,8 @@ export interface ImageEditorProps {
   setExistDay: (value: boolean) => void;
   setExistDayOfWeek: (value: boolean) => void;
   setExistElderName: (value: boolean) => void;
+  files: File[];
+  setFiles: React.Dispatch<React.SetStateAction<File[]>>;
 }
 
 export interface IContent {
