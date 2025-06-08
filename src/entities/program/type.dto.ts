@@ -51,7 +51,8 @@ export interface IRegUser {
   name: string;
   birthDate: string;
   longTermNum: string;
-  validate: string;
+  certificationStart: string;
+  certificationEnd: string;
   servicer: string;
   difficulty: string;
   grade: string;

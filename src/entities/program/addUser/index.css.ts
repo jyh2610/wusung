@@ -28,19 +28,33 @@ export const labelStyle = style({
 });
 
 export const inputWrapperStyle = style({
-  flex: 1,
-  height: '57px'
+  flex: 1
+  // height: '57px'
 });
 
 export const dateGroup = style({
   display: 'flex',
-  alignItems: 'center',
-  gap: '12px',
-  flexWrap: 'wrap'
+  flexDirection: 'column',
+  gap: '24px',
+  width: '100%'
+});
+
+export const dateSection = style({
+  display: 'flex',
+  flexDirection: 'column',
+  gap: '8px'
+});
+
+export const dateLabel = style({
+  fontSize: '14px',
+  color: '#666',
+  marginBottom: '4px',
+  fontWeight: 500
 });
 
 export const dateItem = style({
   display: 'flex',
+  flexDirection: 'row',
   alignItems: 'center',
   gap: '4px'
 });

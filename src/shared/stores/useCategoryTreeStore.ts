@@ -23,7 +23,19 @@ export const useCategoryTreeStore = create<CategoryTreeState>(set => ({
 
   getChildrenOfRootByName: (name: string): CategoryNode[] => {
     const state = useCategoryTreeStore.getState();
-    const root = state.categoryTree.find(node => node.name === name);
+    console.log('Searching for category:', name);
+    console.log('Available categories:', state.categoryTree);
+
+    // 활동지, 평가자료, 기타자료 매핑
+    const categoryMapping: Record<string, string> = {
+      '개별 활동지': '활동지',
+      평가자료: '평가자료',
+      기타자료: '기타자료'
+    };
+
+    const mappedName = categoryMapping[name] || name;
+    const root = state.categoryTree.find(node => node.name === mappedName);
+    console.log('Found root:', root);
     return root?.children || [];
   },
 

@@ -31,39 +31,49 @@ export function ActivityBox() {
     fetchCategoryTree();
   }, [fetchCategoryTree]);
 
-  const children = useCategoryTreeStore(state => {
-    return state.getChildrenOfRootByName(categoryName);
-  });
+  // 모든 최상위 카테고리 가져오기
+  const rootCategories = useCategoryTreeStore(state => state.categoryTree);
+
+  console.log('Category Tree:', categoryTree);
+  console.log('Root Categories:', rootCategories);
 
   const handleCategorySelect = (category: CategoryNode) => {
     setSelectedCategoryNode(category);
   };
+
   useEffect(() => {
-    if (children.length > 0) {
-      setSelectedCategoryNode(children[0]); // 첫 번째 항목 자동 선택
+    if (rootCategories.length > 0) {
+      setSelectedCategoryNode(rootCategories[0]); // 첫 번째 항목 자동 선택
     }
-  }, [children, setSelectedCategoryNode]);
+  }, [rootCategories, setSelectedCategoryNode]);
 
   return (
     <div>
       <h3 className={title} style={{ marginBottom: '32px' }}>
-        {categoryName} 목록
+        카테고리 목록
       </h3>
-      <ul>
-        {children.map(item => (
-          <li
-            key={item.categoryId}
-            onClick={() => handleCategorySelect(item)}
-            className={`${listItem} ${
-              selectedCategoryNode?.categoryId === item.categoryId
-                ? selectedItem
-                : ''
-            }`}
-          >
-            {item.name}
-          </li>
+      <div className="space-y-6">
+        {rootCategories.map(rootCategory => (
+          <div key={rootCategory.categoryId} className="mb-4">
+            <h4 className="font-medium text-lg mb-2">{rootCategory.name}</h4>
+            <ul>
+              {rootCategory.children.map(item => (
+                <li
+                  key={item.categoryId}
+                  onClick={() => handleCategorySelect(item)}
+                  className={`${listItem} ${
+                    selectedCategoryNode?.categoryId === item.categoryId
+                      ? selectedItem
+                      : ''
+                  }`}
+                >
+                  {item.name}
+                </li>
+              ))}
+            </ul>
+          </div>
         ))}
-      </ul>
+      </div>
     </div>
   );
 }

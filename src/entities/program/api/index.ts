@@ -313,8 +313,8 @@ export const submitAddUser = async (form: IRegUser) => {
       data: {
         name: form.name,
         birthDate: form.birthDate,
-        certificationStart: form.validate,
-        certificationEnd: form.validate,
+        certificationStart: form.certificationStart,
+        certificationEnd: form.certificationEnd,
         recipientNumber: form.longTermNum,
         disabilityGrade: form.grade,
         difficultyLevel: form.difficulty,

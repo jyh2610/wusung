@@ -19,7 +19,10 @@ const difficulty = [
 const grade = [
   { label: '1', value: '1' },
   { label: '2', value: '2' },
-  { label: '3', value: '3' }
+  { label: '3', value: '3' },
+  { label: '4', value: '4' },
+  { label: '5', value: '5' },
+  { label: '6', value: '6' }
 ];
 
 const currentYear = new Date().getFullYear();
@@ -52,14 +55,20 @@ export function AddUser({
     name: '',
     birthDate: '',
     longTermNum: '',
-    validate: '',
+    certificationStart: '',
+    certificationEnd: '',
     servicer: '',
     difficulty: '',
     grade: ''
   });
 
   const [birth, setBirth] = useState({ year: '', month: '', day: '' });
-  const [validateDate, setValidateDate] = useState({
+  const [validateStartDate, setValidateStartDate] = useState({
+    year: '',
+    month: '',
+    day: ''
+  });
+  const [validateEndDate, setValidateEndDate] = useState({
     year: '',
     month: '',
     day: ''
@@ -78,12 +87,12 @@ export function AddUser({
     }
   };
 
-  const handleValidateChange = (
+  const handleValidateStartChange = (
     type: 'year' | 'month' | 'day',
     value: string
   ) => {
-    const updated = { ...validateDate, [type]: value };
-    setValidateDate(updated);
+    const updated = { ...validateStartDate, [type]: value };
+    setValidateStartDate(updated);
 
     const { year, month, day } = updated;
     if (year && month && day) {
@@ -94,6 +103,14 @@ export function AddUser({
     }
   };
 
+  const handleValidateEndChange = (
+    type: 'year' | 'month' | 'day',
+    value: string
+  ) => {
+    const updated = { ...validateEndDate, [type]: value };
+    setValidateEndDate(updated);
+  };
+
   const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
 
@@ -101,17 +118,26 @@ export function AddUser({
       !form.name.trim() ||
       !form.longTermNum.trim() ||
       !form.birthDate.trim() ||
-      !form.validate.trim() ||
       !form.servicer.trim() ||
       !form.difficulty.trim() ||
-      !form.grade.trim()
+      !form.grade.trim() ||
+      !validateEndDate.year ||
+      !validateEndDate.month ||
+      !validateEndDate.day
     ) {
       toast.error('필수 항목을 모두 입력해주세요.');
       return;
     }
 
+    const certificationStart = `${validateStartDate.year}-${validateStartDate.month.padStart(2, '0')}-${validateStartDate.day.padStart(2, '0')}`;
+    const certificationEnd = `${validateEndDate.year}-${validateEndDate.month.padStart(2, '0')}-${validateEndDate.day.padStart(2, '0')}`;
+
     try {
-      const result = await submitAddUser(form);
+      const result = await submitAddUser({
+        ...form,
+        certificationStart,
+        certificationEnd
+      });
       toast.success('등록이 완료되었습니다!');
       closeModal();
     } catch (error) {
@@ -147,12 +173,12 @@ export function AddUser({
           {/* 장기요양인증번호 */}
           <div className={styles.rowStyle}>
             <label className={styles.labelStyle}>
-              장기요양인증번호<span className={styles.starSpan}>*</span>
+              장기요양인정번호<span className={styles.starSpan}>*</span>
             </label>
             <div className={styles.inputWrapperStyle}>
               <NomalInput
                 name="longTermNum"
-                placeholder="장기요양인증번호"
+                placeholder="장기요양인정번호"
                 value={form.longTermNum}
                 onChange={e =>
                   setForm({ ...form, longTermNum: e.target.value })
@@ -179,8 +205,6 @@ export function AddUser({
                     />
                   </div>
                   <span>년</span>
-                </div>
-                <div className={styles.dateItem}>
                   <div className={styles.select128}>
                     <DropDown
                       options={months}
@@ -193,8 +217,6 @@ export function AddUser({
                     />
                   </div>
                   <span>월</span>
-                </div>
-                <div className={styles.dateItem}>
                   <div className={styles.select128}>
                     <DropDown
                       options={days}
@@ -217,47 +239,87 @@ export function AddUser({
             </label>
             <div className={styles.inputWrapperStyle}>
               <div className={styles.dateGroup}>
-                <div className={styles.dateItem}>
-                  <div className={styles.select128}>
-                    <DropDown
-                      options={years}
-                      placeholder="년"
-                      isSearchable={false}
-                      value={validateDate.year}
-                      onChange={(val: string) =>
-                        handleValidateChange('year', val)
-                      }
-                    />
+                <div className={styles.dateSection}>
+                  <div className={styles.dateLabel}>시작일</div>
+                  <div className={styles.dateItem}>
+                    <div className={styles.select128}>
+                      <DropDown
+                        options={years}
+                        placeholder="년"
+                        isSearchable={false}
+                        value={validateStartDate.year}
+                        onChange={(val: string) =>
+                          handleValidateStartChange('year', val)
+                        }
+                      />
+                    </div>
+                    <span>년</span>
+                    <div className={styles.select128}>
+                      <DropDown
+                        options={months}
+                        placeholder="월"
+                        isSearchable={false}
+                        value={validateStartDate.month}
+                        onChange={(val: string) =>
+                          handleValidateStartChange('month', val)
+                        }
+                      />
+                    </div>
+                    <span>월</span>
+                    <div className={styles.select128}>
+                      <DropDown
+                        options={days}
+                        placeholder="일"
+                        isSearchable={false}
+                        value={validateStartDate.day}
+                        onChange={(val: string) =>
+                          handleValidateStartChange('day', val)
+                        }
+                      />
+                    </div>
+                    <span>일</span>
                   </div>
-                  <span>년</span>
                 </div>
-                <div className={styles.dateItem}>
-                  <div className={styles.select128}>
-                    <DropDown
-                      options={months}
-                      placeholder="월"
-                      isSearchable={false}
-                      value={validateDate.month}
-                      onChange={(val: string) =>
-                        handleValidateChange('month', val)
-                      }
-                    />
+                <div className={styles.dateSection}>
+                  <div className={styles.dateLabel}>종료일</div>
+                  <div className={styles.dateItem}>
+                    <div className={styles.select128}>
+                      <DropDown
+                        options={years}
+                        placeholder="년"
+                        isSearchable={false}
+                        value={validateEndDate.year}
+                        onChange={(val: string) =>
+                          handleValidateEndChange('year', val)
+                        }
+                      />
+                    </div>
+                    <span>년</span>
+                    <div className={styles.select128}>
+                      <DropDown
+                        options={months}
+                        placeholder="월"
+                        isSearchable={false}
+                        value={validateEndDate.month}
+                        onChange={(val: string) =>
+                          handleValidateEndChange('month', val)
+                        }
+                      />
+                    </div>
+                    <span>월</span>
+                    <div className={styles.select128}>
+                      <DropDown
+                        options={days}
+                        placeholder="일"
+                        isSearchable={false}
+                        value={validateEndDate.day}
+                        onChange={(val: string) =>
+                          handleValidateEndChange('day', val)
+                        }
+                      />
+                    </div>
+                    <span>일</span>
                   </div>
-                  <span>월</span>
-                </div>
-                <div className={styles.dateItem}>
-                  <div className={styles.select128}>
-                    <DropDown
-                      options={days}
-                      placeholder="일"
-                      isSearchable={false}
-                      value={validateDate.day}
-                      onChange={(val: string) =>
-                        handleValidateChange('day', val)
-                      }
-                    />
-                  </div>
-                  <span>일</span>
                 </div>
               </div>
             </div>
