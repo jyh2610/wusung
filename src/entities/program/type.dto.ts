@@ -42,9 +42,11 @@ export interface Schedule {
 
 // 카테고리 데이터 인터페이스
 export interface ICategoryLeaf {
-  categoryId: number; // ✅ 기존 id → categoryId로 수정
+  categoryId: number;
+  parentId: number | null;
   name: string;
-  used: boolean; // ✅ API 응답에 있는 used 추가
+  isUsed: boolean;
+  children: ICategoryLeaf[];
 }
 
 export interface IRegUser {
@@ -91,3 +93,9 @@ export interface CategoryNode {
 
 // API 응답 전체 (CategoryNode의 배열)를 나타내는 타입
 export type CategoryResponse = CategoryNode[];
+
+// API 응답 타입
+export interface ICategoryTreeResponse {
+  data: ICategoryLeaf[];
+  message: string;
+}

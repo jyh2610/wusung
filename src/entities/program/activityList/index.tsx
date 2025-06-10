@@ -15,6 +15,7 @@ import {
   titleContainer
 } from './index.css';
 import { IContent } from '../type.dto';
+import { CustomCascader } from '@/shared/ui/cascader';
 
 const ITEM_HEIGHT = 48;
 const ITEM_PADDING_TOP = 8;
@@ -32,12 +33,14 @@ interface IProps {
 }
 
 export function ActivityList({ activities, onFilterChange, isAdmin }: IProps) {
-  const [personName, setPersonName] = useState<string[]>([]);
   const [selectedLevel, setSelectedLevel] = useState<'high' | 'medium' | 'low'>(
     'medium'
   );
+  const [selectedCategoryId, setSelectedCategoryId] = useState<number | null>(
+    null
+  );
   const { categories, fetchCategories } = useCategoryStore();
-
+  console.log('categories', categories);
   useEffect(() => {
     fetchCategories(isAdmin);
   }, [fetchCategories]);
@@ -45,8 +48,9 @@ export function ActivityList({ activities, onFilterChange, isAdmin }: IProps) {
   // ✅ 카테고리 불러온 후 첫 번째 항목 자동 선택
   useEffect(() => {
     if (categories?.length > 0) {
-      setPersonName([categories[0].name]);
-      onFilterChange(categories[0].categoryId, difficultyMap[selectedLevel]);
+      const firstCategory = categories[0];
+      setSelectedCategoryId(firstCategory.categoryId);
+      onFilterChange(firstCategory.categoryId, difficultyMap[selectedLevel]);
     }
   }, [categories]);
 
@@ -59,28 +63,19 @@ export function ActivityList({ activities, onFilterChange, isAdmin }: IProps) {
     }
   };
 
-  const handleCategoryChange = (
-    event: SelectChangeEvent<typeof personName>
-  ) => {
-    const {
-      target: { value }
-    } = event;
-    const newPersonName = typeof value === 'string' ? value.split(',') : value;
-    setPersonName(newPersonName);
-
-    const selectedCategory = categories.find(n => n.name === newPersonName[0]);
-    if (selectedCategory) {
-      onFilterChange(selectedCategory.categoryId, difficultyMap[selectedLevel]);
-    }
+  const handleCategoryChange = (categoryId: number) => {
+    setSelectedCategoryId(categoryId);
+    onFilterChange(categoryId, difficultyMap[selectedLevel]);
   };
 
   const handleLevelClick = (level: 'high' | 'medium' | 'low') => {
     setSelectedLevel(level);
-    const selectedCategory = categories.find(n => n.name === personName[0]);
-    if (selectedCategory) {
-      onFilterChange(selectedCategory.categoryId, difficultyMap[level]);
+    if (selectedCategoryId) {
+      onFilterChange(selectedCategoryId, difficultyMap[level]);
     }
   };
+
+  console.log('selectedCategoryId', categories);
 
   return (
     <div
@@ -102,32 +97,17 @@ export function ActivityList({ activities, onFilterChange, isAdmin }: IProps) {
           인지활동지 목록
         </span>
         <div>
-          <Select
-            displayEmpty
-            value={personName}
-            onChange={handleCategoryChange}
-            input={<OutlinedInput />}
-            sx={{ width: '240px', height: '50px' }}
-            renderValue={selected => {
-              if (selected.length === 0) {
-                return <em>선택</em>;
+          <CustomCascader
+            options={categories}
+            value={selectedCategoryId ? [selectedCategoryId] : undefined}
+            onChange={value => {
+              if (value && value.length > 0) {
+                handleCategoryChange(value[value.length - 1]);
               }
-              return selected.join(', ');
             }}
-            MenuProps={MenuProps}
-            inputProps={{ 'aria-label': 'Without label' }}
-          >
-            {categories?.length === 0 && (
-              <MenuItem disabled value="">
-                <em>선택</em>
-              </MenuItem>
-            )}
-            {categories?.map(category => (
-              <MenuItem key={category.categoryId} value={category.name}>
-                {category.name}
-              </MenuItem>
-            ))}
-          </Select>
+            placeholder="카테고리 선택"
+            style={{ width: '240px' }}
+          />
         </div>
       </div>
 

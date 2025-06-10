@@ -260,11 +260,11 @@ export const regSchedule = async ({
   }
 };
 
-export const getCategoryLeaf = async (): Promise<ICategoryLeaf[]> => {
+export const getCategoryTree = async (): Promise<ICategoryLeaf[]> => {
   try {
     const res = await request<IRes<ICategoryLeaf[]>>({
       method: 'GET',
-      url: '/api/admin/edu-content/category/leaf'
+      url: '/api/program/use/category/tree/schedule'
     });
 
     return res.data.data; // ✅ TypeScript 경고 우회
@@ -431,32 +431,15 @@ export const deleteContent = async (eduContentId: number) => {
 };
 
 export const getUserCategoryTree = async (): Promise<
-  | {
-      data: CategoryResponse;
-      leafList: ICategoryLeaf[];
-    }
-  | undefined
+  ICategoryLeaf[] | undefined
 > => {
   try {
     const res = await request<IRes<CategoryResponse>>({
       method: 'GET',
-      url: `/api/program/use/category/tree`
+      url: `/api/program/use/category/tree/schedule`
     });
 
-    const treeData = res.data.data;
-    if (!treeData) return undefined;
-
-    // 리프만 추출
-    const leaves = extractLeafNodes<CategoryNode>(treeData);
-
-    // ✅ 필요한 형태로 변환
-    const leafList: ICategoryLeaf[] = leaves.map(leaf => ({
-      categoryId: leaf.categoryId,
-      name: leaf.name,
-      used: leaf.isUsed
-    }));
-
-    return { data: res.data.data, leafList };
+    return res.data.data;
   } catch (error) {
     console.error('getUserCategoryTree error:', error);
   }
