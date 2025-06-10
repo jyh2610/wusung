@@ -25,6 +25,8 @@ import { toast } from 'react-toastify';
 import { useCategoryTreeStore } from '@/shared/stores/useCategoryTreeStore';
 import { usePathname, useRouter } from 'next/navigation';
 import { handleCurrentPathRoute } from '@/lib/utils';
+import { CustomCascader } from '@/shared/ui/cascader';
+import { IContent, ICategoryLeaf } from '@/entities/program/type.dto';
 
 function Activity() {
   const router = useRouter();
@@ -61,7 +63,7 @@ function Activity() {
   const { activities, fetchActivities, setActivities } = useActivities({
     isAdmin,
     categoryId: categoryId ?? 0,
-    difficultyLevel: difficultyMap[selectedLevel] // Pass the mapped difficultyLevel
+    difficultyLevel: difficultyMap[selectedLevel]
   });
 
   const MenuProps = {
@@ -72,21 +74,41 @@ function Activity() {
     }
   };
 
-  const handleCategoryChange = (
-    event: SelectChangeEvent<typeof personName>
-  ) => {
-    const { value } = event.target;
-    const newPersonName = typeof value === 'string' ? value.split(',') : value;
-    setPersonName(newPersonName);
+  const handleCategoryChange = (value: number[]) => {
+    if (value && value.length > 0) {
+      const findCategoryById = (
+        categories: ICategoryLeaf[],
+        targetId: number
+      ): ICategoryLeaf | undefined => {
+        for (const category of categories) {
+          if (category.categoryId === targetId) {
+            return category;
+          }
+          if (category.children) {
+            const found = findCategoryById(category.children, targetId);
+            if (found) return found;
+          }
+        }
+        return undefined;
+      };
 
-    const selectedCategory = categories?.find(n => n.name === newPersonName[0]);
-    if (selectedCategory) {
-      setCategoryId(selectedCategory.categoryId);
+      const selectedId = value[value.length - 1];
+      const selectedCategory = findCategoryById(categories, selectedId);
+
+      if (selectedCategory) {
+        setPersonName([selectedCategory.name]);
+        setSelectedCategoryNode(selectedCategory);
+        setCategoryId(selectedCategory.categoryId);
+        console.log('Selected Category:', selectedCategory); // 디버깅용 로그
+      }
     }
   };
 
   const handleLevelClick = (level: 'high' | 'medium' | 'low') => {
     setSelectedLevel(level);
+    if (selectedCategoryNode) {
+      setCategoryId(selectedCategoryNode.categoryId);
+    }
   };
 
   const handleActivitySelect = (eduContentId: number) => {
@@ -212,16 +234,20 @@ function Activity() {
     const fetchData = async () => {
       if (categoryId !== null) {
         try {
-          await fetchActivities();
+          await fetchActivities({
+            categoryId,
+            difficultyLevel: difficultyMap[selectedLevel]
+          });
         } catch (error) {
           console.error('활동지 불러오기 실패:', error);
           toast.error('활동지 불러오기에 실패했습니다.');
-          setActivities([]); // 실패시 초기화
+          setActivities([]);
         }
       }
     };
     fetchData();
   }, [categoryId, selectedLevel, fetchActivities, setActivities]);
+  console.log(categoryId);
 
   return (
     <div className={container}>
@@ -246,27 +272,17 @@ function Activity() {
           >
             {selectedCategoryNode?.name || '카테고리 선택'}
           </div>
-          <Select
-            displayEmpty
-            value={personName}
-            onChange={handleCategoryChange}
-            input={<OutlinedInput />}
-            sx={{ width: '240px', height: '50px' }}
-            renderValue={selected =>
-              selected.length === 0 ? <em>선택</em> : selected.join(', ')
+          <CustomCascader
+            options={categories}
+            value={
+              selectedCategoryNode
+                ? [selectedCategoryNode.categoryId]
+                : undefined
             }
-            MenuProps={MenuProps}
-            inputProps={{ 'aria-label': 'Without label' }}
-          >
-            <MenuItem disabled value="">
-              <em>선택</em>
-            </MenuItem>
-            {categories?.map(name => (
-              <MenuItem key={name.categoryId} value={name.name}>
-                {name.name}
-              </MenuItem>
-            ))}
-          </Select>
+            onChange={handleCategoryChange}
+            placeholder="카테고리 선택"
+            style={{ width: '240px' }}
+          />
         </div>
 
         {/* 버튼들 */}

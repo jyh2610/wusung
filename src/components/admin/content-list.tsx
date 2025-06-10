@@ -30,6 +30,7 @@ import { useQuery, useMutation, useQueryClient } from '@tanstack/react-query';
 import { getCategoryList, getContentList } from './api';
 import { IContent } from '@/entities/program/type.dto';
 import { useState } from 'react';
+import { CustomCascader } from '@/shared/ui/cascader';
 
 // 최하위 노드만 추출하는 함수
 function getLeafNodes(categories: Category[] = []): Category[] {
@@ -139,24 +140,17 @@ export function ContentList() {
       <div className="flex gap-4 p-4 bg-white rounded-lg border">
         <div className="flex-1">
           <label className="text-sm font-medium mb-1 block">카테고리</label>
-          <Select
-            value={selectedCategory?.toString()}
-            onValueChange={value => setSelectedCategory(Number(value))}
-          >
-            <SelectTrigger>
-              <SelectValue placeholder="카테고리 선택" />
-            </SelectTrigger>
-            <SelectContent>
-              {leafCategories.map(category => (
-                <SelectItem
-                  key={category.categoryId}
-                  value={category.categoryId.toString()}
-                >
-                  {category.name}
-                </SelectItem>
-              ))}
-            </SelectContent>
-          </Select>
+          <CustomCascader
+            options={categories}
+            value={selectedCategory ? [selectedCategory] : undefined}
+            onChange={value => {
+              if (value && value.length > 0) {
+                setSelectedCategory(value[value.length - 1]);
+              }
+            }}
+            placeholder="카테고리 선택"
+            style={{ width: '240px' }}
+          />
         </div>
 
         <div className="flex-1">

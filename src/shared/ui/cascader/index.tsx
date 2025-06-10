@@ -42,8 +42,36 @@ export function CustomCascader({
     }));
   };
 
-  const handleChange: CascaderProps<CascaderOption>['onChange'] = newValue => {
-    onChange?.(newValue as number[]);
+  const handleChange: CascaderProps<CascaderOption>['onChange'] = (
+    newValue,
+    selectedOptions
+  ) => {
+    if (newValue) {
+      onChange?.(newValue as number[]);
+    }
+  };
+
+  const getSelectedLabel = (value: number[] | undefined): string => {
+    if (!value || value.length === 0) return '';
+
+    const findLabel = (
+      items: ICategoryLeaf[],
+      targetId: number
+    ): string | undefined => {
+      for (const item of items) {
+        if (item.categoryId === targetId) {
+          return item.name;
+        }
+        if (item.children) {
+          const found = findLabel(item.children, targetId);
+          if (found) return found;
+        }
+      }
+      return undefined;
+    };
+
+    const lastId = value[value.length - 1];
+    return findLabel(options, lastId) || '';
   };
 
   return (
@@ -57,6 +85,7 @@ export function CustomCascader({
       className={className}
       style={style}
       changeOnSelect
+      displayRender={() => getSelectedLabel(value)}
     />
   );
 }
