@@ -58,3 +58,12 @@ export interface RegCategory {
   parentId: number | null;
   isUsed: boolean;
 }
+
+export interface PrintHistory {
+  printId: number;
+  accessIp: string;
+  memberId: number;
+  printType: string;
+  printCount: number;
+  printDate: string;
+}

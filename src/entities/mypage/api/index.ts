@@ -1,6 +1,6 @@
 import request from '@/shared/api/axiosInstance';
 import { ApiResponse, IManager, PaginatedResponse } from '@/shared/type';
-import { IInquiry, paymentListDTO } from '../type';
+import { IGetInquiryDetail, IInquiry, paymentListDTO } from '../type';
 import { PaymentFilter } from '../ui/Content/const';
 
 export const getManager = async () => {
@@ -137,6 +137,19 @@ export const personalInquiry = async (page: number, size: number) => {
     return res.data;
   } catch (error) {
     console.error('개인문의 조회 실패:', error);
+    throw error;
+  }
+};
+
+export const getInquiryDetail = async (id: number) => {
+  try {
+    const res = await request<ApiResponse<IGetInquiryDetail>>({
+      method: 'GET',
+      url: `/api/inquiry/${id}`
+    });
+    return res.data;
+  } catch (error) {
+    console.error('문의 상세 조회 실패:', error);
     throw error;
   }
 };

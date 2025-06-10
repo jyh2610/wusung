@@ -126,7 +126,7 @@ export const Edit = ({ family, onCancel }: EditProps) => {
           onCheckedChange={checked =>
             setEditedFamily(prev => ({ ...prev, isVisible: checked }))
           }
-          className="bg-gray-200 data-[state=checked]:bg-blue-600"
+          className="bg-gray-200 data-[state=checked]:bg-gray-200 [&>span]:bg-white data-[state=checked]:[&>span]:bg-blue-600"
         />
         <Label htmlFor="isVisible">활성화</Label>
       </div>

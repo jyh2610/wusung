@@ -17,7 +17,7 @@ import {
   date,
   tableContainer
 } from './payment/paymentHistory.css';
-import { personalInquiry } from '@/entities/mypage/api';
+import { personalInquiry, getInquiryDetail } from '@/entities/mypage/api';
 import { useQuery } from '@tanstack/react-query';
 import { IInquiry } from '@/entities/mypage/type';
 import { filterInquiries } from '../../utils';
@@ -29,12 +29,23 @@ const PAGE_SIZE = 10;
 export function InquiryHistory() {
   const [selectedFilter, setSelectedFilter] = useState<string>('전체');
   const [page, setPage] = useState<number>(1);
-  const [selectedInquiry, setSelectedInquiry] = useState<null | IInquiry>(null);
+  const [selectedInquiryId, setSelectedInquiryId] = useState<number | null>(
+    null
+  );
 
   const { data, isLoading } = useQuery({
     queryKey: ['personalInquiry', page],
     queryFn: () => personalInquiry(page - 1, PAGE_SIZE)
   });
+
+  const { data: inquiryDetail, isLoading: isDetailLoading } = useQuery({
+    queryKey: ['inquiryDetail', selectedInquiryId],
+    queryFn: () =>
+      selectedInquiryId ? getInquiryDetail(selectedInquiryId) : null,
+    enabled: !!selectedInquiryId
+  });
+
+  console.log('inquiryDetail:', inquiryDetail);
 
   const inquiries = (data?.data.content as IInquiry[][])?.flat() || [];
   const filteredInquiries = filterInquiries(inquiries, selectedFilter);
@@ -43,16 +54,17 @@ export function InquiryHistory() {
 
   const handleFilter = (option: string) => {
     setSelectedFilter(option);
-    setPage(1); // 필터 변경 시 첫 페이지로 이동
+    setPage(1);
   };
 
-  if (selectedInquiry) {
+  if (selectedInquiryId && inquiryDetail) {
+    const inquiryData = inquiryDetail.data;
     return (
       <InquiryDetail
-        inquiry={selectedInquiry}
-        comments={selectedInquiry.comments || []}
-        files={selectedInquiry.files || []}
-        onBack={() => setSelectedInquiry(null)}
+        inquiry={inquiryData.inquiry}
+        comments={inquiryData.comments || []}
+        files={inquiryData.files || []}
+        onBack={() => setSelectedInquiryId(null)}
       />
     );
   }
@@ -110,9 +122,7 @@ export function InquiryHistory() {
                   className={trStyle}
                   key={inquiry.inquiryId}
                   style={{ cursor: 'pointer' }}
-                  onClick={() =>
-                    setSelectedInquiry({ ...inquiry, comments: [], files: [] })
-                  }
+                  onClick={() => setSelectedInquiryId(inquiry.inquiryId)}
                 >
                   <td className={`${tdStyle} ${tdTitle}`}>{inquiry.title}</td>
                   <td className={`${tdStyle} ${date}`}>

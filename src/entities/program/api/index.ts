@@ -9,7 +9,7 @@ import {
   IUserDetail
 } from '../type.dto';
 import { EduContent, IRes } from '@/shared/type';
-import { extractLeafNodes, getLocalStorageValue } from '@/lib/utils';
+import { extractLeafNodes, getsessionStorageValue } from '@/lib/utils';
 export const putEduContent = async ({
   eduContentId,
   content,
@@ -93,7 +93,7 @@ export const putEduContent = async ({
     console.log('FormData payload:', JSON.stringify(requestBody, null, 2));
     console.log('Files count:', imageFiles.length);
 
-    const userInfo = getLocalStorageValue('userInfo');
+    const userInfo = getsessionStorageValue('userInfo');
     const token = userInfo ? JSON.parse(userInfo).token : '';
 
     const res = await request({
@@ -146,7 +146,7 @@ export const eduContentReg = async (content: IContent, imageFiles: File[]) => {
       formData.append('files', file);
     });
     console.log(imageFiles);
-    const userInfo = getLocalStorageValue('userInfo');
+    const userInfo = getsessionStorageValue('userInfo');
     const token = userInfo ? JSON.parse(userInfo).token : '';
 
     const res = await request({

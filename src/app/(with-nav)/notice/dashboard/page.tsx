@@ -51,13 +51,13 @@ function NoticeDashBoard() {
   };
 
   const columns = [
-    { id: 'title', label: '제목', width: '50%', align: 'left' as const },
     {
       id: 'topExposureTag',
       label: '태그',
       width: '15%',
       align: 'left' as const
     },
+    { id: 'title', label: '제목', width: '50%', align: 'left' as const },
     { id: 'views', label: '조회수', width: '10%', align: 'center' as const },
     { id: 'updatedAt', label: '수정일', width: '25%', align: 'center' as const }
   ];
@@ -78,14 +78,21 @@ function NoticeDashBoard() {
       onClick={() => router.push(`/notice/dashboard/${row.announcementId}`)}
       sx={{ cursor: 'pointer' }}
     >
-      <TableCell sx={{ width: '50%' }}>{row.title}</TableCell>
       <TableCell sx={{ width: '15%' }}>
         {row.topExposureTag && (
-          <Badge variant="secondary" className="ml-2">
+          <Badge
+            variant="secondary"
+            className="ml-2"
+            style={{
+              backgroundColor: colors.brand[500],
+              color: 'white'
+            }}
+          >
             {row.topExposureTag}
           </Badge>
         )}
       </TableCell>
+      <TableCell sx={{ width: '50%' }}>{row.title}</TableCell>
       <TableCell align="center" sx={{ width: '10%' }}>
         {row.views}
       </TableCell>

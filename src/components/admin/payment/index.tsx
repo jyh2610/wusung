@@ -1,6 +1,6 @@
 'use client';
 
-import React, { useState } from 'react';
+import React, { useState, useEffect } from 'react';
 import { Button } from '@/components/ui/button';
 import { Table, Tooltip } from 'antd';
 import { useQuery, useQueryClient } from '@tanstack/react-query';
@@ -18,7 +18,7 @@ import {
 } from '@/components/ui/select';
 import { Switch } from '@/components/ui/switch';
 import { format } from 'date-fns';
-import { useRouter } from 'next/navigation';
+import { useRouter, useSearchParams } from 'next/navigation';
 
 export const Payment = () => {
   const [page, setPage] = useState(0);
@@ -31,6 +31,14 @@ export const Payment = () => {
   const [direction, setDirection] = useState<'ASC' | 'DESC'>('DESC');
   const queryClient = useQueryClient();
   const router = useRouter();
+  const searchParams = useSearchParams();
+
+  useEffect(() => {
+    const memberIdParam = searchParams.get('memberId');
+    if (memberIdParam) {
+      setMemberId(Number(memberIdParam));
+    }
+  }, [searchParams]);
 
   const { data: filterOptions } = useQuery({
     queryKey: ['payment-filter'],
@@ -163,13 +171,25 @@ export const Payment = () => {
         <h1 className="text-2xl font-bold">결제 관리</h1>
       </div>
 
-      <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-4 p-4 bg-white rounded-lg">
+      <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-5 gap-4 p-4 bg-white rounded-lg">
         <div className="space-y-2">
           <Label>검색</Label>
           <Input
             placeholder="계정 이름, 구매자 이름, 구매자 이메일, 구매자 전화번호, 결제 ID"
             value={search}
             onChange={e => setSearch(e.target.value)}
+          />
+        </div>
+
+        <div className="space-y-2">
+          <Label>회원 ID</Label>
+          <Input
+            type="number"
+            placeholder="회원 ID 입력"
+            value={memberId || ''}
+            onChange={e =>
+              setMemberId(e.target.value ? Number(e.target.value) : undefined)
+            }
           />
         </div>
 
@@ -236,7 +256,7 @@ export const Payment = () => {
               id="isBankTransfer"
               checked={isBankTransfer}
               onCheckedChange={setIsBankTransfer}
-              className="bg-gray-200 data-[state=checked]:bg-blue-600"
+              className="bg-gray-200 data-[state=checked]:bg-gray-200 [&>span]:bg-white data-[state=checked]:[&>span]:bg-blue-600"
             />
           </div>
         </div>

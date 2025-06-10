@@ -7,7 +7,7 @@ import { IAnnouncementResponse } from '@/shared/api/common';
 import { format, parseISO } from 'date-fns';
 import { colors } from '@/design-tokens';
 import { Button } from '@/components/ui/button';
-import { ArrowLeft, Eye } from 'lucide-react';
+import { ArrowLeft, Eye, Download } from 'lucide-react';
 
 function Detail() {
   const params = useParams();
@@ -37,6 +37,15 @@ function Detail() {
       console.error('날짜 형식 오류:', error);
       return '날짜 오류';
     }
+  };
+
+  const handleDownload = (fileUrl: string, fileName: string) => {
+    const link = document.createElement('a');
+    link.href = fileUrl;
+    link.download = fileName;
+    document.body.appendChild(link);
+    link.click();
+    document.body.removeChild(link);
   };
 
   if (!announcement) {
@@ -70,6 +79,30 @@ function Detail() {
             <span>수정일: {formatDate(announcement.updatedAt)}</span>
           </div>
         </div>
+
+        {announcement.files && announcement.files.length > 0 && (
+          <div className="border rounded-lg p-4 bg-gray-50">
+            <h3 className="text-lg font-semibold mb-3">첨부파일</h3>
+            <div className="space-y-2">
+              {announcement.files.map(file => (
+                <div
+                  key={file.fileId}
+                  className="flex items-center justify-between p-2 bg-white rounded border"
+                >
+                  <span className="text-sm truncate">{file.fileName}</span>
+                  <Button
+                    variant="ghost"
+                    size="sm"
+                    onClick={() => handleDownload(file.fileUrl, file.fileName)}
+                  >
+                    <Download className="h-4 w-4 mr-1" />
+                    다운로드
+                  </Button>
+                </div>
+              ))}
+            </div>
+          </div>
+        )}
 
         <div className="border-t border-b py-8">
           <div

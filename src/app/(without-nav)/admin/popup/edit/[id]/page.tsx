@@ -285,7 +285,7 @@ const Page = () => {
           onCheckedChange={checked =>
             setPopup((prev: IRegPopup) => ({ ...prev, isActive: checked }))
           }
-          className="data-[state=checked]:bg-blue-500 data-[state=unchecked]:bg-gray-200 border border-gray-300"
+          className="bg-gray-200 data-[state=checked]:bg-gray-200 [&>span]:bg-white data-[state=checked]:[&>span]:bg-blue-600"
         />
         <Label htmlFor="isActive">공개 여부</Label>
       </div>

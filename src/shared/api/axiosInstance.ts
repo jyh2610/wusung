@@ -7,7 +7,7 @@ import axios, {
   InternalAxiosRequestConfig
 } from 'axios';
 import https from 'https';
-import { getLocalStorageValue, setLocalStorageValue } from '@/lib/utils';
+import { getsessionStorageValue, setsessionStorageValue } from '@/lib/utils';
 
 const axiosInstance = axios.create({
   baseURL: process.env.NEXT_PUBLIC_API_BASE_URL,
@@ -24,7 +24,7 @@ const axiosInstance = axios.create({
 axiosInstance.interceptors.request.use(
   (config: InternalAxiosRequestConfig) => {
     try {
-      const userInfo = getLocalStorageValue('userInfo');
+      const userInfo = getsessionStorageValue('userInfo');
       const token = userInfo ? JSON.parse(userInfo).token : '';
 
       if (token) {
@@ -48,11 +48,11 @@ axiosInstance.interceptors.response.use(
       const token = newAccessToken.replace('Bearer ', '');
 
       try {
-        const stored = getLocalStorageValue('userInfo');
+        const stored = getsessionStorageValue('userInfo');
         if (stored) {
           const parsed = JSON.parse(stored);
           const updated = { ...parsed, token };
-          setLocalStorageValue('userInfo', JSON.stringify(updated));
+          setsessionStorageValue('userInfo', JSON.stringify(updated));
         }
 
         if (typeof window !== 'undefined') {
@@ -92,11 +92,11 @@ const handleAxiosError = async (error: AxiosError) => {
       const token = newAccessToken.replace('Bearer ', '');
 
       try {
-        const stored = getLocalStorageValue('userInfo');
+        const stored = getsessionStorageValue('userInfo');
         if (stored) {
           const parsed = JSON.parse(stored);
           const updated = { ...parsed, token };
-          setLocalStorageValue('userInfo', JSON.stringify(updated));
+          setsessionStorageValue('userInfo', JSON.stringify(updated));
         }
 
         if (typeof window !== 'undefined') {

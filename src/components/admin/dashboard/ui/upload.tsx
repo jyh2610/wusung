@@ -44,6 +44,15 @@ export const Upload = ({ onCancel }: UploadProps) => {
   const queryClient = useQueryClient();
 
   useEffect(() => {
+    console.log('상태 변경됨:', {
+      title: newDashboard.title,
+      topExposure: newDashboard.topExposure,
+      topExposureTag: newDashboard.topExposureTag,
+      isVisible: newDashboard.isVisible
+    });
+  }, [newDashboard]);
+
+  useEffect(() => {
     if (editorContainerRef.current) {
       const editor = editorContainerRef.current.querySelector('.ql-editor');
       if (editor) {
@@ -186,6 +195,11 @@ export const Upload = ({ onCancel }: UploadProps) => {
       },
       clipboard: {
         matchVisual: false
+      },
+      keyboard: {
+        bindings: {
+          tab: false
+        }
       }
     }),
     []
@@ -263,9 +277,24 @@ export const Upload = ({ onCancel }: UploadProps) => {
             onCheckedChange={checked =>
               setNewDashboard(prev => ({ ...prev, topExposure: checked }))
             }
-            className="data-[state=checked]:bg-blue-500 data-[state=unchecked]:bg-gray-200 border border-gray-300"
+            className="bg-gray-200 data-[state=checked]:bg-gray-200 [&>span]:bg-white data-[state=checked]:[&>span]:bg-blue-600"
           />
           <Label htmlFor="topExposure">최상단 노출</Label>
+          {newDashboard.topExposure && (
+            <div className="flex-1">
+              <Input
+                id="topExposureTag"
+                value={newDashboard.topExposureTag || ''}
+                onChange={e =>
+                  setNewDashboard(prev =>
+                    prev ? { ...prev, topExposureTag: e.target.value } : prev
+                  )
+                }
+                placeholder="최상단 노출 태그를 입력하세요"
+                className="max-w-xs"
+              />
+            </div>
+          )}
         </div>
 
         <div className="flex items-center space-x-2">
@@ -275,7 +304,7 @@ export const Upload = ({ onCancel }: UploadProps) => {
             onCheckedChange={checked =>
               setNewDashboard(prev => ({ ...prev, isVisible: checked }))
             }
-            className="data-[state=checked]:bg-blue-500 data-[state=unchecked]:bg-gray-200 border border-gray-300"
+            className="bg-gray-200 data-[state=checked]:bg-gray-200 [&>span]:bg-white data-[state=checked]:[&>span]:bg-blue-600"
           />
           <Label htmlFor="isVisible">공개 여부</Label>
         </div>

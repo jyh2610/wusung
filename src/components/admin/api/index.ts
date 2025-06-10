@@ -11,6 +11,7 @@ import {
   IpList,
   Member,
   MemberListParams,
+  PrintHistory,
   RegCategory
 } from '../tpye';
 
@@ -313,6 +314,26 @@ export const deleteContent = async (contentId: number) => {
     const res = await request<ApiResponse<null>>({
       method: 'DELETE',
       url: `/api/admin/edu-content/${contentId}`
+    });
+    return res.data.data;
+  } catch (error) {
+    console.error(error);
+    return undefined;
+  }
+};
+
+export const getPrintHistory = async (
+  memberId: number,
+  params: {
+    page: number;
+    size: number;
+  }
+) => {
+  try {
+    const res = await request<ApiResponse<PaginatedResponse<PrintHistory>>>({
+      method: 'GET',
+      url: `/api/admin/member/${memberId}/print-history`,
+      params
     });
     return res.data.data;
   } catch (error) {

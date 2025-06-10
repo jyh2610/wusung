@@ -31,6 +31,8 @@ export function InquiryDetail({
   files,
   onBack
 }: InquiryDetailProps) {
+  console.log('InquiryDetail props:', inquiry);
+  console.log('inquiry:', inquiry);
   return (
     <div className={detailWrapper}>
       <div className={detailCard}>
@@ -56,13 +58,13 @@ export function InquiryDetail({
             <tr>
               <th className={detailTh}>작성일</th>
               <td className={detailTd}>
-                {inquiry.updatedAt.replace('T', ' ')}
+                {inquiry.updatedAt ? inquiry.updatedAt.replace('T', ' ') : '-'}
               </td>
             </tr>
             <tr>
               <th className={detailTh}>수정일</th>
               <td className={detailTd}>
-                {inquiry.updatedAt.replace('T', ' ')}
+                {inquiry.updatedAt ? inquiry.updatedAt.replace('T', ' ') : '-'}
               </td>
             </tr>
             <tr>
@@ -83,14 +85,14 @@ export function InquiryDetail({
         </table>
 
         <div>
-          <strong className={detailSectionTitle}>첨부 이미지</strong>
+          <strong className={detailSectionTitle}>첨부 파일</strong>
           <div className={detailImageList}>
             {files.length ? (
               files.map((file, idx) => (
                 <InquiryFilePreview key={idx} url={file.url} name={file.name} />
               ))
             ) : (
-              <span className={detailNoData}>첨부 이미지 없음</span>
+              <span className={detailNoData}>첨부 파일 없음</span>
             )}
           </div>
         </div>

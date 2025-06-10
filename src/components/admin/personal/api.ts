@@ -2,14 +2,19 @@ import { ApiResponse, PaginatedResponse } from '@/shared/type';
 import { IGetInquiryDetail, IInquiry } from './type';
 import request from '@/shared/api/axiosInstance';
 
-export const getInquiryList = async (page: number, limit: number) => {
+export const getInquiryList = async (
+  page: number,
+  limit: number,
+  memberId: number | undefined
+) => {
   try {
     const response = await request<ApiResponse<PaginatedResponse<IInquiry[]>>>({
       url: `/api/admin/inquiry/list`,
       method: 'GET',
       params: {
         page,
-        limit
+        limit,
+        memberId: memberId || undefined
       }
     });
     return response.data;

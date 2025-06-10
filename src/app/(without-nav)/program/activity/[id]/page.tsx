@@ -38,7 +38,7 @@ export default function ActivityPage() {
 
   useEffect(() => {
     const fetchContent = async () => {
-      const token = localStorage.getItem('token');
+      const token = sessionStorage.getItem('token');
       try {
         const res = await request<IRes<EduContent>>({
           method: 'GET',

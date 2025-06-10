@@ -51,14 +51,14 @@ export function convertToSchedule(
   return result;
 }
 
-export const getLocalStorageValue = (key: string) => {
+export const getsessionStorageValue = (key: string) => {
   if (typeof window === 'undefined') return null;
-  return localStorage.getItem(key);
+  return sessionStorage.getItem(key);
 };
 
-export const setLocalStorageValue = (key: string, value: string) => {
+export const setsessionStorageValue = (key: string, value: string) => {
   if (typeof window === 'undefined') return null;
-  return localStorage.setItem(key, value);
+  return sessionStorage.setItem(key, value);
 };
 
 type AnyTreeNode = Record<string, any>;

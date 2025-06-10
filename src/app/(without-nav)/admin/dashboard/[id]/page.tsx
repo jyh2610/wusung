@@ -56,7 +56,9 @@ const Page = () => {
   return (
     <div className="space-y-6 p-6 bg-white rounded-lg">
       <div className="flex justify-between items-center">
-        <h1 className="text-2xl font-bold">{detail.title}</h1>
+        <div className="space-y-2">
+          <h1 className="text-2xl font-bold">{detail.title}</h1>
+        </div>
         <div className="flex gap-2">
           <Button
             variant="outline"
@@ -83,8 +85,21 @@ const Page = () => {
 
       <div className="flex items-center space-x-4 text-sm text-gray-500">
         <span>조회수: {detail.views}</span>
-        <span>작성일: {new Date(detail.createdAt).toLocaleDateString()}</span>
-        <span>수정일: {new Date(detail.updatedAt).toLocaleDateString()}</span>
+        <span>작성일: {new Date(detail.createdAt).toLocaleString()}</span>
+        <span>수정일: {new Date(detail.updatedAt).toLocaleString()}</span>
+        <span
+          className={`px-2 py-1 rounded ${detail.isVisible ? 'bg-green-100 text-green-800' : 'bg-red-100 text-red-800'}`}
+        >
+          {detail.isVisible ? '공개' : '비공개'}
+        </span>
+        {detail.topExposure && (
+          <span className="flex items-center space-x-2">
+            {'노출 :' + ' '}
+            <div className="inline-block px-2 py-1 text-sm bg-blue-100 text-blue-800 rounded">
+              {detail.topExposureTag}
+            </div>
+          </span>
+        )}
       </div>
 
       <div className="border-t pt-4">
@@ -103,7 +118,7 @@ const Page = () => {
         )}
       </div>
 
-      {detail.files.length > 0 && (
+      {detail.files && detail.files.length > 0 && (
         <div className="border-t pt-4">
           <h2 className="text-lg font-semibold mb-4">첨부파일</h2>
           <div className="space-y-2">

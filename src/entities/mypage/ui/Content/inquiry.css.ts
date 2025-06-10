@@ -118,3 +118,36 @@ export const detailNoData = style({
   color: '#aaa',
   fontSize: 18
 });
+
+export const detailFileItem = style({
+  display: 'flex',
+  alignItems: 'center',
+  justifyContent: 'space-between',
+  padding: '8px 12px',
+  border: '1px solid #eee',
+  borderRadius: 6,
+  marginBottom: 8,
+  width: '100%'
+});
+
+export const detailFileName = style({
+  fontSize: 14,
+  color: '#333',
+  wordBreak: 'break-all',
+  flex: 1,
+  marginRight: 12
+});
+
+export const detailFileDownload = style({
+  padding: '6px 12px',
+  backgroundColor: '#e1007b',
+  color: '#fff',
+  border: 'none',
+  borderRadius: 4,
+  cursor: 'pointer',
+  fontSize: 13,
+  fontWeight: 500,
+  ':hover': {
+    backgroundColor: '#c1006b'
+  }
+});

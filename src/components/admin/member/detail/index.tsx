@@ -18,14 +18,16 @@ import 'dayjs/locale/ko';
 import { useQuery } from '@tanstack/react-query';
 import request from '@/shared/api/axiosInstance';
 import { ApiResponse } from '@/shared/type';
-import { IMemberDetail, IpList } from '@/components/admin/tpye';
+import { IMemberDetail, IpList, PrintHistory } from '@/components/admin/tpye';
 import {
   withdrawMember,
   restoreMember,
   changeSubscriptionEndDate,
   changePassword,
-  getIpList
+  getIpList,
+  getPrintHistory
 } from '@/components/admin/api';
+import { useRouter } from 'next/navigation';
 
 dayjs.extend(relativeTime);
 dayjs.locale('ko');
@@ -49,6 +51,9 @@ export const MemberDetail: React.FC<MemberDetailProps> = ({ memberId }) => {
   const [isSubscriptionModalVisible, setIsSubscriptionModalVisible] =
     useState(false);
   const [isWithdrawModalVisible, setIsWithdrawModalVisible] = useState(false);
+  const [printHistoryPage, setPrintHistoryPage] = useState(1);
+  const [printHistoryPageSize, setPrintHistoryPageSize] = useState(10);
+  const router = useRouter();
 
   const { data, isLoading, refetch } = useQuery({
     queryKey: ['member', memberId],
@@ -58,6 +63,20 @@ export const MemberDetail: React.FC<MemberDetailProps> = ({ memberId }) => {
   const { data: ipListData } = useQuery({
     queryKey: ['member-ip-list', memberId],
     queryFn: () => getIpList(memberId)
+  });
+
+  const { data: printHistoryData } = useQuery({
+    queryKey: [
+      'member-print-history',
+      memberId,
+      printHistoryPage,
+      printHistoryPageSize
+    ],
+    queryFn: () =>
+      getPrintHistory(memberId, {
+        page: printHistoryPage - 1,
+        size: printHistoryPageSize
+      })
   });
 
   const handlePasswordSubmit = async (values: {
@@ -121,6 +140,19 @@ export const MemberDetail: React.FC<MemberDetailProps> = ({ memberId }) => {
     }
   };
 
+  const handlePrintHistoryTableChange = (pagination: any) => {
+    setPrintHistoryPage(pagination.current);
+    setPrintHistoryPageSize(pagination.pageSize);
+  };
+
+  const handlePaymentHistoryClick = () => {
+    router.push(`/admin/payment?memberId=${memberId}`);
+  };
+
+  const handleInquiryHistoryClick = () => {
+    router.push(`/admin/inquiry?memberId=${memberId}`);
+  };
+
   const ipListColumns = [
     {
       title: 'IP 주소',
@@ -143,6 +175,34 @@ export const MemberDetail: React.FC<MemberDetailProps> = ({ memberId }) => {
     }
   ];
 
+  const printHistoryColumns = [
+    {
+      title: '출력 일시',
+      dataIndex: 'printDate',
+      key: 'printDate',
+      width: '25%',
+      render: (date: string) => dayjs(date).format('YYYY-MM-DD HH:mm:ss')
+    },
+    {
+      title: '출력 유형',
+      dataIndex: 'printType',
+      key: 'printType',
+      width: '25%'
+    },
+    {
+      title: '출력 페이지 수',
+      dataIndex: 'printCount',
+      key: 'printCount',
+      width: '25%'
+    },
+    {
+      title: '접속 IP',
+      dataIndex: 'accessIp',
+      key: 'accessIp',
+      width: '25%'
+    }
+  ];
+
   if (isLoading) {
     return <div>로딩 중...</div>;
   }
@@ -154,6 +214,7 @@ export const MemberDetail: React.FC<MemberDetailProps> = ({ memberId }) => {
   return (
     <div className="p-8 space-y-6">
       <Card title="회원 상세 정보" className="mb-6">
+        {' '}
         <div className="grid grid-cols-2 gap-8">
           <div className="space-y-6">
             <div className="space-y-4">
@@ -178,6 +239,16 @@ export const MemberDetail: React.FC<MemberDetailProps> = ({ memberId }) => {
                   onClick={() => setIsPasswordModalVisible(true)}
                 >
                   비밀번호 변경
+                </Button>
+              </div>
+            </div>
+            <div className="pt-4">
+              <div className="flex items-center gap-3">
+                <Button type="primary" onClick={handlePaymentHistoryClick}>
+                  결제정보 조회
+                </Button>
+                <Button type="primary" onClick={handleInquiryHistoryClick}>
+                  문의내역 조회
                 </Button>
               </div>
             </div>
@@ -224,7 +295,6 @@ export const MemberDetail: React.FC<MemberDetailProps> = ({ memberId }) => {
                 <Button
                   type="primary"
                   onClick={() => setIsSubscriptionModalVisible(true)}
-                  disabled={!data.subscriptionEndDate}
                 >
                   구독 종료일 변경
                 </Button>
@@ -259,6 +329,23 @@ export const MemberDetail: React.FC<MemberDetailProps> = ({ memberId }) => {
             showTotal: total => `총 ${total}개`
           }}
           loading={!ipListData}
+        />
+      </Card>
+
+      <Card title="출력 이력 조회">
+        <Table
+          columns={printHistoryColumns}
+          dataSource={printHistoryData?.content}
+          rowKey={record => `${record.printId}-${record.printDate}`}
+          pagination={{
+            total: printHistoryData?.totalElements,
+            pageSize: printHistoryPageSize,
+            current: printHistoryPage,
+            showSizeChanger: true,
+            showTotal: total => `총 ${total}개`,
+            onChange: handlePrintHistoryTableChange
+          }}
+          loading={!printHistoryData}
         />
       </Card>
 

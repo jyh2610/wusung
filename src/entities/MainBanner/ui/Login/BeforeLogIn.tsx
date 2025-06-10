@@ -3,10 +3,9 @@
 import { useRouter } from 'next/navigation';
 import React, { useState } from 'react';
 import { colors } from '@/design-tokens';
-import { routeMap, showErrorAlert, showSuccessAlert } from '@/shared';
-import { Button, Input } from '@/shared/ui';
+import { routeMap } from '@/shared';
+import { Button } from '@/shared/ui';
 import { VerticalLine } from '@/shared/ui/VerticalLine';
-import { login } from '../../api';
 import { ILoginData } from '../../type';
 import {
   LoginStyles,
@@ -18,6 +17,8 @@ import {
 } from './Login.css';
 import { NomalInput } from '@/shared/ui/Input';
 import { useAuthStore } from '@/shared/stores/useAuthStore';
+import { TwoFAModal } from '@/entities/UserManage/ui/Login/twoFAModal';
+
 export function BeforeLogIn() {
   const [loginData, setLoginData] = useState<ILoginData>({
     userName: '',
@@ -25,23 +26,19 @@ export function BeforeLogIn() {
   });
 
   const navigate = useRouter();
+  const { login } = useAuthStore();
 
   const sendLogin = async () => {
-    const { login, set2FAState } = useAuthStore.getState();
     try {
-      // 로그인 요청
       const success = await login(loginData.userName, loginData.password);
 
-      if (!success) {
-        // 로그인 실패 시 처리
-        return;
+      if (success) {
+        // 로그인 성공 시 입력 필드 초기화
+        setLoginData({
+          userName: '',
+          password: ''
+        });
       }
-
-      // id와 password 초기화
-      setLoginData({
-        userName: '',
-        password: ''
-      });
     } catch (error) {
       console.error('로그인 실패:', error);
     }
@@ -59,7 +56,7 @@ export function BeforeLogIn() {
           placeholder="아이디를 입력해 주세요"
           labelPosition="vertical"
           labelInputGap={4}
-          value={loginData.userName} // 추가
+          value={loginData.userName}
           onChange={e =>
             setLoginData(prev => {
               return { ...prev, userName: e.target.value };
@@ -74,7 +71,7 @@ export function BeforeLogIn() {
           label="비밀번호"
           inputSize="medium"
           placeholder="비밀번호를 입력해 주세요"
-          value={loginData.password} // 추가
+          value={loginData.password}
           onChange={e =>
             setLoginData(prev => {
               return { ...prev, password: e.target.value };
@@ -110,6 +107,7 @@ export function BeforeLogIn() {
           <span className={InfoContentStyles}>아이디·비밀번호 찾기</span>
         </div>
       </div>
+      <TwoFAModal />
     </div>
   );
 }

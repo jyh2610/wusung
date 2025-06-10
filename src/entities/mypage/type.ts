@@ -26,3 +26,21 @@ export interface IInquiry {
   comments?: { [key: string]: any }[];
   files?: { url: string; name?: string }[];
 }
+
+export interface IGetInquiryDetail {
+  inquiry: {
+    inquiryId: number;
+    memberId: number;
+    type: string;
+    title: string;
+    content: string;
+    fileIdList: string;
+    isAnswered: boolean;
+    haveToReadByAdmin: boolean;
+    haveToReadByUser: boolean;
+    createdAt: string;
+    updatedAt: string;
+  };
+  comments?: { [key: string]: any }[];
+  files?: { url: string; name?: string }[];
+}

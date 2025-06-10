@@ -121,6 +121,7 @@ export const Upload = ({ onCancel }: UploadProps) => {
           onCheckedChange={checked =>
             setNewFamily(prev => ({ ...prev, isVisible: checked }))
           }
+          className="bg-gray-200 data-[state=checked]:bg-gray-200 [&>span]:bg-white data-[state=checked]:[&>span]:bg-blue-600"
         />
         <Label htmlFor="isVisible">활성화</Label>
       </div>
