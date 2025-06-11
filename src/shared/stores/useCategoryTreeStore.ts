@@ -11,7 +11,7 @@ interface CategoryTreeState {
   fetchCategoryTree: () => Promise<void>;
   setSelectedCategoryNode: (category: CategoryNode | null) => void;
 
-  findLeafCategoriesByName: (name: string) => CategoryNode[]; // ✅ 추가된 메서드
+  findLeafCategoriesByName: (name: string) => CategoryNode[];
   getChildrenOfRootByName: (name: string) => CategoryNode[];
 }
 
@@ -26,7 +26,6 @@ export const useCategoryTreeStore = create<CategoryTreeState>(set => ({
     console.log('Searching for category:', name);
     console.log('Available categories:', state.categoryTree);
 
-    // 활동지, 평가자료, 기타자료 매핑
     const categoryMapping: Record<string, string> = {
       '개별 활동지': '활동지',
       평가자료: '평가자료',
@@ -43,7 +42,8 @@ export const useCategoryTreeStore = create<CategoryTreeState>(set => ({
     set({ isLoading: true, error: null });
     try {
       const treeData = await getUserCategoryTree();
-      const tree = treeData?.data || [];
+      // Corrected line: Directly use treeData as it's the array
+      const tree = treeData || [];
 
       set({
         categoryTree: tree,
