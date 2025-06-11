@@ -15,10 +15,16 @@ import {
 import { colors } from '@/design-tokens';
 import { toast } from 'react-toastify';
 import { redirect, useRouter } from 'next/navigation';
+import { useIsAdmin } from '@/components/hooks/useIsAdmin';
+import { getRole } from '@/shared/api/common';
+import Cookies from 'js-cookie';
 
 function Logged() {
   const { logout: logoutAction } = useAuthStore();
   const router = useRouter();
+  const cookie = Cookies.get('token') ?? null;
+
+  const [role, setRole] = useState<string>('');
 
   const [userInfo, setUserInfo] = useState({
     username: '',
@@ -41,6 +47,14 @@ function Logged() {
       }
     }
   }, []);
+
+  useEffect(() => {
+    const fetchRole = async () => {
+      const userRole = await getRole(cookie);
+      setRole(userRole?.data || 'USER');
+    };
+    fetchRole();
+  }, [cookie]);
 
   const logOut = async () => {
     try {
@@ -74,10 +88,12 @@ function Logged() {
 
         <div className={LoginBottomStyles}>
           <Button
-            onClick={() => router.push('/program')}
+            onClick={() =>
+              router.push(role === 'ADMIN' ? '/admin/product' : '/program')
+            }
             type={'brand'}
             btnSize={'large'}
-            content={'우성인지펜 실행'}
+            content={role === 'ADMIN' ? '관리자 페이지' : '우성인지펜 실행'}
           />
           <button onClick={logOut} className={logoutStyles}>
             로그아웃

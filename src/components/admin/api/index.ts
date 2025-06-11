@@ -33,11 +33,11 @@ export const getCategoryList = async (): Promise<ICategory[] | undefined> => {
   }
 };
 
-export const getCategoryLeaf = async () => {
+export const getCategoryTree = async () => {
   try {
     const res = await request<ApiResponse<ILeafCategory[]>>({
       method: 'GET',
-      url: '/api/admin/edu-content/category/leaf'
+      url: '/api/admin/edu-content/category/tree'
     });
     return res.data.data;
   } catch (error) {

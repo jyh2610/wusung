@@ -515,6 +515,8 @@ export interface ISchedule {
   year: number;
   month: number;
   categoryId: number;
+  createdAt: string;
+  updatedAt: string;
   categoryName: string;
   title: string;
   difficultyLevel: number;

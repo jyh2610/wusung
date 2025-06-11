@@ -14,15 +14,18 @@ import {
   SelectContent,
   SelectItem,
   SelectTrigger,
-  SelectValue
+  SelectValue,
+  SelectGroup,
+  SelectLabel
 } from '@/components/ui/select';
 import { IContent } from '@/entities/program/type.dto';
 import { eduContentReg, putEduContent } from '@/entities/program/api';
 import { X } from 'lucide-react';
-import { getCategoryLeaf, getCategoryList } from './api';
+import { getCategoryTree } from './api';
 import { ICategory, ILeafCategory, IRes } from '@/shared/type';
 import request from '@/shared/api/axiosInstance';
 import ImageEditor from './ImageEditor/index';
+import { CustomCascader } from '@/shared/ui/cascader';
 
 export interface EduContentFile {
   fileId: number;
@@ -165,7 +168,7 @@ export function ContentUploadForm() {
 
   useEffect(() => {
     const fetchCategories = async () => {
-      const res = await getCategoryLeaf();
+      const res = await getCategoryTree();
       if (res) {
         setCategory(res);
       }
@@ -320,24 +323,15 @@ export function ContentUploadForm() {
 
         <div className="grid gap-3">
           <Label htmlFor="content-type">콘텐츠 유형</Label>
-          <Select
-            value={String(form.categoryId)}
-            onValueChange={val => handleChange('categoryId', Number(val))}
-          >
-            <SelectTrigger id="content-type">
-              <SelectValue placeholder="콘텐츠 유형 선택" />
-            </SelectTrigger>
-            <SelectContent>
-              {category.map(category => (
-                <SelectItem
-                  key={category.categoryId}
-                  value={String(category.categoryId)}
-                >
-                  {category.name}
-                </SelectItem>
-              ))}
-            </SelectContent>
-          </Select>
+          <CustomCascader
+            options={category}
+            value={form.categoryId ? [form.categoryId] : undefined}
+            onChange={value =>
+              handleChange('categoryId', value[value.length - 1])
+            }
+            placeholder="콘텐츠 유형 선택"
+            style={{ width: '100%' }}
+          />
         </div>
 
         <div className="grid gap-3">

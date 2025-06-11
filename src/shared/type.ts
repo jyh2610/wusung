@@ -15,6 +15,8 @@ export interface ILeafCategory {
   categoryId: number;
   name: string;
   isUsed: boolean;
+  parentId: number | null;
+  children: ILeafCategory[];
 }
 
 export interface IRes<T> {
