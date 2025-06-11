@@ -473,3 +473,45 @@ export const getDetailContent = async (
   });
   return res.data ?? [];
 };
+
+export interface ISchedule {
+  scheduleId: number;
+  year: number;
+  month: number;
+  categoryId: number;
+  categoryName: string;
+  title: string;
+  difficultyLevel: number;
+}
+
+export interface IScheduleListResponse {
+  content: ISchedule[];
+  totalElements: number;
+  totalPages: number;
+  size: number;
+  number: number;
+}
+
+export const getScheduleList = async ({
+  year,
+  month,
+  difficultyLevel,
+  page = 0,
+  size = 10
+}: {
+  year: number;
+  month: number;
+  difficultyLevel: number;
+  page?: number;
+  size?: number;
+}) => {
+  try {
+    const response = await request<IRes<IScheduleListResponse>>({
+      method: 'GET',
+      url: `/api/admin/schedule/list?year=${year}&month=${month}&difficultyLevel=${difficultyLevel}&page=${page}&size=${size}`
+    });
+    return response.data.data;
+  } catch (error) {
+    console.error('스케줄 목록 요청을 실패 했습니다.', error);
+  }
+};
