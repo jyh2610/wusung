@@ -2,7 +2,7 @@ import { FloatingMenu } from '@/entities';
 import { MenuList } from '@/entities/floatingMenu/const';
 import { layoutContainer } from './layout.css';
 
-export const menuList: MenuList = {
+const menuList: MenuList = {
   title: '우성인지펜 소개',
   subTitle: {
     greeting: '인사말',
