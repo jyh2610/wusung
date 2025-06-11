@@ -14,6 +14,8 @@ import {
 } from '@/components/ui/table';
 import { Button } from '@/shared/ui';
 import { useRouter, useSearchParams } from 'next/navigation';
+import { deleteSchedule } from '@/components/admin/api';
+import { toast } from 'react-toastify';
 
 const Page = () => {
   const router = useRouter();
@@ -54,7 +56,7 @@ const Page = () => {
   };
 
   // 스케줄 데이터 가져오기
-  const { data: schedules } = useQuery({
+  const { data: schedules, refetch } = useQuery({
     queryKey: [
       'schedules',
       selectedYear,
@@ -108,94 +110,116 @@ const Page = () => {
           marginBottom: '24px'
         }}
       >
-        <div style={{ display: 'flex', gap: '16px', alignItems: 'center' }}>
-          <div>
-            <label
-              style={{
-                display: 'block',
-                marginBottom: '8px',
-                fontSize: '14px',
-                fontWeight: 500
-              }}
-            >
-              년도
-            </label>
-            <select
-              value={selectedYear}
-              onChange={e => handleYearChange(Number(e.target.value))}
-              style={{
-                width: '120px',
-                height: '40px',
-                padding: '0 12px',
-                borderRadius: '6px',
-                border: '1px solid #ddd'
-              }}
-            >
-              {Array.from(
-                { length: 5 },
-                (_, i) => new Date().getFullYear() - 2 + i
-              ).map(year => (
-                <option key={year} value={year}>
-                  {year}년
-                </option>
-              ))}
-            </select>
+        <div
+          style={{
+            display: 'flex',
+            justifyContent: 'space-between',
+            alignItems: 'flex-end'
+          }}
+        >
+          <div style={{ display: 'flex', gap: '16px', alignItems: 'center' }}>
+            <div>
+              <label
+                style={{
+                  display: 'block',
+                  marginBottom: '8px',
+                  fontSize: '14px',
+                  fontWeight: 500
+                }}
+              >
+                년도
+              </label>
+              <select
+                value={selectedYear}
+                onChange={e => handleYearChange(Number(e.target.value))}
+                style={{
+                  width: '120px',
+                  height: '40px',
+                  padding: '0 12px',
+                  borderRadius: '6px',
+                  border: '1px solid #ddd'
+                }}
+              >
+                {Array.from(
+                  { length: 5 },
+                  (_, i) => new Date().getFullYear() - 2 + i
+                ).map(year => (
+                  <option key={year} value={year}>
+                    {year}년
+                  </option>
+                ))}
+              </select>
+            </div>
+            <div>
+              <label
+                style={{
+                  display: 'block',
+                  marginBottom: '8px',
+                  fontSize: '14px',
+                  fontWeight: 500
+                }}
+              >
+                월
+              </label>
+              <select
+                value={selectedMonth}
+                onChange={e => handleMonthChange(Number(e.target.value))}
+                style={{
+                  width: '120px',
+                  height: '40px',
+                  padding: '0 12px',
+                  borderRadius: '6px',
+                  border: '1px solid #ddd'
+                }}
+              >
+                {Array.from({ length: 12 }, (_, i) => i + 1).map(month => (
+                  <option key={month} value={month}>
+                    {month}월
+                  </option>
+                ))}
+              </select>
+            </div>
+            <div>
+              <label
+                style={{
+                  display: 'block',
+                  marginBottom: '8px',
+                  fontSize: '14px',
+                  fontWeight: 500
+                }}
+              >
+                난이도
+              </label>
+              <select
+                value={selectedDifficulty}
+                onChange={e => handleDifficultyChange(Number(e.target.value))}
+                style={{
+                  width: '120px',
+                  height: '40px',
+                  padding: '0 12px',
+                  borderRadius: '6px',
+                  border: '1px solid #ddd'
+                }}
+              >
+                <option value={1}>상</option>
+                <option value={2}>중</option>
+                <option value={3}>하</option>
+              </select>
+            </div>
           </div>
-          <div>
-            <label
-              style={{
-                display: 'block',
-                marginBottom: '8px',
-                fontSize: '14px',
-                fontWeight: 500
-              }}
-            >
-              월
-            </label>
-            <select
-              value={selectedMonth}
-              onChange={e => handleMonthChange(Number(e.target.value))}
-              style={{
-                width: '120px',
-                height: '40px',
-                padding: '0 12px',
-                borderRadius: '6px',
-                border: '1px solid #ddd'
-              }}
-            >
-              {Array.from({ length: 12 }, (_, i) => i + 1).map(month => (
-                <option key={month} value={month}>
-                  {month}월
-                </option>
-              ))}
-            </select>
-          </div>
-          <div>
-            <label
-              style={{
-                display: 'block',
-                marginBottom: '8px',
-                fontSize: '14px',
-                fontWeight: 500
-              }}
-            >
-              난이도
-            </label>
-            <select
-              value={selectedDifficulty}
-              onChange={e => handleDifficultyChange(Number(e.target.value))}
-              style={{
-                width: '120px',
-                height: '40px',
-                padding: '0 12px',
-                borderRadius: '6px',
-                border: '1px solid #ddd'
-              }}
-            >
-              <option value={1}>상</option>
-              <option value={2}>중</option>
-              <option value={3}>하</option>
-            </select>
+          <div
+            style={{
+              display: 'flex',
+              gap: '16px',
+              width: '140px',
+              height: '57px'
+            }}
+          >
+            <Button
+              content="+ 스케줄 추가"
+              type="default"
+              onClick={() => router.push('/admin/schedule')}
+            />
           </div>
         </div>
       </div>
@@ -210,10 +234,11 @@ const Page = () => {
         <Table>
           <TableHeader>
             <TableRow>
+              <TableHead>스케줄 ID</TableHead>
               <TableHead>날짜</TableHead>
-              <TableHead>카테고리</TableHead>
-              <TableHead>활동명</TableHead>
               <TableHead>난이도</TableHead>
+              <TableHead>생성일</TableHead>
+              <TableHead>수정일</TableHead>
               <TableHead>관리</TableHead>
             </TableRow>
           </TableHeader>
@@ -221,7 +246,7 @@ const Page = () => {
             {!schedules?.content || schedules.content.length === 0 ? (
               <TableRow>
                 <TableCell
-                  colSpan={5}
+                  colSpan={6}
                   style={{ textAlign: 'center', padding: '48px 0' }}
                 >
                   스케줄이 없습니다.
@@ -230,11 +255,10 @@ const Page = () => {
             ) : (
               schedules.content.map((schedule: ISchedule) => (
                 <TableRow key={schedule.scheduleId}>
+                  <TableCell>{schedule.scheduleId}</TableCell>
                   <TableCell>
                     {formatDate(schedule.year, schedule.month)}
                   </TableCell>
-                  <TableCell>{schedule.categoryName}</TableCell>
-                  <TableCell>{schedule.title}</TableCell>
                   <TableCell>
                     {schedule.difficultyLevel === 1
                       ? '상'
@@ -243,20 +267,34 @@ const Page = () => {
                         : '하'}
                   </TableCell>
                   <TableCell>
+                    {new Date(schedule.createdAt).toLocaleDateString('ko-KR')}
+                  </TableCell>
+                  <TableCell>
+                    {new Date(schedule.updatedAt).toLocaleDateString('ko-KR')}
+                  </TableCell>
+                  <TableCell>
                     <div style={{ display: 'flex', gap: '8px' }}>
                       <Button
                         content="수정"
                         type="borderBrand"
                         onClick={() =>
-                          router.push(`/admin/schedule/${schedule.scheduleId}`)
+                          router.push(
+                            `/admin/schedule?difficultyid=${schedule.difficultyLevel}&year=${schedule.year}&month=${schedule.month}&scheduleId=${schedule.scheduleId}`
+                          )
                         }
                       />
                       <Button
                         content="삭제"
                         type="borderBrand"
-                        onClick={() => {
+                        onClick={async () => {
                           if (window.confirm('정말 삭제하시겠습니까?')) {
-                            // TODO: 삭제 API 호출
+                            try {
+                              await deleteSchedule(schedule.scheduleId);
+                              toast.success('삭제되었습니다.');
+                              refetch();
+                            } catch (error) {
+                              toast.error('삭제에 실패했습니다.');
+                            }
                           }
                         }}
                       />

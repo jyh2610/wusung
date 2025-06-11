@@ -54,11 +54,17 @@ export default function AdminSidebar() {
       active: pathname === '/admin/content/upload'
     },
 
+    // {
+    //   label: '스케줄 관리',
+    //   icon: Calendar,
+    //   href: '/admin/schedule',
+    //   active: pathname === '/admin/schedule'
+    // },
     {
-      label: '스케줄 관리',
+      label: '스케줄 리스트 관리',
       icon: Calendar,
-      href: '/admin/schedule',
-      active: pathname === '/admin/schedule'
+      href: '/admin/schedule/list',
+      active: pathname === '/admin/schedule/list'
     },
     {
       label: '회원 관리',

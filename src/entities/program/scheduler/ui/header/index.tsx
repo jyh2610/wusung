@@ -1,6 +1,6 @@
 'use client';
 
-import React, { useState } from 'react';
+import React, { useState, useEffect } from 'react';
 import { MdLocalPrintshop } from 'react-icons/md';
 import { IoIosArrowBack, IoIosArrowForward } from 'react-icons/io';
 import {
@@ -12,12 +12,13 @@ import {
 import { CircularProgress } from '@mui/material';
 import { Schedule } from '@/entities/program/type.dto';
 import { formatScheduleData } from '../../utils';
-import { printPDF, regSchedule } from '@/entities/program/api';
+import { printPDF, regSchedule, updateSchedule } from '@/entities/program/api';
 import { useUserStore } from '@/shared/stores/useUserStore';
 import { useDateStore } from '@/shared/stores/useDateStores'; // ✅ 전역 상태 store
 import { toast } from 'react-toastify';
 import { useScheduleStore } from '@/shared/stores/useScheduleStore';
 import { Box, Button, Modal, Typography } from '@mui/material';
+import { useSearchParams } from 'next/navigation';
 
 function Header({
   isAdmin,
@@ -29,8 +30,17 @@ function Header({
   const [isPrintModalOpen, setIsPrintModalOpen] = useState(false);
   const [autoFillDate, setAutoFillDate] = useState(true);
   const [isPrinting, setIsPrinting] = useState(false);
-  // ✅ 전역 날짜 상태 사용
+  const searchParams = useSearchParams();
   const { year, month, setYear, setMonth } = useDateStore();
+
+  useEffect(() => {
+    const yearParam = searchParams.get('year');
+    const monthParam = searchParams.get('month');
+
+    if (yearParam) setYear(Number(yearParam));
+    if (monthParam) setMonth(Number(monthParam));
+  }, [searchParams, setYear, setMonth]);
+
   const mainEduContentIds = formatScheduleData(schedule, year, month);
   const { coverItems, etcItems, noPrintDate, disabledDrops } = useScheduleStore(
     state => ({
@@ -113,24 +123,45 @@ function Header({
     try {
       const coverItemId =
         coverItems && coverItems.id !== 0 ? coverItems.id : null;
-      // etcItems 배열에서 id만 추출 (middleEduContentIds로 사용 가정)
       const middleEduContentIds = etcItems.map(item => item.id);
+      const mainEduContentIds = getFilteredMainEduContentIds();
 
-      // 디버깅 로그 (API 호출 전 값 확인)
-      console.log('Printing with coverEduContentId:', coverItemId);
-      console.log('Printing with main:', mainEduContentIds);
+      // URL에서 scheduleId 가져오기
+      const scheduleId = searchParams.get('scheduleId');
+      const yearParam = searchParams.get('year');
+      const monthParam = searchParams.get('month');
 
-      await regSchedule({
-        year,
-        month,
-        difficultyLevel: 1,
-        coverEduContentId: coverItemId!,
-        middleEduContentIds: middleEduContentIds,
-        mainEduContentIds: mainEduContentIds
-      });
-      toast.success('등록이 완료되었습니다!');
+      // 전역 상태에서 선택된 난이도 가져오기
+      const selectedDifficulty = useScheduleStore.getState().selectedDifficulty;
+
+      if (isAdmin && scheduleId && yearParam && monthParam) {
+        // 수정 API 호출
+        await updateSchedule({
+          scheduleId: Number(scheduleId),
+          year: Number(yearParam),
+          month: Number(monthParam),
+          difficultyLevel: selectedDifficulty, // 전역 상태의 난이도 사용
+          coverEduContentId: coverItemId!,
+          middleEduContentIds,
+          mainEduContentIds
+        });
+        toast.success('수정이 완료되었습니다!');
+      } else {
+        // 기존 등록 API 호출
+        await regSchedule({
+          year,
+          month,
+          difficultyLevel: selectedDifficulty, // 전역 상태의 난이도 사용
+          coverEduContentId: coverItemId!,
+          middleEduContentIds,
+          mainEduContentIds
+        });
+        toast.success('등록이 완료되었습니다!');
+      }
     } catch (error) {
-      toast.error('등록이 실패되었습니다!');
+      toast.error(
+        isAdmin ? '수정이 실패되었습니다!' : '등록이 실패되었습니다!'
+      );
     }
   };
 

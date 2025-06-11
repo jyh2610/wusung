@@ -341,3 +341,16 @@ export const getPrintHistory = async (
     return undefined;
   }
 };
+
+export const deleteSchedule = async (scheduleId: number) => {
+  try {
+    const res = await request<ApiResponse<null>>({
+      method: 'DELETE',
+      url: `/api/admin/schedule/${scheduleId}`
+    });
+    return res.data.data;
+  } catch (error) {
+    console.error(error);
+    return undefined;
+  }
+};

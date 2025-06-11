@@ -260,6 +260,42 @@ export const regSchedule = async ({
   }
 };
 
+export const updateSchedule = async ({
+  scheduleId,
+  year,
+  month,
+  difficultyLevel,
+  coverEduContentId,
+  middleEduContentIds,
+  mainEduContentIds
+}: {
+  scheduleId: number;
+  year: number;
+  month: number;
+  difficultyLevel: number;
+  coverEduContentId: number;
+  middleEduContentIds: number[];
+  mainEduContentIds: number[][];
+}) => {
+  try {
+    const res = await request({
+      method: 'PUT',
+      url: `/api/admin/schedule/${scheduleId}`,
+      data: {
+        year,
+        month,
+        difficultyLevel,
+        coverEduContentId,
+        middleEduContentIds,
+        mainEduContentIds
+      }
+    });
+    return res.data;
+  } catch (error) {
+    console.error('스케줄 등록에 실패 했습니다.', error);
+  }
+};
+
 export const getCategoryTree = async (): Promise<ICategoryLeaf[]> => {
   try {
     const res = await request<IRes<ICategoryLeaf[]>>({

@@ -34,6 +34,9 @@ interface ScheduleState {
   addEtcItem: (item: ScheduleItem) => void;
   clearEtcItems: () => void;
   setDisabledDrop: (id: string, disabled: boolean) => void;
+
+  selectedDifficulty: number;
+  setSelectedDifficulty: (difficulty: number) => void;
 }
 
 export const useScheduleStore = create<ScheduleState>(set => ({
@@ -44,6 +47,7 @@ export const useScheduleStore = create<ScheduleState>(set => ({
   etcItems: [],
   disabledDrops: new Set(),
   noPrintDate: true,
+  selectedDifficulty: 2,
 
   toggleNoPrintDate: () =>
     set(state => ({
@@ -136,5 +140,7 @@ export const useScheduleStore = create<ScheduleState>(set => ({
     set(state => ({
       etcItems: [...state.etcItems, item]
     })),
-  clearEtcItems: () => set({ etcItems: [] })
+  clearEtcItems: () => set({ etcItems: [] }),
+
+  setSelectedDifficulty: difficulty => set({ selectedDifficulty: difficulty })
 }));

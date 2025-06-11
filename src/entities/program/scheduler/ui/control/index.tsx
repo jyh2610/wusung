@@ -1,6 +1,6 @@
 'use client';
 
-import React, { useState } from 'react';
+import React, { useState, useEffect } from 'react';
 import { IoReload } from 'react-icons/io5';
 import {
   controlContainer,
@@ -20,6 +20,7 @@ import { useUserStore } from '@/shared/stores/useUserStore';
 import { toast } from 'react-toastify';
 import { color } from 'bun';
 import { colors } from '@/design-tokens';
+import { useSearchParams } from 'next/navigation';
 
 export function Control({ isAdmin }: { isAdmin: boolean }) {
   const [isModalOpen, setModalOpen] = useState(false);
@@ -38,6 +39,47 @@ export function Control({ isAdmin }: { isAdmin: boolean }) {
   const selectedUserId = useUserStore(state => state.selectedUserId);
   const users = useUserStore.getState().users;
   const selectedUser = users.find(user => user.elderId === selectedUserId);
+
+  const searchParams = useSearchParams();
+
+  const [selectedDifficulty, setSelectedDifficulty] = useState<number>(2);
+
+  const handleLoadPlan = async (
+    year: number,
+    month: number,
+    difficultyLevel: number
+  ) => {
+    try {
+      await getPlan({
+        year,
+        month,
+        difficultyLevel
+      });
+
+      await autoRegisterPlan({
+        year,
+        month,
+        difficultyLevel
+      });
+    } catch (error) {
+      console.error('계획안 불러오기 실패:', error);
+      toast.error('계획안을 불러오는데 실패했습니다.');
+    }
+  };
+
+  useEffect(() => {
+    const difficultyid = searchParams.get('difficultyid');
+    const yearParam = searchParams.get('year');
+    const monthParam = searchParams.get('month');
+
+    if (difficultyid && yearParam && monthParam) {
+      handleLoadPlan(
+        Number(yearParam),
+        Number(monthParam),
+        Number(difficultyid)
+      );
+    }
+  }, [searchParams]);
 
   const openModal = (type: 'etc' | 'cover') => {
     setModalType(type);
@@ -79,6 +121,11 @@ export function Control({ isAdmin }: { isAdmin: boolean }) {
     removeCoverItems();
   };
 
+  const handleDifficultySelect = (difficulty: number) => {
+    setSelectedDifficulty(difficulty);
+    useScheduleStore.getState().setSelectedDifficulty(difficulty);
+  };
+
   return (
     <div className={Container}>
       <div className={controlContainer}>
@@ -90,6 +137,64 @@ export function Control({ isAdmin }: { isAdmin: boolean }) {
           <button className={buttonStyle} onClick={handleConfirm}>
             계획안 불러오기
           </button>
+        )}
+        {isAdmin && (
+          <div style={{ display: 'flex', gap: '8px' }}>
+            <button
+              className={buttonStyle}
+              style={{
+                backgroundColor:
+                  selectedDifficulty === 1 ? colors.brand[500] : 'white',
+                color: selectedDifficulty === 1 ? 'white' : 'black',
+                border: `1px solid ${colors.brand[500]}`,
+                minWidth: '60px',
+                height: '40px',
+                display: 'flex',
+                alignItems: 'center',
+                justifyContent: 'center',
+                fontWeight: selectedDifficulty === 1 ? 'bold' : 'normal'
+              }}
+              onClick={() => handleDifficultySelect(1)}
+            >
+              {selectedDifficulty === 1 ? '상' : '상'}
+            </button>
+            <button
+              className={buttonStyle}
+              style={{
+                backgroundColor:
+                  selectedDifficulty === 2 ? colors.brand[500] : 'white',
+                color: selectedDifficulty === 2 ? 'white' : 'black',
+                border: `1px solid ${colors.brand[500]}`,
+                minWidth: '60px',
+                height: '40px',
+                display: 'flex',
+                alignItems: 'center',
+                justifyContent: 'center',
+                fontWeight: selectedDifficulty === 2 ? 'bold' : 'normal'
+              }}
+              onClick={() => handleDifficultySelect(2)}
+            >
+              {selectedDifficulty === 2 ? '중' : '중'}
+            </button>
+            <button
+              className={buttonStyle}
+              style={{
+                backgroundColor:
+                  selectedDifficulty === 3 ? colors.brand[500] : 'white',
+                color: selectedDifficulty === 3 ? 'white' : 'black',
+                border: `1px solid ${colors.brand[500]}`,
+                minWidth: '60px',
+                height: '40px',
+                display: 'flex',
+                alignItems: 'center',
+                justifyContent: 'center',
+                fontWeight: selectedDifficulty === 3 ? 'bold' : 'normal'
+              }}
+              onClick={() => handleDifficultySelect(3)}
+            >
+              {selectedDifficulty === 3 ? '하' : '하'}
+            </button>
+          </div>
         )}
       </div>
 
