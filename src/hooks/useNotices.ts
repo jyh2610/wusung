@@ -22,16 +22,20 @@ export const useNotices = () => {
           size: 10
         });
         
-        if (response.data) {
+        if (response?.data?.data?.content) {
           const transformedNotices = response.data.data.content.map(notice => ({
-            title: notice.title,
+            title: notice.title || '',
             content: notice.topExposureTag || '',
             positionCode: 'C' as const,
-            priority: notice.announcementId
+            priority: notice.announcementId || 0
           }));
           setNotices(transformedNotices);
+        } else {
+          setNotices([]);
         }
       } catch (err) {
+        console.error('공지사항을 불러오는 중 오류가 발생했습니다:', err);
+        setNotices([]);
         setError(err instanceof Error ? err.message : '알 수 없는 오류가 발생했습니다.');
       } finally {
         setLoading(false);
