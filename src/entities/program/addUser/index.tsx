@@ -32,7 +32,7 @@ const birthYears = Array.from({ length: currentYear - 1900 + 1 }, (_, i) => {
   return { label: `${year}`, value: `${year}` };
 });
 
-const years = Array.from({ length: currentYear - 1900 + 1 }, (_, i) => {
+const years = Array.from({ length: 2100 - 1900 + 1 }, (_, i) => {
   const year = 1900 + i;
   return { label: `${year}`, value: `${year}` };
 });
