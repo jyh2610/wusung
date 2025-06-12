@@ -107,7 +107,7 @@ export const MemberDetail: React.FC<MemberDetailProps> = ({ memberId }) => {
       setLoading(true);
       await changeSubscriptionEndDate({
         memberId,
-        newEndDate: values.subscriptionEndDate,
+        newEndDate: dayjs(values.subscriptionEndDate).format('YYYY-MM-DD'),
         isVip: data?.isVip || false
       });
       message.success('구독 종료일이 성공적으로 변경되었습니다.');

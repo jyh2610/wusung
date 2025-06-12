@@ -65,6 +65,48 @@ export function IndividualComponent() {
   const onSubmit = async (e: React.FormEvent<HTMLFormElement>) => {
     e.preventDefault();
 
+    // 필수 입력값 검증
+    if (!formData.id) {
+      toast.error('아이디를 입력해주세요.');
+      return;
+    }
+    if (!formData.password) {
+      toast.error('비밀번호를 입력해주세요.');
+      return;
+    }
+    if (!formData.passwordConfirm) {
+      toast.error('비밀번호 확인을 입력해주세요.');
+      return;
+    }
+    if (!formData.name) {
+      toast.error('이름을 입력해주세요.');
+      return;
+    }
+    if (!formData.birth.year || !formData.birth.month || !formData.birth.day) {
+      toast.error('생년월일을 입력해주세요.');
+      return;
+    }
+    if (!formData.phone) {
+      toast.error('전화번호를 입력해주세요.');
+      return;
+    }
+    if (!formData.email) {
+      toast.error('이메일을 입력해주세요.');
+      return;
+    }
+    if (!formData.emailDomain) {
+      toast.error('이메일 도메인을 선택해주세요.');
+      return;
+    }
+    if (!formData.verificationCode) {
+      toast.error('인증번호를 입력해주세요.');
+      return;
+    }
+    if (!formData.termOfUse[0] || !formData.termOfUse[1]) {
+      toast.error('이용약관에 모두 동의해주세요.');
+      return;
+    }
+
     try {
       const formattedData: IndividualSignUpDTO = {
         username: formData.id,
@@ -72,7 +114,10 @@ export function IndividualComponent() {
         passwordCheck: formData.passwordConfirm,
         name: formData.name,
         birth: `${formData.birth.year}${formData.birth.month}${formData.birth.day}`,
-        address: formData.address + '|' + formData.detailAddress,
+        address:
+          formData.address && formData.detailAddress
+            ? formData.address + '|' + formData.detailAddress
+            : '',
         email: formData.email + '@' + formData.emailDomain,
         phoneVerificationDTO: {
           code: formData.verificationCode,
@@ -85,6 +130,7 @@ export function IndividualComponent() {
       router.push('/signin');
     } catch (error: any) {
       console.log(error);
+      toast.error('회원가입 중 오류가 발생했습니다.');
     }
   };
 

@@ -30,12 +30,12 @@ export interface IContent {
 }
 
 export interface IContentList {
-    eduContentId: number;
-    title: string;
-    year: number;
-    month: number;
-    viewCount: number;
-    thumbnailUrl: string;
+  eduContentId: number;
+  title: string;
+  year: number;
+  month: number;
+  viewCount: number;
+  thumbnailUrl: string;
 }
 
 export interface ScheduleItem {
@@ -59,6 +59,7 @@ export interface ICategoryLeaf {
 }
 
 export interface IRegUser {
+  elderId?: number;
   name: string;
   birthDate: string;
   longTermNum: string;

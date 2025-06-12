@@ -1,6 +1,12 @@
 import classNames from 'classnames'; // 👈 여러 클래스를 동적으로 적용할 수 있음
 import Image from 'next/image';
-import React, { Dispatch, SetStateAction, useState } from 'react';
+import React, {
+  Dispatch,
+  SetStateAction,
+  useState,
+  useEffect,
+  useRef
+} from 'react';
 import {
   container,
   selectedContainer,
@@ -17,6 +23,13 @@ import { IRegUser, IUser, IUserDetail } from '../../type.dto';
 import { AddUser } from '../../addUser';
 import { getUserDetail } from '../../api';
 import { colors } from '@/design-tokens';
+import { DifficultyBadge, GradeCircle } from './GradeCircle';
+import {
+  DropdownMenu,
+  DropdownMenuTrigger,
+  DropdownMenuContent,
+  DropdownMenuItem
+} from '@/components/ui/dropdown-menu';
 
 interface IProps {
   user: IUser;
@@ -38,13 +51,37 @@ export function UserBox({
   const [showMenu, setShowMenu] = useState(false);
   const [editModalOpen, setEditModalOpen] = useState(false);
   const [editUser, setEditUser] = useState<IUserDetail | null>(null);
+  const menuRef = useRef<HTMLDivElement>(null);
+
+  const formatDate = (dateString: string) => {
+    if (!dateString) return '';
+    const date = new Date(dateString);
+    const year = date.getFullYear();
+    const month = String(date.getMonth() + 1).padStart(2, '0');
+    const day = String(date.getDate()).padStart(2, '0');
+    return `${year}-${month}-${day}`;
+  };
+
+  useEffect(() => {
+    const handleClickOutside = (event: MouseEvent) => {
+      if (menuRef.current && !menuRef.current.contains(event.target as Node)) {
+        setShowMenu(false);
+      }
+    };
+
+    document.addEventListener('mousedown', handleClickOutside);
+    return () => {
+      document.removeEventListener('mousedown', handleClickOutside);
+    };
+  }, []);
 
   const convertToRegUser = (user: IUserDetail): IRegUser => ({
+    elderId: user.elderId,
     name: user.name ?? '',
-    birthDate: user.birthDate ?? '',
+    birthDate: formatDate(user.birthDate ?? ''),
     longTermNum: user.recipientNumber ?? '',
-    certificationStart: user.certificationStart ?? '',
-    certificationEnd: user.certificationEnd ?? '',
+    certificationStart: formatDate(user.certificationStart ?? ''),
+    certificationEnd: formatDate(user.certificationEnd ?? ''),
     servicer: user.managerName ?? '',
     difficulty: user.difficultyLevel ? String(user.difficultyLevel) : '',
     grade: user.disabilityGrade ? String(user.disabilityGrade) : ''
@@ -62,87 +99,57 @@ export function UserBox({
 
           <div className={imgContainer}>
             <div className={imgBox}>
-              {/* <Image fill src={`/images/icons/grade${user.grade}.png`} /> */}
-              <Image fill src={'/images/icons/grade5.png'} alt="유저 등급" />
+              <GradeCircle grade={Number(user.disabilityGrade)} />
             </div>
             <div className={imgBox}>
-              <Image fill src={'/images/icons/high.png'} alt="유저 등급" />
+              <DifficultyBadge level={Number(user.difficultyLevel)} />
             </div>
           </div>
         </div>
 
-        <div
-          className={classNames(imgBox, {
-            [selectedOptContainer]: isSelected
-          })}
-          onClick={e => {
-            e.stopPropagation();
-            setShowMenu(prev => !prev);
-          }}
-          style={{ position: 'relative' }}
-        >
-          <Image
-            fill
-            src={
-              isSelected
-                ? '/images/icons/selectOpt.png'
-                : '/images/icons/opt.png'
-            }
-            alt="유저 선택됨"
-          />
-          {showMenu && (
+        <DropdownMenu>
+          <DropdownMenuTrigger asChild>
             <div
-              style={{
-                position: 'absolute',
-                top: '100%',
-                right: 0,
-                background: '#fff',
-                border: '1px solid #eee',
-                borderRadius: 8,
-                boxShadow: '0 2px 8px rgba(0,0,0,0.08)',
-                zIndex: 10,
-                color: colors.gray_scale[800],
-                minWidth: 100
+              className={classNames(imgBox, {
+                [selectedOptContainer]: isSelected
+              })}
+              style={{ position: 'relative', cursor: 'pointer' }}
+              onClick={e => e.stopPropagation()}
+            >
+              <Image
+                fill
+                src={
+                  isSelected
+                    ? '/images/icons/selectOpt.png'
+                    : '/images/icons/opt.png'
+                }
+                alt="유저 선택됨"
+              />
+            </div>
+          </DropdownMenuTrigger>
+          <DropdownMenuContent side="bottom" align="start">
+            <DropdownMenuItem onClick={() => onDetail(user)}>
+              상세
+            </DropdownMenuItem>
+            <DropdownMenuItem
+              onClick={async () => {
+                const detail = await getUserDetail(user.elderId);
+                if (detail) {
+                  setEditUser(detail);
+                  setEditModalOpen(true);
+                }
               }}
             >
-              <div
-                style={{ padding: '10px 16px', cursor: 'pointer' }}
-                onClick={e => {
-                  e.stopPropagation();
-                  onDetail(user);
-                }}
-              >
-                상세
-              </div>
-              <div
-                style={{ padding: '10px 16px', cursor: 'pointer' }}
-                onClick={async e => {
-                  e.stopPropagation();
-                  const detail = await getUserDetail(user.elderId);
-                  if (detail) {
-                    setEditUser(detail);
-                    setEditModalOpen(true);
-                  }
-                }}
-              >
-                수정
-              </div>
-              <div
-                style={{
-                  padding: '10px 16px',
-                  cursor: 'pointer',
-                  color: '#e1007b'
-                }}
-                onClick={e => {
-                  e.stopPropagation();
-                  onDelete(user);
-                }}
-              >
-                삭제
-              </div>
-            </div>
-          )}
-        </div>
+              수정
+            </DropdownMenuItem>
+            <DropdownMenuItem
+              onClick={() => onDelete(user)}
+              style={{ color: '#e1007b' }}
+            >
+              삭제
+            </DropdownMenuItem>
+          </DropdownMenuContent>
+        </DropdownMenu>
       </div>
 
       <div className={roleBox}>

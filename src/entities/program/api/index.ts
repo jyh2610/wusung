@@ -361,7 +361,16 @@ export const updateUser = async (elderId: number, form: IRegUser) => {
     const res = await request<IRes<IRegUser>>({
       method: 'PUT',
       url: `/api/program/elder/${elderId}`,
-      data: form
+      data: {
+        name: form.name,
+        birthDate: form.birthDate,
+        certificationStart: form.certificationStart,
+        certificationEnd: form.certificationEnd,
+        recipientNumber: form.longTermNum,
+        disabilityGrade: form.grade,
+        difficultyLevel: form.difficulty,
+        managerName: form.servicer
+      }
     });
     return res.data.data;
   } catch (error) {
@@ -553,7 +562,6 @@ export const getScheduleList = async ({
     console.error('스케줄 목록 요청을 실패 했습니다.', error);
   }
 };
-
 
 export const getCategoryIndividualList = async () => {
   try {

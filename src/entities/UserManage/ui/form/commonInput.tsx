@@ -8,6 +8,7 @@ import { IFormCompany, IFormIndividual } from '../../type';
 import { checkUserName } from '@/entities/UserManage/api';
 import { validatePasswordMatch } from '@/lib/utils'; // 유틸 함수 임포트
 import { validatePassword } from '@/lib/vaildatrion';
+import { IoMdEye, IoMdEyeOff } from 'react-icons/io';
 
 interface IProps<T extends IFormIndividual | IFormCompany> {
   formData: T;
@@ -25,6 +26,8 @@ export const IdPw = <T extends IFormIndividual | IFormCompany>({
   const [idError, setIdError] = useState<string>('');
   const [pwError, setPwError] = useState<string>('');
   const [pwConfirmError, setPwConfirmError] = useState<string>('');
+  const [showPassword, setShowPassword] = useState(false);
+  const [showPasswordConfirm, setShowPasswordConfirm] = useState(false);
 
   const handleIdChange = async (e: React.ChangeEvent<HTMLInputElement>) => {
     const value = e.target.value;
@@ -85,7 +88,7 @@ export const IdPw = <T extends IFormIndividual | IFormCompany>({
       <NomalInput
         placeholder="사용하실 비밀번호를 입력해주세요"
         inputSize="medium"
-        type="password"
+        type={showPassword ? 'text' : 'password'}
         label={
           <div className={labelContainer}>
             비밀번호 <span className={starSpan}>*</span>
@@ -94,13 +97,23 @@ export const IdPw = <T extends IFormIndividual | IFormCompany>({
         value={formData.password}
         onChange={e => handleInputChange('password', e.target.value)}
         error={pwError}
+        rightElement={
+          <button
+            type="button"
+            onClick={() => setShowPassword(v => !v)}
+            style={{ background: 'none', border: 'none', cursor: 'pointer' }}
+            tabIndex={-1}
+          >
+            {showPassword ? <IoMdEyeOff size={20} /> : <IoMdEye size={20} />}
+          </button>
+        }
       />
 
       {/* 비밀번호 확인 */}
       <NomalInput
         placeholder="비밀번호를 다시 한 번 입력해주세요"
         inputSize="medium"
-        type="password"
+        type={showPasswordConfirm ? 'text' : 'password'}
         label={
           <div className={labelContainer}>
             비밀번호 확인 <span className={starSpan}>*</span>
@@ -109,6 +122,20 @@ export const IdPw = <T extends IFormIndividual | IFormCompany>({
         value={formData.passwordConfirm}
         onChange={e => handleInputChange('passwordConfirm', e.target.value)}
         error={pwConfirmError}
+        rightElement={
+          <button
+            type="button"
+            onClick={() => setShowPasswordConfirm(v => !v)}
+            style={{ background: 'none', border: 'none', cursor: 'pointer' }}
+            tabIndex={-1}
+          >
+            {showPasswordConfirm ? (
+              <IoMdEyeOff size={20} />
+            ) : (
+              <IoMdEye size={20} />
+            )}
+          </button>
+        }
       />
     </div>
   );

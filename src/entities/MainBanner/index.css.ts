@@ -19,10 +19,15 @@ export const bannerHeaderStyles = style({
   backgroundColor: 'rgba(35, 37, 39, 0.4)',
   padding: '9px 10px',
   position: 'absolute',
-  marginTop: '142px',
-  marginLeft: '100px',
+  marginTop: '50px',
+  marginLeft: '600px',
   color: '#FFFFFF',
   fontSize: '48px',
   fontWeight: '600',
-  lineHeight: '57.28px'
+  lineHeight: '57.28px',
+  '@media': {
+    'screen and (max-width: 1440px)': {
+      marginLeft: '20%'
+    }
+  }
 });

@@ -1,7 +1,7 @@
 'use client';
 
 import { Box } from '@mui/material';
-import { Dispatch, SetStateAction, useEffect, useState } from 'react';
+import { Dispatch, SetStateAction, useState } from 'react';
 import { IoIosAddCircle } from 'react-icons/io';
 import { colors } from '@/design-tokens';
 import { titleContainer, title } from '../../index.css';
@@ -14,6 +14,7 @@ import { useBoxContainer } from './index.css';
 import { usePathname } from 'next/navigation';
 import Modal from '@mui/material/Modal';
 import { IRegUser, IUser, IUserDetail } from '@/entities/program/type.dto';
+import { useQuery, useMutation, useQueryClient } from '@tanstack/react-query';
 
 interface IProps {
   open: boolean;
@@ -27,27 +28,25 @@ export const DrawerList = ({ open, setOpen }: IProps) => {
   const [detailModalOpen, setDetailModalOpen] = useState(false);
   const [editModalOpen, setEditModalOpen] = useState(false);
 
-  const users = useUserStore(state => state.users);
-  const setUsers = useUserStore(state => state.setUsers);
+  const queryClient = useQueryClient();
   const selectedUserId = useUserStore(state => state.selectedUserId);
   const selectUser = useUserStore(state => state.selectUser);
 
   const closeModal = () => setOpenUser(false);
 
-  // Use usePathname hook from next/navigation to get the current route
   const pathname = usePathname();
 
-  useEffect(() => {
-    const getUserHandler = async () => {
-      try {
-        const res = await getUser();
-        setUsers(res || []);
-      } catch (error) {
-        console.error('유저 불러오기 실패:', error);
-      }
-    };
-    getUserHandler();
-  }, []);
+  const { data: users = [], isLoading } = useQuery({
+    queryKey: ['users'],
+    queryFn: getUser
+  });
+
+  const deleteUserMutation = useMutation({
+    mutationFn: (elderId: number) => deleteUser(elderId),
+    onSuccess: () => {
+      queryClient.invalidateQueries({ queryKey: ['users'] });
+    }
+  });
 
   // 상세보기
   const handleDetail = async (user: IUser) => {
@@ -67,10 +66,13 @@ export const DrawerList = ({ open, setOpen }: IProps) => {
   // 삭제
   const handleDelete = async (user: IUser) => {
     if (window.confirm('정말 삭제하시겠습니까?')) {
-      await deleteUser(user.elderId);
-      // 목록 새로고침 등 추가
+      deleteUserMutation.mutate(user.elderId);
     }
   };
+
+  if (isLoading) {
+    return <div>로딩중...</div>;
+  }
 
   return (
     <Box
@@ -92,7 +94,6 @@ export const DrawerList = ({ open, setOpen }: IProps) => {
               color={colors.brand[400]}
               onClick={() => {
                 setOpenUser(true);
-                setOpen(false);
               }}
             />
           </div>
@@ -111,7 +112,13 @@ export const DrawerList = ({ open, setOpen }: IProps) => {
             ))}
           </div>
 
-          <AddUser open={openAddUser} closeModal={closeModal} />
+          <AddUser
+            open={openAddUser}
+            closeModal={closeModal}
+            onSuccess={() => {
+              queryClient.invalidateQueries({ queryKey: ['users'] });
+            }}
+          />
         </>
       ) : (
         <ActivityBox />

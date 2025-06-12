@@ -45,8 +45,10 @@ export function ProgramNav() {
           style={{
             position: 'relative',
             width: '127px',
+            cursor: 'pointer',
             height: '57px'
           }}
+          onClick={() => router.push('/')}
         >
           <Image
             fill

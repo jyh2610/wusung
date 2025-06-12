@@ -7,7 +7,7 @@ import { NomalInput } from '@/shared/ui/Input';
 import * as styles from './index.css';
 import { IRegUser } from '../type.dto';
 import { DropDown } from '../menu/dropDown';
-import { submitAddUser } from '../api';
+import { submitAddUser, updateUser } from '../api';
 import { toast } from 'react-toastify';
 
 const difficulty = [
@@ -31,10 +31,17 @@ const birthYears = Array.from({ length: currentYear - 1900 + 1 }, (_, i) => {
   const year = 1900 + i;
   return { label: `${year}`, value: `${year}` };
 });
+
 const years = Array.from({ length: currentYear - 1900 + 1 }, (_, i) => {
   const year = 1900 + i;
   return { label: `${year}`, value: `${year}` };
 });
+
+const endYears = Array.from({ length: currentYear - 1900 + 1 }, (_, i) => {
+  const year = currentYear - i;
+  return { label: `${year}`, value: `${year}` };
+});
+
 const months = Array.from({ length: 12 }, (_, i) => {
   const month = i + 1;
   return { label: `${month}`, value: `${month}` };
@@ -47,11 +54,13 @@ const days = Array.from({ length: 31 }, (_, i) => {
 export function AddUser({
   open,
   closeModal,
+  onSuccess,
   defaultValue,
   mode
 }: {
   open: boolean;
   closeModal: () => void;
+  onSuccess?: () => void;
   defaultValue?: IRegUser;
   mode?: 'add' | 'edit';
 }) {
@@ -84,15 +93,27 @@ export function AddUser({
 
       if (defaultValue.birthDate) {
         const [year, month, day] = defaultValue.birthDate.split('-');
-        setBirth({ year, month, day });
+        setBirth({
+          year: String(Number(year)),
+          month: String(Number(month)),
+          day: String(Number(day))
+        });
       }
       if (defaultValue.certificationStart) {
         const [year, month, day] = defaultValue.certificationStart.split('-');
-        setValidateStartDate({ year, month, day });
+        setValidateStartDate({
+          year: String(Number(year)),
+          month: String(Number(month)),
+          day: String(Number(day))
+        });
       }
       if (defaultValue.certificationEnd) {
         const [year, month, day] = defaultValue.certificationEnd.split('-');
-        setValidateEndDate({ year, month, day });
+        setValidateEndDate({
+          year: String(Number(year)),
+          month: String(Number(month)),
+          day: String(Number(day))
+        });
       }
     }
     // eslint-disable-next-line
@@ -122,7 +143,7 @@ export function AddUser({
     if (year && month && day) {
       setForm(prev => ({
         ...prev,
-        validate: `${year}-${month.padStart(2, '0')}-${day.padStart(2, '0')}`
+        certificationStart: `${year}-${month.padStart(2, '0')}-${day.padStart(2, '0')}`
       }));
     }
   };
@@ -133,6 +154,14 @@ export function AddUser({
   ) => {
     const updated = { ...validateEndDate, [type]: value };
     setValidateEndDate(updated);
+
+    const { year, month, day } = updated;
+    if (year && month && day) {
+      setForm(prev => ({
+        ...prev,
+        certificationEnd: `${year}-${month.padStart(2, '0')}-${day.padStart(2, '0')}`
+      }));
+    }
   };
 
   const handleSubmit = async (e: React.FormEvent) => {
@@ -157,15 +186,25 @@ export function AddUser({
     const certificationEnd = `${validateEndDate.year}-${validateEndDate.month.padStart(2, '0')}-${validateEndDate.day.padStart(2, '0')}`;
 
     try {
-      const result = await submitAddUser({
-        ...form,
-        certificationStart,
-        certificationEnd
-      });
-      toast.success('등록이 완료되었습니다!');
+      if (mode === 'edit' && defaultValue) {
+        await updateUser(Number(defaultValue.elderId), {
+          ...form,
+          certificationStart,
+          certificationEnd
+        });
+        toast.success('수정이 완료되었습니다!');
+      } else {
+        await submitAddUser({
+          ...form,
+          certificationStart,
+          certificationEnd
+        });
+        toast.success('등록이 완료되었습니다!');
+      }
       closeModal();
+      if (onSuccess) onSuccess();
     } catch (error) {
-      toast.error('등록 중 오류가 발생했습니다.');
+      toast.error('저장 중 오류가 발생했습니다.');
       console.error(error);
     }
   };
@@ -176,7 +215,7 @@ export function AddUser({
         <div
           style={{ marginBottom: '32px', fontSize: '20px', fontWeight: 600 }}
         >
-          대상자 등록
+          {mode === 'edit' ? '대상자 수정' : '대상자 등록'}
         </div>
         <form onSubmit={handleSubmit}>
           {/* 이름 */}
@@ -309,7 +348,7 @@ export function AddUser({
                   <div className={styles.dateItem}>
                     <div className={styles.select128}>
                       <DropDown
-                        options={years}
+                        options={endYears}
                         placeholder="년"
                         isSearchable={false}
                         value={validateEndDate.year}
@@ -404,7 +443,11 @@ export function AddUser({
               margin: 'auto'
             }}
           >
-            <Button content="확인" btnType="submit" type="brand" />
+            <Button
+              content={mode === 'edit' ? '수정' : '확인'}
+              btnType="submit"
+              type="brand"
+            />
           </div>
         </form>
       </Box>

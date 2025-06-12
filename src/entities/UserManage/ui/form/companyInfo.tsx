@@ -6,6 +6,7 @@ import { buttonContainer, container } from './index.css';
 import { IFormCompany } from '../../type';
 import { verifyCoporate } from '../../api';
 import { toast } from 'react-toastify';
+import { colors } from '@/design-tokens';
 
 interface IProps {
   formData: IFormCompany;
@@ -25,11 +26,7 @@ export const CompanyInfo = ({ formData, handleInputChange }: IProps) => {
         b_nm: formData.companyName
       });
 
-      if (res.message === '사용 가능한 기관입니다.') {
-        toast.success('기관인증이 완료되었습니다.');
-      } else {
-        toast.error('기관인증에 실패했습니다.');
-      }
+      toast.success('기관인증이 완료되었습니다.');
     } catch (error: any) {
       toast.error(
         error.response?.data?.message || '기관인증 중 오류가 발생했습니다.'
@@ -91,6 +88,24 @@ export const CompanyInfo = ({ formData, handleInputChange }: IProps) => {
           handleInputChange('openingDate', e.target.value)
         }
       />
+      <div
+        style={{
+          display: 'flex',
+          flexDirection: 'column',
+          justifyContent: 'flex-end',
+          alignItems: 'flex-end',
+          cursor: 'pointer'
+        }}
+      >
+        <a
+          href="/images/opening_date.pdf"
+          download
+          style={{ color: colors.brand[400], textDecoration: 'none' }}
+        >
+          개업일자를 모르시나요? <span>{'>'}</span>
+        </a>
+        <p style={{ color: colors.brand[400] }}>(고유번호증을 보고 있어요)</p>
+      </div>
       <div className={buttonContainer}>
         <Button
           btnType="button"

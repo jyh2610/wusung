@@ -11,9 +11,9 @@ async function ProgramNavlayout({ children }: { children: React.ReactNode }) {
   const cookie = cookies().get('token')?.value ?? null;
 
   const hasPermission = await getRole(cookie);
-  // if (hasPermission?.data === 'UNKNOWN') {
-  //   redirect('/');
-  // }
+  if (hasPermission?.data === 'UNKNOWN') {
+    redirect('/');
+  }
   console.log(hasPermission);
   return (
     <div

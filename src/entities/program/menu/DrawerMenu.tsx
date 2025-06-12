@@ -10,7 +10,7 @@ import { DrawerList } from './ui/drawList';
 import { AddUser } from '../addUser';
 
 export default function TemporaryDrawer() {
-  const [open, setOpen] = useState(false);
+  const [open, setOpen] = useState(true);
   return (
     <>
       <Toolbar />
@@ -51,7 +51,7 @@ export default function TemporaryDrawer() {
         sx={{
           position: 'fixed',
           top: 'calc(50vh + 10px)',
-          left: open ? '210px' : '10px', // Drawer 열릴 때 위치 조정
+          left: open ? '270px' : '10px', // Drawer 열릴 때 위치 조정
           transition: 'left 0.3s ease',
           color: 'black',
           padding: '10px 16px',
@@ -63,7 +63,7 @@ export default function TemporaryDrawer() {
           zIndex: 1100
         }}
       >
-        <div style={{ width: '20px', height: '12px', position: 'relative' }}>
+        <div style={{ width: '25px', height: '14px', position: 'relative' }}>
           <Image
             fill
             style={{
@@ -74,7 +74,6 @@ export default function TemporaryDrawer() {
             alt={'유저 등급'}
           />
         </div>
-        <span>{open ? '숨기기' : '열기'}</span>
       </Button>
     </>
   );

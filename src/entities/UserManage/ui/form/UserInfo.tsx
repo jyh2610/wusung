@@ -129,7 +129,9 @@ export const UserInfo = ({
 
       {/* 생년월일 */}
       <div className={birthContainer}>
-        <label className={birthLabelBox}>생년월일</label>
+        <label className={birthLabelBox}>
+          생년월일<span className={starSpan}>*</span>
+        </label>
         <div className={birthBox}>
           <div className={birthDropdown}>
             <SelectBox
@@ -248,7 +250,11 @@ export const UserInfo = ({
         <NomalInput
           placeholder="이메일을 입력해주세요"
           inputSize="medium"
-          label={<div className={labelContainer}>이메일</div>}
+          label={
+            <div className={labelContainer}>
+              이메일 <span className={starSpan}>*</span>
+            </div>
+          }
           value={formData.email}
           onChange={e => handleInputChange('email', e.target.value)}
         />

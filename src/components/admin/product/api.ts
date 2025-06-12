@@ -19,6 +19,7 @@ export const getProduct = async (page: number, size: number) => {
   }
 };
 
+//multipart/form-data
 export const regProduct = async (product: IRegProduct) => {
   try {
     const response = await request<ApiResponse<IProduct>>({

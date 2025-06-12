@@ -64,31 +64,65 @@ export function Company() {
   const onSubmit = async (e: React.FormEvent<HTMLFormElement>) => {
     e.preventDefault();
 
-    // // 필수 항목 검증
-    // if (
-    //   !formData.id ||
-    //   !formData.password ||
-    //   !formData.passwordConfirm ||
-    //   !formData.address ||
-    //   !formData.email ||
-    //   !formData.emailDomain ||
-    //   !formData.verificationCode ||
-    //   !formData.phone ||
-    //   !formData.corporateNumber ||
-    //   !formData.openingDate ||
-    //   !formData.representativeName ||
-    //   !formData.companyName
-    // ) {
-    //   toast.error('필수 항목을 모두 입력해주세요.');
-    //   return;
-    // }
+    // 필수 입력값 검증
+    if (!formData.id) {
+      toast.error('아이디를 입력해주세요.');
+      return;
+    }
+    if (!formData.password) {
+      toast.error('비밀번호를 입력해주세요.');
+      return;
+    }
+    if (!formData.passwordConfirm) {
+      toast.error('비밀번호 확인을 입력해주세요.');
+      return;
+    }
+    if (!formData.representativeName) {
+      toast.error('대표자명을 입력해주세요.');
+      return;
+    }
+    if (!formData.companyName) {
+      toast.error('회사명을 입력해주세요.');
+      return;
+    }
+    if (!formData.corporateNumber) {
+      toast.error('사업자등록번호를 입력해주세요.');
+      return;
+    }
+    if (!formData.openingDate) {
+      toast.error('개업일을 입력해주세요.');
+      return;
+    }
+    if (!formData.phone) {
+      toast.error('전화번호를 입력해주세요.');
+      return;
+    }
+    if (!formData.email) {
+      toast.error('이메일을 입력해주세요.');
+      return;
+    }
+    if (!formData.emailDomain) {
+      toast.error('이메일 도메인을 선택해주세요.');
+      return;
+    }
+    if (!formData.verificationCode) {
+      toast.error('인증번호를 입력해주세요.');
+      return;
+    }
+    if (!formData.termOfUse[0] || !formData.termOfUse[1]) {
+      toast.error('이용약관에 모두 동의해주세요.');
+      return;
+    }
 
     try {
       const formattedData: SignupCompanyRequest = {
         username: formData.id,
         password: formData.password,
         passwordCheck: formData.passwordConfirm,
-        address: formData.address + '|' + formData.detailAddress,
+        address:
+          formData.address && formData.detailAddress
+            ? formData.address + '|' + formData.detailAddress
+            : '',
         email: `${formData.email}@${formData.emailDomain}`,
         phoneVerificationDTO: {
           code: formData.verificationCode,
