@@ -69,7 +69,7 @@ function Header({
   const selectedUserId = useUserStore(state => state.selectedUserId);
   const users = useUserStore.getState().users;
   const selectedUser = users.find(user => user.elderId === selectedUserId);
-
+  console.log(selectedUser);
   const handlePrevMonth = () => {
     if (month === 1) {
       setMonth(12);

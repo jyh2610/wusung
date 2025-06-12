@@ -1,7 +1,7 @@
 'use client';
 
 import { Box } from '@mui/material';
-import { Dispatch, SetStateAction, useState } from 'react';
+import { Dispatch, SetStateAction, useState, useEffect } from 'react';
 import { IoIosAddCircle } from 'react-icons/io';
 import { colors } from '@/design-tokens';
 import { titleContainer, title } from '../../index.css';
@@ -40,6 +40,10 @@ export const DrawerList = ({ open, setOpen }: IProps) => {
     queryKey: ['users'],
     queryFn: getUser
   });
+
+  const handleUserSelect = (userId: number) => {
+    selectUser(userId);
+  };
 
   const deleteUserMutation = useMutation({
     mutationFn: (elderId: number) => deleteUser(elderId),
@@ -104,7 +108,7 @@ export const DrawerList = ({ open, setOpen }: IProps) => {
                 key={item.elderId}
                 user={item}
                 isSelected={selectedUserId === item.elderId}
-                onSelect={() => selectUser(item.elderId)}
+                onSelect={() => handleUserSelect(item.elderId)}
                 onDetail={handleDetail}
                 onEdit={handleEdit}
                 onDelete={handleDelete}
