@@ -34,7 +34,9 @@ export function ActivityBox() {
   }, [fetchCategoryIndividualList]);
 
   // 모든 최상위 카테고리 가져오기
-  const rootCategories = useCategoryTreeStore(state => state.categoryIndividualList);
+  const rootCategories = useCategoryTreeStore(
+    state => state.categoryIndividualList
+  );
 
   // 엔드포인트가 evaluation일 때 평가자료 카테고리만 필터링
   const filteredCategories = useMemo(() => {
@@ -43,6 +45,9 @@ export function ActivityBox() {
     }
     if (endpoint === 'etc') {
       return rootCategories.filter(category => category.name === '기타자료');
+    }
+    if (endpoint === 'activity') {
+      return rootCategories.filter(category => category.name === '활동지');
     }
     return rootCategories;
   }, [rootCategories, endpoint]);

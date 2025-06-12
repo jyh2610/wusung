@@ -20,12 +20,21 @@ export const getProduct = async (page: number, size: number) => {
 };
 
 //multipart/form-data
-export const regProduct = async (product: IRegProduct) => {
+export const regProduct = async (product: IRegProduct, file?: File) => {
   try {
+    const formData = new FormData();
+    formData.append('dto', JSON.stringify(product));
+    if (file) {
+      formData.append('file', file);
+    }
+
     const response = await request<ApiResponse<IProduct>>({
       method: 'POST',
       url: '/api/admin/product',
-      data: product
+      data: formData,
+      headers: {
+        'Content-Type': 'multipart/form-data'
+      }
     });
     return response.data.data;
   } catch (error) {
@@ -36,13 +45,23 @@ export const regProduct = async (product: IRegProduct) => {
 
 export const updateProduct = async (
   productId: number,
-  product: IRegProduct
+  product: IRegProduct,
+  file?: File
 ) => {
   try {
+    const formData = new FormData();
+    formData.append('dto', JSON.stringify(product));
+    if (file) {
+      formData.append('file', file);
+    }
+
     const response = await request<ApiResponse<IProduct>>({
       method: 'PUT',
       url: `/api/admin/product/${productId}`,
-      data: product
+      data: formData,
+      headers: {
+        'Content-Type': 'multipart/form-data'
+      }
     });
     return response.data.data;
   } catch (error) {

@@ -4,8 +4,19 @@ import { IContent, IContentList } from '@/entities/program/type.dto';
 import { DashBoard } from '@/shared';
 import { useCategoryTreeStore } from '@/shared/stores/useCategoryTreeStore';
 import React, { useEffect, useState } from 'react';
-import { fetchEvaluationContentsOnly, getContentList } from '../evaluation/utils';
-import { TableRow, TableCell, Select, MenuItem, FormControl, InputLabel, Pagination } from '@mui/material';
+import {
+  fetchEvaluationContentsOnly,
+  getContentList
+} from '../evaluation/utils';
+import {
+  TableRow,
+  TableCell,
+  Select,
+  MenuItem,
+  FormControl,
+  InputLabel,
+  Pagination
+} from '@mui/material';
 import { usePathname, useRouter } from 'next/navigation';
 import { handleCurrentPathRoute } from '@/lib/utils';
 
@@ -16,8 +27,11 @@ const columns = [
 ];
 
 function ETC() {
-  const categoryIndividualList = useCategoryTreeStore.getState().categoryIndividualList;
-  const [categoryContentMap, setCategoryContentMap] = useState<IContentList[]>([]);
+  const categoryIndividualList =
+    useCategoryTreeStore.getState().categoryIndividualList;
+  const [categoryContentMap, setCategoryContentMap] = useState<IContentList[]>(
+    []
+  );
   const [difficultyFilter, setDifficultyFilter] = useState<number>(3);
   const [page, setPage] = useState<number>(0);
   const [totalPages, setTotalPages] = useState<number>(0);
@@ -46,9 +60,11 @@ function ETC() {
 
   useEffect(() => {
     const fetchData = async () => {
-      const etcCategory = categoryIndividualList.find(category => category.name === '기타자료');
+      const etcCategory = categoryIndividualList.find(
+        category => category.name === '기타자료'
+      );
       if (!etcCategory) return;
-      
+
       const result = await getContentList({
         categoryId: etcCategory.categoryId,
         difficultyLevel: difficultyFilter,
@@ -61,7 +77,10 @@ function ETC() {
     fetchData();
   }, [categoryIndividualList, difficultyFilter, page]);
 
-  const handlePageChange = (event: React.ChangeEvent<unknown>, value: number) => {
+  const handlePageChange = (
+    event: React.ChangeEvent<unknown>,
+    value: number
+  ) => {
     setPage(value - 1);
   };
 
@@ -73,8 +92,9 @@ function ETC() {
           <Select
             value={difficultyFilter}
             label="난이도"
-            onChange={(e) => setDifficultyFilter(Number(e.target.value))}
+            onChange={e => setDifficultyFilter(Number(e.target.value))}
           >
+            <MenuItem value={0}>없음</MenuItem>
             <MenuItem value={3}>쉬움</MenuItem>
             <MenuItem value={2}>보통</MenuItem>
             <MenuItem value={1}>어려움</MenuItem>
@@ -86,10 +106,12 @@ function ETC() {
         renderRow={renderRow}
         rows={categoryContentMap}
       />
-      <div style={{ display: 'flex', justifyContent: 'center', marginTop: '20px' }}>
-        <Pagination 
-          count={totalPages} 
-          page={page + 1} 
+      <div
+        style={{ display: 'flex', justifyContent: 'center', marginTop: '20px' }}
+      >
+        <Pagination
+          count={totalPages}
+          page={page + 1}
           onChange={handlePageChange}
           color="primary"
         />

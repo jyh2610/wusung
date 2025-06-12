@@ -40,8 +40,21 @@ export default function InquiryDetailPage({
 
   const handleFileChange = (e: React.ChangeEvent<HTMLInputElement>) => {
     if (e.target.files) {
-      setFiles(Array.from(e.target.files));
+      const newFiles = Array.from(e.target.files);
+      setFiles(prev => [...prev, ...newFiles]);
     }
+  };
+
+  const handleFileRemove = (index: number) => {
+    setFiles(prev => prev.filter((_, i) => i !== index));
+  };
+
+  const handleEditingFileRemove = (index: number) => {
+    if (!editingComment) return;
+    setEditingComment(prev => ({
+      ...prev!,
+      files: prev!.files.filter((_, i) => i !== index)
+    }));
   };
 
   const handleCommentSubmit = async () => {
@@ -60,6 +73,7 @@ export default function InquiryDetailPage({
       message.error('댓글 등록 중 오류가 발생했습니다.');
     }
   };
+  console.log(editingComment);
 
   const handleCommentUpdate = async () => {
     if (!editingComment) return;
@@ -143,21 +157,24 @@ export default function InquiryDetailPage({
             <div>
               <Label>첨부파일</Label>
               <div className="mt-1 space-y-2">
-                {inquiry.data.files.map((file: any, index: number) => (
-                  <a
-                    key={index}
-                    href={file.fileUrl || file.url || file.path || '#'}
-                    target="_blank"
-                    rel="noopener noreferrer"
-                    className="block text-blue-600 hover:underline"
-                  >
-                    {file.fileName ||
-                      file.name ||
-                      file.fileUrl ||
-                      file.url ||
-                      '첨부파일'}
-                  </a>
-                ))}
+                {inquiry.data.files
+                  .filter((file: any) => {
+                    const fileIdList = JSON.parse(
+                      inquiry.data.inquiry.fileIdList || '[]'
+                    );
+                    return fileIdList.includes(file.fileId);
+                  })
+                  .map((file: any) => (
+                    <a
+                      key={file.fileId}
+                      href={file.fileUrl}
+                      target="_blank"
+                      rel="noopener noreferrer"
+                      className="block text-blue-600 hover:underline"
+                    >
+                      {file.fileName}
+                    </a>
+                  ))}
               </div>
             </div>
           )}
@@ -190,17 +207,103 @@ export default function InquiryDetailPage({
 
             return (
               <Card key={commentId} className="p-4">
-                {editingComment && editingComment.id === commentId ? (
+                {editingComment && editingComment.id === comment.commentId ? (
                   <div className="space-y-4">
                     <Textarea
-                      value={editingComment.content ?? ''}
+                      value={editingComment.content}
                       onChange={e =>
                         setEditingComment(prev => ({
                           ...prev!,
                           content: e.target.value
                         }))
                       }
+                      placeholder="댓글을 수정해주세요."
                     />
+                    <div>
+                      <Label>첨부파일</Label>
+                      <div className="mt-1 space-y-2">
+                        {inquiry.data.files
+                          .filter((file: any) => {
+                            const fileIdList = JSON.parse(
+                              comment.fileIdList || '[]'
+                            );
+                            return (
+                              fileIdList.includes(file.fileId) &&
+                              !editingComment?.deletedFilesIdList?.includes(
+                                file.fileId
+                              )
+                            );
+                          })
+                          .map((file: any) => (
+                            <div
+                              key={file.fileId}
+                              className="flex items-center justify-between"
+                            >
+                              <a
+                                href={file.fileUrl}
+                                target="_blank"
+                                rel="noopener noreferrer"
+                                className="text-blue-600 hover:underline"
+                              >
+                                {file.fileName}
+                              </a>
+                              <Button
+                                variant="ghost"
+                                size="sm"
+                                onClick={() => {
+                                  setEditingComment(prev => ({
+                                    ...prev!,
+                                    deletedFilesIdList: [
+                                      ...(prev?.deletedFilesIdList || []),
+                                      file.fileId
+                                    ]
+                                  }));
+                                }}
+                              >
+                                삭제
+                              </Button>
+                            </div>
+                          ))}
+                      </div>
+                      <Input
+                        type="file"
+                        multiple
+                        onChange={e => {
+                          if (e.target.files) {
+                            setEditingComment(prev => ({
+                              ...prev!,
+                              files: [
+                                ...(prev?.files || []),
+                                ...Array.from(e.target.files!)
+                              ]
+                            }));
+                          }
+                        }}
+                        className="mt-2"
+                      />
+                      {editingComment?.files.length > 0 && (
+                        <div className="mt-2 space-y-2">
+                          {editingComment.files.map((file, index) => (
+                            <div
+                              key={index}
+                              className="flex items-center justify-between text-sm"
+                            >
+                              <span className="text-gray-600">{file.name}</span>
+                              <Button
+                                variant="ghost"
+                                size="sm"
+                                onClick={() => handleEditingFileRemove(index)}
+                              >
+                                삭제
+                              </Button>
+                            </div>
+                          ))}
+                        </div>
+                      )}
+                      <p className="text-xs text-gray-500 mt-1">
+                        * 최대 5개까지 첨부 가능합니다. (각 파일 최대 10MB)
+                      </p>
+                    </div>
                     <div className="flex justify-end space-x-2">
                       <Button
                         variant="outline"
@@ -214,6 +317,33 @@ export default function InquiryDetailPage({
                 ) : (
                   <div className="space-y-2">
                     <div className="whitespace-pre-wrap">{commentContent}</div>
+                    {inquiry.data.files && inquiry.data.files.length > 0 && (
+                      <div className="mt-2">
+                        <Label className="text-sm text-gray-500">
+                          첨부파일
+                        </Label>
+                        <div className="mt-1 space-y-1">
+                          {inquiry.data.files
+                            .filter((file: any) => {
+                              const fileIdList = JSON.parse(
+                                comment.fileIdList || '[]'
+                              );
+                              return fileIdList.includes(file.fileId);
+                            })
+                            .map((file: any) => (
+                              <a
+                                key={file.fileId}
+                                href={file.fileUrl}
+                                target="_blank"
+                                rel="noopener noreferrer"
+                                className="block text-blue-600 hover:underline text-sm"
+                              >
+                                {file.fileName}
+                              </a>
+                            ))}
+                        </div>
+                      </div>
+                    )}
                     <div className="flex justify-between items-center text-sm text-gray-500">
                       <div className="space-x-2">
                         <Button
@@ -221,7 +351,7 @@ export default function InquiryDetailPage({
                           size="sm"
                           onClick={() =>
                             setEditingComment({
-                              id: Number(commentId),
+                              id: comment.commentId,
                               content: commentContent,
                               files: [],
                               deletedFilesIdList: []
@@ -233,7 +363,7 @@ export default function InquiryDetailPage({
                         <Button
                           variant="ghost"
                           size="sm"
-                          onClick={() => handleCommentDelete(Number(commentId))}
+                          onClick={() => handleCommentDelete(comment.commentId)}
                         >
                           삭제
                         </Button>
@@ -261,6 +391,28 @@ export default function InquiryDetailPage({
                 onChange={handleFileChange}
                 className="mt-1"
               />
+              {files.length > 0 && (
+                <div className="mt-2 space-y-2">
+                  {files.map((file, index) => (
+                    <div
+                      key={index}
+                      className="flex items-center justify-between text-sm"
+                    >
+                      <span className="text-gray-600">{file.name}</span>
+                      <Button
+                        variant="ghost"
+                        size="sm"
+                        onClick={() => handleFileRemove(index)}
+                      >
+                        삭제
+                      </Button>
+                    </div>
+                  ))}
+                </div>
+              )}
+              <p className="text-xs text-gray-500 mt-1">
+                * 최대 5개까지 첨부 가능합니다. (각 파일 최대 10MB)
+              </p>
             </div>
             <div className="flex justify-end">
               <Button onClick={handleCommentSubmit}>답변 등록</Button>

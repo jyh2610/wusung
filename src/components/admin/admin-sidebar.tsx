@@ -14,10 +14,13 @@ import {
   Bell,
   Package,
   CreditCard,
-  MessageCircle
+  MessageCircle,
+  Home,
+  BookOpen
 } from 'lucide-react';
 import { cn } from '@/lib/utils';
 import { Button } from '@/components/ui/button';
+import { logout } from '@/entities/MainBanner/api';
 
 export default function AdminSidebar() {
   const pathname = usePathname();
@@ -104,6 +107,27 @@ export default function AdminSidebar() {
         <h1 className="text-2xl font-bold">관리자</h1>
       </div>
       <div className="flex-1 px-3 py-2 space-y-1">
+        <Link
+          href="/"
+          className={cn(
+            'flex items-center gap-x-2 text-sm font-medium px-3 py-2 rounded-md transition-colors',
+            'text-muted-foreground hover:text-primary hover:bg-primary/10'
+          )}
+        >
+          <Home className="h-5 w-5" />
+          메인 페이지
+        </Link>
+        <Link
+          href="/program"
+          className={cn(
+            'flex items-center gap-x-2 text-sm font-medium px-3 py-2 rounded-md transition-colors',
+            'text-muted-foreground hover:text-primary hover:bg-primary/10'
+          )}
+        >
+          <BookOpen className="h-5 w-5" />
+          프로그램
+        </Link>
+        <div className="h-px bg-border my-2" />
         {routes.map(route => (
           <Link
             key={route.href}
@@ -121,7 +145,14 @@ export default function AdminSidebar() {
         ))}
       </div>
       <div className="p-4 mt-auto border-t">
-        <Button variant="outline" className="w-full justify-start" size="sm">
+        <Button
+          onClick={() => {
+            logout();
+          }}
+          variant="outline"
+          className="w-full justify-start"
+          size="sm"
+        >
           <LogOut className="h-4 w-4 mr-2" />
           로그아웃
         </Button>

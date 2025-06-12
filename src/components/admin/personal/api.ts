@@ -91,11 +91,9 @@ export const updateInquiryComment = async (
       })
     );
 
-    if (files.length > 0) {
-      files.forEach(file => {
-        formData.append('addedFiles', file);
-      });
-    }
+    files.forEach(file => {
+      formData.append('addedFiles', file);
+    });
 
     const params = new URLSearchParams();
     deletedFilesIdList.forEach(id => {
@@ -109,15 +107,15 @@ export const updateInquiryComment = async (
       headers: {
         'Content-Type': 'multipart/form-data'
       },
-      params: Object.fromEntries(params)
+      params // ✅ 여기에서 직접 URLSearchParams 사용
     });
+
     return response.data;
   } catch (error) {
     console.error(error);
     return null;
   }
 };
-
 export const getInquiryDetail = async (inquiryId: number) => {
   try {
     const response = await request<ApiResponse<IGetInquiryDetail>>({

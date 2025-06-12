@@ -8,9 +8,15 @@ import { useState } from 'react';
 import { colors } from '@/design-tokens';
 import { DrawerList } from './ui/drawList';
 import { AddUser } from '../addUser';
+import { usePathname } from 'next/navigation';
 
 export default function TemporaryDrawer() {
   const [open, setOpen] = useState(true);
+  const pathname = usePathname();
+
+  // '/guide' 경로에서는 Drawer를 렌더링하지 않음
+  if (pathname === '/program/guide') return null;
+
   return (
     <>
       <Toolbar />

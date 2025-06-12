@@ -112,7 +112,7 @@ export function MemberList() {
           </Button>
         </div>
         <Input
-          placeholder="검색어를 입력하세요"
+          placeholder="아이디, 이름, 이메일, 전화번호를 입력하세요"
           value={search}
           onChange={e => handleSearch(e.target.value)}
           className="max-w-sm bg-white"

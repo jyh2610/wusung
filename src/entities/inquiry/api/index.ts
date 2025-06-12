@@ -27,3 +27,21 @@ export const regInquiry = async (data: IForm) => {
   });
   return res;
 };
+
+export interface IFAQList {
+  id: number;
+  title: string;
+  content: string;
+}
+
+export const getFAQList = async () => {
+  try {
+    const res = request<ApiResponse<IFAQList[]>>({
+      method: 'GET',
+      url: '/api/inquiry/faq'
+    });
+    return res;
+  } catch (error) {
+    console.error('FAQ 목록 조회 실패:', error);
+  }
+};

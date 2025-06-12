@@ -115,9 +115,23 @@ interface IPartnerResponse {
 }
 
 export const getPartnerList = async () => {
-  const res = request<ApiResponse<IPartnerResponse>>({
+  const res = await request<ApiResponse<IPartnerResponse>>({
     method: 'GET',
     url: '/api/common/main/partner/list'
   });
   return res;
+};
+
+export const getFAQList = async () => {
+  try {
+    const res = await request<
+      ApiResponse<PaginatedResponse<IAnnouncementResponse>>
+    >({
+      method: 'GET',
+      url: '/api/inquiry/faq'
+    });
+    return res.data.data;
+  } catch (error) {
+    console.error('FAQ 목록 조회 실패:', error);
+  }
 };

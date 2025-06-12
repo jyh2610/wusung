@@ -21,6 +21,7 @@ const Page = () => {
   const queryClient = useQueryClient();
   const [isLoading, setIsLoading] = useState(true);
   const [isUpdating, setIsUpdating] = useState(false);
+  const [file, setFile] = useState<File | null>(null);
   const [product, setProduct] = useState<IRegProduct>({
     name: '',
     periodMonths: 0,
@@ -90,7 +91,7 @@ const Page = () => {
 
       setIsUpdating(true);
 
-      await updateProduct(Number(params.id), product);
+      await updateProduct(Number(params.id), product, file || undefined);
 
       message.success('상품이 성공적으로 수정되었습니다.');
       queryClient.invalidateQueries({ queryKey: ['product'] });
@@ -169,7 +170,7 @@ const Page = () => {
       </div>
 
       <div className="space-y-2">
-        <Label htmlFor="discountRate">할인율(%)</Label>
+        <Label htmlFor="discountRate">할인율 (%)</Label>
         <Input
           id="discountRate"
           type="number"
@@ -183,6 +184,21 @@ const Page = () => {
             }))
           }
           placeholder="할인율을 입력하세요"
+        />
+      </div>
+
+      <div className="space-y-2">
+        <Label htmlFor="file">상품 이미지</Label>
+        <Input
+          id="file"
+          type="file"
+          accept="image/*"
+          onChange={e => {
+            const selectedFile = e.target.files?.[0];
+            if (selectedFile) {
+              setFile(selectedFile);
+            }
+          }}
         />
       </div>
 

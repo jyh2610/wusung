@@ -38,11 +38,7 @@ export const Edit = ({ family, onCancel }: EditProps) => {
 
       setIsUpdating(true);
 
-      await updateFamily(
-        family.partnerId,
-        editedFamily,
-        file || new File([], '')
-      );
+      await updateFamily(family.partnerId, editedFamily, file || undefined);
 
       message.success('패밀리 사이트가 성공적으로 수정되었습니다.');
       queryClient.invalidateQueries({ queryKey: ['family'] });

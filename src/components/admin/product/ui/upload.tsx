@@ -23,6 +23,7 @@ export const Upload = ({ onCancel }: UploadProps) => {
     discountRate: 0,
     active: true
   });
+  const [file, setFile] = useState<File | null>(null);
   const [isUploading, setIsUploading] = useState(false);
   const queryClient = useQueryClient();
 
@@ -51,7 +52,7 @@ export const Upload = ({ onCancel }: UploadProps) => {
 
       setIsUploading(true);
 
-      await regProduct(newProduct);
+      await regProduct(newProduct, file || undefined);
 
       message.success('상품이 성공적으로 등록되었습니다.');
       queryClient.invalidateQueries({ queryKey: ['product'] });
@@ -126,7 +127,7 @@ export const Upload = ({ onCancel }: UploadProps) => {
       </div>
 
       <div className="space-y-2">
-        <Label htmlFor="discountRate">할인율(%)</Label>
+        <Label htmlFor="discountRate">할인율 (%)</Label>
         <Input
           id="discountRate"
           type="number"
@@ -140,6 +141,21 @@ export const Upload = ({ onCancel }: UploadProps) => {
             }))
           }
           placeholder="할인율을 입력하세요"
+        />
+      </div>
+
+      <div className="space-y-2">
+        <Label htmlFor="file">상품 이미지</Label>
+        <Input
+          id="file"
+          type="file"
+          accept="image/*"
+          onChange={e => {
+            const selectedFile = e.target.files?.[0];
+            if (selectedFile) {
+              setFile(selectedFile);
+            }
+          }}
         />
       </div>
 

@@ -261,7 +261,7 @@ export const changeSubscriptionEndDate = async ({
   try {
     const res = await request<ApiResponse<null>>({
       method: 'PUT',
-      url: `/api/admin/member/${memberId}/subscription`,
+      url: `/api/admin/member/${memberId}/subscription/end-date`,
       params: {
         newEndDate,
         isVip

@@ -61,7 +61,7 @@ export const deleteFamily = async (id: number) => {
   }
 };
 
-export const updateFamily = async (id: number, data: IFamily, file: File) => {
+export const updateFamily = async (id: number, data: IFamily, file?: File) => {
   try {
     const formData = new FormData();
     formData.append(
@@ -73,7 +73,10 @@ export const updateFamily = async (id: number, data: IFamily, file: File) => {
         isVisible: data.isVisible
       })
     );
-    formData.append('file', file);
+
+    if (file) {
+      formData.append('file', file);
+    }
 
     const response = await request<ApiResponse<IFamily>>({
       url: `/api/admin/partner/${id}`,

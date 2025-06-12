@@ -23,7 +23,15 @@ export interface IInquiryDetail {
 }
 
 export interface IInquiryComment {
-  comments: string[];
+  commentId: number;
+  memberId: number;
+  inquiryId: number;
+  answerOrder: number;
+  isAnswered: boolean;
+  content: string;
+  fileIdList: string;
+  createdAt: string;
+  updatedAt: string;
 }
 
 export interface IInquiryCommentFile {
@@ -32,6 +40,6 @@ export interface IInquiryCommentFile {
 
 export interface IGetInquiryDetail {
   inquiry: IInquiryDetail;
-  comments: string[];
+  comments: IInquiryComment[];
   files: string[];
 }

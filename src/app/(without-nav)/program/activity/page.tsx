@@ -99,7 +99,6 @@ function Activity() {
         setPersonName([selectedCategory.name]);
         setSelectedCategoryNode(selectedCategory);
         setCategoryId(selectedCategory.categoryId);
-        console.log('Selected Category:', selectedCategory); // 디버깅용 로그
       }
     }
   };
@@ -224,9 +223,15 @@ function Activity() {
 
   useEffect(() => {
     if (categories && categories.length > 0 && personName.length === 0) {
-      const firstCategory = categories[0];
-      setPersonName([firstCategory.name]);
-      setCategoryId(firstCategory.categoryId);
+      // 활동지 카테고리만 필터링
+      const activityCategories = categories.filter(
+        category => category.name === '활동지'
+      );
+      if (activityCategories.length > 0) {
+        const firstCategory = activityCategories[0];
+        setPersonName([firstCategory.name]);
+        setCategoryId(firstCategory.categoryId);
+      }
     }
   }, [categories]);
 
@@ -247,7 +252,6 @@ function Activity() {
     };
     fetchData();
   }, [categoryId, selectedLevel, fetchActivities, setActivities]);
-  console.log(categoryId);
 
   return (
     <div className={container}>
@@ -273,7 +277,15 @@ function Activity() {
             {selectedCategoryNode?.name || '카테고리 선택'}
           </div>
           <CustomCascader
-            options={categories}
+            options={categories.filter(category => {
+              if (category.name === '활동지') return true;
+              // 부모 카테고리가 '활동지'인 경우도 포함
+              return (
+                category.parentId &&
+                categories.find(c => c.categoryId === category.parentId)
+                  ?.name === '활동지'
+              );
+            })}
             value={
               selectedCategoryNode
                 ? [selectedCategoryNode.categoryId]

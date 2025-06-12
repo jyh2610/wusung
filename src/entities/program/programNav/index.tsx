@@ -81,17 +81,6 @@ export function ProgramNav() {
 
           <div
             className={btn}
-            onClick={() => router.push('/program/evaluation')}
-            style={getButtonStyle('/program/evaluation')}
-          >
-            <div className={imgContainer}>
-              <Image fill src={'/images/navBtn4.png'} alt={'이동 버튼'} />
-            </div>
-            <div className={textAlign}>평가자료</div>
-          </div>
-
-          <div
-            className={btn}
             onClick={() => router.push('/program/etc')}
             style={getButtonStyle('/program/etc')}
           >
@@ -104,6 +93,17 @@ export function ProgramNav() {
               />
             </div>
             <div className={textAlign}>기타 자료</div>
+          </div>
+
+          <div
+            className={btn}
+            onClick={() => router.push('/program/evaluation')}
+            style={getButtonStyle('/program/evaluation')}
+          >
+            <div className={imgContainer}>
+              <Image fill src={'/images/navBtn4.png'} alt={'이동 버튼'} />
+            </div>
+            <div className={textAlign}>평가자료</div>
           </div>
 
           <div

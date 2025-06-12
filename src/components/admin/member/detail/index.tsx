@@ -10,7 +10,8 @@ import {
   message,
   Modal,
   Switch,
-  Table
+  Table,
+  Radio
 } from 'antd';
 import dayjs from 'dayjs';
 import relativeTime from 'dayjs/plugin/relativeTime';
@@ -102,20 +103,21 @@ export const MemberDetail: React.FC<MemberDetailProps> = ({ memberId }) => {
 
   const handleSubscriptionSubmit = async (values: {
     subscriptionEndDate: string;
+    isVip: boolean;
   }) => {
     try {
       setLoading(true);
       await changeSubscriptionEndDate({
         memberId,
         newEndDate: dayjs(values.subscriptionEndDate).format('YYYY-MM-DD'),
-        isVip: data?.isVip || false
+        isVip: values.isVip
       });
-      message.success('구독 종료일이 성공적으로 변경되었습니다.');
+      message.success('구독 정보가 성공적으로 변경되었습니다.');
       setIsSubscriptionModalVisible(false);
-      form.resetFields(['subscriptionEndDate']);
+      form.resetFields(['subscriptionEndDate', 'isVip']);
       refetch();
     } catch (error) {
-      message.error('구독 종료일 변경 중 오류가 발생했습니다.');
+      message.error('구독 정보 변경 중 오류가 발생했습니다.');
     } finally {
       setLoading(false);
     }
@@ -151,6 +153,16 @@ export const MemberDetail: React.FC<MemberDetailProps> = ({ memberId }) => {
 
   const handleInquiryHistoryClick = () => {
     router.push(`/admin/inquiry?memberId=${memberId}`);
+  };
+
+  const handleSubscriptionModalOpen = () => {
+    form.setFieldsValue({
+      subscriptionEndDate: data?.subscriptionEndDate
+        ? dayjs(data.subscriptionEndDate)
+        : dayjs(),
+      isVip: data?.isVip
+    });
+    setIsSubscriptionModalVisible(true);
   };
 
   const ipListColumns = [
@@ -292,10 +304,7 @@ export const MemberDetail: React.FC<MemberDetailProps> = ({ memberId }) => {
                     </span>
                   )}
                 </div>
-                <Button
-                  type="primary"
-                  onClick={() => setIsSubscriptionModalVisible(true)}
-                >
+                <Button type="primary" onClick={handleSubscriptionModalOpen}>
                   구독 종료일 변경
                 </Button>
               </div>
@@ -409,13 +418,24 @@ export const MemberDetail: React.FC<MemberDetailProps> = ({ memberId }) => {
         onCancel={() => setIsSubscriptionModalVisible(false)}
         footer={null}
       >
-        <Form form={form} onFinish={handleSubscriptionSubmit} layout="vertical">
+        <Form
+          form={form}
+          onFinish={handleSubscriptionSubmit}
+          layout="vertical"
+          initialValues={{ isVip: data?.isVip }}
+        >
           <Form.Item name="subscriptionEndDate" label="구독 종료일">
             <DatePicker
               placeholder="구독 종료일을 선택하세요"
               format="YYYY-MM-DD"
               className="h-12 text-lg w-full"
             />
+          </Form.Item>
+          <Form.Item name="isVip" label="VIP 회원">
+            <Radio.Group>
+              <Radio value={true}>VIP</Radio>
+              <Radio value={false}>일반</Radio>
+            </Radio.Group>
           </Form.Item>
           <div className="flex justify-end gap-2">
             <Button onClick={() => setIsSubscriptionModalVisible(false)}>

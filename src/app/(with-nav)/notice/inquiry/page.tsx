@@ -3,8 +3,23 @@
 import { colors } from '@/design-tokens';
 import { DashBoard } from '@/shared';
 import { TableRow, TableCell } from '@mui/material';
+import { useEffect, useState } from 'react';
+import { getFAQList } from '@/shared/api/common';
+import { IAnnouncementResponse } from '@/shared/api/common';
 
 function Inquiry() {
+  const [faqList, setFaqList] = useState<IAnnouncementResponse[]>([]);
+
+  useEffect(() => {
+    const fetchFAQList = async () => {
+      const data = await getFAQList();
+      if (data) {
+        setFaqList(data.content);
+      }
+    };
+    fetchFAQList();
+  }, []);
+
   const columns = [
     { id: 'title', label: '제목' },
     { id: 'author', label: '작성자' },
@@ -12,11 +27,13 @@ function Inquiry() {
     { id: 'views', label: '조회수' }
   ];
 
-  const renderRow = (row: ReturnType<typeof createData>) => (
-    <TableRow key={row.title} hover>
+  const renderRow = (row: IAnnouncementResponse) => (
+    <TableRow key={row.announcementId} hover>
       <TableCell>{row.title}</TableCell>
-      <TableCell align="right">{row.author}</TableCell>
-      <TableCell align="right">{row.date}</TableCell>
+      <TableCell align="right">관리자</TableCell>
+      <TableCell align="right">
+        {new Date(row.createdAt).toLocaleDateString()}
+      </TableCell>
       <TableCell align="right">{row.views}</TableCell>
     </TableRow>
   );
@@ -36,27 +53,10 @@ function Inquiry() {
         </h1>
       </div>
       <div>
-        <DashBoard columns={columns} rows={rows} renderRow={renderRow} />
+        <DashBoard columns={columns} rows={faqList} renderRow={renderRow} />
       </div>
     </div>
   );
-}
-
-const rows = [
-  createData('Post 1', 'John Doe', '2025-03-01', 120),
-  createData('Post 2', 'Jane Smith', '2025-03-02', 150),
-  createData('Post 3', 'Alice Johnson', '2025-03-03', 98),
-  createData('Post 4', 'Bob Brown', '2025-03-04', 75),
-  createData('Post 5', 'Charlie Green', '2025-03-05', 220)
-  // 데이터가 없으면 빈 배열로 설정 []
-];
-function createData(
-  title: string,
-  author: string,
-  date: string,
-  views: number
-) {
-  return { title, author, date, views };
 }
 
 export default Inquiry;
