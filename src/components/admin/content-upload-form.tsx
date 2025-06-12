@@ -59,6 +59,7 @@ interface Rectangle {
   y: number;
   width: number;
   height: number;
+  type: string;
 }
 const customStyles = {
   option: (provided: any, state: { isSelected: any }) => ({
@@ -303,7 +304,19 @@ export function ContentUploadForm() {
   // 이미지별 좌표 정보 업데이트 함수
   const updateImageCoordinates = (coordinates: Rectangle[][]) => {
     setImageCoordinates(coordinates);
-    // form state의 overlays도 함께 업데이트
+    console.log(coordinates);
+    // overlays 데이터 구조 변환
+    const formattedOverlays = coordinates.flatMap((imageCoords: Rectangle[], fileIndex: number) => 
+      imageCoords.map((coord: Rectangle) => ({
+        ...coord,
+        type: coord.type,
+        fixedText: '',
+        fileIndex,
+        alignment: 'center'
+      }))
+    );
+    
+    // form state의 overlays 업데이트
     handleChange('overlays', coordinates);
   };
 
