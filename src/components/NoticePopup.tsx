@@ -63,7 +63,7 @@ const NoticePopup: React.FC<NoticePopupProps> = ({ notices, onClose }) => {
   }, [closedNotices, sortedNotices.length, onClose]);
 
   return (
-    <div className="fixed inset-0 bg-black bg-opacity-50 flex justify-center items-center z-[9999]">
+    <div className="fixed inset-0 pointer-events-none z-[9999]">
       <div className="fixed top-4 flex flex-col gap-4 w-full max-w-[500px] px-4">
         {sortedNotices.map((notice, index) => {
           if (closedNotices.includes(notice.priority) || dontShowToday.includes(notice.priority)) {
@@ -72,7 +72,7 @@ const NoticePopup: React.FC<NoticePopupProps> = ({ notices, onClose }) => {
           return (
             <div
               key={index}
-              className={`bg-white p-6 rounded-lg shadow-lg relative ${getPositionClass(notice.positionCode)}`}
+              className={`bg-white p-6 rounded-lg shadow-lg relative ${getPositionClass(notice.positionCode)} pointer-events-auto`}
             >
               <div className="flex justify-between items-center mb-4">
                 <h2 className="text-xl font-semibold text-gray-800 m-0">{notice.title}</h2>
