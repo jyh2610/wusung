@@ -1,13 +1,15 @@
 import { create } from 'zustand';
-import { CategoryNode } from '@/entities/program/type.dto';
-import { getUserCategoryTree } from '@/entities/program/api';
+import { CategoryNode, ICategoryLeaf } from '@/entities/program/type.dto';
+import { getCategoryIndividualList, getUserCategoryTree } from '@/entities/program/api';
 
 interface CategoryTreeState {
   categoryTree: CategoryNode[];
+  categoryIndividualList: ICategoryLeaf[];
   selectedCategoryNode: CategoryNode | null;
   isLoading: boolean;
   error: Error | null;
 
+  fetchCategoryIndividualList: () => Promise<void>;
   fetchCategoryTree: () => Promise<void>;
   setSelectedCategoryNode: (category: CategoryNode | null) => void;
 
@@ -17,6 +19,7 @@ interface CategoryTreeState {
 
 export const useCategoryTreeStore = create<CategoryTreeState>(set => ({
   categoryTree: [],
+  categoryIndividualList: [],
   selectedCategoryNode: null,
   isLoading: false,
   error: null,
@@ -36,6 +39,25 @@ export const useCategoryTreeStore = create<CategoryTreeState>(set => ({
     const root = state.categoryTree.find(node => node.name === mappedName);
     console.log('Found root:', root);
     return root?.children || [];
+  },
+
+  fetchCategoryIndividualList: async () => {
+    set({ isLoading: true, error: null });
+    try {
+      const treeData = await getCategoryIndividualList();
+      console.log(treeData);
+      set({
+        categoryIndividualList: treeData,
+        isLoading: false
+      });
+    }
+    catch (err) {
+      console.error('Failed to fetch category individual list:', err);
+      set({ 
+        error: err instanceof Error ? err : new Error('Unknown error'),
+        isLoading: false
+      });
+    }
   },
 
   fetchCategoryTree: async () => {

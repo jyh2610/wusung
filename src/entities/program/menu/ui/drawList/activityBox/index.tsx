@@ -19,7 +19,9 @@ export function ActivityBox() {
   const categoryName = endpointMapper[endpoint];
 
   const {
+    categoryIndividualList,
     categoryTree,
+    fetchCategoryIndividualList,
     fetchCategoryTree,
     selectedCategoryNode,
     setSelectedCategoryNode,
@@ -28,13 +30,24 @@ export function ActivityBox() {
   } = useCategoryTreeStore();
 
   useEffect(() => {
-    fetchCategoryTree();
-  }, [fetchCategoryTree]);
+    fetchCategoryIndividualList();
+  }, [fetchCategoryIndividualList]);
 
   // 모든 최상위 카테고리 가져오기
-  const rootCategories = useCategoryTreeStore(state => state.categoryTree);
+  const rootCategories = useCategoryTreeStore(state => state.categoryIndividualList);
 
-  console.log('Category Tree:', categoryTree);
+  // 엔드포인트가 evaluation일 때 평가자료 카테고리만 필터링
+  const filteredCategories = useMemo(() => {
+    if (endpoint === 'evaluation') {
+      return rootCategories.filter(category => category.name === '평가자료');
+    }
+    if (endpoint === 'etc') {
+      return rootCategories.filter(category => category.name === '기타자료');
+    }
+    return rootCategories;
+  }, [rootCategories, endpoint]);
+
+  console.log('Category Tree:', categoryIndividualList);
   console.log('Root Categories:', rootCategories);
 
   const handleCategorySelect = (category: CategoryNode) => {
@@ -53,7 +66,7 @@ export function ActivityBox() {
         카테고리 목록
       </h3>
       <div className="space-y-6">
-        {rootCategories.map(rootCategory => (
+        {filteredCategories.map(rootCategory => (
           <div key={rootCategory.categoryId} className="mb-4">
             <h4 className="font-medium text-lg mb-2">{rootCategory.name}</h4>
             <ul>

@@ -29,6 +29,15 @@ export interface IContent {
   overlays: IOverlay[];
 }
 
+export interface IContentList {
+    eduContentId: number;
+    title: string;
+    year: number;
+    month: number;
+    viewCount: number;
+    thumbnailUrl: string;
+}
+
 export interface ScheduleItem {
   content: string;
   id: number;

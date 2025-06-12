@@ -553,3 +553,16 @@ export const getScheduleList = async ({
     console.error('스케줄 목록 요청을 실패 했습니다.', error);
   }
 };
+
+
+export const getCategoryIndividualList = async () => {
+  try {
+    const res = await request<IRes<ICategoryLeaf[]>>({
+      method: 'GET',
+      url: `/api/program/use/category/tree/paging`
+    });
+    return res.data.data;
+  } catch (error) {
+    console.error('카테고리 개별 목록 요청을 실패 했습니다.', error);
+  }
+};
