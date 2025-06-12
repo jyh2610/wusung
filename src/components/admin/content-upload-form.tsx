@@ -105,7 +105,7 @@ export function ContentUploadForm() {
     existDayOfWeek: [],
     existElderName: []
   });
-
+  console.log(form.overlays);
   useEffect(() => {
     const fetchContent = async () => {
       const token = sessionStorage.getItem('token');
@@ -304,6 +304,10 @@ export function ContentUploadForm() {
   // 이미지별 좌표 정보 업데이트 함수
   const updateImageCoordinates = (coordinates: Rectangle[][]) => {
     setImageCoordinates(coordinates);
+    console.log(coordinates);
+    // overlays 데이터 구조 변환
+ 
+    
     // form state의 overlays 업데이트
     handleChange('overlays', coordinates);
   };
