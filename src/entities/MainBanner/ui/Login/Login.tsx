@@ -5,7 +5,7 @@ import { BeforeLogIn } from './BeforeLogIn';
 import Logged from './Logged';
 import { useAuthStore } from '@/shared/stores/useAuthStore';
 import { bannerContentsStyle } from './Login.css';
-import { ConsultationInquiry } from './ ConsultationInquiry';
+import { ConsultationInquiry } from './ConsultationInquiry';
 import { LoginSkeleton } from './LoginSkeleton';
 
 export function Login() {

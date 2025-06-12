@@ -10,7 +10,7 @@ import {
   inputContainer,
   label
 } from './index.css';
-import { findId, sendCode } from '../../api/\bfindInfo';
+import { findId, sendCode } from '../../api/findInfo';
 import { toast } from 'react-toastify';
 import { formatTime } from '@/lib/utils';
 import { CompleteId } from '../complete';

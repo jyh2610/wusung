@@ -10,13 +10,13 @@ import {
   inputContainer,
   label
 } from './index.css';
-import { findId, findPassword, sendCode } from '../../api/\bfindInfo';
 import { toast } from 'react-toastify';
 import { formatTime } from '@/lib/utils';
 import { CompleteId } from '../complete';
 import { container, title } from '../index.css';
 import { ResetPw } from './ResetPw';
 import { useSearchParams } from 'next/navigation';
+import { sendCode, findPassword } from '../../api/findInfo';
 const TIME_LEFT = 300;
 export const Password = () => {
   const searchParams = useSearchParams();

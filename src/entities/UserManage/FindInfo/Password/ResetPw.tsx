@@ -2,7 +2,7 @@ import { NomalInput } from '@/shared/ui/Input';
 import React, { useState } from 'react';
 import { container, title } from '../index.css';
 import { fullButton, inputContainer } from './index.css';
-import { resetPassword } from '../../api/\bfindInfo';
+import { resetPassword } from '../../api/findInfo';
 import { toast } from 'react-toastify';
 import { Button, Modal } from '@/shared/ui';
 import { validatePassword } from '@/lib/vaildatrion';
