@@ -305,17 +305,18 @@ export function ContentUploadForm() {
   const updateImageCoordinates = (coordinates: Rectangle[][]) => {
     setImageCoordinates(coordinates);
     console.log(coordinates);
-    
+
     // overlays 데이터 구조 변환
-    const formattedOverlays = coordinates.flatMap((imageCoords: Rectangle[], fileIndex: number) => 
-      imageCoords.map((coord: Rectangle) => ({
-        ...coord,
-        fixedText: '',
-        fileIndex,
-        alignment: 'center'
-      }))
+    const formattedOverlays = coordinates.flatMap(
+      (imageCoords: Rectangle[], fileIndex: number) =>
+        imageCoords.map((coord: Rectangle) => ({
+          ...coord,
+          fixedText: '',
+          fileIndex,
+          alignment: 'center'
+        }))
     );
-    
+
     // form state의 overlays 업데이트
     handleChange('overlays', formattedOverlays);
   };

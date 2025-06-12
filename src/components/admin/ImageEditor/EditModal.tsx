@@ -237,7 +237,7 @@ export const EditModal = ({
               style={{
                 position: 'absolute',
                 left: `${imgRect.left + (rect.x / 100) * imgRect.width}px`,
-                top: `${imgRect.top + (rect.y / 100) * imgRect.height}px`,
+                top: `${imgRect.top + ((100 - rect.y - rect.height) / 100) * imgRect.height}px`,
                 width: `${(rect.width / 100) * imgRect.width}px`,
                 height: `${(rect.height / 100) * imgRect.height}px`,
                 border: '2px solid red',
@@ -253,7 +253,7 @@ export const EditModal = ({
               className="absolute border-2 border-red-500 bg-red-300 bg-opacity-30"
               style={{
                 left: `${currentRect.x}%`,
-                top: `${currentRect.y}%`,
+                top: `${100 - currentRect.y - currentRect.height}%`,
                 width: `${currentRect.width}%`,
                 height: `${currentRect.height}%`
               }}

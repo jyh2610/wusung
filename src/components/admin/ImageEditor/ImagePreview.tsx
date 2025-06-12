@@ -46,7 +46,7 @@ export const ImagePreview = ({
           } bg-blue-400 bg-opacity-20`}
           style={{
             left: `${rect.x}%`,
-            top: `${rect.y}%`,
+            top: `${100 - rect.y - rect.height}%`,
             width: `${rect.width}%`,
             height: `${rect.height}%`
           }}

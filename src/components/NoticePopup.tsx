@@ -11,17 +11,24 @@ interface Notice {
 interface NoticePopupProps {
   notices: Notice[];
   onClose: () => void;
+  dontShowToday: boolean;
+  setDontShowToday: (value: boolean) => void;
 }
 
-const NoticePopup: React.FC<NoticePopupProps> = ({ notices, onClose }) => {
+const NoticePopup: React.FC<NoticePopupProps> = ({
+  notices,
+  onClose,
+  dontShowToday,
+  setDontShowToday
+}) => {
   const [closedNotices, setClosedNotices] = useState<number[]>([]);
-  const [dontShowToday, setDontShowToday] = useState<number[]>([]);
+  const [dontShowTodayState, setDontShowTodayState] = useState<number[]>([]);
 
   // 우선순위에 따라 정렬
   const sortedNotices = [...notices].sort((a, b) => a.priority - b.priority);
 
   const handleDontShowToday = (noticeId: number) => {
-    setDontShowToday(prev => [...prev, noticeId]);
+    setDontShowTodayState(prev => [...prev, noticeId]);
     // 로컬 스토리지에 저장
     const today = new Date().toDateString();
     const storedNotices = JSON.parse(
@@ -47,7 +54,7 @@ const NoticePopup: React.FC<NoticePopupProps> = ({ notices, onClose }) => {
     const todayClosedNotices = storedNotices
       .filter((item: { id: number; date: string }) => item.date === today)
       .map((item: { id: number }) => item.id);
-    setDontShowToday(todayClosedNotices);
+    setDontShowTodayState(todayClosedNotices);
   }, []);
 
   const getPositionClass = (positionCode: string) => {
@@ -76,7 +83,7 @@ const NoticePopup: React.FC<NoticePopupProps> = ({ notices, onClose }) => {
         {sortedNotices.map((notice, index) => {
           if (
             closedNotices.includes(notice.priority) ||
-            dontShowToday.includes(notice.priority)
+            dontShowTodayState.includes(notice.priority)
           ) {
             return null;
           }
@@ -103,7 +110,7 @@ const NoticePopup: React.FC<NoticePopupProps> = ({ notices, onClose }) => {
                 <input
                   type="checkbox"
                   id={`dontShowToday-${notice.priority}`}
-                  checked={dontShowToday.includes(notice.priority)}
+                  checked={dontShowTodayState.includes(notice.priority)}
                   onChange={e => {
                     if (e.target.checked) {
                       handleDontShowToday(notice.priority);
@@ -138,6 +145,29 @@ const NoticePopup: React.FC<NoticePopupProps> = ({ notices, onClose }) => {
             </div>
           );
         })}
+        <div>
+          <label>
+            <input
+              type="checkbox"
+              checked={dontShowToday}
+              onChange={e => setDontShowToday(e.target.checked)}
+            />
+            오늘 하루 보지 않기
+          </label>
+        </div>
+        <div
+          style={{
+            marginTop: '10px',
+            display: 'flex',
+            justifyContent: 'center',
+            alignItems: 'center',
+            width: '70px',
+            height: '26px',
+            marginLeft: 'auto'
+          }}
+        >
+          <Button type="borderBrand" content="확인" onClick={onClose} />
+        </div>
       </div>
     </div>
   );

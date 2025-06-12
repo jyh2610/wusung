@@ -161,7 +161,7 @@ export default function ImageEditor({
     if (x < 0 || x > imageSize.width || y < 0 || y > imageSize.height) return;
 
     const xPercent = (x / imageSize.width) * 100;
-    const yPercent = (y / imageSize.height) * 100;
+    const yPercent = 100 - (y / imageSize.height) * 100;
 
     startRef.current = { x: xPercent, y: yPercent };
     setCurrentRect({ x: xPercent, y: yPercent, width: 0, height: 0 });
@@ -179,7 +179,7 @@ export default function ImageEditor({
     const clampedY = Math.max(0, Math.min(y, imageSize.height));
 
     const xPercent = (clampedX / imageSize.width) * 100;
-    const yPercent = (clampedY / imageSize.height) * 100;
+    const yPercent = 100 - (clampedY / imageSize.height) * 100;
 
     const width = Math.abs(xPercent - startRef.current.x);
     const height = Math.abs(yPercent - startRef.current.y);

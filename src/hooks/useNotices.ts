@@ -21,7 +21,7 @@ export const useNotices = () => {
           page: 0,
           size: 10
         });
-        
+
         if (response?.data?.data?.content) {
           const transformedNotices = response.data.data.content.map(notice => ({
             title: notice.title || '',
@@ -36,7 +36,9 @@ export const useNotices = () => {
       } catch (err) {
         console.error('공지사항을 불러오는 중 오류가 발생했습니다:', err);
         setNotices([]);
-        setError(err instanceof Error ? err.message : '알 수 없는 오류가 발생했습니다.');
+        setError(
+          err instanceof Error ? err.message : '알 수 없는 오류가 발생했습니다.'
+        );
       } finally {
         setLoading(false);
       }
@@ -46,4 +48,4 @@ export const useNotices = () => {
   }, []);
 
   return { notices, loading, error };
-}; 
+};
