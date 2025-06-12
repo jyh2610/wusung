@@ -1,4 +1,5 @@
 import { useState, useEffect } from 'react';
+import { getAnnouncementList } from '@/shared/api/common';
 
 interface Notice {
   title: string;
@@ -16,13 +17,20 @@ export const useNotices = () => {
     const fetchNotices = async () => {
       try {
         setLoading(true);
-        // API 엔드포인트를 실제 URL로 변경해주세요
-        const response = await fetch('/api/notices');
-        if (!response.ok) {
-          throw new Error('공지사항을 불러오는데 실패했습니다.');
+        const response = await getAnnouncementList({
+          page: 0,
+          size: 10
+        });
+        
+        if (response.data) {
+          const transformedNotices = response.data.data.content.map(notice => ({
+            title: notice.title,
+            content: notice.topExposureTag || '',
+            positionCode: 'C' as const,
+            priority: notice.announcementId
+          }));
+          setNotices(transformedNotices);
         }
-        const data = await response.json();
-        setNotices(data);
       } catch (err) {
         setError(err instanceof Error ? err.message : '알 수 없는 오류가 발생했습니다.');
       } finally {
