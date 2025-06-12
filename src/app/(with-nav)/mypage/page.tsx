@@ -14,7 +14,7 @@ async function Mypage() {
   // ✅ 2. 권한 확인
   const roleRes = await getRole(token);
 
-  if (!roleRes) {
+  if (!roleRes || !token) {
     redirect('/'); // ✅ 3. UNKNOWN이면 홈으로 이동
   }
 
