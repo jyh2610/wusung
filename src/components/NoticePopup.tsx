@@ -1,3 +1,4 @@
+import { Button } from '@/shared/ui';
 import React, { useEffect, useState } from 'react';
 
 interface Notice {
@@ -23,8 +24,13 @@ const NoticePopup: React.FC<NoticePopupProps> = ({ notices, onClose }) => {
     setDontShowToday(prev => [...prev, noticeId]);
     // 로컬 스토리지에 저장
     const today = new Date().toDateString();
-    const storedNotices = JSON.parse(localStorage.getItem('noticePopupLastClosed') || '[]');
-    localStorage.setItem('noticePopupLastClosed', JSON.stringify([...storedNotices, { id: noticeId, date: today }]));
+    const storedNotices = JSON.parse(
+      localStorage.getItem('noticePopupLastClosed') || '[]'
+    );
+    localStorage.setItem(
+      'noticePopupLastClosed',
+      JSON.stringify([...storedNotices, { id: noticeId, date: today }])
+    );
     handleClose(noticeId);
   };
 
@@ -34,7 +40,9 @@ const NoticePopup: React.FC<NoticePopupProps> = ({ notices, onClose }) => {
 
   useEffect(() => {
     // 오늘 이미 닫은 공지사항 확인
-    const storedNotices = JSON.parse(localStorage.getItem('noticePopupLastClosed') || '[]');
+    const storedNotices = JSON.parse(
+      localStorage.getItem('noticePopupLastClosed') || '[]'
+    );
     const today = new Date().toDateString();
     const todayClosedNotices = storedNotices
       .filter((item: { id: number; date: string }) => item.date === today)
@@ -66,7 +74,10 @@ const NoticePopup: React.FC<NoticePopupProps> = ({ notices, onClose }) => {
     <div className="fixed inset-0 pointer-events-none z-[9999]">
       <div className="fixed top-4 flex flex-col gap-4 w-full max-w-[500px] px-4">
         {sortedNotices.map((notice, index) => {
-          if (closedNotices.includes(notice.priority) || dontShowToday.includes(notice.priority)) {
+          if (
+            closedNotices.includes(notice.priority) ||
+            dontShowToday.includes(notice.priority)
+          ) {
             return null;
           }
           return (
@@ -75,7 +86,9 @@ const NoticePopup: React.FC<NoticePopupProps> = ({ notices, onClose }) => {
               className={`bg-white p-6 rounded-lg shadow-lg relative ${getPositionClass(notice.positionCode)} pointer-events-auto`}
             >
               <div className="flex justify-between items-center mb-4">
-                <h2 className="text-xl font-semibold text-gray-800 m-0">{notice.title}</h2>
+                <h2 className="text-xl font-semibold text-gray-800 m-0">
+                  {notice.title}
+                </h2>
                 <button
                   onClick={() => handleClose(notice.priority)}
                   className="text-2xl text-gray-500 hover:text-gray-800 bg-transparent border-none cursor-pointer"
@@ -91,23 +104,37 @@ const NoticePopup: React.FC<NoticePopupProps> = ({ notices, onClose }) => {
                   type="checkbox"
                   id={`dontShowToday-${notice.priority}`}
                   checked={dontShowToday.includes(notice.priority)}
-                  onChange={(e) => {
+                  onChange={e => {
                     if (e.target.checked) {
                       handleDontShowToday(notice.priority);
                     }
                   }}
                   className="w-4 h-4"
                 />
-                <label htmlFor={`dontShowToday-${notice.priority}`} className="text-sm text-gray-600">
+                <label
+                  htmlFor={`dontShowToday-${notice.priority}`}
+                  className="text-sm text-gray-600"
+                >
                   오늘 하루 동안 열지 않기
                 </label>
+                <div
+                  style={{
+                    marginTop: '10px',
+                    display: 'flex',
+                    justifyContent: 'center',
+                    alignItems: 'center',
+                    width: '70px',
+                    height: '26px',
+                    marginLeft: 'auto'
+                  }}
+                >
+                  <Button
+                    type="borderBrand"
+                    content="확인"
+                    onClick={() => handleDontShowToday(notice.priority)}
+                  />
+                </div>
               </div>
-              <button
-                onClick={() => handleDontShowToday(notice.priority)}
-                className="mt-4 w-full bg-blue-500 text-white py-2 px-4 rounded hover:bg-blue-600 transition-colors"
-              >
-                확인
-              </button>
             </div>
           );
         })}
@@ -116,4 +143,4 @@ const NoticePopup: React.FC<NoticePopupProps> = ({ notices, onClose }) => {
   );
 };
 
-export default NoticePopup; 
+export default NoticePopup;
