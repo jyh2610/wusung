@@ -10,6 +10,8 @@ import {
 } from '../type.dto';
 import { EduContent, IRes } from '@/shared/type';
 import { extractLeafNodes, getsessionStorageValue } from '@/lib/utils';
+import { toast } from 'react-toastify';
+
 export const putEduContent = async ({
   eduContentId,
   content,
@@ -460,8 +462,14 @@ export const searchContent = async (eduContentId: number) => {
       url: `/api/admin/edu-content/${eduContentId}`
     });
 
+    if (res.status === 4000) {
+      toast.info(res.data.message);
+    }
     return res.data.data;
-  } catch (error) {}
+  } catch (error) {
+    console.error(error);
+    toast.error('컨텐츠를 불러오는데 실패했습니다.');
+  }
 };
 
 export const deleteContent = async (eduContentId: number) => {

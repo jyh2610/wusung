@@ -98,17 +98,19 @@ export function Control({ isAdmin }: { isAdmin: boolean }) {
       return;
     }
     try {
-      await getPlan({
+      const res = await getPlan({
         year,
         month,
         difficultyLevel: selectedUser.difficultyLevel
       });
+
 
       await autoRegisterPlan({
         year,
         month,
         difficultyLevel: selectedUser.difficultyLevel
       });
+
     } catch (error) {
       console.error('계획안 불러오기 실패:', error);
     }
