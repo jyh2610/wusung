@@ -78,7 +78,7 @@ const NoticePopup: React.FC<NoticePopupProps> = ({
   }, [closedNotices, sortedNotices.length, onClose]);
   console.log(sortedNotices, closedNotices, dontShowTodayState);
   return (
-    <div className="fixed inset-0 pointer-events-none z-[9999] bg-white">
+    <div className="fixed inset-0 pointer-events-none z-[9999]">
       <div className="fixed top-4 flex flex-col gap-4 w-full max-w-[500px] px-4">
         {sortedNotices.map((notice, index) => {
           if (
@@ -145,29 +145,6 @@ const NoticePopup: React.FC<NoticePopupProps> = ({
             </div>
           );
         })}
-        <div>
-          <label>
-            <input
-              type="checkbox"
-              checked={dontShowToday}
-              onChange={e => setDontShowToday(e.target.checked)}
-            />
-            오늘 하루 보지 않기
-          </label>
-        </div>
-        <div
-          style={{
-            marginTop: '10px',
-            display: 'flex',
-            justifyContent: 'center',
-            alignItems: 'center',
-            width: '70px',
-            height: '26px',
-            marginLeft: 'auto'
-          }}
-        >
-          <Button type="borderBrand" content="확인" onClick={onClose} />
-        </div>
       </div>
     </div>
   );
