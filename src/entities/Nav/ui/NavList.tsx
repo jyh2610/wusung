@@ -5,7 +5,7 @@ import { listFontStyle } from './NavList.css';
 import { useRouter } from 'next/navigation';
 import { routeMap } from '@/shared/const/route';
 import { useEffect, useState } from 'react';
-import Cookies from 'js-cookie';
+import { useAuthStore } from '@/shared/stores/useAuthStore';
 
 export function NavList({
   list,
@@ -16,25 +16,8 @@ export function NavList({
 }) {
   const router = useRouter();
   const [routeKey, setRouteKey] = useState('');
-  const [username, setUsername] = useState<string | undefined>(undefined);
+  const { username } = useAuthStore();
 
-  // 쿠키 값 변경 감지를 위한 useEffect
-  useEffect(() => {
-    const checkUsername = () => {
-      const currentUsername = Cookies.get('username');
-      setUsername(currentUsername);
-    };
-
-    // 초기 체크
-    checkUsername();
-
-    // 주기적으로 쿠키 체크 (1초마다)
-    const interval = setInterval(checkUsername, 1000);
-
-    return () => clearInterval(interval);
-  }, []);
-
-  // routeKey 설정을 위한 useEffect
   useEffect(() => {
     if (list.title === '우성인지펜 소개') setRouteKey('introduce_greeting');
     else if (list.title === '요금안내') setRouteKey('payment');
