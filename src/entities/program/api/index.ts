@@ -421,7 +421,6 @@ export const getPlan = async ({
     return res.data.data;
   } catch (error) {
     console.error(error);
-    toast.error('계획을 불러오는데 실패했습니다.');
   }
 };
 
