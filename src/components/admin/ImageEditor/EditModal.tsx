@@ -272,6 +272,9 @@ export const EditModal = ({
                 <p className="text-sm text-gray-500">
                   Y: {selectedRect.y.toFixed(2)}%
                 </p>
+                <p className="text-sm text-gray-500">
+                  Type: {selectedRect.type || '없음'}
+                </p>
               </div>
               <div>
                 <p className="text-sm text-gray-500">
@@ -280,6 +283,12 @@ export const EditModal = ({
                 <p className="text-sm text-gray-500">
                   높이: {selectedRect.height.toFixed(2)}%
                 </p>
+                {selectedRect.type === 'fixedText' &&
+                  selectedRect.fixedText && (
+                    <p className="text-sm text-gray-500">
+                      텍스트: {selectedRect.fixedText}
+                    </p>
+                  )}
               </div>
             </div>
             <div className="flex gap-2 items-center mb-2">

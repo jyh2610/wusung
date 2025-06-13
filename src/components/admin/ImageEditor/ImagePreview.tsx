@@ -50,7 +50,13 @@ export const ImagePreview = ({
             width: `${rect.width}%`,
             height: `${rect.height}%`
           }}
-        />
+        >
+          {rect.type === 'fixedText' && rect.fixedText && (
+            <div className="absolute inset-0 flex items-center justify-center text-xs text-white bg-black bg-opacity-50">
+              {rect.fixedText}
+            </div>
+          )}
+        </div>
       ))}
     </div>
   );

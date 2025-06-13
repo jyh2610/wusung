@@ -79,7 +79,13 @@ export default function ImageEditor({
       };
       img.src = image;
       setSelectedRectIndex(null);
-      setOriginalCoordinates(coordinates[imageIndex] || []);
+
+      // overlayLocations 데이터를 사용하여 좌표 초기화
+      if (coordinates && coordinates[imageIndex]) {
+        setOriginalCoordinates(coordinates[imageIndex]);
+      } else {
+        setOriginalCoordinates([]);
+      }
     } else {
       setImageSize(null);
       setOriginalCoordinates([]);

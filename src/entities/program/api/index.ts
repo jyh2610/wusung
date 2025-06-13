@@ -25,7 +25,7 @@ export const putEduContent = async ({
 }) => {
   try {
     const formData = new FormData();
-
+    console.log(content);
     // 오버레이 처리
     const processedOverlays: {
       fileIndex: number;
@@ -38,66 +38,36 @@ export const putEduContent = async ({
       fixedText: string;
     }[] = [];
 
-    if (Array.isArray(content.overlays)) {
-      content.overlays.forEach((coordinates, fileIndex) => {
-        if (Array.isArray(coordinates)) {
-          coordinates.forEach(rect => {
-            processedOverlays.push({
-              fileIndex,
-              x: rect.x,
-              y: rect.y,
-              width: rect.width,
-              height: rect.height,
-              alignment: rect.alignment || 'center',
-              type: rect.type || 'image',
-              fixedText: rect.fixedText || ''
-            });
-          });
-        }
-      });
-    }
-
-    // ✅ 중첩 없이 서버가 기대하는 구조로 만들기
-    const requestBody = {
-      title: content.title,
-      difficultyLevel: content.difficultyLevel,
-      categoryId: content.categoryId,
-      year: content.year || 0,
-      month: content.month || 0,
-      description: content.description,
-      isUsed: content.isUsed,
-      overlays:
-        processedOverlays.length > 0
-          ? processedOverlays
-          : [
-              {
-                fileIndex: 0,
-                x: 0,
-                y: 0,
-                width: 0,
-                height: 0,
-                alignment: 'center',
-                type: 'image',
-                fixedText: ''
-              }
-            ],
+    const editDTO = {
+      eduContentRegisterDTO: {
+        title: content.title,
+        difficultyLevel: content.difficultyLevel,
+        categoryId: content.categoryId,
+        year: content.year || 0,
+        month: content.month || 0,
+        description: content.description,
+        isUsed: content.isUsed,
+        existName: content.existName || [true],
+        existMonth: content.existMonth || [true],
+        existDay: content.existDay || [true],
+        existDayOfWeek: content.existDayOfWeek || [true],
+        existElderName: content.existElderName || [true],
+        overlays: content.overlays
+      },
       deletedFileIdList: deletedFileIds,
-      overlayLocations: processedOverlays
+      overlayLocations: content.overlays
     };
 
-    formData.append('eduContentRegisterDTO', JSON.stringify(requestBody));
+    formData.append('editDTO', JSON.stringify(editDTO));
 
     // 이미지 파일 추가
     imageFiles.forEach(file => {
       formData.append('files', file);
     });
 
-    console.log('FormData payload:', JSON.stringify(requestBody, null, 2));
-    console.log('Files count:', imageFiles.length);
-
     const userInfo = getsessionStorageValue('userInfo');
     const token = userInfo ? JSON.parse(userInfo).token : '';
-
+    console.log(editDTO);
     const res = await request({
       method: 'PUT',
       url: `/api/admin/edu-content/${eduContentId}`,

@@ -21,9 +21,9 @@ export default async function AdminLayout({
 
   console.log(hasPermission);
 
-  if (!(hasPermission?.data === 'ADMIN')) {
-    redirect('/');
-  }
+  // if (!(hasPermission?.data === 'ADMIN')) {
+  //   redirect('/');
+  // }
   return (
     <div className="flex min-h-screen bg-background">
       <AdminSidebar />

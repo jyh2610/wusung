@@ -90,7 +90,7 @@ export function ContentUploadForm() {
   const nextYear =
     now.getMonth() + 2 > 12 ? now.getFullYear() + 1 : now.getFullYear();
 
-  const [form, setForm] = useState<IContent>({
+  const [form, setForm] = useState<IContent & { files?: EduContentFile[] }>({
     title: '',
     difficultyLevel: 1,
     categoryId: 0,
@@ -118,6 +118,11 @@ export function ContentUploadForm() {
           }
         });
         const obj = res.data.data;
+
+        // 파일 개수만큼 false 배열 생성
+        const fileCount = obj.files.length;
+        const falseArray = Array(fileCount).fill(false);
+
         setForm({
           title: obj.title,
           difficultyLevel: obj.difficultyLevel,
@@ -126,35 +131,39 @@ export function ContentUploadForm() {
           month: obj.month,
           description: obj.description,
           isUsed: obj.isUsed,
-          overlays: obj.overlayLocations,
-          existName: Array.isArray(obj.existName)
-            ? obj.existName
-            : [obj.existName],
-          existMonth: Array.isArray(obj.existMonth)
-            ? obj.existMonth
-            : [obj.existMonth],
-          existDay: Array.isArray(obj.existDay) ? obj.existDay : [obj.existDay],
-          existDayOfWeek: Array.isArray(obj.existDayOfWeek)
-            ? obj.existDayOfWeek
-            : [obj.existDayOfWeek],
-          existElderName: Array.isArray(obj.existElderName)
-            ? obj.existElderName
-            : [obj.existElderName]
+          files: obj.files,
+          overlays: obj.overlayLocations.map((location: any) => ({
+            x: location.x,
+            y: location.y,
+            width: location.width,
+            height: location.height,
+            type: location.type,
+            fixedText: location.fixedText,
+            alignment: location.alignment,
+            fileIndex: 0
+          })),
+          existName: falseArray,
+          existMonth: falseArray,
+          existDay: falseArray,
+          existDayOfWeek: falseArray,
+          existElderName: falseArray
         });
 
         const processedFiles: string[] = obj.files.map(file => file.fileUrl);
         setFilePreviews(processedFiles);
 
         // 각 이미지별 좌표 초기화
-        const initialCoordinates = processedFiles.map(() => []);
+        const initialCoordinates = [obj.overlayLocations];
         setImageCoordinates(initialCoordinates);
       } catch (error) {
         console.error(error);
       }
     };
 
-    fetchContent();
-  }, []);
+    if (id) {
+      fetchContent();
+    }
+  }, [id]);
 
   const [files, setFiles] = useState<File[]>([]);
   console.log(files);
@@ -202,15 +211,33 @@ export function ContentUploadForm() {
       // form 데이터를 1차원 배열로 변환
       const formData = {
         ...form,
-        overlays: overlaysForSend
+        overlays: overlaysForSend,
+        existName: form.existName.map(value =>
+          value === null ? false : value
+        ),
+        existMonth: form.existMonth.map(value =>
+          value === null ? false : value
+        ),
+        existDay: form.existDay.map(value => (value === null ? false : value)),
+        existDayOfWeek: form.existDayOfWeek.map(value =>
+          value === null ? false : value
+        ),
+        existElderName: form.existElderName.map(value =>
+          value === null ? false : value
+        )
       };
-      console.log(formData);
+
       if (id) {
         // 수정인 경우
+        const deletedFileIds =
+          form.files
+            ?.filter(file => !filePreviews.includes(file.fileUrl))
+            .map(file => file.fileId) || [];
+
         await putEduContent({
           eduContentId: Number(id),
           content: formData,
-          deletedFileIds: [], // 삭제된 파일 ID 목록 (필요한 경우 구현)
+          deletedFileIds,
           imageFiles: files
         });
       } else {
