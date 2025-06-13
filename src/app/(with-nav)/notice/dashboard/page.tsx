@@ -11,6 +11,7 @@ import { IAnnouncementResponse } from '@/shared/api/common';
 import { ApiResponse, PaginatedResponse } from '@/shared/type';
 import { useRouter } from 'next/navigation';
 import { Badge } from '@/components/ui/badge';
+import { toast } from 'react-toastify';
 
 function NoticeDashBoard() {
   const router = useRouter();
@@ -32,7 +33,13 @@ function NoticeDashBoard() {
         setAnnouncements(response.data.data.content);
         setTotalCount(response.data.data.totalElements);
       }
-    } catch (error) {
+    } catch (error: any) {
+      if (error?.response?.status === 403) {
+        toast.error('로그인이 필요합니다.');
+        router.push('/signin');
+      } else {
+        toast.error('공지사항을 불러오는데 실패했습니다.');
+      }
       console.error('공지사항을 불러오는데 실패했습니다:', error);
     }
   };

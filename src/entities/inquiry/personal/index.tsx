@@ -29,6 +29,7 @@ import {
   previewImage
 } from './index.css';
 import { regInquiry } from '../api';
+import { toast } from 'react-toastify';
 
 const MAX_LENGTH = 5000;
 const MAX_FILE_SIZE = 30 * 1024 * 1024; // 30MB
@@ -98,10 +99,14 @@ export function Personal() {
   };
 
   const onSubmit = async (data: IForm) => {
-    const res = await regInquiry(data);
-    console.log(res);
-    alert('폼이 제출되었습니다!');
-    router.push('/inquiry-complete');
+    try {
+      const res = await regInquiry(data);
+      toast.success('문의가 등록되었습니다!');
+      router.push('/mypage?tab=문의내역');
+      } catch (error) {
+        console.log(error);
+        toast.error('문의 등록에 실패했습니다. 다시 시도해주세요.');
+      } 
   };
 
   const handleCameraClick = () => {

@@ -36,7 +36,7 @@ export const NoticePopupWrapper = () => {
   if (!showPopup || loading || error || notices.length === 0) {
     return null;
   }
-
+  console.log(notices);
   return (
     <NoticePopup
       notices={notices}

@@ -1,7 +1,10 @@
+'use client';
+
 import { INaviList } from '../const';
 import { listFontStyle } from './NavList.css';
 import { useRouter } from 'next/navigation';
 import { routeMap } from '@/shared/const/route';
+import { useEffect, useState } from 'react';
 
 export function NavList({
   list,
@@ -11,11 +14,21 @@ export function NavList({
   isNavHover: boolean;
 }) {
   const router = useRouter();
-  let routeKey = '';
-  if (list.title === '우성인지펜 소개') routeKey = 'introduce_greeting';
-  else if (list.title === '요금안내') routeKey = 'payment';
-  else if (list.title === '공지사항') routeKey = 'inquiry';
-  else if (list.title === '마이페이지') routeKey = 'mypage';
+  const [routeKey, setRouteKey] = useState('');
+
+  useEffect(() => {
+    if (list.title === '우성인지펜 소개') setRouteKey('introduce_greeting');
+    else if (list.title === '요금안내') setRouteKey('payment');
+    else if (list.title === '공지사항') setRouteKey('inquiry');
+    else if (list.title === '마이페이지') {
+      const userInfo = sessionStorage?.getItem('info');
+      if (!userInfo) return;
+      setRouteKey('mypage');
+    }
+  }, [list.title]);
+
+  if (list.title === '마이페이지' && !routeKey) return null;
+
   return (
     <div
       className={listFontStyle}

@@ -26,7 +26,7 @@ const NoticePopup: React.FC<NoticePopupProps> = ({
 
   // 우선순위에 따라 정렬
   const sortedNotices = [...notices].sort((a, b) => a.priority - b.priority);
-
+  console.log(dontShowTodayState);
   const handleDontShowToday = (noticeId: number) => {
     setDontShowTodayState(prev => [...prev, noticeId]);
     // 로컬 스토리지에 저장
@@ -76,9 +76,9 @@ const NoticePopup: React.FC<NoticePopupProps> = ({
       onClose();
     }
   }, [closedNotices, sortedNotices.length, onClose]);
-
+  console.log(sortedNotices, closedNotices, dontShowTodayState);
   return (
-    <div className="fixed inset-0 pointer-events-none z-[9999]">
+    <div className="fixed inset-0 pointer-events-none z-[9999] bg-white">
       <div className="fixed top-4 flex flex-col gap-4 w-full max-w-[500px] px-4">
         {sortedNotices.map((notice, index) => {
           if (

@@ -22,10 +22,6 @@ import {
   radioLabel,
   radioIcon,
   button,
-  toast,
-  toastContent,
-  toastTitle,
-  toastDescription,
   cardHeaderResponsive,
   cardContentResponsive,
   cardTitleResponsive,
@@ -43,6 +39,7 @@ import {
 } from '../../api';
 import { Button } from '@/shared/ui';
 import { PreparePaymentResDTO } from '../../types';
+import { toast } from 'react-toastify';
 
 interface PaymentPageProps {
   productName: string;
@@ -175,6 +172,7 @@ export default function PaymentPage({
         setShowToast(false);
       }, 3000);
     } catch (error) {
+      toast.error('결제 처리 중 오류 발생');
       console.error('결제 처리 중 오류 발생:', error);
     } finally {
       setIsSubmitting(false); // 제출 상태 해제
