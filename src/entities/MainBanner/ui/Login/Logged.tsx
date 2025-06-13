@@ -60,7 +60,7 @@ function Logged() {
     try {
       logoutAction();
       toast.success('로그아웃 성공');
-      redirect('/');
+      router.push('/');
     } catch (error) {
       console.error(error);
     }
