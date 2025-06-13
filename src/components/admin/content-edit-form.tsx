@@ -18,8 +18,8 @@ import {
   SelectGroup,
   SelectLabel
 } from '@/components/ui/select';
-import { IContent } from '@/entities/program/type.dto';
-import { eduContentReg, putEduContent } from '@/entities/program/api';
+import { IContent, IOverlay } from '@/entities/program/type.dto';
+import { putEduContent } from '@/entities/program/api';
 import { X } from 'lucide-react';
 import { getCategoryTree } from './api';
 import { ICategory, ILeafCategory, IRes } from '@/shared/type';
@@ -45,15 +45,15 @@ export interface EduContent {
   viewCount: number;
   year: number;
   month: number;
-  createdAt: string; // ISO 문자열
-  updatedAt: string; // ISO 문자열
+  createdAt: string;
+  updatedAt: string;
   existName: boolean;
   existMonth: boolean;
   existDay: boolean;
   existDayOfWeek: boolean;
   existElderName: boolean;
 }
-// 좌표 타입 정의
+
 interface Rectangle {
   x: number;
   y: number;
@@ -61,41 +61,21 @@ interface Rectangle {
   height: number;
   type?: string;
 }
-const customStyles = {
-  option: (provided: any, state: { isSelected: any }) => ({
-    ...provided,
-    backgroundColor: state.isSelected ? '#f0f0f0' : 'white',
-    color: '#333',
-    '&:hover': {
-      backgroundColor: '#f0f0f0'
-    }
-  }),
-  menu: (provided: any) => ({
-    ...provided,
-    backgroundColor: 'white'
-  }),
-  control: (provided: any) => ({
-    ...provided,
-    backgroundColor: 'white'
-  })
-};
-export function ContentUploadForm() {
-  const searchParams = useSearchParams();
 
+export function ContentEditForm() {
+  const searchParams = useSearchParams();
   const id = searchParams.get('id');
   const router = useRouter();
   const [category, setCategory] = useState<ILeafCategory[]>([]);
-  const now = new Date();
-  const nextMonth = now.getMonth() + 2 > 12 ? 1 : now.getMonth() + 2;
-  const nextYear =
-    now.getMonth() + 2 > 12 ? now.getFullYear() + 1 : now.getFullYear();
+  const [isLoading, setIsLoading] = useState(true);
+  const [isUploading, setIsUploading] = useState(false);
 
   const [form, setForm] = useState<IContent & { files?: EduContentFile[] }>({
     title: '',
     difficultyLevel: 1,
     categoryId: 0,
-    year: nextYear,
-    month: nextMonth,
+    year: new Date().getFullYear(),
+    month: new Date().getMonth() + 1,
     description: '',
     isUsed: true,
     overlays: [],
@@ -105,9 +85,22 @@ export function ContentUploadForm() {
     existDayOfWeek: [],
     existElderName: []
   });
-  console.log(form.overlays);
+
+  const [newOverlays, setNewOverlays] = useState<IOverlay[]>([]);
+
+  const [files, setFiles] = useState<File[]>([]);
+  const [filePreviews, setFilePreviews] = useState<string[]>([]);
+  const [imageCoordinates, setImageCoordinates] = useState<Array<Rectangle[]>>(
+    []
+  );
+  const [selectedImageIndex, setSelectedImageIndex] = useState<number | null>(
+    null
+  );
+
   useEffect(() => {
     const fetchContent = async () => {
+      if (!id) return;
+
       const token = sessionStorage.getItem('token');
       try {
         const res = await request<IRes<EduContent>>({
@@ -119,7 +112,6 @@ export function ContentUploadForm() {
         });
         const obj = res.data.data;
 
-        // 파일 개수만큼 false 배열 생성
         const fileCount = obj.files.length;
         const falseArray = Array(fileCount).fill(false);
 
@@ -132,22 +124,16 @@ export function ContentUploadForm() {
           description: obj.description,
           isUsed: obj.isUsed,
           files: obj.files,
-          overlays: obj.overlayLocations.map((location: any) => {
-            // fileId에 해당하는 파일의 인덱스를 찾습니다
-            const fileIndex = obj.files.findIndex(
-              (file: any) => file.fileId === location.fileId
-            );
-            return {
-              x: location.x,
-              y: location.y,
-              width: location.width,
-              height: location.height,
-              type: location.type,
-              fixedText: location.fixedText,
-              alignment: location.alignment,
-              fileIndex: fileIndex >= 0 ? fileIndex : 0
-            };
-          }),
+          overlays: obj.overlayLocations.map((location: any) => ({
+            x: location.x,
+            y: location.y,
+            width: location.width,
+            height: location.height,
+            type: location.type,
+            fixedText: location.fixedText,
+            alignment: location.alignment,
+            fileIndex: 0
+          })),
           existName: falseArray,
           existMonth: falseArray,
           existDay: falseArray,
@@ -158,42 +144,17 @@ export function ContentUploadForm() {
         const processedFiles: string[] = obj.files.map(file => file.fileUrl);
         setFilePreviews(processedFiles);
 
-        // 각 이미지별 좌표 초기화
-        const initialCoordinates = obj.files.map((file: any) => {
-          // 해당 파일의 fileId와 일치하는 오버레이만 필터링
-          return obj.overlayLocations
-            .filter((overlay: any) => overlay.fileId === file.fileId)
-            .map((overlay: any) => ({
-              x: overlay.x,
-              y: overlay.y,
-              width: overlay.width,
-              height: overlay.height,
-              type: overlay.type,
-              fixedText: overlay.fixedText,
-              alignment: overlay.alignment
-            }));
-        });
+        const initialCoordinates = [obj.overlayLocations];
         setImageCoordinates(initialCoordinates);
+        setIsLoading(false);
       } catch (error) {
         console.error(error);
+        setIsLoading(false);
       }
     };
 
-    if (id) {
-      fetchContent();
-    }
+    fetchContent();
   }, [id]);
-
-  const [files, setFiles] = useState<File[]>([]);
-  console.log(files);
-  const [filePreviews, setFilePreviews] = useState<string[]>([]);
-  const [imageCoordinates, setImageCoordinates] = useState<Array<Rectangle[]>>(
-    []
-  );
-  const [selectedImageIndex, setSelectedImageIndex] = useState<number | null>(
-    null
-  );
-  const [isUploading, setIsUploading] = useState(false);
 
   useEffect(() => {
     const fetchCategories = async () => {
@@ -211,10 +172,11 @@ export function ContentUploadForm() {
   };
 
   const handleSubmit = async () => {
+    if (!id) return;
+
     setIsUploading(true);
 
     try {
-      // overlays 가공: type이 'fixedText'일 때만 fixedText 포함
       const overlaysForSend = (form.overlays || []).map(overlay => {
         if (overlay.type === 'fixedText') {
           return {
@@ -227,7 +189,6 @@ export function ContentUploadForm() {
         }
       });
 
-      // form 데이터를 1차원 배열로 변환
       const formData = {
         ...form,
         overlays: overlaysForSend,
@@ -246,27 +207,22 @@ export function ContentUploadForm() {
         )
       };
 
-      if (id) {
-        // 수정인 경우
-        const deletedFileIds =
-          form.files
-            ?.filter(file => !filePreviews.includes(file.fileUrl))
-            .map(file => file.fileId) || [];
+      const deletedFileIds =
+        form.files
+          ?.filter(file => !filePreviews.includes(file.fileUrl))
+          .map(file => file.fileId) || [];
 
-        await putEduContent({
-          eduContentId: Number(id),
-          content: formData,
-          deletedFileIds,
-          imageFiles: files
-        });
-      } else {
-        // 새로 등록하는 경우
-        await eduContentReg(formData, files);
-      }
+      await putEduContent({
+        eduContentId: Number(id),
+        content: formData,
+        deletedFileIds,
+        imageFiles: files
+      });
+
       setIsUploading(false);
       router.push('/admin/content');
     } catch (error) {
-      console.error('업로드 중 오류 발생:', error);
+      console.error('수정 중 오류 발생:', error);
       setIsUploading(false);
     }
   };
@@ -275,7 +231,6 @@ export function ContentUploadForm() {
     const files = e.target.files ? Array.from(e.target.files) : [];
     if (files.length === 0) return;
 
-    // 기존 배열 복사 후 false 추가
     setForm(prev => ({
       ...prev,
       existName: [...prev.existName, false],
@@ -285,10 +240,8 @@ export function ContentUploadForm() {
       existElderName: [...prev.existElderName, false]
     }));
 
-    // 파일 추가
     setFiles(prev => [...prev, ...files]);
 
-    // 이미지 미리보기 생성
     const previews = files.map(file => {
       return new Promise<string>(resolve => {
         const reader = new FileReader();
@@ -302,7 +255,6 @@ export function ContentUploadForm() {
     Promise.all(previews).then(newImages => {
       setFilePreviews(prev => [...prev, ...newImages]);
 
-      // 새 이미지에 대한 좌표 배열 초기화
       const newCoordinates = [...imageCoordinates];
       newImages.forEach(() => newCoordinates.push([]));
       setImageCoordinates(newCoordinates);
@@ -326,7 +278,6 @@ export function ContentUploadForm() {
     newCoordinates.splice(index, 1);
     setImageCoordinates(newCoordinates);
 
-    // 불리언 배열에서도 해당 이미지의 데이터 제거
     setForm(prev => ({
       ...prev,
       existName: prev.existName.filter((_, i) => i !== index),
@@ -347,12 +298,9 @@ export function ContentUploadForm() {
     }
   };
 
-  // 이미지별 좌표 정보 업데이트 함수
   const updateImageCoordinates = (coordinates: Rectangle[][]) => {
     setImageCoordinates(coordinates);
-    console.log(coordinates);
 
-    // overlays 데이터 구조 변환
     const formattedOverlays = coordinates.flatMap(
       (imageCoords: Rectangle[], fileIndex: number) =>
         imageCoords.map((coord: Rectangle) => ({
@@ -363,9 +311,12 @@ export function ContentUploadForm() {
         }))
     );
 
-    // form state의 overlays 업데이트
     handleChange('overlays', formattedOverlays);
   };
+
+  if (isLoading) {
+    return <div>로딩 중...</div>;
+  }
 
   return (
     <div className="bg-white p-6 rounded-lg">
@@ -570,7 +521,6 @@ export function ContentUploadForm() {
                 />
               )}
 
-              {/* 이미지 썸네일 목록 */}
               {filePreviews.length > 0 && (
                 <div className="mt-4 w-full">
                   <h3 className="text-sm font-medium mb-2">
@@ -602,7 +552,6 @@ export function ContentUploadForm() {
                             }}
                           />
                         </div>
-                        {/* 좌표 개수 표시 */}
                         {imageCoordinates[index]?.length > 0 && (
                           <div className="absolute bottom-0 right-0 bg-blue-500 text-white text-xs px-1 rounded-tl-md">
                             {imageCoordinates[index].length}
@@ -626,7 +575,7 @@ export function ContentUploadForm() {
             취소
           </Button>
           <Button type="button" disabled={isUploading} onClick={handleSubmit}>
-            {isUploading ? '업로드 중...' : '콘텐츠 저장'}
+            {isUploading ? '수정 중...' : '콘텐츠 수정'}
           </Button>
         </div>
       </div>
