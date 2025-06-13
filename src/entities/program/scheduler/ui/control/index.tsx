@@ -50,17 +50,18 @@ export function Control({ isAdmin }: { isAdmin: boolean }) {
     difficultyLevel: number
   ) => {
     try {
-      await getPlan({
+      const plan = await getPlan({
         year,
         month,
         difficultyLevel
       });
 
-      await autoRegisterPlan({
+      const result = await autoRegisterPlan({
         year,
         month,
         difficultyLevel
       });
+
     } catch (error) {
       console.error('계획안 불러오기 실패:', error);
       toast.error('계획안을 불러오는데 실패했습니다.');

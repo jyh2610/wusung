@@ -53,6 +53,10 @@ export function UserBox({
   const [editUser, setEditUser] = useState<IUserDetail | null>(null);
   const menuRef = useRef<HTMLDivElement>(null);
 
+  useEffect(() => {
+    console.log(`UserBox ${user.elderId} 선택 상태:`, isSelected);
+  }, [isSelected, user.elderId]);
+
   const formatDate = (dateString: string) => {
     if (!dateString) return '';
     const date = new Date(dateString);

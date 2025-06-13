@@ -31,6 +31,11 @@ export const DrawerList = ({ open, setOpen }: IProps) => {
   const queryClient = useQueryClient();
   const selectedUserId = useUserStore(state => state.selectedUserId);
   const selectUser = useUserStore(state => state.selectUser);
+  const setUsers = useUserStore(state => state.setUsers);
+
+  useEffect(() => {
+    console.log('현재 선택된 유저 ID:', selectedUserId);
+  }, [selectedUserId]);
 
   const closeModal = () => setOpenUser(false);
 
@@ -41,7 +46,15 @@ export const DrawerList = ({ open, setOpen }: IProps) => {
     queryFn: getUser
   });
 
+  // users 데이터가 변경될 때마다 useUserStore에 저장
+  useEffect(() => {
+    if (users.length > 0) {
+      setUsers(users);
+    }
+  }, [users, setUsers]);
+
   const handleUserSelect = (userId: number) => {
+    console.log('유저 선택됨:', userId);
     selectUser(userId);
   };
 
