@@ -144,8 +144,6 @@ function Activity() {
       const pdfUrl = await printUserPrint(selectedIdsArray);
 
       if (pdfUrl) {
-        toast.info('PDF가 로딩되면 인쇄 대화 상자가 나타납니다.'); // Updated toast message
-
         // 👉 iframe을 생성해서 자동 프린트
         const iframe = document.createElement('iframe');
         iframe.style.position = 'fixed'; // Make it fixed position

@@ -99,14 +99,26 @@ export function Personal() {
   };
 
   const onSubmit = async (data: IForm) => {
+    if (!data.type) {
+      toast.error('유형을 선택해주세요');
+      return;
+    }
+    if (!data.title) {
+      toast.error('제목을 입력해주세요');
+    }
+    if (!data.content) {
+      toast.error('내용을 입력해주세요');
+      return;
+    }
+
     try {
       const res = await regInquiry(data);
-      toast.success('문의가 등록되었습니다!');
+      toast.success(res.data.message);
       router.push('/mypage?tab=문의내역');
-      } catch (error) {
-        console.log(error);
-        toast.error('문의 등록에 실패했습니다. 다시 시도해주세요.');
-      } 
+    } catch (error) {
+      console.log(error);
+      toast.error('문의 등록에 실패했습니다. 다시 시도해주세요.');
+    }
   };
 
   const handleCameraClick = () => {

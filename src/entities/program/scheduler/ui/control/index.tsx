@@ -61,7 +61,6 @@ export function Control({ isAdmin }: { isAdmin: boolean }) {
         month,
         difficultyLevel
       });
-
     } catch (error) {
       console.error('계획안 불러오기 실패:', error);
       toast.error('계획안을 불러오는데 실패했습니다.');
@@ -104,13 +103,11 @@ export function Control({ isAdmin }: { isAdmin: boolean }) {
         difficultyLevel: selectedUser.difficultyLevel
       });
 
-
       await autoRegisterPlan({
         year,
         month,
         difficultyLevel: selectedUser.difficultyLevel
       });
-
     } catch (error) {
       console.error('계획안 불러오기 실패:', error);
     }
@@ -202,63 +199,6 @@ export function Control({ isAdmin }: { isAdmin: boolean }) {
       </div>
 
       <div className={additionalData}>
-        {/* 기타자료 */}
-
-        <Droppable droppableId="etc" isDropDisabled={false}>
-          {(provided, snapshot) => (
-            <div
-              ref={provided.innerRef}
-              {...provided.droppableProps}
-              className={buttonStyle}
-              style={{
-                position: 'relative',
-                backgroundColor: snapshot.isDraggingOver ? '#f5f7fa' : 'white',
-                transition: 'background-color 0.2s',
-                padding: '8px',
-                width: '150px',
-                fontSize: '16px',
-                fontWeight: 500,
-                textAlign: 'center'
-              }}
-              onClick={() => openModal('etc')}
-            >
-              <div
-                style={{
-                  fontSize: '16px',
-                  fontWeight: 500,
-                  textAlign: 'center',
-                  whiteSpace: 'nowrap',
-                  overflow: 'hidden',
-                  textOverflow: 'ellipsis'
-                }}
-              >
-                기타자료
-              </div>
-
-              <div
-                style={{
-                  position: 'absolute',
-                  top: '-5px',
-                  right: '-10px',
-                  backgroundColor: 'red',
-                  color: 'white',
-                  borderRadius: '50%',
-                  width: '20px',
-                  height: '20px',
-                  fontSize: '12px',
-                  display: 'flex',
-                  alignItems: 'center',
-                  justifyContent: 'center'
-                }}
-              >
-                {etcItems.length}
-              </div>
-
-              {provided.placeholder}
-            </div>
-          )}
-        </Droppable>
-
         {/* 커버 */}
         <Droppable droppableId="cover" isDropDisabled={false}>
           {(provided, snapshot) => (
@@ -307,6 +247,62 @@ export function Control({ isAdmin }: { isAdmin: boolean }) {
                 }}
               >
                 {coverItems.content.length > 0 ? 1 : 0}
+              </div>
+
+              {provided.placeholder}
+            </div>
+          )}
+        </Droppable>
+
+        {/* 기타자료 */}
+        <Droppable droppableId="etc" isDropDisabled={false}>
+          {(provided, snapshot) => (
+            <div
+              ref={provided.innerRef}
+              {...provided.droppableProps}
+              className={buttonStyle}
+              style={{
+                position: 'relative',
+                backgroundColor: snapshot.isDraggingOver ? '#f5f7fa' : 'white',
+                transition: 'background-color 0.2s',
+                padding: '8px',
+                width: '150px',
+                fontSize: '16px',
+                fontWeight: 500,
+                textAlign: 'center'
+              }}
+              onClick={() => openModal('etc')}
+            >
+              <div
+                style={{
+                  fontSize: '16px',
+                  fontWeight: 500,
+                  textAlign: 'center',
+                  whiteSpace: 'nowrap',
+                  overflow: 'hidden',
+                  textOverflow: 'ellipsis'
+                }}
+              >
+                기타자료
+              </div>
+
+              <div
+                style={{
+                  position: 'absolute',
+                  top: '-5px',
+                  right: '-10px',
+                  backgroundColor: 'red',
+                  color: 'white',
+                  borderRadius: '50%',
+                  width: '20px',
+                  height: '20px',
+                  fontSize: '12px',
+                  display: 'flex',
+                  alignItems: 'center',
+                  justifyContent: 'center'
+                }}
+              >
+                {etcItems.length}
               </div>
 
               {provided.placeholder}

@@ -14,6 +14,7 @@ import {
   PrintHistory,
   RegCategory
 } from '../tpye';
+import { message } from 'antd';
 
 interface CategoryResponse {
   data: ICategory[];
@@ -83,9 +84,12 @@ export const deleteCategory = async (categoryId: number) => {
       method: 'DELETE',
       url: `/api/admin/category/${categoryId}`
     });
+    message.success('카테고리가 성공적으로 삭제되었습니다.');
     return res.data.data;
-  } catch (error) {
-    console.error(error);
+  } catch (error: any) {
+    message.error(
+      error.response?.data?.message || '카테고리 삭제 중 오류가 발생했습니다.'
+    );
     return undefined;
   }
 };

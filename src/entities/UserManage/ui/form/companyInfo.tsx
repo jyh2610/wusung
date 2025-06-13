@@ -18,6 +18,27 @@ interface IProps {
 
 export const CompanyInfo = ({ formData, handleInputChange }: IProps) => {
   const handleVerifyCorporate = async () => {
+    // 필수 필드 검증
+    const missingFields = [];
+
+    if (!formData.representativeName) {
+      missingFields.push('대표자명');
+    }
+    if (!formData.companyName) {
+      missingFields.push('기관명');
+    }
+    if (!formData.corporateNumber) {
+      missingFields.push('사업자 번호');
+    }
+    if (!formData.openingDate) {
+      missingFields.push('개업일자');
+    }
+
+    if (missingFields.length > 0) {
+      toast.error(`${missingFields.join(', ')}을(를) 입력해주세요.`);
+      return;
+    }
+
     try {
       await verifyCoporate({
         b_no: formData.corporateNumber,
@@ -29,7 +50,7 @@ export const CompanyInfo = ({ formData, handleInputChange }: IProps) => {
       toast.success('기관인증이 완료되었습니다.');
     } catch (error: any) {
       toast.error(
-        '기관인증 중 오류가 발생했습니다.'
+        error.response?.data?.message || '기관인증 중 오류가 발생했습니다.'
       );
     }
   };

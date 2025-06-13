@@ -1,6 +1,12 @@
 'use client';
 
-import React, { useEffect, useState } from 'react';
+import React, {
+  useState,
+  useCallback,
+  useMemo,
+  useRef,
+  useEffect
+} from 'react';
 import { useParams, useRouter } from 'next/navigation';
 import { Button } from '@/components/ui/button';
 import { Input } from '@/components/ui/input';
@@ -38,6 +44,21 @@ const Page = () => {
     endTime: ''
   });
   const [editorContent, setEditorContent] = useState('');
+  const quillRef = useRef<any>(null);
+  const editorContainerRef = useRef<HTMLDivElement>(null);
+
+  useEffect(() => {
+    if (editorContainerRef.current) {
+      const editor = editorContainerRef.current.querySelector('.ql-editor');
+      if (editor) {
+        editor.addEventListener('drop', handleDrop as unknown as EventListener);
+        editor.addEventListener(
+          'dragover',
+          handleDragOver as unknown as EventListener
+        );
+      }
+    }
+  }, []);
 
   useEffect(() => {
     const fetchPopup = async () => {
@@ -47,14 +68,17 @@ const Page = () => {
           p => p.popupId === Number(params.id)
         );
         if (popupData) {
+          const startDate = popupData.startTime.split('T')[0];
+          const endDate = popupData.endTime.split('T')[0];
+
           setPopup({
             title: popupData.title,
             content: popupData.content,
             positionCode: popupData.positionCode,
             isActive: popupData.isActive,
             priority: popupData.priority,
-            startTime: popupData.startTime,
-            endTime: popupData.endTime
+            startTime: startDate,
+            endTime: endDate
           });
           setEditorContent(popupData.content);
         }
@@ -103,9 +127,14 @@ const Page = () => {
 
       setIsUpdating(true);
 
+      const formattedStartTime = popup.startTime + 'T00:00:00';
+      const formattedEndTime = popup.endTime + 'T23:59:59';
+
       await updatePopup(Number(params.id), {
         ...popup,
-        content: editorContent
+        content: editorContent,
+        startTime: formattedStartTime,
+        endTime: formattedEndTime
       });
 
       message.success('팝업이 성공적으로 수정되었습니다.');
@@ -118,63 +147,105 @@ const Page = () => {
     }
   };
 
-  const handleEditorChange = (content: string) => {
+  const handleEditorChange = useCallback((content: string) => {
     setEditorContent(content);
-  };
+  }, []);
 
-  const modules = {
-    toolbar: {
-      container: [
-        [{ header: [1, 2, 3, 4, 5, 6, false] }],
-        ['bold', 'italic', 'underline', 'strike'],
-        [{ list: 'ordered' }, { list: 'bullet' }],
-        [{ align: [] }],
-        ['link', 'image'],
-        ['clean']
-      ],
-      handlers: {
-        image: function () {
-          const input = document.createElement('input');
-          input.setAttribute('type', 'file');
-          input.setAttribute('accept', 'image/*');
-          input.click();
+  const handleDrop = useCallback(async (e: React.DragEvent) => {
+    e.preventDefault();
+    e.stopPropagation();
 
-          input.onchange = async () => {
-            const file = input.files?.[0];
-            if (file) {
-              const url = await handleImageUpload(file);
-              if (url) {
-                const quill = (this as any).quill;
-                const range = quill.getSelection(true);
-                quill.insertEmbed(
-                  range.index,
-                  'image',
-                  url,
-                  'photo-in-text-cloudfront-src'
-                );
-              }
-            }
-          };
-        }
-      }
-    },
-    clipboard: {
-      matchVisual: false
+    const files = Array.from(e.dataTransfer.files);
+    const imageFiles = files.filter(file => file.type.startsWith('image/'));
+
+    if (imageFiles.length === 0) {
+      message.warning('이미지 파일만 업로드 가능합니다.');
+      return;
     }
-  };
 
-  const formats = [
-    'header',
-    'bold',
-    'italic',
-    'underline',
-    'strike',
-    'list',
-    'bullet',
-    'align',
-    'link',
-    'image'
-  ];
+    const quill = quillRef.current?.getEditor();
+    if (!quill) return;
+
+    const range = quill.getSelection(true) || { index: quill.getLength() };
+
+    for (const file of imageFiles) {
+      const url = await handleImageUpload(file);
+      if (url) {
+        quill.insertEmbed(
+          range.index,
+          'image',
+          url,
+          'photo-in-text-cloudfront-src'
+        );
+        range.index += 1;
+      }
+    }
+  }, []);
+
+  const handleDragOver = useCallback((e: React.DragEvent) => {
+    e.preventDefault();
+    e.stopPropagation();
+  }, []);
+
+  const modules = useMemo(
+    () => ({
+      toolbar: {
+        container: [
+          [{ header: [1, 2, 3, 4, 5, 6, false] }],
+          ['bold', 'italic', 'underline', 'strike'],
+          [{ list: 'ordered' }, { list: 'bullet' }],
+          [{ align: [] }],
+          ['link', 'image'],
+          ['clean']
+        ],
+        handlers: {
+          image: function () {
+            const input = document.createElement('input');
+            input.setAttribute('type', 'file');
+            input.setAttribute('accept', 'image/*');
+            input.click();
+
+            input.onchange = async () => {
+              const file = input.files?.[0];
+              if (file) {
+                const url = await handleImageUpload(file);
+                if (url) {
+                  const quill = (this as any).quill;
+                  const range = quill.getSelection(true);
+                  quill.insertEmbed(
+                    range.index,
+                    'image',
+                    url,
+                    'photo-in-text-cloudfront-src'
+                  );
+                }
+              }
+            };
+          }
+        }
+      },
+      clipboard: {
+        matchVisual: false
+      }
+    }),
+    []
+  );
+
+  const formats = useMemo(
+    () => [
+      'header',
+      'bold',
+      'italic',
+      'underline',
+      'strike',
+      'list',
+      'bullet',
+      'align',
+      'link',
+      'image'
+    ],
+    []
+  );
 
   if (isLoading) {
     return <div>로딩 중...</div>;
@@ -196,7 +267,12 @@ const Page = () => {
 
       <div className="space-y-2">
         <Label>내용</Label>
-        <div className="h-[400px]">
+        <div
+          className="h-[400px]"
+          ref={editorContainerRef}
+          onDrop={handleDrop}
+          onDragOver={handleDragOver}
+        >
           <ReactQuill
             theme="snow"
             value={editorContent}

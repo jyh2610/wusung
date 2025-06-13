@@ -3,7 +3,7 @@
 import React from 'react';
 import { Button } from '@/components/ui/button';
 import { IProduct } from '../type';
-import { Table } from 'antd';
+import { Table, Modal } from 'antd';
 import type { ColumnsType } from 'antd/es/table';
 import { format } from 'date-fns';
 import { useRouter } from 'next/navigation';
@@ -35,6 +35,19 @@ export const List = ({
 
   const handleEdit = (product: IProduct) => {
     router.push(`/admin/product/${product.productId}`);
+  };
+
+  const handleDelete = (productId: number) => {
+    Modal.confirm({
+      title: '상품 삭제',
+      content: '정말로 이 상품을 삭제하시겠습니까?',
+      okText: '삭제',
+      okType: 'danger',
+      cancelText: '취소',
+      onOk: () => {
+        onDelete(productId);
+      }
+    });
   };
 
   const columns: ColumnsType<IProduct> = [
@@ -76,7 +89,7 @@ export const List = ({
           <Button
             variant="destructive"
             size="sm"
-            onClick={() => onDelete(record.productId)}
+            onClick={() => handleDelete(record.productId)}
           >
             삭제
           </Button>

@@ -59,6 +59,10 @@ export const Category = () => {
     new Set()
   );
   const [isAddModalOpen, setIsAddModalOpen] = useState(false);
+  const [isDeleteModalOpen, setIsDeleteModalOpen] = useState(false);
+  const [selectedCategory, setSelectedCategory] = useState<ICategory | null>(
+    null
+  );
   const [isEditMode, setIsEditMode] = useState(false);
   const [selectedCategoryId, setSelectedCategoryId] = useState<number | null>(
     null
@@ -149,13 +153,17 @@ export const Category = () => {
       message.error('최상위 카테고리는 삭제할 수 없습니다.');
       return;
     }
-    try {
-      await deleteCategory(category.categoryId);
-      message.success('카테고리가 성공적으로 삭제되었습니다.');
-      queryClient.invalidateQueries({ queryKey: ['categories'] });
-    } catch (error) {
-      message.error('카테고리 삭제 중 오류가 발생했습니다.');
-    }
+    setSelectedCategory(category);
+    setIsDeleteModalOpen(true);
+  };
+
+  const handleConfirmDelete = async () => {
+    if (!selectedCategory) return;
+
+    await deleteCategory(selectedCategory.categoryId);
+    queryClient.invalidateQueries({ queryKey: ['categories'] });
+    setIsDeleteModalOpen(false);
+    setSelectedCategory(null);
   };
 
   const filteredCategories = categories?.filter(category =>
@@ -301,6 +309,34 @@ export const Category = () => {
           </TableBody>
         </Table>
       </div>
+
+      <Dialog open={isDeleteModalOpen} onOpenChange={setIsDeleteModalOpen}>
+        <DialogContent className="bg-white">
+          <DialogHeader>
+            <DialogTitle>카테고리 삭제</DialogTitle>
+          </DialogHeader>
+          <div className="py-4">
+            <p>
+              정말로 &quot;{selectedCategory?.name}&quot; 카테고리를
+              삭제하시겠습니까?
+            </p>
+            <p className="text-sm text-red-500 mt-2">
+              이 작업은 되돌릴 수 없습니다.
+            </p>
+          </div>
+          <DialogFooter>
+            <Button
+              variant="outline"
+              onClick={() => setIsDeleteModalOpen(false)}
+            >
+              취소
+            </Button>
+            <Button variant="destructive" onClick={handleConfirmDelete}>
+              삭제
+            </Button>
+          </DialogFooter>
+        </DialogContent>
+      </Dialog>
 
       <Dialog open={isAddModalOpen} onOpenChange={handleModalClose}>
         <DialogContent className="bg-white">

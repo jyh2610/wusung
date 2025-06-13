@@ -1,11 +1,15 @@
+'use client';
+
 import Image from 'next/image';
 import React from 'react';
 import { companyInfo } from '@/shared/const/Info';
 import { BorderButton } from '@/shared/ui';
 import { Header } from '../Header';
 import { storyHeaderStyles, storyImage, storyContent } from './index.css';
+import { useRouter } from 'next/navigation';
 
 export function Story() {
+  const router = useRouter();
   return (
     <div className={storyHeaderStyles}>
       <div>
@@ -24,6 +28,9 @@ export function Story() {
           }}
         >
           <BorderButton
+            onClick={() => {
+              router.push('/program/guide');
+            }}
             content="더 알아보기"
             type="borderBrand"
             btnSize="medium"

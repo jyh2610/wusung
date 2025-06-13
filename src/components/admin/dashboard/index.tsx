@@ -21,6 +21,13 @@ import { format } from 'date-fns';
 import { IDashboard } from './type';
 import { Upload } from './ui/upload';
 import { useRouter } from 'next/navigation';
+import {
+  Dialog,
+  DialogContent,
+  DialogHeader,
+  DialogTitle,
+  DialogFooter
+} from '@/components/ui/dialog';
 
 function TableSkeleton() {
   return (
@@ -37,22 +44,39 @@ function TableSkeleton() {
 export const Dashboard = () => {
   const [search, setSearch] = useState('');
   const [isUploadOpen, setIsUploadOpen] = useState(false);
+  const [isDeleteModalOpen, setIsDeleteModalOpen] = useState(false);
+  const [selectedAnnouncementId, setSelectedAnnouncementId] = useState<
+    number | null
+  >(null);
   const router = useRouter();
   const queryClient = useQueryClient();
 
   const { data: dashboardData, isLoading } = useQuery({
     queryKey: ['dashboard'],
-    queryFn: getDashboard
+    queryFn: getDashboard,
+    refetchOnWindowFocus: true,
+    refetchOnMount: true
   });
 
   const handleDelete = async (announcementId: number) => {
+    setSelectedAnnouncementId(announcementId);
+    setIsDeleteModalOpen(true);
+  };
+
+  const handleConfirmDelete = async () => {
+    if (!selectedAnnouncementId) return;
+
     try {
-      await deleteDashboard(announcementId);
+      await deleteDashboard(selectedAnnouncementId);
       message.success('공지사항이 성공적으로 삭제되었습니다.');
-      queryClient.invalidateQueries({ queryKey: ['dashboard'] });
+      await queryClient.invalidateQueries({ queryKey: ['dashboard'] });
+      const newData = await getDashboard();
+      queryClient.setQueryData(['dashboard'], newData);
     } catch (error) {
       message.error('공지사항 삭제 중 오류가 발생했습니다.');
     }
+    setIsDeleteModalOpen(false);
+    setSelectedAnnouncementId(null);
   };
 
   const filteredDashboard = dashboardData?.content.filter(item =>
@@ -140,7 +164,10 @@ export const Dashboard = () => {
                         variant="outline"
                         size="sm"
                         className="text-red-500 hover:text-red-700 hover:bg-red-50"
-                        onClick={() => handleDelete(item.announcementId)}
+                        onClick={e => {
+                          e.stopPropagation();
+                          handleDelete(item.announcementId);
+                        }}
                       >
                         <Trash2 className="h-4 w-4" />
                       </Button>
@@ -152,6 +179,31 @@ export const Dashboard = () => {
           </TableBody>
         </Table>
       </div>
+
+      <Dialog open={isDeleteModalOpen} onOpenChange={setIsDeleteModalOpen}>
+        <DialogContent className="bg-white">
+          <DialogHeader>
+            <DialogTitle>공지사항 삭제</DialogTitle>
+          </DialogHeader>
+          <div className="py-4">
+            <p>정말로 이 공지사항을 삭제하시겠습니까?</p>
+            <p className="text-sm text-red-500 mt-2">
+              이 작업은 되돌릴 수 없습니다.
+            </p>
+          </div>
+          <DialogFooter>
+            <Button
+              variant="outline"
+              onClick={() => setIsDeleteModalOpen(false)}
+            >
+              취소
+            </Button>
+            <Button variant="destructive" onClick={handleConfirmDelete}>
+              삭제
+            </Button>
+          </DialogFooter>
+        </DialogContent>
+      </Dialog>
     </div>
   );
 };

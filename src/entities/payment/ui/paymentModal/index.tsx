@@ -128,13 +128,14 @@ export default function PaymentPage({
         });
 
         if (!res) {
-          console.error('무통장 입금 요청 실패');
+          toast.error('무통장 입금 처리 실패');
           return;
         }
 
         setBankData(res.data); // 여기서 accountNumber만 있다고 가정
       } catch (err) {
         console.error('무통장 입금 처리 실패', err);
+        toast.error('무통장 입금 처리 실패');
       }
 
       return;
@@ -157,7 +158,7 @@ export default function PaymentPage({
         | undefined;
 
       if (prepare === undefined) {
-        console.error(
+        toast.error(
           '사전검증 실패: 결제 준비 데이터 요청 오류 또는 유효성 불일치'
         );
         return;
@@ -165,15 +166,12 @@ export default function PaymentPage({
 
       const portOneRes = await requestPayment({ data: prepare, formData });
 
-      console.log('결제 요청 성공', portOneRes);
-
       setShowToast(true); // 예시 토스트 메시지 표시
       setTimeout(() => {
         setShowToast(false);
       }, 3000);
     } catch (error) {
       toast.error('결제 처리 중 오류 발생');
-      console.error('결제 처리 중 오류 발생:', error);
     } finally {
       setIsSubmitting(false); // 제출 상태 해제
     }

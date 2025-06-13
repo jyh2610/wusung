@@ -12,9 +12,15 @@ import {
   MenuItem,
   FormControl,
   InputLabel,
-  Pagination
+  Pagination,
+  Dialog,
+  DialogTitle,
+  DialogContent,
+  DialogActions,
+  Button
 } from '@mui/material';
 import { usePathname, useRouter } from 'next/navigation';
+import { getNotokenSubscription } from '@/entities/UserManage/api';
 
 const columns = [
   { id: 'title', label: '제목' },
@@ -31,10 +37,26 @@ function Evaluation() {
   const [difficultyFilter, setDifficultyFilter] = useState<number>(3);
   const [page, setPage] = useState<number>(0);
   const [totalPages, setTotalPages] = useState<number>(0);
+  const [isModalOpen, setIsModalOpen] = useState(false);
   const pageSize = 10;
 
   const router = useRouter();
   const pathname = usePathname();
+
+  useEffect(() => {
+    const checkSubscription = async () => {
+      const subscription = await getNotokenSubscription();
+      if (!subscription?.data?.isVip) {
+        setIsModalOpen(true);
+      }
+    };
+    checkSubscription();
+  }, [router]);
+
+  const handleModalClose = () => {
+    setIsModalOpen(false);
+    router.push('/program');
+  };
 
   const handleClick = (id: string) => {
     const currentPath = pathname.replace(/\/$/, '');
@@ -82,6 +104,18 @@ function Evaluation() {
 
   return (
     <div>
+      <Dialog open={isModalOpen} onClose={handleModalClose}>
+        <DialogTitle>접근 권한 없음</DialogTitle>
+        <DialogContent>
+          <p>VIP 회원만 이용할 수 있는 서비스입니다.</p>
+        </DialogContent>
+        <DialogActions>
+          <Button onClick={handleModalClose} color="primary">
+            확인
+          </Button>
+        </DialogActions>
+      </Dialog>
+
       <div style={{ marginBottom: '20px' }}>
         <FormControl sx={{ minWidth: 200 }}>
           <InputLabel>난이도</InputLabel>

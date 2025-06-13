@@ -2,7 +2,7 @@
 
 import React, { useState } from 'react';
 import { Button } from '@/components/ui/button';
-import { Table } from 'antd';
+import { Table, Modal } from 'antd';
 import { useQuery, useQueryClient } from '@tanstack/react-query';
 import { getFamilyList, deleteFamily } from './api';
 import { IFamily } from './type';
@@ -23,14 +23,23 @@ export const Family = () => {
   });
 
   const handleDelete = async (id: number) => {
-    try {
-      await deleteFamily(id);
-      message.success('패밀리 사이트가 삭제되었습니다.');
-      queryClient.invalidateQueries({ queryKey: ['family'] });
-      queryClient.refetchQueries({ queryKey: ['family'] });
-    } catch (error) {
-      message.error('패밀리 사이트 삭제 중 오류가 발생했습니다.');
-    }
+    Modal.confirm({
+      title: '패밀리 사이트 삭제',
+      content: '정말로 이 패밀리 사이트를 삭제하시겠습니까?',
+      okText: '삭제',
+      okType: 'danger',
+      cancelText: '취소',
+      onOk: async () => {
+        try {
+          await deleteFamily(id);
+          message.success('패밀리 사이트가 삭제되었습니다.');
+          queryClient.invalidateQueries({ queryKey: ['family'] });
+          queryClient.refetchQueries({ queryKey: ['family'] });
+        } catch (error) {
+          message.error('패밀리 사이트 삭제 중 오류가 발생했습니다.');
+        }
+      }
+    });
   };
 
   const columns = [

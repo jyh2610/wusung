@@ -91,9 +91,14 @@ export const Upload = ({ onCancel }: UploadProps) => {
 
       setIsUploading(true);
 
+      const formattedStartTime = newPopup.startTime + 'T00:00:00';
+      const formattedEndTime = newPopup.endTime + 'T23:59:59';
+
       await regPopup({
         ...newPopup,
-        content: editorContent
+        content: editorContent,
+        startTime: formattedStartTime,
+        endTime: formattedEndTime
       });
 
       message.success('팝업이 성공적으로 등록되었습니다.');

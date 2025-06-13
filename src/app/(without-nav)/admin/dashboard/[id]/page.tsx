@@ -63,6 +63,13 @@ const Page = () => {
           <Button
             variant="outline"
             size="sm"
+            onClick={() => router.push('/admin/dashboard')}
+          >
+            목록
+          </Button>
+          <Button
+            variant="outline"
+            size="sm"
             className="text-blue-500 hover:text-blue-700 hover:bg-blue-50"
             onClick={() =>
               router.push(`/admin/dashboard/edit/${detail.announcementId}`)

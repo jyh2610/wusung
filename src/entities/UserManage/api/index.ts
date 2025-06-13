@@ -166,3 +166,15 @@ export const getSubscription = async (token: string) => {
     console.log('구독 잔여기간 조회 실패');
   }
 };
+export const getNotokenSubscription = async () => {
+  try {
+    const res = await request<ApiResponse<userSub>>({
+      method: 'GET',
+      url: '/api/program/use/subscription'
+    });
+
+    return res.data;
+  } catch (error) {
+    console.log('구독 잔여기간 조회 실패');
+  }
+};
