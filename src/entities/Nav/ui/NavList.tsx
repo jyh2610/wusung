@@ -21,7 +21,7 @@ export function NavList({
     else if (list.title === '요금안내') setRouteKey('payment');
     else if (list.title === '공지사항') setRouteKey('inquiry');
     else if (list.title === '마이페이지') {
-      const userInfo = sessionStorage?.getItem('info');
+      const userInfo = sessionStorage?.getItem('userInfo');
       if (!userInfo) return;
       setRouteKey('mypage');
     }
