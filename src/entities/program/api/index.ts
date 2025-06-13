@@ -415,9 +415,13 @@ export const getPlan = async ({
       url: `/api/program/use/plan/${year}/${month}/${difficultyLevel}`
     });
 
+    if (res.status === 4000) {
+      toast.info(res.data.message);
+    }
     return res.data.data;
   } catch (error) {
     console.error(error);
+    toast.error('계획을 불러오는데 실패했습니다.');
   }
 };
 
