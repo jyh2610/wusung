@@ -5,6 +5,7 @@ import { listFontStyle } from './NavList.css';
 import { useRouter } from 'next/navigation';
 import { routeMap } from '@/shared/const/route';
 import { useEffect, useState } from 'react';
+import Cookies from 'js-cookie';
 
 export function NavList({
   list,
@@ -21,13 +22,21 @@ export function NavList({
     else if (list.title === '요금안내') setRouteKey('payment');
     else if (list.title === '공지사항') setRouteKey('inquiry');
     else if (list.title === '마이페이지') {
-      const userInfo = sessionStorage?.getItem('userInfo');
-      if (!userInfo) return;
-      setRouteKey('mypage');
+      const username = Cookies.get('username');
+      console.log('마이페이지 쿠키 확인:', username);
+      
+      if (username) {
+        setRouteKey('mypage');
+      } else {
+        console.log('username이 없습니다');
+      }
     }
   }, [list.title]);
 
-  if (list.title === '마이페이지' && !routeKey) return null;
+  if (list.title === '마이페이지' && !routeKey) {
+    console.log('마이페이지 렌더링 스킵됨');
+    return null;
+  }
 
   return (
     <div

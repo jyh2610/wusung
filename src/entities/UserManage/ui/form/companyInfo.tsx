@@ -19,7 +19,7 @@ interface IProps {
 export const CompanyInfo = ({ formData, handleInputChange }: IProps) => {
   const handleVerifyCorporate = async () => {
     try {
-      const res = await verifyCoporate({
+      await verifyCoporate({
         b_no: formData.corporateNumber,
         start_dt: formData.openingDate,
         p_nm: formData.representativeName,
@@ -29,7 +29,7 @@ export const CompanyInfo = ({ formData, handleInputChange }: IProps) => {
       toast.success('기관인증이 완료되었습니다.');
     } catch (error: any) {
       toast.error(
-        error.response?.data?.message || '기관인증 중 오류가 발생했습니다.'
+        '기관인증 중 오류가 발생했습니다.'
       );
     }
   };
