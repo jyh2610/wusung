@@ -153,3 +153,29 @@ export const getInquiryDetail = async (id: number) => {
     throw error;
   }
 };
+
+export const addReply = async (id: number, content: string, files?: File[]) => {
+  try {
+    const formData = new FormData();
+    formData.append('commentRegisterDTO', JSON.stringify({ content }));
+
+    if (files && files.length > 0) {
+      files.forEach(file => {
+        formData.append('files', file);
+      });
+    }
+
+    const res = await request<ApiResponse<null>>({
+      method: 'POST',
+      url: `/api/inquiry/${id}/comment/register`,
+      data: formData,
+      headers: {
+        'Content-Type': 'multipart/form-data'
+      }
+    });
+    return res.data;
+  } catch (error) {
+    console.error('답글 등록 실패:', error);
+    throw error;
+  }
+};

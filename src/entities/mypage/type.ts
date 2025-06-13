@@ -18,29 +18,43 @@ export interface paymentListDTO {
 
 export interface IInquiry {
   inquiryId: number;
+  memberId: number;
   type: string;
   title: string;
-  content: string; // 문의 내용
+  content: string;
+  fileIdList: string;
   isAnswered: boolean;
+  haveToReadByAdmin: boolean;
+  haveToReadByUser: boolean;
+  createdAt: string;
   updatedAt: string;
-  comments?: { [key: string]: any }[];
-  files?: { url: string; name?: string }[];
+}
+
+export interface Reply {
+  commentId: string;
+  content: string;
+}
+
+export interface Comment {
+  commentId: number;
+  memberId: number;
+  inquiryId: number;
+  answerOrder: number;
+  isAnswered: boolean;
+  content: string;
+  fileIdList: string;
+  createdAt: string;
+  updatedAt: string;
+}
+
+export interface File {
+  fileId: number;
+  fileName: string;
+  fileUrl: string;
 }
 
 export interface IGetInquiryDetail {
-  inquiry: {
-    inquiryId: number;
-    memberId: number;
-    type: string;
-    title: string;
-    content: string;
-    fileIdList: string;
-    isAnswered: boolean;
-    haveToReadByAdmin: boolean;
-    haveToReadByUser: boolean;
-    createdAt: string;
-    updatedAt: string;
-  };
-  comments?: { [key: string]: any }[];
-  files?: { url: string; name?: string }[];
+  inquiry: IInquiry;
+  comments: Comment[];
+  files: File[];
 }

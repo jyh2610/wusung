@@ -17,7 +17,11 @@ import {
   date,
   tableContainer
 } from './payment/paymentHistory.css';
-import { personalInquiry, getInquiryDetail } from '@/entities/mypage/api';
+import {
+  personalInquiry,
+  getInquiryDetail,
+  addReply
+} from '@/entities/mypage/api';
 import { useQuery } from '@tanstack/react-query';
 import { IInquiry } from '@/entities/mypage/type';
 import { filterInquiries } from '../../utils';
@@ -57,6 +61,23 @@ export function InquiryHistory() {
     setPage(1);
   };
 
+  const handleAddReply = async (
+    commentId: number,
+    content: string,
+    files?: globalThis.File[]
+  ) => {
+    try {
+      await addReply(commentId, content, files);
+      // 답글 등록 후 상세 정보 다시 불러오기
+      if (selectedInquiryId) {
+        const updatedDetail = await getInquiryDetail(selectedInquiryId);
+        // 여기서 상태 업데이트 로직 추가 필요
+      }
+    } catch (error) {
+      console.error('답글 등록 실패:', error);
+    }
+  };
+
   if (selectedInquiryId && inquiryDetail) {
     const inquiryData = inquiryDetail.data;
     return (
@@ -65,6 +86,7 @@ export function InquiryHistory() {
         comments={inquiryData.comments || []}
         files={inquiryData.files || []}
         onBack={() => setSelectedInquiryId(null)}
+        onAddReply={handleAddReply}
       />
     );
   }

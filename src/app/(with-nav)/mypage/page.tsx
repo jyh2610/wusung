@@ -29,7 +29,16 @@ async function Mypage() {
 
   return (
     <HydrationBoundary state={dehydratedState}>
-      <main className={layoutContainer}>
+      <main
+        style={{
+          width: '100%',
+          display: 'flex',
+          justifyContent: 'center',
+          gap: '112px',
+          paddingTop: '60px',
+          marginBottom: '310px'
+        }}
+      >
         <MypageComponent />
       </main>
     </HydrationBoundary>
