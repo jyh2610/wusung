@@ -16,25 +16,39 @@ export function NavList({
 }) {
   const router = useRouter();
   const [routeKey, setRouteKey] = useState('');
+  const [username, setUsername] = useState<string | undefined>(undefined);
 
+  // 쿠키 값 변경 감지를 위한 useEffect
+  useEffect(() => {
+    const checkUsername = () => {
+      const currentUsername = Cookies.get('username');
+      setUsername(currentUsername);
+    };
+
+    // 초기 체크
+    checkUsername();
+
+    // 주기적으로 쿠키 체크 (1초마다)
+    const interval = setInterval(checkUsername, 1000);
+
+    return () => clearInterval(interval);
+  }, []);
+
+  // routeKey 설정을 위한 useEffect
   useEffect(() => {
     if (list.title === '우성인지펜 소개') setRouteKey('introduce_greeting');
     else if (list.title === '요금안내') setRouteKey('payment');
     else if (list.title === '공지사항') setRouteKey('inquiry');
     else if (list.title === '마이페이지') {
-      const username = Cookies.get('username');
-      console.log('마이페이지 쿠키 확인:', username);
-      
       if (username) {
         setRouteKey('mypage');
       } else {
-        console.log('username이 없습니다');
+        setRouteKey('');
       }
     }
-  }, [list.title]);
+  }, [list.title, username]);
 
   if (list.title === '마이페이지' && !routeKey) {
-    console.log('마이페이지 렌더링 스킵됨');
     return null;
   }
 
