@@ -56,6 +56,18 @@ export function useDragAndDrop(
     // 같은 위치면 무시
     if (srcDay === destDay && srcCategory === destCategory) return;
 
+    // 다른 카테고리에 같은 아이디가 있는지 확인
+    const isDuplicate = schedule[destDay]
+      ? Object.entries(schedule[destDay]).some(
+          ([category, item]) => category !== destCategory && item?.id === id
+        )
+      : false;
+
+    if (isDuplicate) {
+      toast.error('같은 요일의 다른 카테고리에 이미 존재하는 활동입니다.');
+      return;
+    }
+
     const newSchedule = {
       ...schedule,
       [destDay]: {
