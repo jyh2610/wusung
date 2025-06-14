@@ -37,8 +37,8 @@ const years = Array.from({ length: 2100 - 1900 + 1 }, (_, i) => {
   return { label: `${year}`, value: `${year}` };
 });
 
-const endYears = Array.from({ length: currentYear - 1900 + 1 }, (_, i) => {
-  const year = currentYear - i;
+const endYears = Array.from({ length: 2100 - 1900 + 1 }, (_, i) => {
+  const year = 2100 - i;
   return { label: `${year}`, value: `${year}` };
 });
 
@@ -75,16 +75,20 @@ export function AddUser({
     grade: ''
   });
 
-  const [birth, setBirth] = useState({ year: '', month: '', day: '' });
+  const [birth, setBirth] = useState({
+    year: String(currentYear),
+    month: '1',
+    day: '1'
+  });
   const [validateStartDate, setValidateStartDate] = useState({
-    year: '',
-    month: '',
-    day: ''
+    year: String(currentYear),
+    month: '1',
+    day: '1'
   });
   const [validateEndDate, setValidateEndDate] = useState({
-    year: '',
-    month: '',
-    day: ''
+    year: String(currentYear),
+    month: '1',
+    day: '1'
   });
 
   useEffect(() => {
