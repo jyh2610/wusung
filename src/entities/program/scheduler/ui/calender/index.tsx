@@ -21,6 +21,7 @@ import { useDateStore } from '@/shared/stores/useDateStores';
 import { useScheduleStore } from '@/shared/stores/useScheduleStore';
 import { MdDelete } from 'react-icons/md';
 import { colors } from '@/design-tokens';
+import { Tooltip } from '@/shared/ui/tooltip';
 
 interface CalendarProps {
   schedule: Schedule;
@@ -134,7 +135,13 @@ export function Calendar({ schedule, isAdmin }: CalendarProps) {
                       alignItems: 'center'
                     }}
                   >
-                    <span>{item.content}</span>
+                    <Tooltip content={item.content}>
+                      <span>
+                        {item.content.length > 5
+                          ? `${item.content.slice(0, 5)}...`
+                          : item.content}
+                      </span>
+                    </Tooltip>
                     <MdDelete onClick={handleDelete} />
                   </div>
                 )}

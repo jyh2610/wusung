@@ -118,7 +118,7 @@ export function IndividualComponent() {
           formData.address && formData.detailAddress
             ? formData.address + '|' + formData.detailAddress
             : '',
-        email: formData.email + '@' + formData.emailDomain,
+        email: formData.email,
         phoneVerificationDTO: {
           code: formData.verificationCode,
           phoneNum: formData.phone

@@ -54,7 +54,7 @@ export const UserInfo = ({
   setShowVerification
 }: IProps) => {
   const [birthError, setBirthError] = useState<string>('');
-
+  console.log(formData.birth, 'formData');
   const yearList = generateYears();
   const monthList = generateMonths();
   const dayList = generateDays(2025, 1); // TODO: 실제 날짜 계산 로직으로 개선 가능
@@ -64,8 +64,8 @@ export const UserInfo = ({
     value: string
   ) => {
     let formattedValue = value;
-    if (field !== 'year' && value.length === 1) {
-      formattedValue = `0${value}`;
+    if (field === 'month' || field === 'day') {
+      formattedValue = value.padStart(2, '0');
     }
     const newBirth = { ...formData.birth, [field]: formattedValue };
     handleInputChange('birth', newBirth);
@@ -125,6 +125,7 @@ export const UserInfo = ({
             이름<span className={starSpan}>*</span>
           </div>
         }
+        value={formData.name || ''}
       />
 
       {/* 생년월일 */}
@@ -145,7 +146,7 @@ export const UserInfo = ({
             <SelectBox
               options={monthList}
               placeholder="월"
-              value={formData.birth?.month}
+              value={formData.birth?.month?.replace(/^0+/, '')}
               onChange={val => handleBirthChange('month', val)}
             />
           </div>
@@ -153,22 +154,11 @@ export const UserInfo = ({
             <SelectBox
               options={dayList}
               placeholder="일"
-              value={formData.birth?.day}
+              value={formData.birth?.day?.replace(/^0+/, '')}
               onChange={val => handleBirthChange('day', val)}
             />
           </div>
         </div>
-        {birthError && (
-          <p
-            style={{
-              color: birthError.includes('가능') ? '#EEFCF2' : 'red',
-              marginTop: '8px',
-              fontSize: '14px'
-            }}
-          >
-            {birthError}
-          </p>
-        )}
       </div>
 
       {/* 주소 */}
@@ -197,54 +187,6 @@ export const UserInfo = ({
         onChange={e => handleInputChange('detailAddress', e.target.value)}
       />
 
-      {/* 휴대폰 및 인증 */}
-      <div style={{ display: 'flex', gap: '8px' }}>
-        <NomalInput
-          placeholder="번호를 입력해주세요"
-          inputSize="medium"
-          label={
-            <div className={labelContainer}>
-              휴대폰 번호<span className={starSpan}>*</span>
-            </div>
-          }
-          value={formData.phone}
-          onChange={e => handleInputChange('phone', e.target.value)}
-        />
-        <div className={regBtn}>
-          <Button
-            onClick={handlePhoneVerificationSend}
-            btnType="button"
-            type="borderBrand"
-            content="인증번호 발송"
-          />
-        </div>
-      </div>
-
-      {showVerification && (
-        <div className={inputBox}>
-          <NomalInput
-            placeholder="인증번호를 입력해주세요"
-            inputSize="medium"
-            label={<div className={labelContainer}>인증번호</div>}
-            value={formData.verificationCode}
-            onChange={e =>
-              handleInputChange('verificationCode', e.target.value)
-            }
-            rightElement={
-              <span style={{ color: 'red' }}>({formatTime(timeLeft)})</span>
-            }
-          />
-          <div className={regBtn}>
-            <Button
-              onClick={handleCodeVerify}
-              btnType="button"
-              type="borderBrand"
-              content="인증"
-            />
-          </div>
-        </div>
-      )}
-
       {/* 이메일 */}
       <div className={emailBox}>
         <NomalInput
@@ -255,8 +197,14 @@ export const UserInfo = ({
               이메일 <span className={starSpan}>*</span>
             </div>
           }
-          value={formData.email}
-          onChange={e => handleInputChange('email', e.target.value)}
+          value={formData.email.split('@')[0]}
+          onChange={e => {
+            const emailId = e.target.value;
+            handleInputChange(
+              'email',
+              emailId + '@' + (formData.emailDomain || '')
+            );
+          }}
         />
         <span style={{ fontSize: '18px', color: '#333' }}>@</span>
         <Select
@@ -267,7 +215,13 @@ export const UserInfo = ({
               ? { label: formData.emailDomain, value: formData.emailDomain }
               : null
           }
-          onChange={handleEmailDomainChange}
+          onChange={selected => {
+            if (selected) {
+              const emailId = formData.email.split('@')[0];
+              handleInputChange('emailDomain', selected.value);
+              handleInputChange('email', emailId + '@' + selected.value);
+            }
+          }}
           styles={{
             control: (provided, state) => ({
               ...provided,
@@ -319,6 +273,54 @@ export const UserInfo = ({
           }}
         />
       </div>
+
+      {/* 휴대폰 및 인증 */}
+      <div style={{ display: 'flex', gap: '8px' }}>
+        <NomalInput
+          placeholder="번호를 입력해주세요"
+          inputSize="medium"
+          label={
+            <div className={labelContainer}>
+              휴대폰 번호<span className={starSpan}>*</span>
+            </div>
+          }
+          value={formData.phone}
+          onChange={e => handleInputChange('phone', e.target.value)}
+        />
+        <div className={regBtn}>
+          <Button
+            onClick={handlePhoneVerificationSend}
+            btnType="button"
+            type="borderBrand"
+            content="인증번호 발송"
+          />
+        </div>
+      </div>
+
+      {showVerification && (
+        <div className={inputBox}>
+          <NomalInput
+            placeholder="인증번호를 입력해주세요"
+            inputSize="medium"
+            label={<div className={labelContainer}>인증번호</div>}
+            value={formData.verificationCode}
+            onChange={e => {
+              handleInputChange('verificationCode', e.target.value);
+            }}
+            rightElement={
+              <span style={{ color: 'red' }}>({formatTime(timeLeft)})</span>
+            }
+          />
+          <div className={regBtn}>
+            <Button
+              onClick={handleCodeVerify}
+              btnType="button"
+              type="borderBrand"
+              content="인증"
+            />
+          </div>
+        </div>
+      )}
     </div>
   );
 };

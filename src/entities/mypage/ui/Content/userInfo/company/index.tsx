@@ -3,7 +3,8 @@ import { CompanyLocation } from '@/entities/UserManage/ui/form/companyLocation';
 import React, { Dispatch, SetStateAction, useEffect, useState } from 'react';
 import {
   CompanyUserInfo,
-  useUserInfoStore
+  useUserInfoStore,
+  UserInfoStore
 } from '@/shared/stores/EditUserInfostore';
 import { IFormCompany } from '@/entities/UserManage/type';
 import { IdPw } from '@/entities/UserManage';
@@ -18,48 +19,65 @@ import {
 } from './index.css';
 import { Button } from '@/shared/ui';
 import { buttonContainer } from '../index.css';
+import { toast } from 'react-toastify';
+import { useRouter } from 'next/navigation';
 
 export const CompanyInfoEdit = ({
   setIsWithdrawal
 }: {
   setIsWithdrawal: Dispatch<SetStateAction<boolean>>;
 }) => {
+  const router = useRouter();
   const userInfo = useUserInfoStore();
   const setUserInfo = useUserInfoStore(state => state.setUserInfo);
   const [showVerification, setShowVerification] = useState(false);
-  const [timeLeft, setTimeLeft] = useState(120); // 2분을 초 단위로
+  const [timeLeft, setTimeLeft] = useState(120);
   const [profileFile, setProfileFile] = useState<File | null>(null);
-
-  const companyUserInfo = userInfo as CompanyUserInfo; // 또는 as CompanyUserInfo
-
-  // IFormCompany에 맞는 핸들러
-  const handleInputChange = (
-    field: keyof IFormCompany,
-    value: string | { year: string; month: string; day: string }
-  ) => {
-    setUserInfo({ ...userInfo, [field]: value } as any);
-  };
-
-  const formData: IFormCompany = {
+  const [formData, setFormData] = useState<IFormCompany>({
     verificationCode: '',
-    id: companyUserInfo.id,
+    id: '',
     password: '',
     passwordConfirm: '',
-    representativeName: companyUserInfo.representativeName,
-    companyName: companyUserInfo.companyName,
-    corporateNumber: companyUserInfo.corporateNumber,
-    openingDate: companyUserInfo.openingDate,
-    address: companyUserInfo.address,
-    detailAddress: companyUserInfo.detailAddress,
-    phone: companyUserInfo.phoneNumber,
+    representativeName: '',
+    companyName: '',
+    corporateNumber: '',
+    openingDate: '',
+    address: '',
+    detailAddress: '',
+    phone: '',
     phoneCode: '',
-    email: companyUserInfo.email,
+    email: '',
     termOfUse: [false, false],
     emailDomain: ''
-    // ...userInfo의 나머지 필드도 필요시 추가
+  });
+
+  // 타입 가드 추가
+  const isCompanyUser = (
+    user: UserInfoStore
+  ): user is CompanyUserInfo & {
+    setUserInfo: (info: CompanyUserInfo) => void;
+  } => {
+    return user.UserType === '기업';
   };
 
-  // 아래 핸들러들도 zustand 상태로 관리하거나, 필요시 추가 구현
+  useEffect(() => {
+    if (isCompanyUser(userInfo)) {
+      setFormData(prev => ({
+        ...prev,
+        id: userInfo.id || '',
+        representativeName: userInfo.representativeName || '',
+        companyName: userInfo.companyName || '',
+        corporateNumber: userInfo.corporateNumber || '',
+        openingDate: userInfo.openingDate || '',
+        address: userInfo.address || '',
+        detailAddress: userInfo.detailAddress || '',
+        phone: userInfo.phoneNumber || '',
+        email: userInfo.email?.split('@')[0] || '',
+        emailDomain: userInfo.email?.split('@')[1] || ''
+      }));
+    }
+  }, [userInfo]);
+
   useEffect(() => {
     let timer: NodeJS.Timeout;
     if (showVerification && timeLeft > 0) {
@@ -73,18 +91,49 @@ export const CompanyInfoEdit = ({
     return () => clearInterval(timer);
   }, [showVerification, timeLeft]);
 
+  if (!isCompanyUser(userInfo)) {
+    return null;
+  }
+
+  const handleInputChange = (
+    field: keyof IFormCompany,
+    value: string | { year: string; month: string; day: string }
+  ) => {
+    if (field === 'openingDate' && typeof value === 'object') {
+      const openingDate = `${value.year}${value.month}${value.day}`;
+      setUserInfo({ ...userInfo, openingDate } as any);
+      setFormData(prev => ({
+        ...prev,
+        openingDate
+      }));
+    } else {
+      setUserInfo({ ...userInfo, [field]: value } as any);
+      setFormData(prev => ({
+        ...prev,
+        [field]: value
+      }));
+    }
+  };
+
   const handleSendVerification = () => {
     setShowVerification(true);
     setTimeLeft(120);
   };
 
   const SubmitUserInfo = async () => {
+    const domainFormData = {
+      ...formData,
+      email: formData.email + '@' + formData.emailDomain
+    };
     try {
       const response = await submitCompanyUserInfoHandler(
-        formData,
+        domainFormData,
         profileFile as File
       );
+      toast.success('회원정보가 수정되었습니다.');
+      router.push('/mypage?tab=결재내역');
     } catch (error) {
+      toast.error('회원정보 수정에 실패했습니다.');
       console.log(error);
     }
   };

@@ -1,8 +1,14 @@
+'use client';
+
 import { colors } from '@/design-tokens';
 import { IdPw } from '@/entities/UserManage';
 import { IFormIndividual } from '@/entities/UserManage/type';
 import { UserInfo } from '@/entities/UserManage/ui/form/UserInfo';
-import { useUserInfoStore } from '@/shared';
+import {
+  useUserInfoStore,
+  IndividualUserInfo,
+  UserInfoStore
+} from '@/shared/stores/EditUserInfostore';
 import { HorizontalLine } from '@/shared/ui/VerticalLine';
 import { Dispatch, SetStateAction, useEffect, useState } from 'react';
 import { buttonContainer, labelContainer } from '../index.css';
@@ -24,6 +30,7 @@ import {
   modalTitle,
   fullButton
 } from '@/entities/UserManage/FindInfo/Id/index.css';
+import { toast } from 'react-toastify';
 
 export const IndivisualInfo = ({
   setIsWithdrawal
@@ -33,37 +40,61 @@ export const IndivisualInfo = ({
   const userInfo = useUserInfoStore();
   const setUserInfo = useUserInfoStore(state => state.setUserInfo);
   const [showVerification, setShowVerification] = useState(false);
-  const [timeLeft, setTimeLeft] = useState(120); // 2분을 초 단위로
+  const [timeLeft, setTimeLeft] = useState(120);
   const [profileFile, setProfileFile] = useState<File | null>(null);
   const [isOpen, setIsOpen] = useState(false);
+  const [formData, setFormData] = useState<IFormIndividual>({
+    verificationCode: '',
+    id: '',
+    password: '',
+    passwordConfirm: '',
+    name: '',
+    address: '',
+    detailAddress: '',
+    phone: '',
+    email: '',
+    termOfUse: [false, false],
+    emailDomain: '',
+    birth: {
+      year: '',
+      month: '',
+      day: ''
+    }
+  });
 
   const router = useRouter();
-
   const [emailId, emailDomain] = (userInfo.email || '').split('@');
   const [mainAddress, detailAddress] = (userInfo.address || '').split('|');
 
-  const handleInputChange = (
-    field: keyof IFormIndividual,
-    value: string | { year: string; month: string; day: string }
-  ) => {
-    setUserInfo({ ...userInfo, [field]: value } as any);
+  // 타입 가드 추가
+  const isIndividualUser = (
+    user: UserInfoStore
+  ): user is IndividualUserInfo & {
+    setUserInfo: (info: IndividualUserInfo) => void;
+  } => {
+    return user.UserType === '개인';
   };
 
-  const formData: IFormIndividual = {
-    verificationCode: '',
-    id: userInfo.id,
-    password: '',
-    passwordConfirm: '',
-    name: userInfo.username,
-    address: mainAddress || '',
-    detailAddress: detailAddress || '',
-    phone: userInfo.phoneNumber,
-    email: emailId || '',
-    termOfUse: [false, false],
-    emailDomain: emailDomain || '',
-    birth: { year: '', month: '', day: '' }
-    // ...userInfo의 나머지 필드도 필요시 추가
-  };
+  useEffect(() => {
+    if (isIndividualUser(userInfo)) {
+      setFormData(prev => ({
+        ...prev,
+        id: userInfo.username || '',
+        name: userInfo.name || '',
+        address: mainAddress || '',
+        detailAddress: detailAddress || '',
+        phone: userInfo.phoneNumber || '',
+        email: emailId || '',
+        emailDomain: emailDomain || '',
+        birth: {
+          year: userInfo.birthOrEstablishmentDate?.substring(0, 4) || '',
+          month: userInfo.birthOrEstablishmentDate?.substring(4, 6) || '',
+          day: userInfo.birthOrEstablishmentDate?.substring(6, 8) || ''
+        }
+      }));
+    }
+  }, [userInfo, mainAddress, detailAddress, emailId, emailDomain]);
+
   useEffect(() => {
     let timer: NodeJS.Timeout;
     if (showVerification && timeLeft > 0) {
@@ -77,19 +108,49 @@ export const IndivisualInfo = ({
     return () => clearInterval(timer);
   }, [showVerification, timeLeft]);
 
+  if (!isIndividualUser(userInfo)) {
+    return null;
+  }
+
+  const handleInputChange = (
+    field: keyof IFormIndividual,
+    value: string | { year: string; month: string; day: string }
+  ) => {
+    if (field === 'birth' && typeof value === 'object') {
+      const birthDate = `${value.year}${value.month}${value.day}`;
+      setUserInfo({ ...userInfo, birthOrEstablishmentDate: birthDate } as any);
+      setFormData(prev => ({
+        ...prev,
+        birth: value
+      }));
+    } else {
+      setUserInfo({ ...userInfo, [field]: value } as any);
+      setFormData(prev => ({
+        ...prev,
+        [field]: value
+      }));
+    }
+  };
+
   const handleSendVerification = () => {
     setShowVerification(true);
     setTimeLeft(120);
   };
 
   const SubmitUserInfo = async () => {
+    const domainFormData = {
+      ...formData,
+      email: formData.email + '@' + formData.emailDomain
+    };
     try {
       const response = await submitIndivisualUserInfoHandler(
-        formData,
+        domainFormData,
         profileFile as File
       );
-      console.log(response);
+      toast.success('회원정보가 수정되었습니다.');
+      router.push('/mypage?tab=결재내역');
     } catch (error) {
+      toast.error('회원정보 수정에 실패했습니다.');
       console.log(error);
     }
   };
@@ -115,7 +176,7 @@ export const IndivisualInfo = ({
           <span className={label}>아이디</span>
           <input
             type="text"
-            value={userInfo.id}
+            value={userInfo.username}
             disabled
             className={inputStyle}
           />

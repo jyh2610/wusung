@@ -15,7 +15,7 @@ const checkPwHandler = async (pw: string) => {
 
 const submitCompanyUserInfoHandler = async (data: IFormCompany, file: File) => {
   const formData = new FormData();
-  formData.append('inquiryRegisterDTO', JSON.stringify(data));
+  formData.append('businessAccountEditDTO', JSON.stringify(data));
 
   formData.append('files', file);
 
@@ -36,12 +36,29 @@ const submitIndivisualUserInfoHandler = async (
   file: File
 ) => {
   const formData = new FormData();
-  formData.append('inquiryRegisterDTO', JSON.stringify(data));
 
-  formData.append('files', file);
+  // 서버 요청 형식에 맞게 데이터 재가공
+  const personalAccountEditDTO = {
+    name: data.name,
+    address: data.address + '|' + data.detailAddress,
+    email: data.email,
+    phoneVerificationDTO: {
+      code: data.verificationCode,
+      phoneNum: data.phone
+    },
+    birthOrEstablishmentDate: `${data.birth.year}${data.birth.month}${data.birth.day}`
+  };
+
+  formData.append(
+    'personalAccountEditDTO',
+    JSON.stringify(personalAccountEditDTO)
+  );
+  if (file) {
+    formData.append('file', file);
+  }
 
   const response = await request<ApiResponse<UserInfoResponse>>({
-    method: 'post',
+    method: 'PUT',
     headers: {
       'Content-Type': 'multipart/form-data'
     },

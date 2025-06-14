@@ -19,7 +19,7 @@ export const metadata: Metadata = {
   },
   icons: {
     icon: [
-      { url: '/images/favicon.png', type: 'image/png' },
+      { url: './public/images/favicon.png', type: 'image/png' },
       { url: '/favicon.ico', type: 'image/x-icon' }
     ],
     shortcut: '/images/favicon.png',
