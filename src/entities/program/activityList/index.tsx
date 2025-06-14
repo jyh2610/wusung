@@ -75,8 +75,6 @@ export function ActivityList({ activities, onFilterChange, isAdmin }: IProps) {
     }
   };
 
-  console.log('selectedCategoryId', categories);
-
   return (
     <div
       style={{

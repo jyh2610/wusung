@@ -44,7 +44,17 @@ export function Control({ isAdmin }: { isAdmin: boolean }) {
 
   const searchParams = useSearchParams();
 
-  const [selectedDifficulty, setSelectedDifficulty] = useState<number>(2);
+  const [selectedDifficulty, setSelectedDifficulty] = useState<number>(() => {
+    const difficultyid = searchParams.get('difficultyid');
+    return difficultyid ? Number(difficultyid) : 2;
+  });
+
+  useEffect(() => {
+    const difficultyid = searchParams.get('difficultyid');
+    if (difficultyid) {
+      setSelectedDifficulty(Number(difficultyid));
+    }
+  }, [searchParams]);
 
   const handleLoadPlan = async (
     year: number,
@@ -221,9 +231,6 @@ export function Control({ isAdmin }: { isAdmin: boolean }) {
     setSelectedDifficulty(difficulty);
     useScheduleStore.getState().setSelectedDifficulty(difficulty);
   };
-
-  console.log(coverContent, 'coverContent');
-  console.log(coverItems, 'coverItems');
 
   return (
     <div className={Container}>

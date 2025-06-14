@@ -335,11 +335,7 @@ function Activity() {
         {activities && activities.length > 0 ? (
           <div className={activityCardContainer}>
             {activities.map(activity => (
-              <div
-                key={activity.eduContentId}
-                className={activityCard}
-                onClick={() => handleClick(activity.eduContentId + '')}
-              >
+              <div key={activity.eduContentId} className={activityCard}>
                 <div
                   style={{ display: 'flex', justifyContent: 'space-between' }}
                 >
@@ -349,9 +345,10 @@ function Activity() {
                   </div>
                   <Checkbox
                     checked={selectedActivities.has(activity.eduContentId!)}
-                    onChange={() =>
-                      handleActivitySelect(activity.eduContentId!)
-                    }
+                    onChange={e => {
+                      e.stopPropagation();
+                      handleActivitySelect(activity.eduContentId!);
+                    }}
                   />
                 </div>
                 <div
@@ -360,6 +357,7 @@ function Activity() {
                     height: '357px',
                     position: 'relative'
                   }}
+                  onClick={() => handleClick(activity.eduContentId + '')}
                 >
                   <Image src={activity.thumbnailUrl!} alt="썸네일" fill />
                 </div>
