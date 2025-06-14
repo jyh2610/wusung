@@ -50,7 +50,7 @@ export interface IAnnouncementResponse {
   views: number;
 }
 
-interface IPopupResponse {
+export interface IPopupResponse {
   popupId: number;
   title: string;
   content: string;
@@ -74,7 +74,7 @@ export const getAnnouncementList = async ({
 }) => {
   const res = request<ApiResponse<PaginatedResponse<IAnnouncementResponse>>>({
     method: 'GET',
-    url: '/api/common/main/popup/list',
+    url: '/api/common/main/announcement/list',
     params: {
       page: page,
       size: size
@@ -92,7 +92,7 @@ export const getAnnouncementDetail = async (announcementId: number) => {
 };
 
 export const popupList = async () => {
-  const res = request<ApiResponse<IPopupResponse>>({
+  const res = request<ApiResponse<IPopupResponse[]>>({
     method: 'GET',
     url: '/api/common/main/popup/list'
   });

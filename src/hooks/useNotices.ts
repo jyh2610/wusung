@@ -1,5 +1,5 @@
 import { useState, useEffect } from 'react';
-import { getAnnouncementList } from '@/shared/api/common';
+import { popupList, IPopupResponse } from '@/shared/api/common';
 
 interface Notice {
   title: string;
@@ -17,18 +17,17 @@ export const useNotices = () => {
     const fetchNotices = async () => {
       try {
         setLoading(true);
-        const response = await getAnnouncementList({
-          page: 0,
-          size: 10
-        });
+        const response = await popupList();
 
-        if (response?.data?.data?.content) {
-          const transformedNotices = response.data.data.content.map(notice => ({
-            title: notice.title || '',
-            content: notice.topExposureTag || '',
-            positionCode: 'C' as const,
-            priority: notice.announcementId || 0
-          }));
+        if (response?.data?.data) {
+          const transformedNotices = response.data.data.map(
+            (notice: IPopupResponse) => ({
+              title: notice.title || '',
+              content: notice.content || '',
+              positionCode: 'C' as const,
+              priority: notice.popupId || 0
+            })
+          );
           setNotices(transformedNotices);
         } else {
           setNotices([]);

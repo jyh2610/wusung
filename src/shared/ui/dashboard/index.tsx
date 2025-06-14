@@ -30,7 +30,7 @@ interface DashBoardProps<T> {
 }
 
 export function DashBoard<T>({
-  rows,
+  rows = [],
   columns,
   renderRow,
   rowsPerPage = 10,
@@ -45,6 +45,8 @@ export function DashBoard<T>({
   ) => {
     onPageChange?.(value - 1);
   };
+
+  const isEmpty = !rows || rows.length === 0;
 
   return (
     <>
@@ -64,12 +66,20 @@ export function DashBoard<T>({
             </TableRow>
           </TableHead>
           <TableBody>
-            {rows.length > 0 ? (
+            {!isEmpty ? (
               rows.map(row => renderRow(row))
             ) : (
               <TableRow>
-                <TableCell colSpan={columns.length} align="center">
-                  No Content
+                <TableCell
+                  colSpan={columns.length}
+                  align="center"
+                  sx={{
+                    padding: '40px 0',
+                    color: 'text.secondary',
+                    fontSize: '14px'
+                  }}
+                >
+                  데이터가 없습니다.
                 </TableCell>
               </TableRow>
             )}

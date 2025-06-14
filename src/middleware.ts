@@ -13,7 +13,10 @@ export function middleware(request: NextRequest) {
   if (pathname.startsWith('/program')) {
     const token = request.cookies.get('token')?.value;
     if (!token) {
-      return NextResponse.redirect(new URL('/', request.url));
+      const url = new URL('/', request.url);
+      const message = encodeURIComponent('로그인이 필요한 서비스입니다.');
+      url.searchParams.set('toast', message);
+      return NextResponse.redirect(url);
     }
   }
 

@@ -104,7 +104,7 @@ const NoticePopup: React.FC<NoticePopupProps> = ({
                 </button>
               </div>
               <div className="text-gray-600 leading-relaxed mb-4">
-                {notice.content}
+                <div dangerouslySetInnerHTML={{ __html: notice.content }} />
               </div>
               <div className="flex items-center gap-2">
                 <input

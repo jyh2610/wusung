@@ -1,7 +1,7 @@
 'use client';
 
 import Link from 'next/link';
-import { usePathname } from 'next/navigation';
+import { usePathname, useRouter } from 'next/navigation';
 import {
   LayoutDashboard,
   FileText,
@@ -20,11 +20,12 @@ import {
 } from 'lucide-react';
 import { cn } from '@/lib/utils';
 import { Button } from '@/components/ui/button';
-import { logout } from '@/entities/MainBanner/api';
+import { useAuthStore } from '@/shared/stores/useAuthStore';
 
 export default function AdminSidebar() {
+  const { logout } = useAuthStore();
   const pathname = usePathname();
-
+  const router = useRouter();
   const routes = [
     {
       label: '상품 관리',
@@ -147,7 +148,12 @@ export default function AdminSidebar() {
       <div className="p-4 mt-auto border-t">
         <Button
           onClick={() => {
-            logout();
+            try {
+              logout();
+              router.push('/');
+            } catch (error) {
+              console.error('로그아웃 실패:', error);
+            }
           }}
           variant="outline"
           className="w-full justify-start"
