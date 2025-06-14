@@ -1,7 +1,7 @@
 'use client';
 
 import { DragDropContext } from '@hello-pangea/dnd';
-import React, { useState } from 'react';
+import React, { useState, useEffect } from 'react';
 import { ActivityList } from './activityList';
 import { useActivities } from './scheduler/model/useActivities';
 import { useDragAndDrop } from './scheduler/model/useDragAndDrop';
@@ -12,7 +12,13 @@ import { scrollHidden } from './scheduler/index.css';
 
 export function ProgramComponent() {
   const isAdmin = useIsAdmin();
-  const { schedule } = useScheduleStore();
+  const { schedule, reInit } = useScheduleStore();
+
+  useEffect(() => {
+    return () => {
+      reInit();
+    };
+  }, [reInit]);
 
   const [categoryId, setCategoryId] = useState<number>(1);
   const [difficultyLevel, setDifficultyLevel] = useState<number>(2);

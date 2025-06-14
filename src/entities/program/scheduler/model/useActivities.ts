@@ -14,11 +14,14 @@ export function useActivities({
   difficultyLevel
 }: IProps) {
   const [activities, setActivities] = useState<IContent[]>([]);
+  const [isLoading, setIsLoading] = useState(false);
 
-  const fetchActivities = useCallback(
-    async (options?: { categoryId: number; difficultyLevel: number }) => {
+  const fetchActivities = useCallback(() => {
+    setIsLoading(true);
+    const params = { categoryId, difficultyLevel };
+
+    const fetchData = async () => {
       try {
-        const params = options ?? { categoryId, difficultyLevel }; // 파라미터가 없으면 현재 상태 사용
         const response = isAdmin
           ? await getContentList(params)
           : await getUserContentList(params);
@@ -32,14 +35,18 @@ export function useActivities({
         }
       } catch (error) {
         console.error('콘텐츠 목록 조회 실패:', error);
+        setActivities([]);
+      } finally {
+        setIsLoading(false);
       }
-    },
-    [isAdmin, categoryId, difficultyLevel]
-  ); // 의존성 추가
+    };
+
+    fetchData();
+  }, [isAdmin, categoryId, difficultyLevel]);
 
   useEffect(() => {
     fetchActivities();
-  }, [fetchActivities]); // 함수에 의존하도록 수정
+  }, [fetchActivities]);
 
-  return { activities, fetchActivities, setActivities };
+  return { activities, fetchActivities, setActivities, isLoading };
 }

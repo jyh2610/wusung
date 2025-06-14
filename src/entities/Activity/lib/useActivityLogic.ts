@@ -123,10 +123,7 @@ export function useActivityLogic() {
 
   useEffect(() => {
     if (categoryId !== null) {
-      fetchActivities().catch(err => {
-        toast.error('활동지 불러오기에 실패했습니다.');
-        setActivities([]);
-      });
+      fetchActivities();
     }
   }, [categoryId, selectedLevel]);
 

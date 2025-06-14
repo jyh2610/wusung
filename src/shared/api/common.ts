@@ -74,7 +74,7 @@ export const getAnnouncementList = async ({
 }) => {
   const res = request<ApiResponse<PaginatedResponse<IAnnouncementResponse>>>({
     method: 'GET',
-    url: '/api/common/main/announcement/list',
+    url: '/api/common/main/popup/list',
     params: {
       page: page,
       size: size

@@ -4,24 +4,35 @@ import { colors } from '@/design-tokens';
 import TemporaryDrawer from '@/entities/program/menu/DrawerMenu';
 import { ProgramNav } from '@/entities/program/programNav';
 import { getNotokenSubscription } from '@/entities/UserManage/api';
-import { redirect } from 'next/navigation';
-import { cookies } from 'next/headers';
+import { useRouter } from 'next/navigation';
+import { useQuery } from '@tanstack/react-query';
 
 const drawerWidth = 300; // 사이드바 너비
 
-async function ProgramNavlayout({ children }: { children: React.ReactNode }) {
-  // 쿠키에서 토큰 가져오기
+function ProgramNavlayout({ children }: { children: React.ReactNode }) {
+  const router = useRouter();
 
-  // 구독 정보 확인
-  const subscription = await getNotokenSubscription();
-  console.log(subscription);
-  if (subscription?.data) {
-    const endDate = new Date(subscription.data.endDate);
-    const currentDate = new Date();
+  const { isLoading, error } = useQuery({
+    queryKey: ['subscription'],
+    queryFn: async () => {
+      const subscription = await getNotokenSubscription();
+      if (subscription?.data) {
+        const endDate = new Date(subscription.data.endDate);
+        const currentDate = new Date();
 
-    if (endDate < currentDate) {
-      redirect('/'); // 구독이 만료된 경우 메인 페이지로 리다이렉트
-    }
+        if (endDate < currentDate) {
+          router.push('/'); // 구독이 만료된 경우 메인 페이지로 리다이렉트
+        }
+      }
+      return subscription;
+    },
+    staleTime: 1000 * 60 * 5, // 5분 동안 캐시 유지
+    retry: 1 // 실패 시 1번만 재시도
+  });
+
+  if (error) {
+    console.error('구독 정보 확인 중 오류 발생:', error);
+    return <div>오류가 발생했습니다.</div>;
   }
 
   return (

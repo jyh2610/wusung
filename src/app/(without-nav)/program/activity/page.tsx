@@ -234,13 +234,10 @@ function Activity() {
   }, [categories]);
 
   useEffect(() => {
-    const fetchData = async () => {
+    const fetchData = () => {
       if (categoryId !== null) {
         try {
-          await fetchActivities({
-            categoryId,
-            difficultyLevel: difficultyMap[selectedLevel]
-          });
+          fetchActivities();
         } catch (error) {
           console.error('활동지 불러오기 실패:', error);
           toast.error('활동지 불러오기에 실패했습니다.');
@@ -249,7 +246,7 @@ function Activity() {
       }
     };
     fetchData();
-  }, [categoryId, selectedLevel, fetchActivities, setActivities]);
+  }, [categoryId, fetchActivities, setActivities]);
 
   return (
     <div className={container}>
