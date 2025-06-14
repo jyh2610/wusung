@@ -2,6 +2,7 @@ import { DropResult, DragUpdate } from '@hello-pangea/dnd';
 import { Dispatch, SetStateAction } from 'react';
 import { IContent } from '../../type.dto';
 import { useScheduleStore } from '@/shared/stores/useScheduleStore';
+import { toast } from 'react-toastify';
 
 export function useDragAndDrop(
   activities: IContent[],
@@ -32,11 +33,17 @@ export function useDragAndDrop(
 
     // ✅ 기타 드랍
     if (destId === 'etc') {
-      if (etcItems.length >= 2) {
-        console.log('ETC limit reached.');
-        alert('기타자료는 최대 2개까지만 넣을 수 있어요!');
+      // 중복 체크
+      if (etcItems.some(item => item.id === id)) {
+        toast.error('이미 추가된 기타자료입니다.');
         return;
       }
+
+      if (etcItems.length >= 2) {
+        toast.error('기타자료는 최대 2개까지만 넣을 수 있어요!');
+        return;
+      }
+
       console.log('Calling addEtcItem with:', { id, content }); // 5. addEtcItem 호출 직전 확인
       addEtcItem({ id, content });
       return;

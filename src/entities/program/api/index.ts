@@ -385,7 +385,7 @@ export const getPlan = async ({
       url: `/api/program/use/plan/${year}/${month}/${difficultyLevel}`
     });
 
-    if (res.status === 4000) {
+    if (res.status === 400) {
       toast.info(res.data.message);
     }
     return res.data.data;
@@ -553,5 +553,34 @@ export const getCategoryIndividualList = async () => {
     return res.data.data;
   } catch (error) {
     console.error('카테고리 개별 목록 요청을 실패 했습니다.', error);
+  }
+};
+
+export const getContent = async (eduContentId: number) => {
+  try {
+    const res = await request<IRes<IContent>>({
+      method: 'GET',
+      url: `/api/program/use/content/${eduContentId}`
+    });
+    return res.data.data;
+  } catch (error) {
+    console.error('컨텐츠 조회 실패');
+  }
+};
+
+export const getContentByIds = async (ids: number[]) => {
+  try {
+    const contents = await Promise.all(
+      ids.map(async id => {
+        const content = await getContent(id);
+        return content;
+      })
+    );
+    return contents.filter(
+      (content): content is IContent => content !== undefined
+    );
+  } catch (error) {
+    console.error('컨텐츠 조회 실패');
+    return [];
   }
 };

@@ -18,7 +18,7 @@ import { useDateStore } from '@/shared/stores/useDateStores'; // ✅ 전역 상�
 import { toast } from 'react-toastify';
 import { useScheduleStore } from '@/shared/stores/useScheduleStore';
 import { Box, Button, Modal, Typography } from '@mui/material';
-import { useSearchParams } from 'next/navigation';
+import { useSearchParams, useRouter } from 'next/navigation';
 
 function Header({
   isAdmin,
@@ -31,6 +31,7 @@ function Header({
   const [autoFillDate, setAutoFillDate] = useState(true);
   const [isPrinting, setIsPrinting] = useState(false);
   const searchParams = useSearchParams();
+  const router = useRouter();
   const { year, month, setYear, setMonth } = useDateStore();
 
   useEffect(() => {
@@ -140,18 +141,19 @@ function Header({
           scheduleId: Number(scheduleId),
           year: Number(yearParam),
           month: Number(monthParam),
-          difficultyLevel: selectedDifficulty, // 전역 상태의 난이도 사용
+          difficultyLevel: selectedDifficulty,
           coverEduContentId: coverItemId!,
           middleEduContentIds,
           mainEduContentIds
         });
         toast.success('수정이 완료되었습니다!');
+        router.push('/admin/schedule/list'); // 이전 페이지로 이동
       } else {
         // 기존 등록 API 호출
         await regSchedule({
           year,
           month,
-          difficultyLevel: selectedDifficulty, // 전역 상태의 난이도 사용
+          difficultyLevel: selectedDifficulty,
           coverEduContentId: coverItemId!,
           middleEduContentIds,
           mainEduContentIds

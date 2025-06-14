@@ -12,19 +12,21 @@ import {
   closeButton
 } from './index.css';
 import { useScheduleStore } from '@/shared/stores/useScheduleStore';
-import { Draggable, Droppable } from '@hello-pangea/dnd';
-import { getPlan } from '@/entities/program/api';
+import { Droppable } from '@hello-pangea/dnd';
+import { getPlan, getContentByIds, getContent } from '@/entities/program/api';
 import { autoRegisterPlan } from '../../model/autoRegisterPlan';
 import { useDateStore } from '@/shared/stores/useDateStores';
 import { useUserStore } from '@/shared/stores/useUserStore';
 import { toast } from 'react-toastify';
-import { color } from 'bun';
 import { colors } from '@/design-tokens';
 import { useSearchParams } from 'next/navigation';
+import { IContent } from '@/entities/program/type.dto';
 
 export function Control({ isAdmin }: { isAdmin: boolean }) {
   const [isModalOpen, setModalOpen] = useState(false);
   const [modalType, setModalType] = useState<'etc' | 'cover' | null>(null);
+  const [coverContent, setCoverContent] = useState<IContent | null>(null);
+  const [etcContents, setEtcContents] = useState<IContent[]>([]);
   const { reInit, removeEtcItem, removeCoverItems } = useScheduleStore();
   const coverItems = useScheduleStore(state => state.coverItems);
   const etcItems = useScheduleStore(state => state.etcItems);
@@ -50,11 +52,56 @@ export function Control({ isAdmin }: { isAdmin: boolean }) {
     difficultyLevel: number
   ) => {
     try {
+      // 기존 데이터 초기화
+      useScheduleStore.getState().clearCoverItems();
+      useScheduleStore.getState().clearEtcItems();
+      setCoverContent(null);
+      setEtcContents([]);
+
       const plan = await getPlan({
         year,
         month,
         difficultyLevel
       });
+
+      if (plan) {
+        // 커버 데이터 설정
+        if (plan.coverEduContentId) {
+          const coverContent = await getContent(plan.coverEduContentId);
+          if (coverContent) {
+            setCoverContent(coverContent);
+            useScheduleStore.getState().addCoverItem({
+              id: coverContent.eduContentId!,
+              content: coverContent.title
+            });
+          }
+        }
+
+        // 미들 데이터 설정 - 중복 제거
+        if (plan.middleEduContentIds && plan.middleEduContentIds.length > 0) {
+          // 중복 제거
+          const uniqueIds = plan.middleEduContentIds.filter(
+            (id, index, self) => self.indexOf(id) === index
+          );
+          const middleContents = await getContentByIds(uniqueIds);
+          const validContents = middleContents.filter(
+            content => content.eduContentId
+          );
+
+          // 스토어와 상태 모두 업데이트
+          useScheduleStore.getState().clearEtcItems();
+          setEtcContents(validContents);
+
+          validContents.forEach(content => {
+            if (content.eduContentId) {
+              useScheduleStore.getState().addEtcItem({
+                id: content.eduContentId,
+                content: content.title
+              });
+            }
+          });
+        }
+      }
 
       const result = await autoRegisterPlan({
         year,
@@ -80,6 +127,53 @@ export function Control({ isAdmin }: { isAdmin: boolean }) {
       );
     }
   }, [searchParams]);
+
+  useEffect(() => {
+    const fetchContents = async () => {
+      // 드래그 앤 드롭으로 추가된 아이템들의 컨텐츠 정보 가져오기
+      const newEtcIds = etcItems
+        .filter(
+          item => !etcContents.some(content => content.eduContentId === item.id)
+        )
+        .map(item => item.id);
+
+      if (newEtcIds.length > 0) {
+        const newContents = await getContentByIds(newEtcIds);
+        if (newContents.length > 0) {
+          setEtcContents(prev => {
+            const uniqueContents = [...prev];
+            newContents.forEach(newContent => {
+              if (
+                !uniqueContents.some(
+                  content => content.eduContentId === newContent.eduContentId
+                )
+              ) {
+                uniqueContents.push(newContent);
+              }
+            });
+            return uniqueContents;
+          });
+        }
+      }
+    };
+
+    fetchContents();
+  }, [etcItems]);
+
+  // coverItems가 변경될 때 coverContent 업데이트
+  useEffect(() => {
+    const updateCoverContent = async () => {
+      if (coverItems?.id) {
+        const content = await getContent(coverItems.id);
+        if (content) {
+          setCoverContent(content);
+        }
+      } else {
+        setCoverContent(null);
+      }
+    };
+    updateCoverContent();
+  }, [coverItems]);
 
   const openModal = (type: 'etc' | 'cover') => {
     setModalType(type);
@@ -115,16 +209,21 @@ export function Control({ isAdmin }: { isAdmin: boolean }) {
 
   const handleDeleteItem = (id: number) => {
     removeEtcItem(id);
+    setEtcContents(prev => prev.filter(content => content.eduContentId !== id));
   };
 
   const handleDeleteCover = () => {
     removeCoverItems();
+    setCoverContent(null);
   };
 
   const handleDifficultySelect = (difficulty: number) => {
     setSelectedDifficulty(difficulty);
     useScheduleStore.getState().setSelectedDifficulty(difficulty);
   };
+
+  console.log(coverContent, 'coverContent');
+  console.log(coverItems, 'coverItems');
 
   return (
     <div className={Container}>
@@ -246,7 +345,7 @@ export function Control({ isAdmin }: { isAdmin: boolean }) {
                   justifyContent: 'center'
                 }}
               >
-                {coverItems.content.length > 0 ? 1 : 0}
+                {coverContent ? 1 : 0}
               </div>
 
               {provided.placeholder}
@@ -302,7 +401,7 @@ export function Control({ isAdmin }: { isAdmin: boolean }) {
                   justifyContent: 'center'
                 }}
               >
-                {etcItems.length}
+                {etcContents.length}
               </div>
 
               {provided.placeholder}
@@ -324,11 +423,11 @@ export function Control({ isAdmin }: { isAdmin: boolean }) {
             <div style={{ marginTop: '20px' }}>
               {/* 기타자료 목록 */}
               {modalType === 'etc' &&
-                (etcItems.length > 0 ? (
+                (etcContents.length > 0 ? (
                   <ul style={{ padding: 0, listStyle: 'none' }}>
-                    {etcItems.map(item => (
+                    {etcContents.map(content => (
                       <li
-                        key={item.id}
+                        key={content.eduContentId}
                         style={{
                           display: 'flex',
                           justifyContent: 'space-between',
@@ -338,7 +437,7 @@ export function Control({ isAdmin }: { isAdmin: boolean }) {
                           paddingBottom: '4px'
                         }}
                       >
-                        <span>{item.content}</span>
+                        <span>{content.title}</span>
                         <button
                           style={{
                             border: 'none',
@@ -346,7 +445,9 @@ export function Control({ isAdmin }: { isAdmin: boolean }) {
                             color: 'red',
                             cursor: 'pointer'
                           }}
-                          onClick={() => handleDeleteItem(item.id)}
+                          onClick={() =>
+                            handleDeleteItem(content.eduContentId!)
+                          }
                         >
                           삭제
                         </button>
@@ -359,7 +460,7 @@ export function Control({ isAdmin }: { isAdmin: boolean }) {
 
               {/* 커버 목록 */}
               {modalType === 'cover' &&
-                (coverItems.content ? (
+                (coverContent ? (
                   <div
                     style={{
                       display: 'flex',
@@ -367,7 +468,7 @@ export function Control({ isAdmin }: { isAdmin: boolean }) {
                       alignItems: 'center'
                     }}
                   >
-                    <p>{coverItems.content}</p>
+                    <p>{coverContent.title}</p>
                     <button
                       style={{
                         border: 'none',

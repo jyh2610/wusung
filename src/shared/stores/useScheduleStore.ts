@@ -10,7 +10,7 @@ interface ScheduleState {
   history: Schedule[];
   redoStack: Schedule[];
 
-  coverItems: ScheduleItem;
+  coverItems: ScheduleItem | null;
   etcItems: ScheduleItem[];
 
   noPrintDate: boolean;
@@ -43,7 +43,7 @@ export const useScheduleStore = create<ScheduleState>(set => ({
   schedule: {},
   history: [],
   redoStack: [],
-  coverItems: { id: 0, content: '' },
+  coverItems: null,
   etcItems: [],
   disabledDrops: new Set(),
   noPrintDate: true,
@@ -97,9 +97,9 @@ export const useScheduleStore = create<ScheduleState>(set => ({
       schedule: {},
       history: [],
       redoStack: [],
-      coverItems: { id: 0, content: '' },
+      coverItems: null,
       etcItems: [],
-      disabledDrops: new Set() // ✅ 초기화할 때 같이 초기화
+      disabledDrops: new Set()
     }),
 
   removeScheduleItem: (dateKey, itemId) =>
@@ -126,7 +126,7 @@ export const useScheduleStore = create<ScheduleState>(set => ({
       return { disabledDrops: newSet };
     }),
 
-  removeCoverItems: () => set({ coverItems: { id: 0, content: '' } }),
+  removeCoverItems: () => set({ coverItems: null }),
 
   removeEtcItem: id =>
     set(state => ({
@@ -134,7 +134,7 @@ export const useScheduleStore = create<ScheduleState>(set => ({
     })),
 
   addCoverItem: item => set({ coverItems: item }),
-  clearCoverItems: () => set({ coverItems: { id: 0, content: '' } }),
+  clearCoverItems: () => set({ coverItems: null }),
 
   addEtcItem: item =>
     set(state => ({

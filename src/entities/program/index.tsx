@@ -13,7 +13,7 @@ import { scrollHidden } from './scheduler/index.css';
 export function ProgramComponent() {
   const isAdmin = useIsAdmin();
   const { schedule, reInit } = useScheduleStore();
-
+  console.log(schedule, 'schedule');
   useEffect(() => {
     return () => {
       reInit();

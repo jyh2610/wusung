@@ -32,13 +32,6 @@ export const autoRegisterPlan = async ({
       const [cognitive, daily] = contents;
       const day = i + 1;
 
-      if (i === 0 && cognitive) {
-        addCoverItem({
-          id: cognitive.eduContentId!,
-          content: cognitive.title
-        });
-      }
-
       if (daily) {
         addEtcItem({
           id: daily.eduContentId!,
