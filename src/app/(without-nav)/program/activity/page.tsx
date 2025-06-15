@@ -31,6 +31,7 @@ import { IContent, ICategoryLeaf } from '@/entities/program/type.dto';
 function Activity() {
   const router = useRouter();
   const pathname = usePathname();
+  const [isModalOpen, setIsModalOpen] = useState(false);
   const handleClick = (id: string) => {
     const path = handleCurrentPathRoute(id, pathname);
     router.push(path);
@@ -50,6 +51,9 @@ function Activity() {
   const [selectedActivities, setSelectedActivities] = useState<Set<number>>(
     new Set()
   );
+  const [selectedActivitiesInfo, setSelectedActivitiesInfo] = useState<
+    IContent[]
+  >([]);
 
   const { categories, fetchCategories } = useCategoryStore();
 
@@ -114,8 +118,17 @@ function Activity() {
     const newSelectedActivities = new Set(selectedActivities);
     if (newSelectedActivities.has(eduContentId)) {
       newSelectedActivities.delete(eduContentId);
+      setSelectedActivitiesInfo(prev =>
+        prev.filter(activity => activity.eduContentId !== eduContentId)
+      );
     } else {
       newSelectedActivities.add(eduContentId);
+      const selectedActivity = activities.find(
+        activity => activity.eduContentId === eduContentId
+      );
+      if (selectedActivity) {
+        setSelectedActivitiesInfo(prev => [...prev, selectedActivity]);
+      }
     }
     setSelectedActivities(newSelectedActivities);
   };
@@ -126,11 +139,22 @@ function Activity() {
         activities.map(activity => activity.eduContentId!)
       );
       setSelectedActivities(allActivityIds);
+      setSelectedActivitiesInfo(activities);
     }
   };
 
   const handleDeselectAll = () => {
     setSelectedActivities(new Set());
+    setSelectedActivitiesInfo([]);
+  };
+
+  const removeSelectedActivity = (eduContentId: number) => {
+    const newSelectedActivities = new Set(selectedActivities);
+    newSelectedActivities.delete(eduContentId);
+    setSelectedActivities(newSelectedActivities);
+    setSelectedActivitiesInfo(prev =>
+      prev.filter(activity => activity.eduContentId !== eduContentId)
+    );
   };
 
   const handlePrint = async () => {
@@ -250,6 +274,128 @@ function Activity() {
 
   return (
     <div className={container}>
+      {/* 선택된 활동지 모달 */}
+      {isModalOpen && (
+        <div
+          style={{
+            position: 'fixed',
+            top: 0,
+            left: 0,
+            right: 0,
+            bottom: 0,
+            backgroundColor: 'rgba(0, 0, 0, 0.5)',
+            display: 'flex',
+            justifyContent: 'center',
+            alignItems: 'center',
+            zIndex: 1000
+          }}
+        >
+          <div
+            style={{
+              backgroundColor: 'white',
+              padding: '24px',
+              borderRadius: '8px',
+              width: '80%',
+              maxWidth: '600px',
+              maxHeight: '80vh',
+              overflowY: 'auto'
+            }}
+          >
+            <div
+              style={{
+                display: 'flex',
+                justifyContent: 'space-between',
+                alignItems: 'center',
+                marginBottom: '20px'
+              }}
+            >
+              <h2 style={{ margin: 0 }}>
+                선택된 활동지 ({selectedActivitiesInfo.length})
+              </h2>
+              <button
+                onClick={() => setIsModalOpen(false)}
+                style={{
+                  background: 'none',
+                  border: 'none',
+                  fontSize: '24px',
+                  cursor: 'pointer',
+                  color: colors.gray_scale[500]
+                }}
+              >
+                ✕
+              </button>
+            </div>
+            <div
+              style={{ display: 'flex', flexDirection: 'column', gap: '12px' }}
+            >
+              {selectedActivitiesInfo.map(activity => (
+                <div
+                  key={activity.eduContentId}
+                  style={{
+                    display: 'flex',
+                    justifyContent: 'space-between',
+                    alignItems: 'center',
+                    padding: '12px',
+                    border: '1px solid #eee',
+                    borderRadius: '4px'
+                  }}
+                >
+                  <div
+                    style={{
+                      display: 'flex',
+                      gap: '12px',
+                      alignItems: 'center'
+                    }}
+                  >
+                    <div
+                      style={{
+                        width: '60px',
+                        height: '60px',
+                        position: 'relative',
+                        borderRadius: '4px',
+                        overflow: 'hidden'
+                      }}
+                    >
+                      <Image
+                        src={activity.thumbnailUrl!}
+                        alt="썸네일"
+                        fill
+                        style={{ objectFit: 'cover' }}
+                      />
+                    </div>
+                    <div>
+                      <div style={{ fontWeight: 'bold' }}>{activity.title}</div>
+                      <div
+                        style={{
+                          color: colors.gray_scale[500],
+                          fontSize: '14px'
+                        }}
+                      >
+                        ID: {activity.eduContentId}
+                      </div>
+                    </div>
+                  </div>
+                  <button
+                    onClick={() =>
+                      removeSelectedActivity(activity.eduContentId!)
+                    }
+                    style={{
+                      background: 'none',
+                      border: 'none',
+                      color: colors.gray_scale[500],
+                      cursor: 'pointer',
+                      padding: '8px'
+                    }}
+                  >
+                    ✕
+                  </button>
+                </div>
+              ))}
+            </div>
+          </div>
+        </div>
+      )}
+
       {/* 상단 */}
       <div
         className={titleContainer}
@@ -294,6 +440,13 @@ function Activity() {
 
         {/* 버튼들 */}
         <div style={{ display: 'flex', gap: '8px', alignItems: 'center' }}>
+          <div style={{ width: '150px', height: '56px' }}>
+            <Button
+              content={`선택된 목록 (${selectedActivitiesInfo.length})`}
+              onClick={() => setIsModalOpen(true)}
+              type="borderBrand"
+            />
+          </div>
           <div style={{ width: '113px', height: '56px' }}>
             <Button
               content="전체 선택"
