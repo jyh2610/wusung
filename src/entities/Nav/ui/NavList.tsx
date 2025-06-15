@@ -37,12 +37,12 @@ export function NavList({
 
   const handleClick = () => {
     if (!routeKey) return;
-    console.log('결재내역', routeMap.mypage_payment);
+    console.log('결제내역', routeMap.mypage_payment);
     console.log('문의내역', routeMap.mypage_inquiry);
     console.log('routeKey', routeKey);
 
     if (list.title === '마이페이지' && list.subTitle) {
-      if (list.subTitle[0] === '결재내역') {
+      if (list.subTitle[0] === '결제내역') {
         router.push(routeMap.mypage_payment);
       } else if (list.subTitle[0] === '문의내역') {
         router.push(routeMap.mypage_inquiry);

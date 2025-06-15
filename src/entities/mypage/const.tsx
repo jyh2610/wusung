@@ -10,7 +10,7 @@ import {
 
 export const menuItems = [
   {
-    label: '결재내역',
+    label: '결제내역',
     icon: <IoReceiptOutline />,
     component: <PaymentHistory />
   },

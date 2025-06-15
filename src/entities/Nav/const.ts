@@ -19,6 +19,6 @@ export const navLists: INaviList[] = [
   },
   {
     title: '마이페이지',
-    subTitle: ['결재내역', '문의내역']
+    subTitle: ['결제내역', '문의내역']
   }
 ];

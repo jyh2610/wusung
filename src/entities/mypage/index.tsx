@@ -8,7 +8,7 @@ import { useSearchParams } from 'next/navigation';
 
 // 메뉴 리스트
 export function MypageComponent() {
-  const [selectedMenu, setSelectedMenu] = useState<string>('결재내역');
+  const [selectedMenu, setSelectedMenu] = useState<string>('결제내역');
   const searchParams = useSearchParams();
 
   useEffect(() => {

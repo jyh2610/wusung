@@ -13,6 +13,6 @@ export const routeMap = {
   notice: '/notice/dashboard', // 공지사항
   inquiry: '/notice/personal-inquiry', // 1:1문의
   mypage: '/mypage', // 마이페이지
-  mypage_payment: '/mypage?tab=결재내역', // 결재내역
+  mypage_payment: '/mypage?tab=결제내역', // 결제내역
   mypage_inquiry: '/mypage?tab=문의내역' // 문의내역
 };

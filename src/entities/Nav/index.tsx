@@ -28,7 +28,7 @@ export function Nav() {
 
   const handleSubMenuClick = (list: any, sub: string) => {
     if (list.title === '마이페이지') {
-      if (sub === '결재내역') {
+      if (sub === '결제내역') {
         router.push(routeMap.mypage_payment);
       } else if (sub === '문의내역') {
         router.push(routeMap.mypage_inquiry);
