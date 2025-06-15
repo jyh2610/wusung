@@ -394,6 +394,18 @@ export const getPlan = async ({
   }
 };
 
+export const getAdminPlan = async (scheduleId: number) => {
+  try {
+    const res = await request<IRes<IPlan>>({
+      method: 'GET',
+      url: `/api/admin/schedule/${scheduleId}`
+    });
+    return res.data.data;
+  } catch (error) {
+    console.error(error);
+  }
+};
+
 export interface PrintPDFPayload {
   year: number;
   month: number;
@@ -568,11 +580,40 @@ export const getContent = async (eduContentId: number) => {
   }
 };
 
+export const getAdminContent = async (eduContentId: number) => {
+  try {
+    const res = await request<IRes<IContent>>({
+      method: 'GET',
+      url: `/api/admin/edu-content/${eduContentId}`
+    });
+    return res.data.data;
+  } catch (error) {
+    console.error('컨텐츠 조회 실패');
+  }
+};
+
 export const getContentByIds = async (ids: number[]) => {
   try {
     const contents = await Promise.all(
       ids.map(async id => {
         const content = await getContent(id);
+        return content;
+      })
+    );
+    return contents.filter(
+      (content): content is IContent => content !== undefined
+    );
+  } catch (error) {
+    console.error('컨텐츠 조회 실패');
+    return [];
+  }
+};
+
+export const getAdminContentByIds = async (ids: number[]) => {
+  try {
+    const contents = await Promise.all(
+      ids.map(async id => {
+        const content = await getAdminContent(id);
         return content;
       })
     );

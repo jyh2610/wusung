@@ -13,7 +13,14 @@ import {
 } from './index.css';
 import { useScheduleStore } from '@/shared/stores/useScheduleStore';
 import { Droppable } from '@hello-pangea/dnd';
-import { getPlan, getContentByIds, getContent } from '@/entities/program/api';
+import {
+  getPlan,
+  getContentByIds,
+  getContent,
+  getAdminPlan,
+  searchContent,
+  getAdminContentByIds
+} from '@/entities/program/api';
 import { autoRegisterPlan } from '../../model/autoRegisterPlan';
 import { useDateStore } from '@/shared/stores/useDateStores';
 import { useUserStore } from '@/shared/stores/useUserStore';
@@ -32,7 +39,8 @@ export function Control({ isAdmin }: { isAdmin: boolean }) {
   const coverItems = useScheduleStore(state => state.coverItems);
   const etcItems = useScheduleStore(state => state.etcItems);
   const addEtcItem = useScheduleStore(state => state.addEtcItem);
-
+  console.log('etcContents:', etcContents);
+  console.log('etcItems:', etcItems);
   const { noPrintDate, toggleNoPrintDate } = useScheduleStore(state => ({
     noPrintDate: state.noPrintDate,
     toggleNoPrintDate: state.toggleNoPrintDate
@@ -70,16 +78,36 @@ export function Control({ isAdmin }: { isAdmin: boolean }) {
       useScheduleStore.getState().clearCoverItems();
       useScheduleStore.getState().clearEtcItems();
 
-      const plan = await getPlan({
-        year,
-        month,
-        difficultyLevel
-      });
+      let plan;
+      if (isAdmin) {
+        // 어드민인 경우 getAdminPlan 사용
+        const scheduleId = Number(searchParams.get('scheduleId'));
+        if (!scheduleId) {
+          toast.error('스케줄 ID가 필요합니다.');
+          return;
+        }
+        plan = await getAdminPlan(scheduleId);
+      } else {
+        // 일반 사용자인 경우 getPlan 사용
+        plan = await getPlan({
+          year,
+          month,
+          difficultyLevel
+        });
+      }
+
+      console.log('Loaded plan:', plan); // 디버깅용 로그
 
       if (plan) {
         // 커버 데이터 설정
         if (plan.coverEduContentId) {
-          const coverContent = await getContent(plan.coverEduContentId);
+          console.log('Loading cover content:', plan.coverEduContentId); // 디버깅용 로그
+          const coverContent = isAdmin
+            ? await searchContent(plan.coverEduContentId)
+            : await getContent(plan.coverEduContentId);
+
+          console.log('Cover content loaded:', coverContent); // 디버깅용 로그
+
           if (coverContent) {
             setCoverContent(coverContent);
             useScheduleStore.getState().addCoverItem({
@@ -90,32 +118,57 @@ export function Control({ isAdmin }: { isAdmin: boolean }) {
           }
         }
 
-        // 미들 데이터 설정 - 서버에서 받은 데이터의 중복 제거
-        if (plan.middleEduContentIds && plan.middleEduContentIds.length > 0) {
-          // 서버에서 받은 데이터의 중복을 제거
-          const uniqueIds = plan.middleEduContentIds.filter(
-            (id, index, self) => self.indexOf(id) === index
-          );
-          console.log('Original IDs:', plan.middleEduContentIds);
-          console.log('Unique IDs:', uniqueIds);
-
-          // 새로운 컨텐츠 가져오기
-          const middleContents = await getContentByIds(uniqueIds);
-          const validContents = middleContents.filter(
-            content => content.eduContentId
+        // 미들 데이터 설정
+        if (plan.middleEduContentIds) {
+          console.log(
+            'Original middleEduContentIds:',
+            plan.middleEduContentIds
           );
 
-          // 중복 없이 한 번만 추가
-          const store = useScheduleStore.getState();
-          validContents.forEach(content => {
-            if (content.eduContentId) {
-              store.addEtcItem({
-                id: content.eduContentId,
-                content: content.title,
-                thumbnailUrl: content.thumbnailUrl
-              });
-            }
-          });
+          // 문자열인 경우 JSON 파싱
+          const middleIds =
+            typeof plan.middleEduContentIds === 'string'
+              ? JSON.parse(plan.middleEduContentIds)
+              : plan.middleEduContentIds;
+
+          console.log('Parsed middleIds:', middleIds);
+
+          if (Array.isArray(middleIds) && middleIds.length > 0) {
+            const uniqueIds = middleIds.filter(
+              (id, index, self) => self.indexOf(id) === index
+            );
+            console.log('uniqueIds:', uniqueIds);
+
+            const middleContents = isAdmin
+              ? await getAdminContentByIds(uniqueIds)
+              : await getContentByIds(uniqueIds);
+            console.log('middleContents:', middleContents);
+
+            const validContents = middleContents.filter(
+              (content): content is IContent =>
+                content !== undefined && content.eduContentId !== undefined
+            );
+            console.log('validContents:', validContents);
+
+            // 기존 etcItems 초기화
+            useScheduleStore.getState().clearEtcItems();
+
+            // 새로운 컨텐츠 추가
+            const store = useScheduleStore.getState();
+            validContents.forEach(content => {
+              if (content.eduContentId) {
+                console.log('Adding content:', content);
+                store.addEtcItem({
+                  id: content.eduContentId,
+                  content: content.title,
+                  thumbnailUrl: content.thumbnailUrl
+                });
+              }
+            });
+
+            // etcContents 상태 업데이트
+            setEtcContents(validContents);
+          }
         }
       }
 
@@ -136,6 +189,12 @@ export function Control({ isAdmin }: { isAdmin: boolean }) {
     const yearParam = searchParams.get('year');
     const monthParam = searchParams.get('month');
 
+    console.log('useEffect triggered with params:', {
+      difficultyid,
+      yearParam,
+      monthParam
+    });
+
     if (difficultyid && yearParam && monthParam) {
       handleLoadPlan(
         Number(yearParam),
@@ -143,11 +202,13 @@ export function Control({ isAdmin }: { isAdmin: boolean }) {
         Number(difficultyid)
       );
     }
-  }, [searchParams]);
+  }, [searchParams, isAdmin]);
 
   // etcItems가 변경될 때 etcContents 업데이트
   useEffect(() => {
     const fetchContents = async () => {
+      console.log('fetchContents called with etcItems:', etcItems);
+
       // etcItems가 비어있으면 etcContents도 비우기
       if (etcItems.length === 0) {
         setEtcContents([]);
@@ -161,38 +222,48 @@ export function Control({ isAdmin }: { isAdmin: boolean }) {
         )
         .map(item => item.id);
 
+      console.log('newEtcIds to fetch:', newEtcIds);
+
       if (newEtcIds.length > 0) {
-        const newContents = await getContentByIds(newEtcIds);
-        if (newContents.length > 0) {
-          setEtcContents(prev => {
-            const uniqueContents = [...prev];
-            newContents.forEach(newContent => {
-              if (
-                !uniqueContents.some(
-                  content => content.eduContentId === newContent.eduContentId
-                )
-              ) {
-                uniqueContents.push(newContent);
-              }
+        try {
+          const newContents = await getContentByIds(newEtcIds);
+          console.log('fetched newContents:', newContents);
+
+          if (newContents.length > 0) {
+            setEtcContents(prev => {
+              const uniqueContents = [...prev];
+              newContents.forEach(newContent => {
+                if (
+                  newContent &&
+                  newContent.eduContentId &&
+                  !uniqueContents.some(
+                    content => content.eduContentId === newContent.eduContentId
+                  )
+                ) {
+                  uniqueContents.push(newContent);
+                }
+              });
+              console.log('updated etcContents:', uniqueContents);
+              return uniqueContents;
             });
-            return uniqueContents;
-          });
+          }
+        } catch (error) {
+          console.error('컨텐츠 조회 실패:', error);
         }
       }
     };
 
-    // handleLoadPlan에서 호출된 경우가 아닐 때만 실행
-    if (!searchParams.get('year') || !searchParams.get('month')) {
-      fetchContents();
-    }
-  }, [etcItems, etcContents, searchParams]);
+    fetchContents();
+  }, [etcItems]);
 
   // 컴포넌트 마운트 시 초기화
   useEffect(() => {
+    console.log('Component mounted, initializing...');
     reInit();
     setCoverContent(null);
     setEtcContents([]);
     return () => {
+      console.log('Component unmounting, cleaning up...');
       reInit();
       setCoverContent(null);
       setEtcContents([]);
@@ -202,10 +273,18 @@ export function Control({ isAdmin }: { isAdmin: boolean }) {
   // coverItems가 변경될 때 coverContent 업데이트
   useEffect(() => {
     const updateCoverContent = async () => {
+      console.log('updateCoverContent called with coverItems:', coverItems);
+
       if (coverItems?.id) {
-        const content = await getContent(coverItems.id);
-        if (content) {
-          setCoverContent(content);
+        try {
+          const content = await getContent(coverItems.id);
+          console.log('fetched cover content:', content);
+
+          if (content) {
+            setCoverContent(content);
+          }
+        } catch (error) {
+          console.error('커버 컨텐츠 조회 실패:', error);
         }
       } else {
         setCoverContent(null);
@@ -230,12 +309,6 @@ export function Control({ isAdmin }: { isAdmin: boolean }) {
       return;
     }
     try {
-      const res = await getPlan({
-        year,
-        month,
-        difficultyLevel: selectedUser.difficultyLevel
-      });
-
       await autoRegisterPlan({
         year,
         month,
