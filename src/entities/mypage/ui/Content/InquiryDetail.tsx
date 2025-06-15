@@ -32,6 +32,47 @@ interface InquiryDetailProps {
   onRefresh?: () => void;
 }
 
+// 이미지 파일 확장자 체크 함수 추가
+const isImageFile = (fileName: string): boolean => {
+  const imageExtensions = ['.jpg', '.jpeg', '.png', '.gif', '.bmp', '.webp'];
+  return imageExtensions.some(ext => fileName.toLowerCase().endsWith(ext));
+};
+
+// 파일 다운로드 링크 컴포넌트 추가
+const FileDownloadLink = ({ url, name }: { url: string; name: string }) => (
+  <a
+    href={url}
+    download={name}
+    style={{
+      display: 'flex',
+      alignItems: 'center',
+      gap: '8px',
+      padding: '8px 12px',
+      backgroundColor: '#f5f5f5',
+      borderRadius: '4px',
+      color: '#333',
+      textDecoration: 'none',
+      fontSize: '14px'
+    }}
+  >
+    <svg
+      width="16"
+      height="16"
+      viewBox="0 0 24 24"
+      fill="none"
+      stroke="currentColor"
+      strokeWidth="2"
+      strokeLinecap="round"
+      strokeLinejoin="round"
+    >
+      <path d="M21 15v4a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2v-4" />
+      <polyline points="7 10 12 15 17 10" />
+      <line x1="12" y1="15" x2="12" y2="3" />
+    </svg>
+    {name}
+  </a>
+);
+
 export function InquiryDetail({
   inquiry,
   comments,
@@ -144,13 +185,23 @@ export function InquiryDetail({
           <strong className={detailSectionTitle}>첨부 파일</strong>
           <div className={detailImageList}>
             {getInquiryFiles().length ? (
-              getInquiryFiles().map(file => (
-                <InquiryFilePreview
-                  key={file.fileId}
-                  url={file.fileUrl}
-                  name={file.fileName}
-                />
-              ))
+              <div style={{ display: 'flex', gap: '8px', flexWrap: 'wrap' }}>
+                {getInquiryFiles().map(file =>
+                  isImageFile(file.fileName) ? (
+                    <InquiryFilePreview
+                      key={file.fileId}
+                      url={file.fileUrl}
+                      name={file.fileName}
+                    />
+                  ) : (
+                    <FileDownloadLink
+                      key={file.fileId}
+                      url={file.fileUrl}
+                      name={file.fileName}
+                    />
+                  )
+                )}
+              </div>
             ) : (
               <span className={detailNoData}>첨부 파일 없음</span>
             )}
@@ -159,48 +210,6 @@ export function InquiryDetail({
 
         <div>
           <strong className={detailSectionTitle}>댓글</strong>
-          <form onSubmit={handleSubmitReply} style={{ marginBottom: '20px' }}>
-            <textarea
-              value={replyContent}
-              onChange={e => setReplyContent(e.target.value)}
-              placeholder="댓글을 입력하세요"
-              style={{
-                width: '100%',
-                minHeight: '60px',
-                padding: '8px',
-                marginBottom: '8px',
-                border: '1px solid #ddd',
-                borderRadius: '4px'
-              }}
-            />
-            <div style={{ marginBottom: '8px' }}>
-              <input
-                type="file"
-                multiple
-                onChange={handleFileChange}
-                style={{ marginBottom: '8px' }}
-              />
-              {selectedFiles.length > 0 && (
-                <div style={{ fontSize: '12px', color: '#666' }}>
-                  {selectedFiles.length}개의 파일이 선택됨
-                </div>
-              )}
-            </div>
-            <button
-              type="submit"
-              style={{
-                padding: '6px 12px',
-                backgroundColor: '#e1007b',
-                color: 'white',
-                border: 'none',
-                borderRadius: '4px',
-                cursor: 'pointer'
-              }}
-            >
-              댓글 작성
-            </button>
-          </form>
-
           <div
             className={detailCommentList}
             style={{
@@ -212,12 +221,13 @@ export function InquiryDetail({
               padding: '16px',
               border: '1px solid #eee',
               borderRadius: '8px',
-              backgroundColor: '#fff'
+              backgroundColor: '#fff',
+              marginBottom: '16px'
             }}
           >
             {comments.length ? (
               comments.map(comment => {
-                const isCurrentUser = currentMemberId === comment.memberId;
+                const isInquiryWriter = inquiry.memberId === comment.memberId;
                 const commentFiles = getCommentFiles(comment);
 
                 return (
@@ -226,15 +236,17 @@ export function InquiryDetail({
                     style={{
                       display: 'flex',
                       flexDirection: 'column',
-                      alignItems: isCurrentUser ? 'flex-end' : 'flex-start',
+                      alignItems: isInquiryWriter ? 'flex-end' : 'flex-start',
                       maxWidth: '70%',
-                      alignSelf: isCurrentUser ? 'flex-end' : 'flex-start'
+                      alignSelf: isInquiryWriter ? 'flex-end' : 'flex-start'
                     }}
                   >
                     <div
                       style={{
-                        backgroundColor: isCurrentUser ? '#e1007b' : '#f0f0f0',
-                        color: isCurrentUser ? 'white' : 'black',
+                        backgroundColor: isInquiryWriter
+                          ? '#e1007b'
+                          : '#f0f0f0',
+                        color: isInquiryWriter ? 'white' : 'black',
                         padding: '12px 16px',
                         borderRadius: '12px',
                         marginBottom: '4px',
@@ -248,16 +260,25 @@ export function InquiryDetail({
                         style={{
                           display: 'flex',
                           gap: '8px',
-                          marginTop: '8px'
+                          marginTop: '8px',
+                          flexWrap: 'wrap'
                         }}
                       >
-                        {commentFiles.map(file => (
-                          <InquiryFilePreview
-                            key={file.fileId}
-                            url={file.fileUrl}
-                            name={file.fileName}
-                          />
-                        ))}
+                        {commentFiles.map(file =>
+                          isImageFile(file.fileName) ? (
+                            <InquiryFilePreview
+                              key={file.fileId}
+                              url={file.fileUrl}
+                              name={file.fileName}
+                            />
+                          ) : (
+                            <FileDownloadLink
+                              key={file.fileId}
+                              url={file.fileUrl}
+                              name={file.fileName}
+                            />
+                          )
+                        )}
                       </div>
                     )}
                     <div
@@ -276,6 +297,71 @@ export function InquiryDetail({
               <div className={detailNoData}>댓글 없음</div>
             )}
           </div>
+
+          <form
+            onSubmit={handleSubmitReply}
+            style={{
+              display: 'flex',
+              gap: '8px',
+              padding: '16px',
+              border: '1px solid #eee',
+              borderRadius: '8px',
+              backgroundColor: '#fff'
+            }}
+          >
+            <div
+              style={{
+                flex: 1,
+                display: 'flex',
+                flexDirection: 'column',
+                gap: '8px'
+              }}
+            >
+              <textarea
+                value={replyContent}
+                onChange={e => setReplyContent(e.target.value)}
+                placeholder="댓글을 입력하세요"
+                style={{
+                  width: '100%',
+                  minHeight: '60px',
+                  padding: '8px',
+                  border: '1px solid #ddd',
+                  borderRadius: '4px',
+                  resize: 'none'
+                }}
+              />
+              <div
+                style={{ display: 'flex', alignItems: 'center', gap: '8px' }}
+              >
+                <input
+                  type="file"
+                  multiple
+                  onChange={handleFileChange}
+                  style={{ flex: 1 }}
+                />
+                {selectedFiles.length > 0 && (
+                  <div style={{ fontSize: '12px', color: '#666' }}>
+                    {selectedFiles.length}개의 파일이 선택됨
+                  </div>
+                )}
+              </div>
+            </div>
+            <button
+              type="submit"
+              style={{
+                padding: '0 16px',
+                backgroundColor: '#e1007b',
+                color: 'white',
+                border: 'none',
+                borderRadius: '4px',
+                cursor: 'pointer',
+                height: '40px',
+                alignSelf: 'flex-end'
+              }}
+            >
+              전송
+            </button>
+          </form>
         </div>
       </div>
     </div>
