@@ -25,7 +25,9 @@ export const CoordinateList = ({
         >
           <span>
             #{i + 1} X:{rect.x.toFixed(4)}%, Y:{rect.y.toFixed(4)}%, W:
-            {rect.width.toFixed(4)}%, H:{rect.height.toFixed(4)}%
+            {rect.width.toFixed(4)}%, H:{rect.height.toFixed(4)}%,
+            {rect.type && ` 타입: ${rect.type}`},
+            {rect.fixedText && ` 텍스트: ${rect.fixedText}`}
           </span>
           <Button
             variant="outline"
