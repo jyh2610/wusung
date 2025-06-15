@@ -16,8 +16,16 @@ export function LineBannerContent({
 }) {
   const router = useRouter();
 
+  const handleClick = () => {
+    if (link.startsWith('http')) {
+      window.open(link, '_blank');
+    } else {
+      router.push(link);
+    }
+  };
+
   return (
-    <div className={LineBannerContentStyles} onClick={() => router.push(link)}>
+    <div className={LineBannerContentStyles} onClick={handleClick}>
       <span className={contentStyles}>
         {content}
         <FaArrowRight />

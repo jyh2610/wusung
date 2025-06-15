@@ -77,9 +77,10 @@ export const putEduContent = async ({
         Authorization: `Bearer ${token}`
       }
     });
-
+    toast.success('콘텐츠가 수정되었습니다.');
     return res.data;
   } catch (error) {
+    toast.error('콘텐츠 수정에 실패했습니다.');
     console.error('Failed to update content:', error);
     throw error;
   }
@@ -130,9 +131,10 @@ export const eduContentReg = async (content: IContent, imageFiles: File[]) => {
         Authorization: `Bearer ${token}`
       }
     });
-
+    toast.success('콘텐츠가 등록되었습니다.');
     return res.data;
   } catch (error) {
+    toast.error('콘텐츠 등록에 실패했습니다.');
     console.error('Failed to register content:', error);
     throw error;
   }

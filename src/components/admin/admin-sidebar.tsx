@@ -59,13 +59,6 @@ export default function AdminSidebar() {
       active: pathname === '/admin/content'
     },
     {
-      label: '콘텐츠 업로드',
-      icon: Upload,
-      href: '/admin/content/upload',
-      active: pathname === '/admin/content/upload'
-    },
-
-    {
       label: '스케줄 리스트 관리',
       icon: Calendar,
       href: '/admin/schedule/list',

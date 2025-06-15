@@ -10,12 +10,14 @@ import { title } from '../../../index.css';
 const endpointMapper: Record<string, string> = {
   evaluation: '평가자료',
   etc: '기타자료',
-  activity: '개별 활동지'
+  activity: '활동지'
 };
 
 export function ActivityBox() {
   const pathname = usePathname();
-  const endpoint = pathname.split('/').pop() || '';
+  const pathSegments = pathname.split('/');
+  const endpoint =
+    Object.keys(endpointMapper).find(key => pathSegments.includes(key)) || '';
   const categoryName = endpointMapper[endpoint];
 
   const {
@@ -52,18 +54,20 @@ export function ActivityBox() {
     return rootCategories;
   }, [rootCategories, endpoint]);
 
-  console.log('Category Tree:', categoryIndividualList);
-  console.log('Root Categories:', rootCategories);
-
   const handleCategorySelect = (category: CategoryNode) => {
     setSelectedCategoryNode(category);
   };
 
   useEffect(() => {
     if (rootCategories.length > 0) {
-      setSelectedCategoryNode(rootCategories[0]); // 첫 번째 항목 자동 선택
+      const targetCategory = rootCategories.find(
+        category => category.name === categoryName
+      );
+      if (targetCategory) {
+        setSelectedCategoryNode(targetCategory);
+      }
     }
-  }, [rootCategories, setSelectedCategoryNode]);
+  }, [rootCategories, setSelectedCategoryNode, categoryName, pathname]);
 
   return (
     <div>
@@ -73,7 +77,12 @@ export function ActivityBox() {
       <div className="space-y-6">
         {filteredCategories.map(rootCategory => (
           <div key={rootCategory.categoryId} className="mb-4">
-            <h4 className="font-medium text-lg mb-2">{rootCategory.name}</h4>
+            <h4
+              className={`font-medium text-lg mb-2 cursor-pointer ${selectedCategoryNode?.categoryId === rootCategory.categoryId ? selectedItem : ''}`}
+              onClick={() => handleCategorySelect(rootCategory)}
+            >
+              {rootCategory.name}
+            </h4>
             <ul>
               {rootCategory.children.map(item => (
                 <li

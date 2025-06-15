@@ -1,5 +1,9 @@
 import { getDetailContent } from '@/entities/program/api';
-import { CategoryNode, IContent, IContentList } from '@/entities/program/type.dto';
+import {
+  CategoryNode,
+  IContent,
+  IContentList
+} from '@/entities/program/type.dto';
 import { findEvaluationCategories } from '@/lib/utils';
 import request from '@/shared/api/axiosInstance';
 import { ApiResponse, PaginatedResponse } from '@/shared/type';
@@ -29,14 +33,22 @@ export const fetchEvaluationContentsOnly = async (
   return results.flat();
 };
 
-export const getContentList = async ({categoryId, difficultyLevel,page,size}:{categoryId:number, difficultyLevel:number,page:number,size:number}) => {
+export const getContentList = async ({
+  categoryId,
+  page,
+  size
+}: {
+  categoryId: number;
+  page: number;
+  size: number;
+}) => {
   const res = await request<ApiResponse<PaginatedResponse<IContentList[]>>>({
     method: 'GET',
-    url: `/api/program/use/${categoryId}/${difficultyLevel}`,
+    url: `/api/program/use/${categoryId}/0`,
     params: {
       page,
-      size    
-    } 
+      size
+    }
   });
   return res;
 };

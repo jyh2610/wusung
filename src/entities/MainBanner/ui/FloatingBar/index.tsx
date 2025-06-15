@@ -35,7 +35,9 @@ export const FloatingBar = () => {
         </div>
         <div
           className={floatingBarItem}
-          onClick={() => router.push('/remote-support')}
+          onClick={() =>
+            window.open('https://remotedesktop.google.com/support', '_blank')
+          }
         >
           <Image
             src={'/images/joy.png'}
