@@ -27,6 +27,7 @@ import { usePathname, useRouter } from 'next/navigation';
 import { handleCurrentPathRoute } from '@/lib/utils';
 import { CustomCascader } from '@/shared/ui/cascader';
 import { IContent, ICategoryLeaf } from '@/entities/program/type.dto';
+import { useIsAdmin } from '@/components/hooks/useIsAdmin';
 
 function Activity() {
   const router = useRouter();
@@ -42,7 +43,8 @@ function Activity() {
     selectedCategoryNode,
     setSelectedCategoryNode
   } = useCategoryTreeStore();
-  const isAdmin = true;
+
+  const isAdmin = useIsAdmin();
   const [personName, setPersonName] = useState<string[]>([]);
   const [selectedLevel, setSelectedLevel] = useState<'high' | 'medium' | 'low'>(
     'medium'
