@@ -390,8 +390,10 @@ export const getPlan = async ({
     if (res.status === 400) {
       toast.info(res.data.message);
     }
+    toast.success('계획안을 불러왔습니다.');
     return res.data.data;
   } catch (error) {
+    toast.error('계획안을 불러오는데 실패했습니다.');
     console.error(error);
   }
 };
