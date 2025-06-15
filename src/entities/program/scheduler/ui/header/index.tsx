@@ -37,9 +37,25 @@ function Header({
   useEffect(() => {
     const yearParam = searchParams.get('year');
     const monthParam = searchParams.get('month');
+    const scheduleId = searchParams.get('scheduleId');
 
-    if (yearParam) setYear(Number(yearParam));
-    if (monthParam) setMonth(Number(monthParam));
+    if (yearParam && monthParam) {
+      // 수정 모드이거나 URL 파라미터가 있는 경우 그대로 사용
+      setYear(Number(yearParam));
+      setMonth(Number(monthParam));
+    } else if (!scheduleId) {
+      // 새로 생성하는 경우에만 현재 월 +1 로직 적용
+      const currentDate = new Date();
+      const currentMonth = currentDate.getMonth() + 1; // 0-based이므로 +1
+
+      if (currentMonth === 12) {
+        setYear(currentDate.getFullYear() + 1);
+        setMonth(1);
+      } else {
+        setYear(currentDate.getFullYear());
+        setMonth(currentMonth + 1);
+      }
+    }
   }, [searchParams, setYear, setMonth]);
 
   const mainEduContentIds = formatScheduleData(schedule, year, month);

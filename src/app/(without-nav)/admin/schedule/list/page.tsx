@@ -21,12 +21,17 @@ const Page = () => {
   const router = useRouter();
   const searchParams = useSearchParams();
 
-  const [selectedYear, setSelectedYear] = useState<number>(
-    new Date().getFullYear()
-  );
-  const [selectedMonth, setSelectedMonth] = useState<number>(
-    new Date().getMonth() + 1
-  );
+  const [selectedYear, setSelectedYear] = useState<number>(() => {
+    const currentDate = new Date();
+    const currentMonth = currentDate.getMonth() + 1;
+    return currentMonth === 12
+      ? currentDate.getFullYear() + 1
+      : currentDate.getFullYear();
+  });
+  const [selectedMonth, setSelectedMonth] = useState<number>(() => {
+    const currentMonth = new Date().getMonth() + 1;
+    return currentMonth === 12 ? 1 : currentMonth;
+  });
   const [selectedDifficulty, setSelectedDifficulty] = useState<number>(2);
   const [currentPage, setCurrentPage] = useState<number>(0);
   const pageSize = 10;
@@ -87,6 +92,11 @@ const Page = () => {
   };
 
   const handleMonthChange = (month: number) => {
+    if (selectedMonth === 12 && month === 1) {
+      setSelectedYear(selectedYear + 1);
+    } else if (selectedMonth === 1 && month === 12) {
+      setSelectedYear(selectedYear - 1);
+    }
     setSelectedMonth(month);
     setCurrentPage(0);
     updateQueryParams(selectedYear, month, selectedDifficulty);
