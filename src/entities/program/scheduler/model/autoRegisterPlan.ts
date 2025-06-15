@@ -1,5 +1,5 @@
 import { useScheduleStore } from '@/shared/stores/useScheduleStore';
-import { getPlan, searchContent } from '../../api';
+import { getPlan, getContent } from '../../api';
 import { ScheduleItem } from '../../type.dto';
 
 interface AutoRegisterParams {
@@ -25,9 +25,7 @@ export const autoRegisterPlan = async ({
       const contentIds = plan.mainEduContentIds[i];
       if (!contentIds.length) continue;
 
-      const contents = await Promise.all(
-        contentIds.map(id => searchContent(id))
-      );
+      const contents = await Promise.all(contentIds.map(id => getContent(id)));
       const [cognitive, daily] = contents;
       const day = i + 1;
 
@@ -37,7 +35,8 @@ export const autoRegisterPlan = async ({
           ? {
               cognitive: {
                 id: cognitive.eduContentId!,
-                content: cognitive.title
+                content: cognitive.title,
+                thumbnailUrl: cognitive.thumbnailUrl
               }
             }
           : {}),
@@ -45,7 +44,8 @@ export const autoRegisterPlan = async ({
           ? {
               daily: {
                 id: daily.eduContentId!,
-                content: daily.title
+                content: daily.title,
+                thumbnailUrl: daily.thumbnailUrl
               }
             }
           : {})

@@ -144,6 +144,11 @@ export function Calendar({ schedule, isAdmin }: CalendarProps) {
                             gap: '8px',
                             alignItems: 'center'
                           }}
+                          onMouseEnter={() => {
+                            if (item.thumbnailUrl) {
+                              console.log('Thumbnail URL:', item.thumbnailUrl);
+                            }
+                          }}
                         >
                           {item.thumbnailUrl && (
                             <img

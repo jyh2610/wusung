@@ -70,7 +70,6 @@ function Header({
   const selectedUserId = useUserStore(state => state.selectedUserId);
   const users = useUserStore.getState().users;
   const selectedUser = users.find(user => user.elderId === selectedUserId);
-  console.log(selectedUser);
   const handlePrevMonth = () => {
     if (month === 1) {
       setMonth(12);
@@ -126,7 +125,6 @@ function Header({
         coverItems && coverItems.id !== 0 ? coverItems.id : null;
       const middleEduContentIds = etcItems.map(item => item.id);
       const mainEduContentIds = getFilteredMainEduContentIds();
-
       // URL에서 scheduleId 가져오기
       const scheduleId = searchParams.get('scheduleId');
       const yearParam = searchParams.get('year');

@@ -139,9 +139,14 @@ export const useScheduleStore = create<ScheduleState>(set => ({
   clearCoverItems: () => set({ coverItems: null }),
 
   addEtcItem: item =>
-    set(state => ({
-      etcItems: [...state.etcItems, item]
-    })),
+    set(state => {
+      if (state.etcItems.some(existingItem => existingItem.id === item.id)) {
+        return state;
+      }
+      return {
+        etcItems: [...state.etcItems, item]
+      };
+    }),
   clearEtcItems: () => set({ etcItems: [] }),
 
   setSelectedDifficulty: difficulty => set({ selectedDifficulty: difficulty })

@@ -84,26 +84,35 @@ export function Control({ isAdmin }: { isAdmin: boolean }) {
             setCoverContent(coverContent);
             useScheduleStore.getState().addCoverItem({
               id: coverContent.eduContentId!,
-              content: coverContent.title
+              content: coverContent.title,
+              thumbnailUrl: coverContent.thumbnailUrl
             });
           }
         }
 
-        // 미들 데이터 설정 - 중복 제거
+        // 미들 데이터 설정 - 서버에서 받은 데이터의 중복 제거
         if (plan.middleEduContentIds && plan.middleEduContentIds.length > 0) {
-          // 중복 제거를 Array.from과 Set을 사용하여 수행
-          const uniqueIds = Array.from(new Set(plan.middleEduContentIds));
+          // 서버에서 받은 데이터의 중복을 제거
+          const uniqueIds = plan.middleEduContentIds.filter(
+            (id, index, self) => self.indexOf(id) === index
+          );
+          console.log('Original IDs:', plan.middleEduContentIds);
+          console.log('Unique IDs:', uniqueIds);
+
+          // 새로운 컨텐츠 가져오기
           const middleContents = await getContentByIds(uniqueIds);
           const validContents = middleContents.filter(
             content => content.eduContentId
           );
 
           // 중복 없이 한 번만 추가
+          const store = useScheduleStore.getState();
           validContents.forEach(content => {
             if (content.eduContentId) {
-              useScheduleStore.getState().addEtcItem({
+              store.addEtcItem({
                 id: content.eduContentId,
-                content: content.title
+                content: content.title,
+                thumbnailUrl: content.thumbnailUrl
               });
             }
           });
@@ -172,8 +181,11 @@ export function Control({ isAdmin }: { isAdmin: boolean }) {
       }
     };
 
-    fetchContents();
-  }, [etcItems, etcContents]);
+    // handleLoadPlan에서 호출된 경우가 아닐 때만 실행
+    if (!searchParams.get('year') || !searchParams.get('month')) {
+      fetchContents();
+    }
+  }, [etcItems, etcContents, searchParams]);
 
   // 컴포넌트 마운트 시 초기화
   useEffect(() => {
@@ -250,14 +262,21 @@ export function Control({ isAdmin }: { isAdmin: boolean }) {
   };
 
   // 스타일 추가
-  const style = document.createElement('style');
-  style.textContent = `
-    li:hover .thumbnail-popup,
-    div:hover .thumbnail-popup {
-      display: block !important;
-    }
-  `;
-  document.head.appendChild(style);
+  useEffect(() => {
+    const style = document.createElement('style');
+    style.textContent = `
+      li:hover .thumbnail-popup,
+      div:hover .thumbnail-popup {
+        display: block !important;
+      }
+    `;
+    document.head.appendChild(style);
+
+    // cleanup
+    return () => {
+      document.head.removeChild(style);
+    };
+  }, []);
 
   return (
     <div className={Container}>
@@ -435,7 +454,7 @@ export function Control({ isAdmin }: { isAdmin: boolean }) {
                   justifyContent: 'center'
                 }}
               >
-                {etcContents.length}
+                {etcItems.length}
               </div>
 
               {provided.placeholder}
@@ -457,11 +476,11 @@ export function Control({ isAdmin }: { isAdmin: boolean }) {
             <div style={{ marginTop: '20px' }}>
               {/* 기타자료 목록 */}
               {modalType === 'etc' &&
-                (etcContents.length > 0 ? (
+                (etcItems.length > 0 ? (
                   <ul style={{ padding: 0, listStyle: 'none' }}>
-                    {etcContents.map(content => (
+                    {etcItems.map(content => (
                       <li
-                        key={content.eduContentId}
+                        key={content.id}
                         style={{
                           display: 'flex',
                           justifyContent: 'space-between',
@@ -474,7 +493,7 @@ export function Control({ isAdmin }: { isAdmin: boolean }) {
                         }}
                         onMouseEnter={() => {
                           const popup = document.querySelector(
-                            `#thumbnail-${content.eduContentId}`
+                            `#thumbnail-${content.id}`
                           );
                           if (popup) {
                             (popup as HTMLElement).style.display = 'block';
@@ -482,14 +501,14 @@ export function Control({ isAdmin }: { isAdmin: boolean }) {
                         }}
                         onMouseLeave={() => {
                           const popup = document.querySelector(
-                            `#thumbnail-${content.eduContentId}`
+                            `#thumbnail-${content.id}`
                           );
                           if (popup) {
                             (popup as HTMLElement).style.display = 'none';
                           }
                         }}
                       >
-                        <span>{content.title}</span>
+                        <span>{content.content}</span>
                         <button
                           style={{
                             border: 'none',
@@ -497,15 +516,13 @@ export function Control({ isAdmin }: { isAdmin: boolean }) {
                             color: 'red',
                             cursor: 'pointer'
                           }}
-                          onClick={() =>
-                            handleDeleteItem(content.eduContentId!)
-                          }
+                          onClick={() => handleDeleteItem(content.id)}
                         >
                           삭제
                         </button>
                         {content.thumbnailUrl && (
                           <div
-                            id={`thumbnail-${content.eduContentId}`}
+                            id={`thumbnail-${content.id}`}
                             style={{
                               position: 'absolute',
                               left: 0,
