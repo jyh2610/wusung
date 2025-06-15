@@ -23,8 +23,8 @@ export const BannerEdit = () => {
     type: 'slide_banner',
     displayOrder: 1
   });
-  const [images, setImages] = useState<File[]>([]);
-  const [previewUrls, setPreviewUrls] = useState<string[]>([]);
+  const [image, setImage] = useState<File | null>(null);
+  const [previewUrl, setPreviewUrl] = useState<string>('');
 
   // 기존 배너 데이터가 로드되면 폼 초기화
   React.useEffect(() => {
@@ -33,7 +33,7 @@ export const BannerEdit = () => {
         type: bannerData.data.type,
         displayOrder: bannerData.data.displayOrder
       });
-      setPreviewUrls(bannerData.data.url.split(',').map(url => url.trim()));
+      setPreviewUrl(bannerData.data.url.split(',')[0].trim());
     }
   }, [bannerData]);
 
@@ -41,12 +41,16 @@ export const BannerEdit = () => {
     mutationFn: (data: {
       bannerId: string;
       bannerData: IBannerRegisterDTO;
-      images: File[];
-    }) => updateBanner(data.bannerId, data.bannerData, data.images),
+      image: File | null;
+    }) =>
+      updateBanner(
+        data.bannerId,
+        data.bannerData,
+        data.image ? [data.image] : []
+      ),
     onSuccess: () => {
       queryClient.invalidateQueries({ queryKey: ['bannerList'] });
       queryClient.invalidateQueries({ queryKey: ['bannerDetail', bannerId] });
-      toast.success('배너가 수정되었습니다.');
       router.push(`/admin/banner/${bannerId}`);
     },
     onError: () => {
@@ -55,12 +59,14 @@ export const BannerEdit = () => {
   });
 
   const handleImageChange = (e: React.ChangeEvent<HTMLInputElement>) => {
-    const files = Array.from(e.target.files || []);
-    setImages(files);
+    const file = e.target.files?.[0] || null;
+    setImage(file);
 
     // 미리보기 URL 생성
-    const urls = files.map(file => URL.createObjectURL(file));
-    setPreviewUrls(urls);
+    if (file) {
+      const url = URL.createObjectURL(file);
+      setPreviewUrl(url);
+    }
   };
 
   const handleSubmit = (e: React.FormEvent) => {
@@ -68,7 +74,7 @@ export const BannerEdit = () => {
     updateBannerMutation.mutate({
       bannerId,
       bannerData: bannerForm,
-      images
+      image
     });
   };
 
@@ -135,29 +141,23 @@ export const BannerEdit = () => {
           <div>
             <label className="block text-sm font-medium text-gray-700 mb-2">
               이미지
-              {bannerForm.type === 'slide_banner' && ' (여러 개 선택 가능)'}
             </label>
             <input
               type="file"
               accept="image/*"
-              multiple={bannerForm.type === 'slide_banner'}
               onChange={handleImageChange}
               className="w-full"
             />
           </div>
 
           {/* 이미지 미리보기 */}
-          {previewUrls.length > 0 && (
-            <div className="grid grid-cols-2 md:grid-cols-3 gap-4">
-              {previewUrls.map((url, index) => (
-                <div key={index} className="relative aspect-video">
-                  <img
-                    src={url}
-                    alt={`Preview ${index + 1}`}
-                    className="w-full h-full object-cover rounded-lg"
-                  />
-                </div>
-              ))}
+          {previewUrl && (
+            <div className="relative aspect-video">
+              <img
+                src={previewUrl}
+                alt="Preview"
+                className="w-full h-full object-cover rounded-lg"
+              />
             </div>
           )}
 

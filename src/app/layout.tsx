@@ -39,7 +39,18 @@ export default function RootLayout({
         <QueryProvider>
           <NextUiProvider>{children}</NextUiProvider>
         </QueryProvider>
-        <ToastContainer />
+        <ToastContainer
+          position="top-center"
+          autoClose={2000}
+          hideProgressBar={false}
+          newestOnTop
+          closeOnClick
+          rtl={false}
+          pauseOnFocusLoss
+          draggable
+          pauseOnHover
+          theme="light"
+        />
       </body>
     </html>
   );

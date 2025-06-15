@@ -36,6 +36,8 @@ export function PaymentComponent() {
   };
 
   const handleOpenModal = () => {
+    const { username } = useAuthStore.getState();
+    if (!username) return toast.info('로그인이 필요한 서비스입니다.');
     if (!selectedPayment) return toast.info('상품을 선택해 주세요.');
     setIsModalOpen(true);
   };

@@ -15,15 +15,16 @@ export const BannerRegister = () => {
     type: 'slide_banner',
     displayOrder: 1
   });
-  const [images, setImages] = useState<File[]>([]);
-  const [previewUrls, setPreviewUrls] = useState<string[]>([]);
+  const [image, setImage] = useState<File | null>(null);
+  const [previewUrl, setPreviewUrl] = useState<string>('');
 
   const createBannerMutation = useMutation({
-    mutationFn: (data: { bannerData: IBannerRegisterDTO; images: File[] }) =>
-      createBanner(data.bannerData, data.images),
+    mutationFn: (data: {
+      bannerData: IBannerRegisterDTO;
+      image: File | null;
+    }) => createBanner(data.bannerData, data.image ? [data.image] : []),
     onSuccess: () => {
       queryClient.invalidateQueries({ queryKey: ['bannerList'] });
-      toast.success('배너가 등록되었습니다.');
       router.push('/admin/banner');
     },
     onError: () => {
@@ -33,16 +34,16 @@ export const BannerRegister = () => {
 
   const handleImageChange = (e: React.ChangeEvent<HTMLInputElement>) => {
     const files = Array.from(e.target.files || []);
-    setImages(files);
+    setImage(files[0]);
 
     // 미리보기 URL 생성
     const urls = files.map(file => URL.createObjectURL(file));
-    setPreviewUrls(urls);
+    setPreviewUrl(urls[0]);
   };
 
   const handleSubmit = (e: React.FormEvent) => {
     e.preventDefault();
-    createBannerMutation.mutate({ bannerData, images });
+    createBannerMutation.mutate({ bannerData, image });
   };
 
   return (
@@ -104,29 +105,24 @@ export const BannerRegister = () => {
           <div>
             <label className="block text-sm font-medium text-gray-700 mb-2">
               이미지
-              {bannerData.type === 'slide_banner' && ' (여러 개 선택 가능)'}
             </label>
             <input
               type="file"
               accept="image/*"
-              multiple={bannerData.type === 'slide_banner'}
+              multiple={false}
               onChange={handleImageChange}
               className="w-full"
             />
           </div>
 
           {/* 이미지 미리보기 */}
-          {previewUrls.length > 0 && (
-            <div className="grid grid-cols-2 md:grid-cols-3 gap-4">
-              {previewUrls.map((url, index) => (
-                <div key={index} className="relative aspect-video">
-                  <img
-                    src={url}
-                    alt={`Preview ${index + 1}`}
-                    className="w-full h-full object-cover rounded-lg"
-                  />
-                </div>
-              ))}
+          {previewUrl && (
+            <div className="relative aspect-video">
+              <img
+                src={previewUrl}
+                alt="Preview"
+                className="w-full h-full object-cover rounded-lg"
+              />
             </div>
           )}
 
