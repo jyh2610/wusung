@@ -15,14 +15,21 @@ import {
   getCategoryList,
   regCategory,
   updateCategory,
-  deleteCategory
+  deleteCategory,
+  controlCategory
 } from '../api';
 import { ICategory } from '@/shared/type';
 import { RegCategory } from '@/components/admin/tpye';
 import { Input } from '@/components/ui/input';
 import { Skeleton } from '@/components/ui/skeleton';
 import { Badge } from '@/components/ui/badge';
-import { ChevronDown, ChevronRight, Trash2 } from 'lucide-react';
+import {
+  ChevronDown,
+  ChevronRight,
+  Trash2,
+  ArrowUp,
+  ArrowDown
+} from 'lucide-react';
 import {
   Dialog,
   DialogContent,
@@ -166,6 +173,15 @@ export const Category = () => {
     setSelectedCategory(null);
   };
 
+  const handleOrderChange = async (categoryId: number, up: boolean) => {
+    try {
+      await controlCategory(categoryId, up);
+      queryClient.invalidateQueries({ queryKey: ['categories'] });
+    } catch (error) {
+      console.error('카테고리 순서 변경 중 오류:', error);
+    }
+  };
+
   const filteredCategories = categories?.filter(category =>
     category.name.toLowerCase().includes(search.toLowerCase())
   );
@@ -182,10 +198,17 @@ export const Category = () => {
     });
   };
 
-  const renderCategoryRow = (category: ICategory, level: number = 0) => {
+  const renderCategoryRow = (
+    category: ICategory,
+    level: number = 0,
+    index: number = 0,
+    totalCount: number = 0
+  ) => {
     const hasChildren = category.children && category.children.length > 0;
     const isExpanded = expandedCategories.has(category.categoryId);
     const isTopLevel = !category.parentId;
+    const isFirst = index === 0;
+    const isLast = index === totalCount - 1;
 
     return (
       <React.Fragment key={category.categoryId}>
@@ -219,33 +242,64 @@ export const Category = () => {
             </Badge>
           </TableCell>
           <TableCell>
-            <div className="flex gap-2">
-              {!isTopLevel && (
-                <>
+            <div className="flex items-center gap-2">
+              <div className="flex items-center gap-2">
+                {!isTopLevel && (
+                  <>
+                    <Button
+                      variant="outline"
+                      size="sm"
+                      onClick={() => handleEditClick(category)}
+                    >
+                      수정
+                    </Button>
+                    <Button
+                      variant="outline"
+                      size="sm"
+                      className="text-red-500 hover:text-red-700 hover:bg-red-50"
+                      onClick={() => handleDeleteClick(category)}
+                    >
+                      <Trash2 className="h-4 w-4" />
+                    </Button>
+                  </>
+                )}
+              </div>
+              <div className="flex items-center gap-1">
+                {!isFirst && (
                   <Button
-                    variant="outline"
-                    size="sm"
-                    onClick={() => handleEditClick(category)}
+                    variant="ghost"
+                    size="icon"
+                    className="h-8 w-8"
+                    onClick={() => handleOrderChange(category.categoryId, true)}
                   >
-                    수정
+                    <ArrowUp className="h-4 w-4" />
                   </Button>
+                )}
+                {!isLast && (
                   <Button
-                    variant="outline"
-                    size="sm"
-                    className="text-red-500 hover:text-red-700 hover:bg-red-50"
-                    onClick={() => handleDeleteClick(category)}
+                    variant="ghost"
+                    size="icon"
+                    className="h-8 w-8"
+                    onClick={() =>
+                      handleOrderChange(category.categoryId, false)
+                    }
                   >
-                    <Trash2 className="h-4 w-4" />
+                    <ArrowDown className="h-4 w-4" />
                   </Button>
-                </>
-              )}
+                )}
+              </div>
             </div>
           </TableCell>
         </TableRow>
         {hasChildren &&
           isExpanded &&
-          category.children?.map((child: ICategory) =>
-            renderCategoryRow(child, level + 1)
+          category.children?.map((child: ICategory, childIndex: number) =>
+            renderCategoryRow(
+              child,
+              level + 1,
+              childIndex,
+              category.children?.length || 0
+            )
           )}
       </React.Fragment>
     );
@@ -304,7 +358,9 @@ export const Category = () => {
                 </TableCell>
               </TableRow>
             ) : (
-              filteredCategories?.map(category => renderCategoryRow(category))
+              filteredCategories?.map((category, index) =>
+                renderCategoryRow(category, 0, index, filteredCategories.length)
+              )
             )}
           </TableBody>
         </Table>

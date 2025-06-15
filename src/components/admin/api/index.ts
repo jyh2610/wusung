@@ -15,6 +15,7 @@ import {
   RegCategory
 } from '../tpye';
 import { message } from 'antd';
+import { toast } from 'react-toastify';
 
 interface CategoryResponse {
   data: ICategory[];
@@ -355,6 +356,23 @@ export const deleteSchedule = async (scheduleId: number) => {
     return res.data.data;
   } catch (error) {
     console.error(error);
+    return undefined;
+  }
+};
+export const controlCategory = async (categoryId: number, up: boolean) => {
+  try {
+    const res = await request<ApiResponse<null>>({
+      method: 'PATCH',
+      url: `/api/admin/category/${categoryId}/order`,
+      data: { up }
+    });
+    toast.success('카테고리 순서가 성공적으로 변경되었습니다.');
+    return res.data.data;
+  } catch (error: any) {
+    toast.error(
+      error.response?.data?.message ||
+        '카테고리 순서 변경 중 오류가 발생했습니다.'
+    );
     return undefined;
   }
 };
