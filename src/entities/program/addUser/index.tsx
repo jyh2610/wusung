@@ -245,7 +245,7 @@ export function AddUser({
             <div className={styles.inputWrapperStyle}>
               <NomalInput
                 name="longTermNum"
-                placeholder="장기요양인정번호"
+                placeholder="L00000000-000 -> L[10자리]-[3자리] 숫자를 입력하세요"
                 value={form.longTermNum}
                 onChange={e =>
                   setForm({ ...form, longTermNum: e.target.value })
