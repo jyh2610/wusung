@@ -160,7 +160,7 @@ export function UserBox({
         <div className={imgBox}>
           <Image fill src={'/images/icons/support_agent.png'} alt="담당자" />
         </div>
-        담당자
+        담당자 {user.managerName}
       </div>
 
       <AddUser

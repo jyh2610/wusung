@@ -226,6 +226,7 @@ export function Control({ isAdmin }: { isAdmin: boolean }) {
         month,
         difficultyLevel: selectedUser.difficultyLevel
       });
+      toast.success('계획안을 불러왔습니다.');
     } catch (error) {
       console.error('계획안 불러오기 실패:', error);
     }

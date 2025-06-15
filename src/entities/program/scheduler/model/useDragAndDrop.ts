@@ -63,8 +63,8 @@ export function useDragAndDrop(
         return;
       }
 
-      if (etcItems.length >= 2) {
-        toast.error('기타자료는 최대 2개까지만 넣을 수 있어요!');
+      if (etcItems.length >= 10) {
+        toast.error('기타자료는 최대 10개까지만 넣을 수 있어요!');
         return;
       }
 
