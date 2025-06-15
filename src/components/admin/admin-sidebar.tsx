@@ -16,7 +16,8 @@ import {
   CreditCard,
   MessageCircle,
   Home,
-  BookOpen
+  BookOpen,
+  ImageIcon
 } from 'lucide-react';
 import { cn } from '@/lib/utils';
 import { Button } from '@/components/ui/button';
@@ -27,6 +28,12 @@ export default function AdminSidebar() {
   const pathname = usePathname();
   const router = useRouter();
   const routes = [
+    {
+      label: '배너 관리',
+      icon: ImageIcon,
+      href: '/admin/banner',
+      active: pathname === '/admin/banner'
+    },
     {
       label: '상품 관리',
       icon: Package,
@@ -58,12 +65,6 @@ export default function AdminSidebar() {
       active: pathname === '/admin/content/upload'
     },
 
-    // {
-    //   label: '스케줄 관리',
-    //   icon: Calendar,
-    //   href: '/admin/schedule',
-    //   active: pathname === '/admin/schedule'
-    // },
     {
       label: '스케줄 리스트 관리',
       icon: Calendar,
