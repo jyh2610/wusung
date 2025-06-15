@@ -7,9 +7,19 @@ import { BorderButton } from '@/shared/ui';
 import { Header } from '../Header';
 import { storyHeaderStyles, storyImage, storyContent } from './index.css';
 import { useRouter } from 'next/navigation';
+import { useQuery } from '@tanstack/react-query';
+import { getMainBanner } from '@/entities/MainBanner/api';
 
 export function Story() {
   const router = useRouter();
+
+  const { data: bannerData, isLoading } = useQuery({
+    queryKey: ['story_banner'],
+    queryFn: () => getMainBanner('story_banner')
+  });
+
+  const storyImageUrl = bannerData?.data?.[0]?.url || '/images/storyImage.png';
+
   return (
     <div className={storyHeaderStyles}>
       <div>
@@ -38,7 +48,12 @@ export function Story() {
         </div>
       </div>
       <div className={storyImage}>
-        <Image fill src={'/images/storyImage.png'} alt={'story image'} />
+        <Image
+          fill
+          src={storyImageUrl}
+          alt={'story image'}
+          style={{ objectFit: 'cover' }}
+        />
       </div>
     </div>
   );

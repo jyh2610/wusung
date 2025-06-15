@@ -3,17 +3,30 @@
 import { useState } from 'react';
 import { bannerStyle, bannerHeaderStyles } from './index.css';
 import { Login } from './ui';
-import { BeforeLogIn } from './ui/Login/BeforeLogIn';
 import { ImageSlider } from '@/shared/ui';
+import type { IMainBannerResponse } from './api';
+import { BannerSkeleton } from './ui/BannerSkeleton';
+import { ApiResponse } from '@/shared/type';
 
-export function MainBanner() {
-  const images = [
-    '/images/banner1.png',
-    '/images/banne.',
-    '/images/banner1.png'
-  ];
-  // 인덱스 상태 (초기값 1)
+interface MainBannerProps {
+  bannerData: ApiResponse<IMainBannerResponse[]> | null | undefined;
+  isLoading: boolean;
+}
+
+export function MainBanner({ bannerData, isLoading }: MainBannerProps) {
   const [sliderIndex, setSliderIndex] = useState(1);
+
+  if (isLoading) {
+    return <BannerSkeleton />;
+  }
+
+  if (!bannerData?.data) {
+    return null;
+  }
+
+  const images = bannerData.data.map(
+    (banner: IMainBannerResponse) => banner.url
+  );
 
   return (
     <div className={bannerStyle}>

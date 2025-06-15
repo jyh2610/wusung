@@ -7,9 +7,16 @@ import { NoticePopupWrapper } from '@/components/NoticePopupWrapper';
 import { useEffect } from 'react';
 import { useSearchParams } from 'next/navigation';
 import { toast } from 'react-toastify';
+import { useQuery } from '@tanstack/react-query';
+import { getMainBanner } from '@/entities/MainBanner/api';
 
 export default function Home() {
   const searchParams = useSearchParams();
+
+  const { data: bannerData, isLoading: isBannerLoading } = useQuery({
+    queryKey: ['mainBanner', 'story_banner'],
+    queryFn: () => getMainBanner('story_banner')
+  });
 
   useEffect(() => {
     const toastMessage = searchParams.get('toast');
@@ -23,11 +30,15 @@ export default function Home() {
     <main className={MainStyles}>
       <NoticePopupWrapper />
       <section>
-        <MainBanner />
-        <LineBanner />
+        <MainBanner bannerData={bannerData} isLoading={isBannerLoading} />
+        {!isBannerLoading && (
+          <>
+            <LineBanner />
+            <MainSection />
+            <FloatingBar />
+          </>
+        )}
       </section>
-      <MainSection />
-      <FloatingBar />
     </main>
   );
 }
