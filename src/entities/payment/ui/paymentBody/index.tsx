@@ -132,16 +132,24 @@ export const SelectPayment = ({
                 <div className={contentBody}>
                   <span>{payment.name}</span>
                   <div className={price}>
-                    <span className={beforePrice}>
-                      {payment.price.toLocaleString()} 원
-                    </span>
-                    <span className={paymentPrice}>
-                      {calculateDiscount({
-                        amount: payment.price,
-                        rate: payment.discountRate
-                      }).toLocaleString()}
-                      원
-                    </span>
+                    {payment.discountRate > 0 ? (
+                      <>
+                        <span className={beforePrice}>
+                          {payment.price.toLocaleString()} 원
+                        </span>
+                        <span className={paymentPrice}>
+                          {calculateDiscount({
+                            amount: payment.price,
+                            rate: payment.discountRate
+                          }).toLocaleString()}
+                          원
+                        </span>
+                      </>
+                    ) : (
+                      <span className={paymentPrice}>
+                        {payment.price.toLocaleString()} 원
+                      </span>
+                    )}
                   </div>
                 </div>
               </div>
