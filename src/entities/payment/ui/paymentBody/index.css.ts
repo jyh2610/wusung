@@ -50,12 +50,12 @@ export const selectedTheme = createTheme(contentTheme, {
 });
 
 export const content = style({
-  width: '262px',
-  height: '126px',
+  width: '220px',
+  height: '110px',
   borderRadius: '12px',
   border: `1px solid ${contentTheme.borderColor}`,
   color: contentTheme.borderColor,
-  padding: '16px',
+  padding: '12px',
   display: 'flex',
   justifyContent: 'space-between',
   alignItems: 'center',
@@ -128,4 +128,49 @@ export const lookAccept = style({
   alignItems: 'center',
   color: colors.brand[500],
   cursor: 'pointer'
+});
+
+export const sliderContainer = style({
+  position: 'relative',
+  width: '100%',
+  overflow: 'hidden',
+  display: 'flex',
+  alignItems: 'center',
+  flexDirection: 'column',
+  gap: '16px'
+});
+
+export const sliderTrack = style({
+  display: 'flex',
+  width: '100%',
+  overflow: 'hidden',
+  gap: '8px'
+});
+
+export const sliderItem = style({
+  display: 'flex',
+  width: 'calc(33.33% - 5.33px)',
+  boxSizing: 'border-box'
+});
+
+export const dotsContainer = style({
+  display: 'flex',
+  gap: '8px',
+  justifyContent: 'center',
+  alignItems: 'center'
+});
+
+export const dot = style({
+  width: '8px',
+  height: '8px',
+  borderRadius: '50%',
+  background: colors.gray_scale[300],
+  cursor: 'pointer',
+  transition: 'all 0.3s ease'
+});
+
+export const activeDot = style({
+  background: colors.brand[400],
+  width: '24px',
+  borderRadius: '4px'
 });

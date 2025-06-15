@@ -35,12 +35,11 @@ export function Control({ isAdmin }: { isAdmin: boolean }) {
   const [modalType, setModalType] = useState<'etc' | 'cover' | null>(null);
   const [coverContent, setCoverContent] = useState<IContent | null>(null);
   const [etcContents, setEtcContents] = useState<IContent[]>([]);
+  const [showCount, setShowCount] = useState(false);
   const { reInit, removeEtcItem, removeCoverItems } = useScheduleStore();
   const coverItems = useScheduleStore(state => state.coverItems);
   const etcItems = useScheduleStore(state => state.etcItems);
   const addEtcItem = useScheduleStore(state => state.addEtcItem);
-  console.log('etcContents:', etcContents);
-  console.log('etcItems:', etcItems);
   const { noPrintDate, toggleNoPrintDate } = useScheduleStore(state => ({
     noPrintDate: state.noPrintDate,
     toggleNoPrintDate: state.toggleNoPrintDate
@@ -65,19 +64,21 @@ export function Control({ isAdmin }: { isAdmin: boolean }) {
     }
   }, [searchParams]);
 
+  // 컴포넌트 마운트 시 1초 후에 카운트 표시
+  useEffect(() => {
+    const timer = setTimeout(() => {
+      setShowCount(true);
+    }, 500);
+
+    return () => clearTimeout(timer);
+  }, []);
+
   const handleLoadPlan = async (
     year: number,
     month: number,
     difficultyLevel: number
   ) => {
     try {
-      // 모든 데이터 초기화
-      reInit();
-      setCoverContent(null);
-      setEtcContents([]);
-      useScheduleStore.getState().clearCoverItems();
-      useScheduleStore.getState().clearEtcItems();
-
       let plan;
       if (isAdmin) {
         // 어드민인 경우 getAdminPlan 사용
@@ -96,84 +97,8 @@ export function Control({ isAdmin }: { isAdmin: boolean }) {
         });
       }
 
-      console.log('Loaded plan:', plan); // 디버깅용 로그
-
-      if (plan) {
-        // 커버 데이터 설정
-        if (plan.coverEduContentId) {
-          console.log('Loading cover content:', plan.coverEduContentId); // 디버깅용 로그
-          const coverContent = isAdmin
-            ? await searchContent(plan.coverEduContentId)
-            : await getContent(plan.coverEduContentId);
-
-          console.log('Cover content loaded:', coverContent); // 디버깅용 로그
-
-          if (coverContent) {
-            setCoverContent(coverContent);
-            useScheduleStore.getState().addCoverItem({
-              id: coverContent.eduContentId!,
-              content: coverContent.title,
-              thumbnailUrl: coverContent.thumbnailUrl
-            });
-          }
-        }
-
-        // 미들 데이터 설정
-        if (plan.middleEduContentIds) {
-          console.log(
-            'Original middleEduContentIds:',
-            plan.middleEduContentIds
-          );
-
-          // 문자열인 경우 JSON 파싱
-          const middleIds =
-            typeof plan.middleEduContentIds === 'string'
-              ? JSON.parse(plan.middleEduContentIds)
-              : plan.middleEduContentIds;
-
-          console.log('Parsed middleIds:', middleIds);
-
-          if (Array.isArray(middleIds) && middleIds.length > 0) {
-            const uniqueIds = middleIds.filter(
-              (id, index, self) => self.indexOf(id) === index
-            );
-            console.log('uniqueIds:', uniqueIds);
-
-            const middleContents = isAdmin
-              ? await getAdminContentByIds(uniqueIds)
-              : await getContentByIds(uniqueIds);
-            console.log('middleContents:', middleContents);
-
-            const validContents = middleContents.filter(
-              (content): content is IContent =>
-                content !== undefined && content.eduContentId !== undefined
-            );
-            console.log('validContents:', validContents);
-
-            // 기존 etcItems 초기화
-            useScheduleStore.getState().clearEtcItems();
-
-            // 새로운 컨텐츠 추가
-            const store = useScheduleStore.getState();
-            validContents.forEach(content => {
-              if (content.eduContentId) {
-                console.log('Adding content:', content);
-                store.addEtcItem({
-                  id: content.eduContentId,
-                  content: content.title,
-                  thumbnailUrl: content.thumbnailUrl
-                });
-              }
-            });
-
-            // etcContents 상태 업데이트
-            setEtcContents(validContents);
-          }
-        }
-      }
-
-      // autoRegisterPlan은 mainEduContentIds만 처리하도록 수정
-      const result = await autoRegisterPlan({
+      // autoRegisterPlan이 모든 데이터를 처리하도록 수정
+      await autoRegisterPlan({
         year,
         month,
         difficultyLevel
@@ -188,12 +113,6 @@ export function Control({ isAdmin }: { isAdmin: boolean }) {
     const difficultyid = searchParams.get('difficultyid');
     const yearParam = searchParams.get('year');
     const monthParam = searchParams.get('month');
-
-    console.log('useEffect triggered with params:', {
-      difficultyid,
-      yearParam,
-      monthParam
-    });
 
     if (difficultyid && yearParam && monthParam) {
       handleLoadPlan(
@@ -221,8 +140,6 @@ export function Control({ isAdmin }: { isAdmin: boolean }) {
           item => !etcContents.some(content => content.eduContentId === item.id)
         )
         .map(item => item.id);
-
-      console.log('newEtcIds to fetch:', newEtcIds);
 
       if (newEtcIds.length > 0) {
         try {
@@ -258,12 +175,7 @@ export function Control({ isAdmin }: { isAdmin: boolean }) {
 
   // 컴포넌트 마운트 시 초기화
   useEffect(() => {
-    console.log('Component mounted, initializing...');
-    reInit();
-    setCoverContent(null);
-    setEtcContents([]);
     return () => {
-      console.log('Component unmounting, cleaning up...');
       reInit();
       setCoverContent(null);
       setEtcContents([]);
@@ -455,24 +367,26 @@ export function Control({ isAdmin }: { isAdmin: boolean }) {
                 표지
               </div>
 
-              <div
-                style={{
-                  position: 'absolute',
-                  top: '-5px',
-                  right: '-10px',
-                  backgroundColor: 'red',
-                  color: 'white',
-                  borderRadius: '50%',
-                  width: '20px',
-                  height: '20px',
-                  fontSize: '12px',
-                  display: 'flex',
-                  alignItems: 'center',
-                  justifyContent: 'center'
-                }}
-              >
-                {coverContent ? 1 : 0}
-              </div>
+              {showCount && (
+                <div
+                  style={{
+                    position: 'absolute',
+                    top: '-5px',
+                    right: '-10px',
+                    backgroundColor: 'red',
+                    color: 'white',
+                    borderRadius: '50%',
+                    width: '20px',
+                    height: '20px',
+                    fontSize: '12px',
+                    display: 'flex',
+                    alignItems: 'center',
+                    justifyContent: 'center'
+                  }}
+                >
+                  {coverItems ? 1 : 0}
+                </div>
+              )}
 
               {provided.placeholder}
             </div>
@@ -511,24 +425,26 @@ export function Control({ isAdmin }: { isAdmin: boolean }) {
                 기타자료
               </div>
 
-              <div
-                style={{
-                  position: 'absolute',
-                  top: '-5px',
-                  right: '-10px',
-                  backgroundColor: 'red',
-                  color: 'white',
-                  borderRadius: '50%',
-                  width: '20px',
-                  height: '20px',
-                  fontSize: '12px',
-                  display: 'flex',
-                  alignItems: 'center',
-                  justifyContent: 'center'
-                }}
-              >
-                {etcItems.length}
-              </div>
+              {showCount && (
+                <div
+                  style={{
+                    position: 'absolute',
+                    top: '-5px',
+                    right: '-10px',
+                    backgroundColor: 'red',
+                    color: 'white',
+                    borderRadius: '50%',
+                    width: '20px',
+                    height: '20px',
+                    fontSize: '12px',
+                    display: 'flex',
+                    alignItems: 'center',
+                    justifyContent: 'center'
+                  }}
+                >
+                  {etcItems.length}
+                </div>
+              )}
 
               {provided.placeholder}
             </div>
@@ -631,7 +547,7 @@ export function Control({ isAdmin }: { isAdmin: boolean }) {
 
               {/* 커버 목록 */}
               {modalType === 'cover' &&
-                (coverContent ? (
+                (coverItems !== null ? (
                   <div
                     style={{
                       display: 'flex',
@@ -664,8 +580,8 @@ export function Control({ isAdmin }: { isAdmin: boolean }) {
                         }
                       }}
                     >
-                      <p style={{ margin: 0 }}>{coverContent.title}</p>
-                      {coverContent.thumbnailUrl && (
+                      <p style={{ margin: 0 }}>{coverItems.content}</p>
+                      {coverItems.thumbnailUrl && (
                         <div
                           id="cover-thumbnail-popup"
                           style={{
@@ -684,7 +600,7 @@ export function Control({ isAdmin }: { isAdmin: boolean }) {
                           }}
                         >
                           <Image
-                            src={coverContent.thumbnailUrl}
+                            src={coverItems.thumbnailUrl}
                             alt="thumbnail"
                             fill
                             style={{

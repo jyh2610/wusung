@@ -1,6 +1,6 @@
 'use client';
 
-import { Dispatch, SetStateAction, useState } from 'react';
+import { Dispatch, SetStateAction, useState, useRef } from 'react';
 import {
   container,
   head,
@@ -12,7 +12,13 @@ import {
   beforePrice,
   price,
   paymentPrice,
-  lookAccept
+  lookAccept,
+  sliderContainer,
+  sliderTrack,
+  sliderItem,
+  dotsContainer,
+  dot,
+  activeDot
 } from './index.css';
 import { productListDTO } from '../../types';
 import { calculateDiscount } from '../../utils';
@@ -93,6 +99,11 @@ export const SelectPayment = ({
   selectedPayment,
   setSelectedPayment
 }: ISelectProps) => {
+  const [currentIndex, setCurrentIndex] = useState(0);
+  const trackRef = useRef<HTMLDivElement>(null);
+
+  const totalSlides = data ? Math.ceil(data.length / 3) : 0;
+
   return (
     <div
       style={{
@@ -104,31 +115,48 @@ export const SelectPayment = ({
       <div className={head}>
         <span>요금 선택</span>
       </div>
-      <div className={body}>
-        {data?.map((payment, index) => {
-          const isSelected = selectedPayment === payment;
-          return (
-            <div
-              key={payment.productId}
-              className={`${content} ${isSelected ? selectedTheme : defaultTheme}`}
-              onClick={() => setSelectedPayment(payment)}
-            >
-              <div className={contentBody}>
-                <span>{payment.name}</span>
-                <div className={price}>
-                  <span className={beforePrice}>{payment.price} 원</span>
-                  <span className={paymentPrice}>
-                    {calculateDiscount({
-                      amount: payment.price,
-                      rate: payment.discountRate
-                    })}
-                    원
-                  </span>
+      <div className={sliderContainer}>
+        <div className={sliderTrack} ref={trackRef}>
+          {data?.map((payment, index) => {
+            const isSelected = selectedPayment === payment;
+            return (
+              <div
+                key={payment.productId}
+                className={`${sliderItem} ${content} ${isSelected ? selectedTheme : defaultTheme}`}
+                style={{
+                  transform: `translateX(-${currentIndex * 100}%)`,
+                  transition: 'transform 0.3s ease-in-out'
+                }}
+                onClick={() => setSelectedPayment(payment)}
+              >
+                <div className={contentBody}>
+                  <span>{payment.name}</span>
+                  <div className={price}>
+                    <span className={beforePrice}>
+                      {payment.price.toLocaleString()} 원
+                    </span>
+                    <span className={paymentPrice}>
+                      {calculateDiscount({
+                        amount: payment.price,
+                        rate: payment.discountRate
+                      }).toLocaleString()}
+                      원
+                    </span>
+                  </div>
                 </div>
               </div>
-            </div>
-          );
-        })}
+            );
+          })}
+        </div>
+        <div className={dotsContainer}>
+          {Array.from({ length: totalSlides }).map((_, index) => (
+            <div
+              key={index}
+              className={`${dot} ${index === currentIndex ? activeDot : ''}`}
+              onClick={() => setCurrentIndex(index)}
+            />
+          ))}
+        </div>
       </div>
     </div>
   );
