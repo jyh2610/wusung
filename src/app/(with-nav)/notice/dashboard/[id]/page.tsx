@@ -8,12 +8,27 @@ import { format, parseISO } from 'date-fns';
 import { colors } from '@/design-tokens';
 import { Button } from '@/components/ui/button';
 import { ArrowLeft, Eye, Download } from 'lucide-react';
+import { useAuthStore } from '@/shared/stores/useAuthStore';
+import { toast } from 'react-toastify';
 
 function Detail() {
   const params = useParams();
   const router = useRouter();
   const [announcement, setAnnouncement] =
     useState<IAnnouncementResponse | null>(null);
+  const username = useAuthStore(state => state.username);
+  const [showModal, setShowModal] = useState(false);
+
+  useEffect(() => {
+    if (!username || username === 'null') {
+      setShowModal(true);
+    }
+  }, [username]);
+
+  const handleModalConfirm = () => {
+    setShowModal(false);
+    router.push('/signin');
+  };
 
   useEffect(() => {
     const fetchAnnouncement = async () => {
@@ -23,7 +38,8 @@ function Detail() {
           setAnnouncement(response.data.data);
         }
       } catch (error) {
-        console.error('공지사항을 불러오는데 실패했습니다:', error);
+        toast.error('로그인이 필요합니다.');
+        router.push('/signin');
       }
     };
 
@@ -111,6 +127,50 @@ function Detail() {
           />
         </div>
       </div>
+      {showModal && (
+        <div
+          style={{
+            position: 'fixed',
+            top: 0,
+            left: 0,
+            right: 0,
+            bottom: 0,
+            backgroundColor: 'rgba(0, 0, 0, 0.5)',
+            display: 'flex',
+            justifyContent: 'center',
+            alignItems: 'center',
+            zIndex: 9999
+          }}
+        >
+          <div
+            style={{
+              backgroundColor: 'white',
+              padding: '20px',
+              borderRadius: '8px',
+              width: '300px',
+              textAlign: 'center'
+            }}
+          >
+            <h3 style={{ marginBottom: '20px' }}>로그인이 필요합니다</h3>
+            <p style={{ marginBottom: '20px' }}>
+              해당 기능을 이용하기 위해서는 로그인이 필요합니다.
+            </p>
+            <button
+              onClick={handleModalConfirm}
+              style={{
+                padding: '8px 16px',
+                backgroundColor: '#007bff',
+                color: 'white',
+                border: 'none',
+                borderRadius: '4px',
+                cursor: 'pointer'
+              }}
+            >
+              확인
+            </button>
+          </div>
+        </div>
+      )}
     </div>
   );
 }
