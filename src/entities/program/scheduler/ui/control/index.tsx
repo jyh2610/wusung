@@ -21,6 +21,7 @@ import { toast } from 'react-toastify';
 import { colors } from '@/design-tokens';
 import { useSearchParams } from 'next/navigation';
 import { IContent } from '@/entities/program/type.dto';
+import Image from 'next/image';
 
 export function Control({ isAdmin }: { isAdmin: boolean }) {
   const [isModalOpen, setModalOpen] = useState(false);
@@ -232,6 +233,16 @@ export function Control({ isAdmin }: { isAdmin: boolean }) {
     useScheduleStore.getState().setSelectedDifficulty(difficulty);
   };
 
+  // 스타일 추가
+  const style = document.createElement('style');
+  style.textContent = `
+    li:hover .thumbnail-popup,
+    div:hover .thumbnail-popup {
+      display: block !important;
+    }
+  `;
+  document.head.appendChild(style);
+
   return (
     <div className={Container}>
       <div className={controlContainer}>
@@ -441,7 +452,25 @@ export function Control({ isAdmin }: { isAdmin: boolean }) {
                           alignItems: 'center',
                           marginBottom: '8px',
                           borderBottom: '1px solid #eee',
-                          paddingBottom: '4px'
+                          paddingBottom: '4px',
+                          position: 'relative',
+                          cursor: 'pointer'
+                        }}
+                        onMouseEnter={() => {
+                          const popup = document.querySelector(
+                            `#thumbnail-${content.eduContentId}`
+                          );
+                          if (popup) {
+                            (popup as HTMLElement).style.display = 'block';
+                          }
+                        }}
+                        onMouseLeave={() => {
+                          const popup = document.querySelector(
+                            `#thumbnail-${content.eduContentId}`
+                          );
+                          if (popup) {
+                            (popup as HTMLElement).style.display = 'none';
+                          }
                         }}
                       >
                         <span>{content.title}</span>
@@ -458,6 +487,35 @@ export function Control({ isAdmin }: { isAdmin: boolean }) {
                         >
                           삭제
                         </button>
+                        {content.thumbnailUrl && (
+                          <div
+                            id={`thumbnail-${content.eduContentId}`}
+                            style={{
+                              position: 'absolute',
+                              left: 0,
+                              top: 'calc(100% + 8px)',
+                              backgroundColor: 'white',
+                              border: '1px solid #ddd',
+                              boxShadow: '0 4px 8px rgba(0,0,0,0.1)',
+                              padding: '4px',
+                              borderRadius: '8px',
+                              width: '150px',
+                              height: '250px',
+                              zIndex: 1300,
+                              display: 'none'
+                            }}
+                          >
+                            <Image
+                              src={content.thumbnailUrl}
+                              alt="thumbnail"
+                              fill
+                              style={{
+                                borderRadius: '8px',
+                                objectFit: 'contain'
+                              }}
+                            />
+                          </div>
+                        )}
                       </li>
                     ))}
                   </ul>
@@ -472,10 +530,65 @@ export function Control({ isAdmin }: { isAdmin: boolean }) {
                     style={{
                       display: 'flex',
                       justifyContent: 'space-between',
-                      alignItems: 'center'
+                      alignItems: 'center',
+                      position: 'relative'
                     }}
                   >
-                    <p>{coverContent.title}</p>
+                    <div
+                      style={{
+                        display: 'flex',
+                        alignItems: 'center',
+                        position: 'relative',
+                        cursor: 'pointer'
+                      }}
+                      onMouseEnter={() => {
+                        const popup = document.querySelector(
+                          `#cover-thumbnail-popup`
+                        );
+                        if (popup) {
+                          (popup as HTMLElement).style.display = 'block';
+                        }
+                      }}
+                      onMouseLeave={() => {
+                        const popup = document.querySelector(
+                          `#cover-thumbnail-popup`
+                        );
+                        if (popup) {
+                          (popup as HTMLElement).style.display = 'none';
+                        }
+                      }}
+                    >
+                      <p style={{ margin: 0 }}>{coverContent.title}</p>
+                      {coverContent.thumbnailUrl && (
+                        <div
+                          id="cover-thumbnail-popup"
+                          style={{
+                            position: 'absolute',
+                            left: 0,
+                            top: 'calc(100% + 8px)',
+                            backgroundColor: 'white',
+                            border: '1px solid #ddd',
+                            boxShadow: '0 4px 8px rgba(0,0,0,0.1)',
+                            padding: '4px',
+                            borderRadius: '8px',
+                            width: '150px',
+                            height: '250px',
+                            zIndex: 1300,
+                            display: 'none'
+                          }}
+                        >
+                          <Image
+                            src={coverContent.thumbnailUrl}
+                            alt="thumbnail"
+                            fill
+                            style={{
+                              borderRadius: '8px',
+                              objectFit: 'contain'
+                            }}
+                          />
+                        </div>
+                      )}
+                    </div>
                     <button
                       style={{
                         border: 'none',

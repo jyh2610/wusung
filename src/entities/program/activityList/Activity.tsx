@@ -42,7 +42,10 @@ export function Activity({
   };
 
   return (
-    <Draggable draggableId={`${number}|${content}`} index={index}>
+    <Draggable
+      draggableId={`${number}|${content}|${thumbnailUrl}`}
+      index={index}
+    >
       {(provided, snapshot) => (
         <div
           ref={provided.innerRef}

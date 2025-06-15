@@ -41,6 +41,7 @@ export interface IContentList {
 export interface ScheduleItem {
   content: string;
   id: number;
+  thumbnailUrl?: string;
 }
 export interface Schedule {
   [key: number]: {

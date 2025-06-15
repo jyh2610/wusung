@@ -120,7 +120,7 @@ export function Calendar({ schedule, isAdmin }: CalendarProps) {
           >
             {item ? (
               <Draggable
-                draggableId={`${item.id}|${item.content}|${category}`}
+                draggableId={`${item.id}|${item.content}|${item.thumbnailUrl || ''}`}
                 index={0}
               >
                 {dragProvided => (
@@ -135,7 +135,32 @@ export function Calendar({ schedule, isAdmin }: CalendarProps) {
                       alignItems: 'center'
                     }}
                   >
-                    <Tooltip content={item.content}>
+                    <Tooltip
+                      content={
+                        <div
+                          style={{
+                            display: 'flex',
+                            flexDirection: 'column',
+                            gap: '8px',
+                            alignItems: 'center'
+                          }}
+                        >
+                          {item.thumbnailUrl && (
+                            <img
+                              src={item.thumbnailUrl}
+                              alt={item.content}
+                              style={{
+                                maxWidth: '200px',
+                                maxHeight: '200px',
+                                objectFit: 'contain',
+                                borderRadius: '4px'
+                              }}
+                            />
+                          )}
+                          <span>{item.content}</span>
+                        </div>
+                      }
+                    >
                       <span>
                         {item.content.length > 5
                           ? `${item.content.slice(0, 5)}...`

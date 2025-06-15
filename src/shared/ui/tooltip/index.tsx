@@ -5,7 +5,7 @@ import { createPortal } from 'react-dom';
 
 interface TooltipProps {
   children: ReactNode;
-  content: string;
+  content: ReactNode | string;
 }
 
 export function Tooltip({ children, content }: TooltipProps) {

@@ -17,7 +17,7 @@ export function useDragAndDrop(
     const { source, destination, draggableId } = result;
     if (!destination) return;
 
-    const [idStr, content] = draggableId.split('|');
+    const [idStr, content, thumbnailUrl] = draggableId.split('|');
     const id = Number(idStr);
 
     const [srcDayStr, srcCategory] = source.droppableId.split('-');
@@ -26,7 +26,7 @@ export function useDragAndDrop(
 
     // ✅ 커버 드랍
     if (destId === 'cover') {
-      addCoverItem({ id, content });
+      addCoverItem({ id, content, thumbnailUrl });
       return;
     }
     console.log('Dropped onto ETC area!'); // 4. "etc" 블록 진입 확인
@@ -44,8 +44,8 @@ export function useDragAndDrop(
         return;
       }
 
-      console.log('Calling addEtcItem with:', { id, content }); // 5. addEtcItem 호출 직전 확인
-      addEtcItem({ id, content });
+      console.log('Calling addEtcItem with:', { id, content, thumbnailUrl }); // 5. addEtcItem 호출 직전 확인
+      addEtcItem({ id, content, thumbnailUrl });
       return;
     }
 
@@ -67,12 +67,12 @@ export function useDragAndDrop(
       toast.error('같은 요일의 다른 카테고리에 이미 존재하는 활동입니다.');
       return;
     }
-
+    console.log(thumbnailUrl, 'thumbnailUrl');
     const newSchedule = {
       ...schedule,
       [destDay]: {
         ...schedule[destDay],
-        [destCategory]: { id, content }
+        [destCategory]: { id, content, thumbnailUrl }
       },
       [srcDay]: {
         ...schedule[srcDay],
