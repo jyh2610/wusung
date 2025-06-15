@@ -14,8 +14,8 @@ export default function Home() {
   const searchParams = useSearchParams();
 
   const { data: bannerData, isLoading: isBannerLoading } = useQuery({
-    queryKey: ['mainBanner', 'story_banner'],
-    queryFn: () => getMainBanner('story_banner')
+    queryKey: ['mainBanner', 'slide_banner'],
+    queryFn: () => getMainBanner('slide_banner')
   });
 
   useEffect(() => {

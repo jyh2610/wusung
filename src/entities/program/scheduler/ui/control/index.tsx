@@ -63,11 +63,12 @@ export function Control({ isAdmin }: { isAdmin: boolean }) {
     difficultyLevel: number
   ) => {
     try {
-      // 기존 데이터 초기화
-      useScheduleStore.getState().clearCoverItems();
-      useScheduleStore.getState().clearEtcItems();
+      // 모든 데이터 초기화
+      reInit();
       setCoverContent(null);
       setEtcContents([]);
+      useScheduleStore.getState().clearCoverItems();
+      useScheduleStore.getState().clearEtcItems();
 
       const plan = await getPlan({
         year,
@@ -90,19 +91,14 @@ export function Control({ isAdmin }: { isAdmin: boolean }) {
 
         // 미들 데이터 설정 - 중복 제거
         if (plan.middleEduContentIds && plan.middleEduContentIds.length > 0) {
-          // 중복 제거
-          const uniqueIds = plan.middleEduContentIds.filter(
-            (id, index, self) => self.indexOf(id) === index
-          );
+          // 중복 제거를 Array.from과 Set을 사용하여 수행
+          const uniqueIds = Array.from(new Set(plan.middleEduContentIds));
           const middleContents = await getContentByIds(uniqueIds);
           const validContents = middleContents.filter(
             content => content.eduContentId
           );
 
-          // 스토어와 상태 모두 업데이트
-          useScheduleStore.getState().clearEtcItems();
-          setEtcContents(validContents);
-
+          // 중복 없이 한 번만 추가
           validContents.forEach(content => {
             if (content.eduContentId) {
               useScheduleStore.getState().addEtcItem({
@@ -114,6 +110,7 @@ export function Control({ isAdmin }: { isAdmin: boolean }) {
         }
       }
 
+      // autoRegisterPlan은 mainEduContentIds만 처리하도록 수정
       const result = await autoRegisterPlan({
         year,
         month,
@@ -139,8 +136,15 @@ export function Control({ isAdmin }: { isAdmin: boolean }) {
     }
   }, [searchParams]);
 
+  // etcItems가 변경될 때 etcContents 업데이트
   useEffect(() => {
     const fetchContents = async () => {
+      // etcItems가 비어있으면 etcContents도 비우기
+      if (etcItems.length === 0) {
+        setEtcContents([]);
+        return;
+      }
+
       // 드래그 앤 드롭으로 추가된 아이템들의 컨텐츠 정보 가져오기
       const newEtcIds = etcItems
         .filter(
@@ -169,7 +173,19 @@ export function Control({ isAdmin }: { isAdmin: boolean }) {
     };
 
     fetchContents();
-  }, [etcItems]);
+  }, [etcItems, etcContents]);
+
+  // 컴포넌트 마운트 시 초기화
+  useEffect(() => {
+    reInit();
+    setCoverContent(null);
+    setEtcContents([]);
+    return () => {
+      reInit();
+      setCoverContent(null);
+      setEtcContents([]);
+    };
+  }, []);
 
   // coverItems가 변경될 때 coverContent 업데이트
   useEffect(() => {
@@ -344,7 +360,7 @@ export function Control({ isAdmin }: { isAdmin: boolean }) {
                   textOverflow: 'ellipsis'
                 }}
               >
-                커버
+                표지
               </div>
 
               <div
@@ -436,7 +452,7 @@ export function Control({ isAdmin }: { isAdmin: boolean }) {
               ✕
             </button>
 
-            <h2>{modalType === 'etc' ? '기타자료 목록' : '커버 목록'}</h2>
+            <h2>{modalType === 'etc' ? '기타자료 목록' : '표지 목록'}</h2>
 
             <div style={{ marginTop: '20px' }}>
               {/* 기타자료 목록 */}

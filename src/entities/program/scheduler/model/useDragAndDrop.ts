@@ -1,4 +1,4 @@
-import { DropResult, DragUpdate } from '@hello-pangea/dnd';
+import { DropResult, DragUpdate, DragStart } from '@hello-pangea/dnd';
 import { Dispatch, SetStateAction } from 'react';
 import { IContent } from '../../type.dto';
 import { useScheduleStore } from '@/shared/stores/useScheduleStore';
@@ -12,6 +12,30 @@ export function useDragAndDrop(
     useScheduleStore();
   const coverItems = useScheduleStore(state => state.coverItems);
   const etcItems = useScheduleStore(state => state.etcItems);
+
+  const onDragStart = (start: DragStart) => {
+    const { draggableId } = start;
+    const [idStr, content, thumbnailUrl] = draggableId.split('|');
+
+    // 드래그 중인 아이템의 스타일 설정
+    const draggedElement = document.querySelector(
+      `[data-rbd-draggable-id="${draggableId}"]`
+    );
+    if (draggedElement && thumbnailUrl) {
+      const img = document.createElement('img');
+      img.src = thumbnailUrl;
+      img.style.width = '100px';
+      img.style.height = '100px';
+      img.style.objectFit = 'cover';
+      img.style.borderRadius = '8px';
+
+      const existingImg = draggedElement.querySelector('img');
+      if (existingImg) {
+        existingImg.remove();
+      }
+      draggedElement.appendChild(img);
+    }
+  };
 
   const onDragEnd = (result: DropResult) => {
     const { source, destination, draggableId } = result;
@@ -44,7 +68,6 @@ export function useDragAndDrop(
         return;
       }
 
-      console.log('Calling addEtcItem with:', { id, content, thumbnailUrl }); // 5. addEtcItem 호출 직전 확인
       addEtcItem({ id, content, thumbnailUrl });
       return;
     }
@@ -67,7 +90,6 @@ export function useDragAndDrop(
       toast.error('같은 요일의 다른 카테고리에 이미 존재하는 활동입니다.');
       return;
     }
-    console.log(thumbnailUrl, 'thumbnailUrl');
     const newSchedule = {
       ...schedule,
       [destDay]: {
@@ -94,5 +116,5 @@ export function useDragAndDrop(
     }
   };
 
-  return { onDragEnd, onDragUpdate };
+  return { onDragEnd, onDragUpdate, onDragStart };
 }

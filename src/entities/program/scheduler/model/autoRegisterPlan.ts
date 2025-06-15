@@ -17,8 +17,7 @@ export const autoRegisterPlan = async ({
     const plan = await getPlan({ year, month, difficultyLevel });
     if (!plan?.mainEduContentIds?.length) return;
 
-    const { schedule, updateSchedule, addCoverItem, addEtcItem } =
-      useScheduleStore.getState();
+    const { schedule, updateSchedule } = useScheduleStore.getState();
 
     const updatedSchedule = { ...schedule };
 
@@ -31,13 +30,6 @@ export const autoRegisterPlan = async ({
       );
       const [cognitive, daily] = contents;
       const day = i + 1;
-
-      if (daily) {
-        addEtcItem({
-          id: daily.eduContentId!,
-          content: daily.title
-        });
-      }
 
       // ✅ disabled 상태 고려 없이 모든 날짜에 등록
       updatedSchedule[day] = {

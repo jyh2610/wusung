@@ -137,7 +137,7 @@ function Header({
 
       if (isAdmin && scheduleId && yearParam && monthParam) {
         // 수정 API 호출
-        await updateSchedule({
+        const res = await updateSchedule({
           scheduleId: Number(scheduleId),
           year: Number(yearParam),
           month: Number(monthParam),
@@ -146,11 +146,15 @@ function Header({
           middleEduContentIds,
           mainEduContentIds
         });
+
+        if (!res) {
+          throw new Error('수정 실패');
+        }
+
         toast.success('수정이 완료되었습니다!');
-        router.push('/admin/schedule/list'); // 이전 페이지로 이동
       } else {
         // 기존 등록 API 호출
-        await regSchedule({
+        const res = await regSchedule({
           year,
           month,
           difficultyLevel: selectedDifficulty,
@@ -158,9 +162,15 @@ function Header({
           middleEduContentIds,
           mainEduContentIds
         });
+
+        if (!res) {
+          throw new Error('등록 실패');
+        }
+
         toast.success('등록이 완료되었습니다!');
       }
     } catch (error) {
+      console.error('Schedule operation failed:', error);
       toast.error(
         isAdmin ? '수정이 실패되었습니다!' : '등록이 실패되었습니다!'
       );

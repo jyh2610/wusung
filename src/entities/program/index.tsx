@@ -13,7 +13,6 @@ import { scrollHidden } from './scheduler/index.css';
 export function ProgramComponent() {
   const isAdmin = useIsAdmin();
   const { schedule, reInit } = useScheduleStore();
-  console.log(schedule, 'schedule');
   useEffect(() => {
     return () => {
       reInit();
@@ -29,7 +28,10 @@ export function ProgramComponent() {
     difficultyLevel
   });
 
-  const { onDragEnd, onDragUpdate } = useDragAndDrop(activities, setActivities);
+  const { onDragEnd, onDragUpdate, onDragStart } = useDragAndDrop(
+    activities,
+    setActivities
+  );
 
   const handleFilterChange = (categoryId: number, difficultyLevel: number) => {
     setCategoryId(categoryId);
@@ -37,7 +39,11 @@ export function ProgramComponent() {
   };
 
   return (
-    <DragDropContext onDragEnd={onDragEnd} onDragUpdate={onDragUpdate}>
+    <DragDropContext
+      onDragEnd={onDragEnd}
+      onDragUpdate={onDragUpdate}
+      onDragStart={onDragStart}
+    >
       <div
         style={{
           display: 'flex',

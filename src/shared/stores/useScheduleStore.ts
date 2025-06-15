@@ -99,7 +99,9 @@ export const useScheduleStore = create<ScheduleState>(set => ({
       redoStack: [],
       coverItems: null,
       etcItems: [],
-      disabledDrops: new Set()
+      disabledDrops: new Set(),
+      noPrintDate: true,
+      selectedDifficulty: 2
     }),
 
   removeScheduleItem: (dateKey, itemId) =>

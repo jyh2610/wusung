@@ -120,7 +120,7 @@ export function Calendar({ schedule, isAdmin }: CalendarProps) {
           >
             {item ? (
               <Draggable
-                draggableId={`${item.id}|${item.content}|${item.thumbnailUrl || ''}`}
+                draggableId={`${dayNum}-${category}-${item.id}`}
                 index={0}
               >
                 {dragProvided => (
