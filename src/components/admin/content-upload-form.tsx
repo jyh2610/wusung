@@ -105,7 +105,6 @@ export function ContentUploadForm() {
     existDayOfWeek: [],
     existElderName: []
   });
-  console.log(form.overlays);
   useEffect(() => {
     const fetchContent = async () => {
       const token = sessionStorage.getItem('token');
@@ -185,7 +184,6 @@ export function ContentUploadForm() {
   }, [id]);
 
   const [files, setFiles] = useState<File[]>([]);
-  console.log(files);
   const [filePreviews, setFilePreviews] = useState<string[]>([]);
   const [imageCoordinates, setImageCoordinates] = useState<Array<Rectangle[]>>(
     []

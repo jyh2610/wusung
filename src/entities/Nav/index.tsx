@@ -18,11 +18,28 @@ import {
   NavContentBoxStyle
 } from './index.css';
 import { getRouteKey } from './utils';
+import { useAuthStore } from '@/shared/stores/useAuthStore';
 
 export function Nav() {
   const [isNavHover, setIsNavHover] = useState(false);
   const [hoveredTitle, setHoveredTitle] = useState('');
   const router = useRouter();
+  const { username } = useAuthStore();
+
+  const handleSubMenuClick = (list: any, sub: string) => {
+    if (list.title === '마이페이지') {
+      if (sub === '결재내역') {
+        router.push(routeMap.mypage_payment);
+      } else if (sub === '문의내역') {
+        router.push(routeMap.mypage_inquiry);
+      }
+    } else {
+      const routeKey = getRouteKey(list.title, sub);
+      if (routeKey) {
+        router.push(routeMap[routeKey as keyof typeof routeMap]);
+      }
+    }
+  };
 
   return (
     <nav className={NavStyle} onMouseLeave={() => setIsNavHover(false)}>
@@ -54,17 +71,14 @@ export function Nav() {
               {navLists.map((list, idx) => (
                 <div key={idx} className={NavItemWrapperStyle}>
                   {list.subTitle.map((sub, subIdx) => {
-                    const routeKey = getRouteKey(list.title, sub);
+                    if (list.title === '마이페이지' && !username) {
+                      return null;
+                    }
                     return (
                       <div
                         key={subIdx}
                         className={SubMenuItemStyle}
-                        onClick={() =>
-                          routeKey &&
-                          router.push(
-                            routeMap[routeKey as keyof typeof routeMap]
-                          )
-                        }
+                        onClick={() => handleSubMenuClick(list, sub)}
                       >
                         {sub}
                       </div>

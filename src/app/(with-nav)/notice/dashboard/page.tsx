@@ -8,10 +8,10 @@ import { useEffect, useState } from 'react';
 import { getAnnouncementList } from '@/shared/api/common';
 import { format, parseISO } from 'date-fns';
 import { IAnnouncementResponse } from '@/shared/api/common';
-import { ApiResponse, PaginatedResponse } from '@/shared/type';
 import { useRouter } from 'next/navigation';
 import { Badge } from '@/components/ui/badge';
 import { toast } from 'react-toastify';
+import { useAuthStore } from '@/shared/stores/useAuthStore';
 
 function NoticeDashBoard() {
   const router = useRouter();
@@ -21,6 +21,19 @@ function NoticeDashBoard() {
   const [page, setPage] = useState(0);
   const [rowsPerPage, setRowsPerPage] = useState(10);
   const [totalCount, setTotalCount] = useState(0);
+  const username = useAuthStore(state => state.username);
+  const [showModal, setShowModal] = useState(false);
+
+  useEffect(() => {
+    if (!username) {
+      setShowModal(true);
+    }
+  }, [username]);
+
+  const handleModalConfirm = () => {
+    setShowModal(false);
+    router.push('/signin');
+  };
 
   const fetchAnnouncements = async () => {
     try {
@@ -135,6 +148,50 @@ function NoticeDashBoard() {
           onRowsPerPageChange={handleChangeRowsPerPage}
         />
       </div>
+      {showModal && (
+        <div
+          style={{
+            position: 'fixed',
+            top: 0,
+            left: 0,
+            right: 0,
+            bottom: 0,
+            backgroundColor: 'rgba(0, 0, 0, 0.5)',
+            display: 'flex',
+            justifyContent: 'center',
+            alignItems: 'center',
+            zIndex: 9999
+          }}
+        >
+          <div
+            style={{
+              backgroundColor: 'white',
+              padding: '20px',
+              borderRadius: '8px',
+              width: '300px',
+              textAlign: 'center'
+            }}
+          >
+            <h3 style={{ marginBottom: '20px' }}>로그인이 필요합니다</h3>
+            <p style={{ marginBottom: '20px' }}>
+              해당 기능을 이용하기 위해서는 로그인이 필요합니다.
+            </p>
+            <button
+              onClick={handleModalConfirm}
+              style={{
+                padding: '8px 16px',
+                backgroundColor: '#007bff',
+                color: 'white',
+                border: 'none',
+                borderRadius: '4px',
+                cursor: 'pointer'
+              }}
+            >
+              확인
+            </button>
+          </div>
+        </div>
+      )}
     </div>
   );
 }

@@ -35,12 +35,29 @@ export function NavList({
     return null;
   }
 
+  const handleClick = () => {
+    if (!routeKey) return;
+    console.log('결재내역', routeMap.mypage_payment);
+    console.log('문의내역', routeMap.mypage_inquiry);
+    console.log('routeKey', routeKey);
+
+    if (list.title === '마이페이지' && list.subTitle) {
+      if (list.subTitle[0] === '결재내역') {
+        router.push(routeMap.mypage_payment);
+      } else if (list.subTitle[0] === '문의내역') {
+        router.push(routeMap.mypage_inquiry);
+      } else {
+        router.push(routeMap[routeKey as keyof typeof routeMap]);
+      }
+    } else {
+      router.push(routeMap[routeKey as keyof typeof routeMap]);
+    }
+  };
+
   return (
     <div
       className={listFontStyle}
-      onClick={() =>
-        routeKey && router.push(routeMap[routeKey as keyof typeof routeMap])
-      }
+      onClick={handleClick}
       style={{ cursor: 'pointer' }}
     >
       {list.title}
