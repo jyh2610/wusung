@@ -1,6 +1,7 @@
 'use client';
 
 import React, { useEffect, useRef, useState } from 'react';
+import Image from 'next/image';
 import { sliderWrapper, slideImg, slider } from './index.css';
 
 interface ImageSliderProps {
@@ -51,8 +52,8 @@ export const ImageSlider = ({
       className={sliderWrapper}
       style={{
         position: 'absolute',
-        width: '1920px',
-        height: '700px',
+        width: '100vw',
+        height: '700Px',
         backgroundSize: 'cover',
         backgroundPosition: 'left',
         overflow: 'hidden',
@@ -71,13 +72,15 @@ export const ImageSlider = ({
         }}
       >
         {totalImages.map((src, i) => (
-          <img
+          <Image
             key={i}
             src={src}
+            width={1920}
+            height={1080}
             className={slideImg}
             alt={`slide-${i}`}
             style={{
-              width: '1920px',
+              width: '100vw',
               height: '700px',
               objectFit: 'cover',
               borderTopLeftRadius: '120px',
