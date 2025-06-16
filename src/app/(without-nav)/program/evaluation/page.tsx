@@ -20,9 +20,9 @@ import { getNotokenSubscription } from '@/entities/UserManage/api';
 import { useQuery } from '@tanstack/react-query';
 
 const columns = [
-  { id: 'title', label: '제목' },
-  { id: 'date', label: '날짜' },
-  { id: 'viewCount', label: '조회수' }
+  { id: 'title', label: '제목', align: 'left' as const },
+  { id: 'date', label: '날짜', align: 'right' as const },
+  { id: 'viewCount', label: '조회수', align: 'right' as const }
 ];
 
 function Evaluation() {
@@ -77,7 +77,7 @@ function Evaluation() {
       sx={{ cursor: 'pointer' }}
       onClick={() => handleClick(row.eduContentId + '')}
     >
-      <TableCell>{row.title}</TableCell>
+      <TableCell align="left">{row.title}</TableCell>
       <TableCell align="right">{`${row.year}-${row.month}`}</TableCell>
       <TableCell align="right">{row.viewCount}</TableCell>
     </TableRow>
@@ -115,11 +115,13 @@ function Evaluation() {
       >
         {selectedCategoryNode?.name}
       </p>
-      <DashBoard
-        columns={columns}
-        renderRow={renderRow}
-        rows={contentData?.content.flat() || []}
-      />
+      <div style={{ maxWidth: 900, margin: '0 auto' }}>
+        <DashBoard
+          columns={columns}
+          renderRow={renderRow}
+          rows={contentData?.content.flat() || []}
+        />
+      </div>
       <div
         style={{ display: 'flex', justifyContent: 'center', marginTop: '20px' }}
       >
