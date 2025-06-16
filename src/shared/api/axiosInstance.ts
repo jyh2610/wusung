@@ -8,6 +8,7 @@ import axios, {
 } from 'axios';
 import https from 'https';
 import { getsessionStorageValue, setsessionStorageValue } from '@/lib/utils';
+import { useAuthStore } from '@/shared/stores/useAuthStore';
 
 const axiosInstance = axios.create({
   baseURL: process.env.NEXT_PUBLIC_API_BASE_URL,
@@ -42,33 +43,41 @@ axiosInstance.interceptors.request.use(
 // 응답 인터셉터: 서버가 새 access token을 내려줄 경우 저장
 axiosInstance.interceptors.response.use(
   response => {
+    // 서버에서 새로운 액세스 토큰을 헤더에 담아 보내는 경우
     const newAccessToken = response.headers['authorization'];
-
     if (newAccessToken) {
       const token = newAccessToken.replace('Bearer ', '');
-
-      try {
-        const stored = getsessionStorageValue('userInfo');
-        if (stored) {
-          const parsed = JSON.parse(stored);
-          const updated = { ...parsed, token };
-          setsessionStorageValue('userInfo', JSON.stringify(updated));
-        }
-
-        if (typeof window !== 'undefined') {
-          document.cookie = `token=${token}; path=/; SameSite=Lax; Secure`;
-        }
-      } catch (err) {
-        console.warn('토큰 저장 실패', err);
-      }
+      updateToken(token);
     }
-
     return response;
   },
   async error => {
     return handleAxiosError(error);
   }
 );
+
+// 토큰 업데이트 유틸리티 함수
+const updateToken = (token: string) => {
+  try {
+    // sessionStorage 업데이트
+    const stored = getsessionStorageValue('userInfo');
+    if (stored) {
+      const parsed = JSON.parse(stored);
+      const updated = { ...parsed, token };
+      setsessionStorageValue('userInfo', JSON.stringify(updated));
+
+      // Zustand 스토어 업데이트
+      useAuthStore.setState({ token });
+    }
+
+    // 쿠키 업데이트
+    if (typeof window !== 'undefined') {
+      document.cookie = `token=${token}; path=/; SameSite=Lax; Secure`;
+    }
+  } catch (err) {
+    console.warn('토큰 저장 실패', err);
+  }
+};
 
 // 401 응답 시 재시도 로직 포함
 export interface ErrorResponse {
@@ -87,32 +96,19 @@ const handleAxiosError = async (error: AxiosError) => {
   if (error.response?.status === 401 && !originalRequest._retry) {
     originalRequest._retry = true;
 
+    // 서버에서 새로운 액세스 토큰을 헤더에 담아 보내는 경우
     const newAccessToken = error.response.headers['authorization'];
     if (newAccessToken) {
       const token = newAccessToken.replace('Bearer ', '');
+      updateToken(token);
 
-      try {
-        const stored = getsessionStorageValue('userInfo');
-        if (stored) {
-          const parsed = JSON.parse(stored);
-          const updated = { ...parsed, token };
-          setsessionStorageValue('userInfo', JSON.stringify(updated));
-        }
+      // 헤더에 새로운 토큰으로 재요청
+      originalRequest.headers = {
+        ...originalRequest.headers,
+        Authorization: `Bearer ${token}`
+      };
 
-        if (typeof window !== 'undefined') {
-          document.cookie = `token=${token}; path=/; SameSite=Lax; Secure`;
-        }
-
-        // 헤더에 새로운 토큰으로 재요청
-        originalRequest.headers = {
-          ...originalRequest.headers,
-          Authorization: `Bearer ${token}`
-        };
-
-        return axiosInstance(originalRequest);
-      } catch (err) {
-        console.warn('토큰 갱신 실패', err);
-      }
+      return axiosInstance(originalRequest);
     }
   }
 
