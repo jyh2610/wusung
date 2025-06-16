@@ -19,9 +19,9 @@ export default async function AdminLayout({
 
   const hasPermission = await getRole(cookie);
 
-  if (!(hasPermission?.data === 'ADMIN')) {
-    redirect('/');
-  }
+  // if (!(hasPermission?.data === 'ADMIN')) {
+  //   redirect('/');
+  // }
   return (
     <div className="flex min-h-screen bg-background">
       <AdminSidebar />

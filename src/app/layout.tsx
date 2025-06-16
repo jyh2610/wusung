@@ -50,9 +50,9 @@ export const metadata: Metadata = {
     images: ['/images/og-image.jpg']
   },
   icons: {
-    icon: './favicon.png',
-    shortcut: './favicon.png',
-    apple: './favicon.png'
+    icon: './favicon.ico',
+    shortcut: './favicon.ico',
+    apple: './favicon.ico'
   },
   robots: {
     index: true,
@@ -84,7 +84,7 @@ const structuredData = {
   name: '우성인지펜',
   description: '치매학습지, 인지활동형프로그램 등 노인복지 관련 콘텐츠',
   url: 'https://woosungpen.com',
-  logo: 'https://woosungpen.com/favicon.png',
+  logo: 'https://woosungpen.com/favicon.ico',
   contactPoint: {
     '@type': 'ContactPoint',
     contactType: '고객 서비스',

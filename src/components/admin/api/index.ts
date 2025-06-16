@@ -301,11 +301,12 @@ export const changePassword = async ({
   }
 };
 
-export const getIpList = async (memberId: number) => {
+export const getIpList = async (memberId: number, params: { page: number; size: number }) => {
   try {
     const res = await request<ApiResponse<PaginatedResponse<IpList>>>({
       method: 'GET',
-      url: `/api/admin/member/${memberId}/ip-list`
+      url: `/api/admin/member/${memberId}/ip-list`,
+      params
     });
     return res.data.data;
   } catch (error) {

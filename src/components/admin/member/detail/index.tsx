@@ -10,9 +10,25 @@ import {
   message,
   Modal,
   Switch,
-  Table,
   Radio
 } from 'antd';
+import {
+  Table,
+  TableBody,
+  TableCell,
+  TableHead,
+  TableHeader,
+  TableRow,
+} from "@/components/ui/table";
+import {
+  Pagination,
+  PaginationContent,
+  PaginationEllipsis,
+  PaginationItem,
+  PaginationLink,
+  PaginationNext,
+  PaginationPrevious,
+} from "@/components/ui/pagination";
 import dayjs from 'dayjs';
 import relativeTime from 'dayjs/plugin/relativeTime';
 import 'dayjs/locale/ko';
@@ -54,6 +70,8 @@ export const MemberDetail: React.FC<MemberDetailProps> = ({ memberId }) => {
   const [isWithdrawModalVisible, setIsWithdrawModalVisible] = useState(false);
   const [printHistoryPage, setPrintHistoryPage] = useState(1);
   const [printHistoryPageSize, setPrintHistoryPageSize] = useState(10);
+  const [ipListPage, setIpListPage] = useState(1);
+  const [ipListPageSize, setIpListPageSize] = useState(10);
   const router = useRouter();
 
   const { data, isLoading, refetch } = useQuery({
@@ -62,8 +80,18 @@ export const MemberDetail: React.FC<MemberDetailProps> = ({ memberId }) => {
   });
 
   const { data: ipListData } = useQuery({
-    queryKey: ['member-ip-list', memberId],
-    queryFn: () => getIpList(memberId)
+    queryKey: [
+      'member-ip-list',
+      memberId,
+      ipListPage,
+      ipListPageSize
+    ],
+    queryFn: () =>
+      getIpList(memberId, {
+        page: ipListPage-1,
+        size: ipListPageSize
+      }),
+    placeholderData: (previousData) => previousData
   });
 
   const { data: printHistoryData } = useQuery({
@@ -75,10 +103,13 @@ export const MemberDetail: React.FC<MemberDetailProps> = ({ memberId }) => {
     ],
     queryFn: () =>
       getPrintHistory(memberId, {
-        page: printHistoryPage - 1,
+        page: printHistoryPage,
         size: printHistoryPageSize
-      })
+      }),
+    placeholderData: (previousData) => previousData
   });
+
+  console.log('Print History Data:', printHistoryData);
 
   const handlePasswordSubmit = async (values: {
     password: string;
@@ -142,9 +173,14 @@ export const MemberDetail: React.FC<MemberDetailProps> = ({ memberId }) => {
     }
   };
 
-  const handlePrintHistoryTableChange = (pagination: any) => {
-    setPrintHistoryPage(pagination.current);
-    setPrintHistoryPageSize(pagination.pageSize);
+  const handlePrintHistoryTableChange = (page: number, pageSize: number) => {
+    setPrintHistoryPage(page);
+    setPrintHistoryPageSize(pageSize);
+  };
+
+  const handleIpListTableChange = (page: number, pageSize: number) => {
+    setIpListPage(page);
+    setIpListPageSize(pageSize);
   };
 
   const handlePaymentHistoryClick = () => {
@@ -167,51 +203,51 @@ export const MemberDetail: React.FC<MemberDetailProps> = ({ memberId }) => {
 
   const ipListColumns = [
     {
-      title: 'IP 주소',
-      dataIndex: 'ipAddress',
-      key: 'ipAddress',
-      width: '40%'
+      header: '회원 ID',
+      accessorKey: 'memberId',
     },
     {
-      title: '작업 유형',
-      dataIndex: 'operationType',
-      key: 'operationType',
-      width: '30%'
+      header: 'IP 주소',
+      accessorKey: 'ipAddress',
     },
     {
-      title: '업데이트 시간',
-      dataIndex: 'updatedAt',
-      key: 'updatedAt',
-      width: '30%',
-      render: (date: string) => dayjs(date).format('YYYY-MM-DD HH:mm:ss')
+      header: '작업 유형',
+      accessorKey: 'operationType',
+    },
+    {
+      header: '업데이트 시간',
+      accessorKey: 'updatedAt',
     }
   ];
 
   const printHistoryColumns = [
     {
-      title: '출력 일시',
-      dataIndex: 'printDate',
-      key: 'printDate',
-      width: '25%',
-      render: (date: string) => dayjs(date).format('YYYY-MM-DD HH:mm:ss')
+      header: '출력 ID',
+      accessorKey: 'printId',
     },
     {
-      title: '출력 유형',
-      dataIndex: 'printType',
-      key: 'printType',
-      width: '25%'
+      header: '출력 일시',
+      accessorKey: 'printDate',
+      cell: ({ row }: any) => {
+        const date = row?.original?.printDate;
+        return date ? dayjs(date).format('YYYY-MM-DD HH:mm:ss') : '-';
+      }
     },
     {
-      title: '출력 페이지 수',
-      dataIndex: 'printCount',
-      key: 'printCount',
-      width: '25%'
+      header: '출력 유형',
+      accessorKey: 'printType',
     },
     {
-      title: '접속 IP',
-      dataIndex: 'accessIp',
-      key: 'accessIp',
-      width: '25%'
+      header: '출력 페이지 수',
+      accessorKey: 'printCount',
+    },
+    {
+      header: '접속 IP',
+      accessorKey: 'accessIp',
+    },
+    {
+      header: '회원 ID',
+      accessorKey: 'memberId',
     }
   ];
 
@@ -325,37 +361,164 @@ export const MemberDetail: React.FC<MemberDetailProps> = ({ memberId }) => {
         </div>
       </Card>
 
-      <Card title="IP 접속 기록">
-        <Table
-          columns={ipListColumns}
-          dataSource={ipListData?.content}
-          rowKey={record => `${record.ipAddress}-${record.updatedAt}`}
-          pagination={{
-            total: ipListData?.totalElements,
-            pageSize: ipListData?.size || 10,
-            current: ipListData?.number ? ipListData.number + 1 : 1,
-            showSizeChanger: true,
-            showTotal: total => `총 ${total}개`
-          }}
-          loading={!ipListData}
-        />
+      <Card title="IP 접속 기록" className="mb-6">
+        <div className="rounded-md border">
+          <Table>
+            <TableHeader>
+              <TableRow>
+                {ipListColumns.map((column) => (
+                  <TableHead key={column.accessorKey}>{column.header}</TableHead>
+                ))}
+              </TableRow>
+            </TableHeader>
+            <TableBody>
+              {!ipListData ? (
+                <TableRow>
+                  <TableCell colSpan={ipListColumns.length} className="text-center">
+                    로딩 중...
+                  </TableCell>
+                </TableRow>
+              ) : ipListData.content.length === 0 ? (
+                <TableRow>
+                  <TableCell colSpan={ipListColumns.length} className="text-center">
+                    데이터가 없습니다.
+                  </TableCell>
+                </TableRow>
+              ) : (
+                ipListData.content.map((row: IpList) => (
+                  <TableRow key={`${row.ipAddress}-${row.updatedAt}`}>
+                    <TableCell>{row.memberId}</TableCell>
+                    <TableCell>{row.ipAddress}</TableCell>
+                    <TableCell>{row.operationType}</TableCell>
+                    <TableCell>{dayjs(row.updatedAt).format('YYYY-MM-DD HH:mm:ss')}</TableCell>
+                  </TableRow>
+                ))
+              )}
+            </TableBody>
+          </Table>
+        </div>
+        {ipListData && ipListData.totalElements > 0 && (
+          <div className="mt-4">
+            <Pagination>
+              <PaginationContent>
+                <PaginationItem>
+                  <PaginationPrevious 
+                    onClick={(e) => {
+                      e.preventDefault();
+                      if (ipListPage > 1) {
+                        handleIpListTableChange(ipListPage - 1, ipListPageSize);
+                      }
+                    }}
+                  />
+                </PaginationItem>
+                {Array.from({ length: Math.ceil(ipListData.totalElements / ipListPageSize) }, (_, i) => (
+                  <PaginationItem key={i + 1}>
+                    <PaginationLink
+                      onClick={(e) => {
+                        e.preventDefault();
+                        handleIpListTableChange(i + 1, ipListPageSize);
+                      }}
+                      isActive={i + 1 === ipListPage}
+                    >
+                      {i + 1}
+                    </PaginationLink>
+                  </PaginationItem>
+                ))}
+                <PaginationItem>
+                  <PaginationNext 
+                    onClick={(e) => {
+                      e.preventDefault();
+                      if (ipListPage < Math.ceil(ipListData.totalElements / ipListPageSize)) {
+                        handleIpListTableChange(ipListPage + 1, ipListPageSize);
+                      }
+                    }}
+                  />
+                </PaginationItem>
+              </PaginationContent>
+            </Pagination>
+          </div>
+        )}
       </Card>
 
-      <Card title="출력 이력 조회">
-        <Table
-          columns={printHistoryColumns}
-          dataSource={printHistoryData?.content}
-          rowKey={record => `${record.printId}-${record.printDate}`}
-          pagination={{
-            total: printHistoryData?.totalElements,
-            pageSize: printHistoryPageSize,
-            current: printHistoryPage,
-            showSizeChanger: true,
-            showTotal: total => `총 ${total}개`,
-            onChange: handlePrintHistoryTableChange
-          }}
-          loading={!printHistoryData}
-        />
+      <Card title="출력 이력 조회" className="mb-6">
+        <div className="rounded-md border">
+          <Table>
+            <TableHeader>
+              <TableRow>
+                {printHistoryColumns.map((column) => (
+                  <TableHead key={column.accessorKey}>{column.header}</TableHead>
+                ))}
+              </TableRow>
+            </TableHeader>
+            <TableBody>
+              {!printHistoryData ? (
+                <TableRow>
+                  <TableCell colSpan={printHistoryColumns.length} className="text-center">
+                    로딩 중...
+                  </TableCell>
+                </TableRow>
+              ) : printHistoryData.content.length === 0 ? (
+                <TableRow>
+                  <TableCell colSpan={printHistoryColumns.length} className="text-center">
+                    데이터가 없습니다.
+                  </TableCell>
+                </TableRow>
+              ) : (
+                printHistoryData.content.map((row: PrintHistory) => (
+                  <TableRow key={row.printId}>
+                    <TableCell>{row.printId}</TableCell>
+                    <TableCell>{dayjs(row.printDate).format('YYYY-MM-DD HH:mm:ss')}</TableCell>
+                    <TableCell>{row.printType}</TableCell>
+                    <TableCell>{row.printCount}</TableCell>
+                    <TableCell>{row.accessIp}</TableCell>
+                    <TableCell>{row.memberId}</TableCell>
+                  </TableRow>
+                ))
+              )}
+            </TableBody>
+          </Table>
+        </div>
+        {printHistoryData && printHistoryData.totalElements > 0 && (
+          <div className="mt-4">
+            <Pagination>
+              <PaginationContent>
+                <PaginationItem>
+                  <PaginationPrevious 
+                    onClick={(e) => {
+                      e.preventDefault();
+                      if (printHistoryPage > 1) {
+                        handlePrintHistoryTableChange(printHistoryPage - 1, printHistoryPageSize);
+                      }
+                    }}
+                  />
+                </PaginationItem>
+                {Array.from({ length: Math.ceil(printHistoryData.totalElements / printHistoryPageSize) }, (_, i) => (
+                  <PaginationItem key={i + 1}>
+                    <PaginationLink
+                      onClick={(e) => {
+                        e.preventDefault();
+                        handlePrintHistoryTableChange(i + 1, printHistoryPageSize);
+                      }}
+                      isActive={i + 1 === printHistoryPage}
+                    >
+                      {i + 1}
+                    </PaginationLink>
+                  </PaginationItem>
+                ))}
+                <PaginationItem>
+                  <PaginationNext 
+                    onClick={(e) => {
+                      e.preventDefault();
+                      if (printHistoryPage < Math.ceil(printHistoryData.totalElements / printHistoryPageSize)) {
+                        handlePrintHistoryTableChange(printHistoryPage + 1, printHistoryPageSize);
+                      }
+                    }}
+                  />
+                </PaginationItem>
+              </PaginationContent>
+            </Pagination>
+          </div>
+        )}
       </Card>
 
       <Modal
