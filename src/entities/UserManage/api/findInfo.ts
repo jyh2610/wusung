@@ -32,7 +32,7 @@ const findId = async (payload: {
 }) => {
   const res = await request<ApiResponse<string[]>>({
     method: 'POST',
-    url: `/api/common/account/phone/verification/confirm/userName`,
+    url: `/api/common/account/phone/verification/confirm/username`,
     data: {
       code: payload.code,
       phoneNum: payload.phoneNum
@@ -57,7 +57,7 @@ const findPassword = async (payload: {
       phoneNum: payload.phoneNum
     },
     params: {
-      username: payload.name
+      userName: payload.name
     }
   });
   return res;
