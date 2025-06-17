@@ -7,12 +7,11 @@ import axios, {
   InternalAxiosRequestConfig
 } from 'axios';
 import https from 'https';
-import { getsessionStorageValue, setsessionStorageValue } from '@/lib/utils';
 import { useAuthStore } from '@/shared/stores/useAuthStore';
 
 const axiosInstance = axios.create({
   baseURL: process.env.NEXT_PUBLIC_API_BASE_URL,
-  withCredentials: true, // 쿠키 자동 전송
+  withCredentials: true,
   headers: {
     'Content-Type': 'application/json'
   },
@@ -21,13 +20,18 @@ const axiosInstance = axios.create({
   })
 });
 
-// 요청 인터셉터: 항상 Authorization 헤더에 access token 삽입
+// 요청 인터셉터
 axiosInstance.interceptors.request.use(
   (config: InternalAxiosRequestConfig) => {
     try {
-      const userInfo = getsessionStorageValue('userInfo');
-      const token = userInfo ? JSON.parse(userInfo).token : '';
+      const getCookie = (name: string) => {
+        const value = `; ${document.cookie}`;
+        const parts = value.split(`; ${name}=`);
+        if (parts.length === 2) return parts.pop()?.split(';').shift();
+        return '';
+      };
 
+      const token = getCookie('token') || '';
       if (token) {
         config.headers.Authorization = `Bearer ${token}`;
       }
@@ -40,14 +44,20 @@ axiosInstance.interceptors.request.use(
   error => Promise.reject(error)
 );
 
-// 응답 인터셉터: 서버가 새 access token을 내려줄 경우 저장
+// 응답 인터셉터
 axiosInstance.interceptors.response.use(
   response => {
-    // 서버에서 새로운 액세스 토큰을 헤더에 담아 보내는 경우
+    console.log('전체 응답:', response);
+    console.log('응답 헤더 키들:', Object.keys(response.headers));
+    console.log('응답 헤더 전체:', response.headers);
+
     const newAccessToken =
       response.headers['authorization'] || response.headers['Authorization'];
+
+    console.log('새로운 액세스 토큰:', newAccessToken);
     if (newAccessToken) {
       const token = newAccessToken.replace('Bearer ', '');
+      console.log('처리된 토큰:', token);
       updateToken(token);
     }
     return response;
@@ -57,21 +67,10 @@ axiosInstance.interceptors.response.use(
   }
 );
 
-// 토큰 업데이트 유틸리티 함수
+// 토큰 저장
 const updateToken = (token: string) => {
   try {
-    // sessionStorage 업데이트
-    const stored = getsessionStorageValue('userInfo');
-    if (stored) {
-      const parsed = JSON.parse(stored);
-      const updated = { ...parsed, token };
-      setsessionStorageValue('userInfo', JSON.stringify(updated));
-
-      // Zustand 스토어 업데이트
-      useAuthStore.setState({ token });
-    }
-
-    // 쿠키 업데이트
+    useAuthStore.setState({ token });
     if (typeof window !== 'undefined') {
       document.cookie = `token=${token}; path=/; SameSite=Lax; Secure`;
     }
@@ -80,7 +79,7 @@ const updateToken = (token: string) => {
   }
 };
 
-// 401 응답 시 재시도 로직 포함
+// 재시도 처리
 export interface ErrorResponse {
   statusCode: number;
   message: string;
@@ -96,18 +95,18 @@ const handleAxiosError = async (error: AxiosError) => {
 
   if (error.response?.status === 401 && !originalRequest._retry) {
     originalRequest._retry = true;
+    console.log('401 에러 발생 - 응답 헤더:', error.response.headers);
 
-    // 서버에서 새로운 액세스 토큰을 헤더에 담아 보내는 경우
     const newAccessToken =
       error.response.headers['authorization'] ||
       error.response.headers['Authorization'];
+    console.log('401 에러에서 받은 새로운 토큰:', newAccessToken);
+
     if (newAccessToken) {
       const token = newAccessToken.replace('Bearer ', '');
-
-      // 기존 토큰을 버리고 새로운 토큰으로 업데이트
+      console.log('처리된 새로운 토큰:', token);
       updateToken(token);
 
-      // 헤더에 새로운 토큰으로 재요청
       originalRequest.headers = {
         ...originalRequest.headers,
         Authorization: `Bearer ${token}`
@@ -115,16 +114,13 @@ const handleAxiosError = async (error: AxiosError) => {
 
       return axiosInstance(originalRequest);
     } else {
-      // 새로운 토큰이 없는 경우 (토큰 만료)
       console.warn('액세스 토큰이 만료되었습니다.');
-      // 여기서 로그아웃 처리나 다른 처리를 추가할 수 있습니다.
     }
   }
 
   return Promise.reject(error);
 };
 
-// 실제 요청 함수
 const request = async <T>(
   config: CustomAxiosRequestConfig
 ): Promise<AxiosResponse<T>> => {

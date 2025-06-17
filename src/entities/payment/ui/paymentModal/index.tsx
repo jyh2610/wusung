@@ -40,6 +40,8 @@ import {
 import { Button } from '@/shared/ui';
 import { PreparePaymentResDTO } from '../../types';
 import { toast } from 'react-toastify';
+import { getsessionStorageValue } from '@/lib/utils';
+import { useAuthStore } from '@/shared/stores/useAuthStore';
 
 interface PaymentPageProps {
   productName: string;
@@ -62,6 +64,7 @@ export default function PaymentPage({
   price
 }: PaymentPageProps) {
   const { requestPayment, paymentStatus, resData } = usePayment();
+  const { username } = useAuthStore();
   const [formData, setFormData] = useState<userDTO>({
     name: '',
     email: '',
@@ -293,8 +296,17 @@ export default function PaymentPage({
                         className={radioInput}
                         onChange={handleInputChange}
                         checked={formData.paymentMethod === method}
+                        disabled={method === 'card' && username !== 'payment'}
                       />
-                      <label htmlFor={method} className={radioLabel}>
+                      <label
+                        htmlFor={method}
+                        className={radioLabel}
+                        style={
+                          method === 'card' && username !== 'payment'
+                            ? { color: '#9CA3AF', cursor: 'not-allowed' }
+                            : {}
+                        }
+                      >
                         <span className={radioIcon}>
                           {method === 'card' ? '💳' : '🏦'}
                         </span>{' '}

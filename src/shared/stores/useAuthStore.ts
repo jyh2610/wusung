@@ -32,11 +32,9 @@ export const useAuthStore = create<AuthState>((set, get) => ({
   tempUser: null,
   isHydrated: false,
 
-  // 1차 로그인 시도
-  login: async (id: string, password: string) => {
+  login: async (id, password) => {
     try {
       const res = await login({ userName: id, password });
-
       const userSub = await getSubscription(res.accessToken);
 
       sessionStorage.setItem(
@@ -49,8 +47,8 @@ export const useAuthStore = create<AuthState>((set, get) => ({
         })
       );
 
-      document.cookie = `token=${res?.accessToken}; path=/;`;
-      document.cookie = `username=${res?.username}; path=/;`;
+      document.cookie = `token=${res.accessToken}; path=/;`;
+      document.cookie = `username=${res.username}; path=/;`;
 
       set({
         token: res.accessToken,
@@ -65,9 +63,7 @@ export const useAuthStore = create<AuthState>((set, get) => ({
       return true;
     } catch (error: any) {
       const errorRes = error?.response?.data;
-
       if (errorRes?.requires2FA) {
-        // 2차 인증 필요
         set({
           requires2FA: true,
           tempUser: { id, password }
@@ -80,7 +76,6 @@ export const useAuthStore = create<AuthState>((set, get) => ({
     }
   },
 
-  // 2차 인증 코드 제출
   submit2FACode: async (code: string) => {
     const tempUser = get().tempUser;
     if (!tempUser) return false;
@@ -103,6 +98,7 @@ export const useAuthStore = create<AuthState>((set, get) => ({
           isVip: userSub?.data.isVip
         })
       );
+
       document.cookie = `token=${res.accessToken}; path=/;`;
       document.cookie = `username=${res.username}; path=/;`;
 
@@ -115,6 +111,7 @@ export const useAuthStore = create<AuthState>((set, get) => ({
         requires2FA: false,
         tempUser: null
       });
+
       return true;
     } catch (error) {
       console.error('2차 인증 실패:', error);
@@ -122,7 +119,6 @@ export const useAuthStore = create<AuthState>((set, get) => ({
     }
   },
 
-  // 2FA 상태 수동 변경
   set2FAState: (state, user = null) => {
     set({
       requires2FA: state,
@@ -130,7 +126,6 @@ export const useAuthStore = create<AuthState>((set, get) => ({
     });
   },
 
-  // 로그아웃
   logout: async () => {
     await logout();
 
@@ -150,7 +145,6 @@ export const useAuthStore = create<AuthState>((set, get) => ({
     });
   },
 
-  // 초기 인증 상태 확인
   checkAuthentication: () => {
     const userInfo = sessionStorage.getItem('userInfo');
     if (userInfo) {
