@@ -44,6 +44,7 @@ export const Password = () => {
   const handleSendVerification = () => {
     setIsSend(true);
     setTimeLeft(TIME_LEFT);
+    sendPhoneCode();
   };
 
   const sendPhoneCode = async () => {
