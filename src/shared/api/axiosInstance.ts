@@ -44,7 +44,8 @@ axiosInstance.interceptors.request.use(
 axiosInstance.interceptors.response.use(
   response => {
     // 서버에서 새로운 액세스 토큰을 헤더에 담아 보내는 경우
-    const newAccessToken = response.headers['authorization'];
+    const newAccessToken =
+      response.headers['authorization'] || response.headers['Authorization'];
     if (newAccessToken) {
       const token = newAccessToken.replace('Bearer ', '');
       updateToken(token);
@@ -97,7 +98,9 @@ const handleAxiosError = async (error: AxiosError) => {
     originalRequest._retry = true;
 
     // 서버에서 새로운 액세스 토큰을 헤더에 담아 보내는 경우
-    const newAccessToken = error.response.headers['authorization'];
+    const newAccessToken =
+      error.response.headers['authorization'] ||
+      error.response.headers['Authorization'];
     if (newAccessToken) {
       const token = newAccessToken.replace('Bearer ', '');
 
