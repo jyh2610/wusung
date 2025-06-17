@@ -32,7 +32,7 @@ const findId = async (payload: {
 }) => {
   const res = await request<ApiResponse<string[]>>({
     method: 'POST',
-    url: `/api/common/account/phone/verification/confirm/username`,
+    url: `/api/common/account/phone/verification/confirm/userName`,
     data: {
       code: payload.code,
       phoneNum: payload.phoneNum
