@@ -49,7 +49,8 @@ export const Password = () => {
   const sendPhoneCode = async () => {
     try {
       const res = await sendCode({
-        name,
+        name: '',
+        userName: name,
         phoneNum
       });
       setIsSend(true);
@@ -85,13 +86,13 @@ export const Password = () => {
       <div className={container}>
         <div className={inputContainer}>
           <NomalInput
-            label="이름"
+            label="아이디"
             labelInputGap={12}
             height={57}
             labelPosition="vertical"
             value={name}
             onChange={e => setName(e.target.value)}
-            placeholder="이름 입력"
+            placeholder="아이디 입력"
           />
         </div>
         <div className={inputContainer}>

@@ -100,6 +100,8 @@ const handleAxiosError = async (error: AxiosError) => {
     const newAccessToken = error.response.headers['authorization'];
     if (newAccessToken) {
       const token = newAccessToken.replace('Bearer ', '');
+
+      // 기존 토큰을 버리고 새로운 토큰으로 업데이트
       updateToken(token);
 
       // 헤더에 새로운 토큰으로 재요청
@@ -109,6 +111,10 @@ const handleAxiosError = async (error: AxiosError) => {
       };
 
       return axiosInstance(originalRequest);
+    } else {
+      // 새로운 토큰이 없는 경우 (토큰 만료)
+      console.warn('액세스 토큰이 만료되었습니다.');
+      // 여기서 로그아웃 처리나 다른 처리를 추가할 수 있습니다.
     }
   }
 

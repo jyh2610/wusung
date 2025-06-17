@@ -67,8 +67,11 @@ export const metadata: Metadata = {
   },
   verification: {
     // 구글 서치 콘솔 등록 후 verification 코드 추가
-    // google: 'verification-code',
-    // naver: 'verification-code',
+    google: 'P0AAyhnRI1tXcvLZkblltek8bHSagJpimMEF1v4AD6w'
+  },
+  other: {
+    'google-site-verification': 'P0AAyhnRI1tXcvLZkblltek8bHSagJpimMEF1v4AD6w',
+    'naver-site-verification': '286525876ff492cc08443847fbb0e7ca2831fe8e'
   },
   viewport: {
     width: 'device-width',
