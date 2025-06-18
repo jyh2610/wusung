@@ -21,7 +21,7 @@ import {
 } from './index.css';
 import { json } from 'stream/consumers';
 import { useRouter } from 'next/navigation';
-import { setsessionStorageValue } from '@/lib/utils';
+import { setlocalStorageValue } from '@/lib/utils';
 import { useAuthStore } from '@/shared/stores/useAuthStore';
 import { TwoFAModal } from './twoFAModal';
 

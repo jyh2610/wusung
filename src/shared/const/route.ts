@@ -7,6 +7,7 @@ export const routeMap = {
   program: '/program',
   introduce: '/introduce',
   // 네비게이션 메뉴별 라우팅
+  dashboard: '/notice/dashboard', // 공지사항
   introduce_greeting: '/introduce/greeting', // 인사말
   introduce_direction: '/introduce/map', // 오시는길
   payment_info: '/payment', // 요금 안내 및 결제

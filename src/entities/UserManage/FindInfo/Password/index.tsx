@@ -42,22 +42,20 @@ export const Password = () => {
   }, [isSend, timeLeft]);
 
   const handleSendVerification = () => {
-    setIsSend(true);
     setTimeLeft(TIME_LEFT);
     sendPhoneCode();
   };
 
   const sendPhoneCode = async () => {
     try {
-      const res = await sendCode({
+      await sendCode({
         name: '',
         userName: name,
         phoneNum
       });
       setIsSend(true);
-      toast.success(res.data.message);
-    } catch (error) {
-      console.error(error);
+    } catch (error: any) {
+      toast.error(error.response.data.message);
     }
   };
 
@@ -68,10 +66,10 @@ export const Password = () => {
         phoneNum,
         name
       });
-      setResetPw(true);
       toast.success(res.data.message);
-    } catch (error) {
-      console.error(error);
+      setResetPw(true);
+    } catch (error: any) {
+      toast.error(error.response.data.message);
     }
   };
 

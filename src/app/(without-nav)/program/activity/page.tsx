@@ -33,7 +33,8 @@ import {
   emptyState,
   activityCardHeader,
   activityCardInfo,
-  activityCardThumbnail
+  activityCardThumbnail,
+  cascaderHighlight
 } from './index.css';
 import { useActivities } from '@/entities/program/scheduler/model/useActivities';
 import Image from 'next/image';
@@ -42,11 +43,10 @@ import { printUserPrint } from '@/entities/program/api';
 import { toast } from 'react-toastify';
 import { useCategoryTreeStore } from '@/shared/stores/useCategoryTreeStore';
 import { usePathname, useRouter } from 'next/navigation';
-import { handleCurrentPathRoute } from '@/lib/utils';
+import { handleCurrentPathRoute, getCascaderOptions } from '@/lib/utils';
 import { CustomCascader } from '@/shared/ui/cascader';
 import { IContent, ICategoryLeaf } from '@/entities/program/type.dto';
 import { useIsAdmin } from '@/components/hooks/useIsAdmin';
-import { printSelectedActivities } from '@/lib/utils/printUtils';
 
 function Activity() {
   const router = useRouter();
@@ -75,6 +75,7 @@ function Activity() {
   const [selectedActivitiesInfo, setSelectedActivitiesInfo] = useState<
     IContent[]
   >([]);
+  const [isCascaderClicked, setIsCascaderClicked] = useState(false);
 
   // 페이지네이션 상태 추가
   const [currentPage, setCurrentPage] = useState(1);
@@ -89,7 +90,13 @@ function Activity() {
     low: 3
   };
 
-  const { activities, fetchActivities, setActivities, totalElements, totalPages } = useActivities({
+  const {
+    activities,
+    fetchActivities,
+    setActivities,
+    totalElements,
+    totalPages
+  } = useActivities({
     isAdmin,
     categoryId: categoryId ?? 0,
     difficultyLevel: difficultyMap[selectedLevel],
@@ -139,6 +146,14 @@ function Activity() {
     }
   };
 
+  const handleCascaderClick = () => {
+    setIsCascaderClicked(true);
+  };
+
+  const handleCascaderFocus = () => {
+    setIsCascaderClicked(true);
+  };
+
   const handleLevelClick = (level: 'high' | 'medium' | 'low') => {
     setSelectedLevel(level);
     setCurrentPage(1); // 난이도 변경 시 첫 페이지로 이동
@@ -168,18 +183,11 @@ function Activity() {
 
   const handleSelectAll = () => {
     if (activities && activities.length > 0) {
-      const newSelectedActivities = new Set(selectedActivities);
-      const newSelectedActivitiesInfo = [...selectedActivitiesInfo];
-      
-      activities.forEach(activity => {
-        if (!newSelectedActivities.has(activity.eduContentId!)) {
-          newSelectedActivities.add(activity.eduContentId!);
-          newSelectedActivitiesInfo.push(activity);
-        }
-      });
-      
-      setSelectedActivities(newSelectedActivities);
-      setSelectedActivitiesInfo(newSelectedActivitiesInfo);
+      const allActivityIds = new Set(
+        activities.map(activity => activity.eduContentId!)
+      );
+      setSelectedActivities(allActivityIds);
+      setSelectedActivitiesInfo(activities);
     }
   };
 
@@ -207,49 +215,11 @@ function Activity() {
     setCurrentPage(1); // 페이지 크기 변경 시 첫 페이지로 이동
   };
 
-  const handlePrint = async () => {
-    const selectedIdsArray = Array.from(selectedActivities);
-    await printSelectedActivities(selectedIdsArray, printUserPrint);
-  };
-
-  useEffect(() => {
-    fetchCategories(isAdmin);
-  }, [fetchCategories, isAdmin]);
-
-  useEffect(() => {
-    if (categories && categories.length > 0 && personName.length === 0) {
-      // 활동지 카테고리만 필터링
-      const activityCategories = categories.filter(
-        category => category.name === '활동지'
-      );
-      if (activityCategories.length > 0) {
-        const firstCategory = activityCategories[0];
-        setPersonName([firstCategory.name]);
-        setCategoryId(firstCategory.categoryId);
-      }
-    }
-  }, [categories]);
-
-  useEffect(() => {
-    const fetchData = () => {
-      if (categoryId !== null) {
-        try {
-          fetchActivities();
-        } catch (error) {
-          console.error('활동지 불러오기 실패:', error);
-          toast.error('활동지 불러오기에 실패했습니다.');
-          setActivities([]);
-        }
-      }
-    };
-    fetchData();
-  }, [categoryId, fetchActivities, setActivities]);
-
   // 페이지네이션 번호 생성
   const getPageNumbers = () => {
     const pages = [];
     const maxVisiblePages = 5;
-    
+
     if (totalPages <= maxVisiblePages) {
       for (let i = 1; i <= totalPages; i++) {
         pages.push(i);
@@ -269,9 +239,116 @@ function Activity() {
         }
       }
     }
-    
+
     return pages;
   };
+
+  const handlePrint = async () => {
+    try {
+      const selectedIdsArray = Array.from(selectedActivities);
+      if (selectedIdsArray.length === 0) {
+        toast.warn('인쇄할 활동지를 선택해주세요.');
+        return;
+      }
+
+      const pdfUrl = await printUserPrint(selectedIdsArray);
+
+      if (pdfUrl) {
+        const iframe = document.createElement('iframe');
+        iframe.style.position = 'fixed';
+        iframe.style.right = '0';
+        iframe.style.bottom = '0';
+        iframe.style.width = '0';
+        iframe.style.height = '0';
+        iframe.style.border = 'none';
+        iframe.style.visibility = 'hidden';
+        iframe.style.pointerEvents = 'none';
+
+        iframe.src = pdfUrl;
+
+        iframe.onload = () => {
+          setTimeout(() => {
+            if (iframe.contentWindow) {
+              try {
+                iframe.contentWindow.focus();
+                iframe.contentWindow.print();
+                console.log('Print dialog initiated.');
+              } catch (printError) {
+                console.error('Error initiating print on iframe:', printError);
+                toast.error('인쇄 대화 상자를 열 수 없습니다.');
+                if (iframe.parentElement) {
+                  iframe.parentElement.removeChild(iframe);
+                }
+              }
+            } else {
+              console.error(
+                'iframe contentWindow is not available after load.'
+              );
+              toast.error('인쇄 창을 열 수 없습니다.');
+              if (iframe.parentElement) {
+                iframe.parentElement.removeChild(iframe);
+              }
+            }
+          }, 500);
+        };
+
+        iframe.onerror = e => {
+          console.error('Error loading PDF in iframe:', e);
+          toast.error('PDF 로딩 중 오류가 발생했습니다.');
+          if (iframe.parentElement) {
+            iframe.parentElement.removeChild(iframe);
+          }
+        };
+
+        document.body.appendChild(iframe);
+      } else {
+        toast.error('PDF 파일을 받지 못했습니다.');
+      }
+    } catch (error) {
+      console.error('프린트 에러:', error);
+      toast.error('인쇄 실패되었습니다!');
+    }
+  };
+
+  useEffect(() => {
+    fetchCategories(isAdmin);
+  }, [fetchCategories, isAdmin]);
+
+  useEffect(() => {
+    if (categories && categories.length > 0 && personName.length === 0) {
+      // 활동지 카테고리만 필터링
+      const activityCategories = categories.filter(
+        category => category.name === '활동지'
+      );
+      if (activityCategories.length > 0) {
+        const firstCategory = activityCategories[0];
+        setPersonName([firstCategory.name]);
+        setCategoryId(firstCategory.categoryId);
+        setSelectedCategoryNode(firstCategory);
+      }
+    }
+  }, [categories, personName.length, setSelectedCategoryNode]);
+
+  useEffect(() => {
+    if (selectedCategoryNode) {
+      setCategoryId(selectedCategoryNode.categoryId);
+    }
+  }, [selectedCategoryNode]);
+
+  useEffect(() => {
+    const fetchData = () => {
+      if (categoryId !== null) {
+        try {
+          fetchActivities();
+        } catch (error) {
+          console.error('활동지 불러오기 실패:', error);
+          toast.error('활동지 불러오기에 실패했습니다.');
+          setActivities([]);
+        }
+      }
+    };
+    fetchData();
+  }, [categoryId, fetchActivities, setActivities]);
 
   return (
     <div className={container}>
@@ -306,7 +383,9 @@ function Activity() {
                       />
                     </div>
                     <div>
-                      <div className={selectedActivityTitle}>{activity.title}</div>
+                      <div className={selectedActivityTitle}>
+                        {activity.title}
+                      </div>
                       <div className={selectedActivityId}>
                         ID: {activity.eduContentId}
                       </div>
@@ -334,15 +413,11 @@ function Activity() {
             {selectedCategoryNode?.name || '카테고리 선택'}
           </div>
           <CustomCascader
-            options={categories.filter(category => {
-              if (category.name === '활동지') return true;
-              // 부모 카테고리가 '활동지'인 경우도 포함
-              return (
-                category.parentId &&
-                categories.find(c => c.categoryId === category.parentId)
-                  ?.name === '활동지'
-              );
-            })}
+            options={getCascaderOptions(
+              categories,
+              selectedCategoryNode,
+              '활동지'
+            )}
             value={
               selectedCategoryNode
                 ? [selectedCategoryNode.categoryId]
@@ -351,6 +426,8 @@ function Activity() {
             onChange={handleCategoryChange}
             placeholder="카테고리 선택"
             style={{ width: '240px' }}
+            className={!isCascaderClicked ? cascaderHighlight : ''}
+            onClick={handleCascaderClick}
           />
         </div>
 
@@ -430,19 +507,25 @@ function Activity() {
             </div>
 
             {/* 페이지네이션 */}
-            <div style={{ 
-              display: 'flex', 
-              justifyContent: 'space-between', 
-              alignItems: 'center', 
-              marginTop: '20px',
-              padding: '0 20px'
-            }}>
+            <div
+              style={{
+                display: 'flex',
+                justifyContent: 'space-between',
+                alignItems: 'center',
+                marginTop: '20px',
+                padding: '0 20px'
+              }}
+            >
               {/* 페이지 크기 선택 */}
-              <div style={{ display: 'flex', alignItems: 'center', gap: '10px' }}>
-                <span style={{ fontSize: '14px', color: '#666' }}>페이지당 항목:</span>
+              <div
+                style={{ display: 'flex', alignItems: 'center', gap: '10px' }}
+              >
+                <span style={{ fontSize: '14px', color: '#666' }}>
+                  페이지당 항목:
+                </span>
                 <select
                   value={pageSize}
-                  onChange={(e) => handlePageSizeChange(Number(e.target.value))}
+                  onChange={e => handlePageSizeChange(Number(e.target.value))}
                   style={{
                     padding: '5px 10px',
                     border: '1px solid #ddd',
@@ -455,12 +538,15 @@ function Activity() {
                   <option value={20}>20</option>
                 </select>
                 <span style={{ fontSize: '14px', color: '#666' }}>
-                  총 {totalElements}개 중 {startIndex + 1}-{Math.min(endIndex, totalElements)}개 표시
+                  총 {totalElements}개 중 {startIndex + 1}-
+                  {Math.min(endIndex, totalElements)}개 표시
                 </span>
               </div>
 
               {/* 페이지 번호 */}
-              <div style={{ display: 'flex', alignItems: 'center', gap: '5px' }}>
+              <div
+                style={{ display: 'flex', alignItems: 'center', gap: '5px' }}
+              >
                 <button
                   onClick={() => handlePageChange(currentPage - 1)}
                   disabled={currentPage === 1}
@@ -475,7 +561,7 @@ function Activity() {
                 >
                   이전
                 </button>
-                
+
                 {getPageNumbers().map(pageNum => (
                   <button
                     key={pageNum}
@@ -494,7 +580,7 @@ function Activity() {
                     {pageNum}
                   </button>
                 ))}
-                
+
                 <button
                   onClick={() => handlePageChange(currentPage + 1)}
                   disabled={currentPage === totalPages}
@@ -502,8 +588,10 @@ function Activity() {
                     padding: '8px 12px',
                     border: '1px solid #ddd',
                     borderRadius: '4px',
-                    background: currentPage === totalPages ? '#f5f5f5' : 'white',
-                    cursor: currentPage === totalPages ? 'not-allowed' : 'pointer',
+                    background:
+                      currentPage === totalPages ? '#f5f5f5' : 'white',
+                    cursor:
+                      currentPage === totalPages ? 'not-allowed' : 'pointer',
                     fontSize: '14px'
                   }}
                 >
@@ -513,9 +601,7 @@ function Activity() {
             </div>
           </>
         ) : (
-          <div className={emptyState}>
-            활동지가 없습니다.
-          </div>
+          <div className={emptyState}>활동지가 없습니다.</div>
         )}
       </div>
     </div>

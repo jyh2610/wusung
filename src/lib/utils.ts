@@ -5,7 +5,11 @@ export function cn(...inputs: ClassValue[]) {
   return twMerge(clsx(inputs));
 }
 // utils/scheduleConverter.ts
-import { CategoryNode, IContent } from '@/entities/program/type.dto';
+import {
+  CategoryNode,
+  IContent,
+  ICategoryLeaf
+} from '@/entities/program/type.dto';
 import { Schedule } from '@/entities/program/type.dto';
 import { QueryClient } from '@tanstack/react-query';
 export function convertToSchedule(
@@ -51,14 +55,14 @@ export function convertToSchedule(
   return result;
 }
 
-export const getsessionStorageValue = (key: string) => {
+export const getlocalStorageValue = (key: string) => {
   if (typeof window === 'undefined') return null;
-  return sessionStorage.getItem(key);
+  return localStorage.getItem(key);
 };
 
-export const setsessionStorageValue = (key: string, value: string) => {
+export const setlocalStorageValue = (key: string, value: string) => {
   if (typeof window === 'undefined') return null;
-  return sessionStorage.setItem(key, value);
+  return localStorage.setItem(key, value);
 };
 
 type AnyTreeNode = Record<string, any>;
@@ -183,3 +187,38 @@ export function maskLastThree(str: string): string {
   }
   return str.slice(0, -3) + '***';
 }
+
+/**
+ * cascader 옵션을 필터링하는 유틸 함수
+ * @param categories 전체 카테고리 배열
+ * @param selectedCategoryNode 현재 선택된 카테고리 노드
+ * @param rootCategoryName 루트 카테고리 이름 (예: '활동지', '기타자료')
+ * @returns 필터링된 카테고리 배열
+ */
+export const getCascaderOptions = (
+  categories: ICategoryLeaf[],
+  selectedCategoryNode: ICategoryLeaf | null,
+  rootCategoryName: string
+): ICategoryLeaf[] => {
+  // selectedCategoryNode가 있으면 해당 노드와 그 하위 카테고리들을 모두 표시
+  if (selectedCategoryNode) {
+    const childCategories = categories.filter(
+      category => category.parentId === selectedCategoryNode.categoryId
+    );
+    // 현재 선택된 노드와 그 하위 노드들을 모두 포함
+    return [selectedCategoryNode, ...childCategories];
+  }
+
+  // selectedCategoryNode가 없으면 루트 카테고리와 그 하위 카테고리들을 모두 표시
+  const rootCategory = categories.find(
+    category => category.name === rootCategoryName
+  );
+  if (rootCategory) {
+    const childCategories = categories.filter(
+      category => category.parentId === rootCategory.categoryId
+    );
+    return [rootCategory, ...childCategories];
+  }
+
+  return [];
+};

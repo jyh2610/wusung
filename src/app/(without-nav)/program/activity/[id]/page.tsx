@@ -38,7 +38,8 @@ export default function ActivityPage() {
 
   useEffect(() => {
     const fetchContent = async () => {
-      const token = sessionStorage.getItem('token');
+      const userInfo = localStorage.getItem('userInfo');
+      const token = userInfo ? JSON.parse(userInfo).token : null;
       try {
         const res = await request<IRes<EduContent>>({
           method: 'GET',

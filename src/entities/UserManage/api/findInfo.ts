@@ -7,22 +7,29 @@ import {
   userSub
 } from '../type';
 import { ApiResponse } from '@/shared/type';
+import { toast } from 'react-toastify';
 
 const sendCode = async (payload: {
   name?: string;
   userName?: string;
   phoneNum: string;
 }) => {
-  const res = await request<ApiResponse<unknown>>({
-    method: 'POST',
-    url: '/api/common/account/phone/verification/send',
-    data: {
-      name: payload.name || '',
-      userName: payload.userName || '',
-      phoneNum: payload.phoneNum
-    }
-  });
-  return res;
+  try {
+    const res = await request<ApiResponse<unknown>>({
+      method: 'POST',
+      url: '/api/common/account/phone/verification/send',
+      data: {
+        name: payload.name || '',
+        userName: payload.userName || '',
+        phoneNum: payload.phoneNum
+      }
+    });
+    toast.success(res.data.message);
+    return res;
+  } catch (error: any) {
+    toast.error(error.response.data.message);
+    throw error;
+  }
 };
 
 const findId = async (payload: {

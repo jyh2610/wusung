@@ -21,14 +21,15 @@ export function PaymentHistory() {
     filterOptions[0]
   );
   const [page, setPage] = useState(1);
+  const [monthsAgo, setMonthsAgo] = useState<number>(0);
 
   const { data, isLoading, isError } = useQuery<
     ApiResponse<PaginatedResponse<paymentListDTO>>,
     Error
   >({
-    queryKey: ['paymentList', selectedFilter, page],
-    queryFn: () => getPaymentList(selectedFilter, page - 1, PAGE_SIZE)
-    // keepPreviousData: true // (tanstack v4 이상에서만 지원, 필요시 주석 해제)
+    queryKey: ['paymentList', selectedFilter, page, monthsAgo],
+    queryFn: () =>
+      getPaymentList(selectedFilter, page - 1, PAGE_SIZE, monthsAgo)
   });
 
   const payments: paymentListDTO[] = data?.data.content || [];
@@ -72,6 +73,15 @@ export function PaymentHistory() {
           onSelect={option => {
             setSelectedFilter(option);
             setPage(1);
+            if (option === '3개월') {
+              setMonthsAgo(3);
+            } else if (option === '6개월') {
+              setMonthsAgo(6);
+            } else if (option === '12개월') {
+              setMonthsAgo(12);
+            } else {
+              setMonthsAgo(0);
+            }
           }}
         />
       </div>

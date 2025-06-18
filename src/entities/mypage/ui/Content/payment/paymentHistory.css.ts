@@ -294,20 +294,41 @@ export const emptyStyle = style({
   padding: '40px 0',
   color: '#888'
 });
-export const receipt = style({
-  width: '100%',
-  height: '56px',
-  borderRadius: '12px',
-  padding: '10px 20px',
-  cursor: 'pointer',
-  transition: 'all 0.3s ease',
-  fontSize: '20px',
-  fontWeight: '500',
-  letterSpacing: '-2.5%',
-  textDecoration: 'none',
-  display: 'flex',
-  alignItems: 'center',
-  justifyContent: 'center',
-  color: colors.brand[600],
-  border: `1px solid ${colors.brand['400']}`
+export const receipt = recipe({
+  base: {
+    width: '100%',
+    height: '56px',
+    borderRadius: '12px',
+    padding: '10px 20px',
+    cursor: 'pointer',
+    transition: 'all 0.3s ease',
+    fontSize: '20px',
+    fontWeight: '500',
+    letterSpacing: '-2.5%',
+    textDecoration: 'none',
+    display: 'flex',
+    alignItems: 'center',
+    justifyContent: 'center',
+    color: colors.brand[600],
+    border: `1px solid ${colors.brand['400']}`
+  },
+  variants: {
+    disabled: {
+      true: {
+        cursor: 'not-allowed',
+        color: colors.gray_scale[400],
+        border: `1px solid ${colors.gray_scale[300]}`,
+        backgroundColor: colors.gray_scale[100]
+      },
+      false: {
+        cursor: 'pointer',
+        color: colors.brand[600],
+        border: `1px solid ${colors.brand['400']}`,
+        backgroundColor: 'transparent'
+      }
+    }
+  },
+  defaultVariants: {
+    disabled: false
+  }
 });

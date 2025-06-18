@@ -122,13 +122,17 @@ export const getPartnerList = async () => {
   return res;
 };
 
-export const getFAQList = async () => {
+export const getFAQList = async (page: number, size: number) => {
   try {
     const res = await request<
       ApiResponse<PaginatedResponse<IAnnouncementResponse>>
     >({
       method: 'GET',
-      url: '/api/inquiry/faq'
+      url: '/api/common/main/announcement/FAQ/list',
+      params: {
+        page: page,
+        size: size
+      }
     });
     return res.data.data;
   } catch (error) {

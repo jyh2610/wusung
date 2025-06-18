@@ -14,7 +14,8 @@ import {
   activityCard,
   activityCardContainer,
   container,
-  titleContainer
+  titleContainer,
+  cascaderHighlight
 } from './ETC.css';
 import { useActivities } from '@/entities/program/scheduler/model/useActivities';
 import Image from 'next/image';
@@ -23,7 +24,7 @@ import { printUserPrint } from '@/entities/program/api';
 import { toast } from 'react-toastify';
 import { useCategoryTreeStore } from '@/shared/stores/useCategoryTreeStore';
 import { usePathname, useRouter } from 'next/navigation';
-import { handleCurrentPathRoute } from '@/lib/utils';
+import { handleCurrentPathRoute, getCascaderOptions } from '@/lib/utils';
 import { CustomCascader } from '@/shared/ui/cascader';
 import { IContent, ICategoryLeaf } from '@/entities/program/type.dto';
 import { useIsAdmin } from '@/components/hooks/useIsAdmin';
@@ -52,6 +53,7 @@ function ETC() {
   const [selectedActivitiesInfo, setSelectedActivitiesInfo] = useState<
     IContent[]
   >([]);
+  const [isCascaderClicked, setIsCascaderClicked] = useState(false);
 
   // 페이지네이션 상태 추가
   const [currentPage, setCurrentPage] = useState(1);
@@ -59,7 +61,13 @@ function ETC() {
 
   const { categories, fetchCategories } = useCategoryStore();
 
-  const { activities, fetchActivities, setActivities, totalElements, totalPages } = useActivities({
+  const {
+    activities,
+    fetchActivities,
+    setActivities,
+    totalElements,
+    totalPages
+  } = useActivities({
     isAdmin,
     categoryId: categoryId ?? 0,
     difficultyLevel: 0,
@@ -107,6 +115,14 @@ function ETC() {
         setCurrentPage(1);
       }
     }
+  };
+
+  const handleCascaderClick = () => {
+    setIsCascaderClicked(true);
+  };
+
+  const handleCascaderFocus = () => {
+    setIsCascaderClicked(true);
   };
 
   const handleActivitySelect = (eduContentId: number) => {
@@ -166,7 +182,7 @@ function ETC() {
   const getPageNumbers = () => {
     const pages = [];
     const maxVisiblePages = 5;
-    
+
     if (totalPages <= maxVisiblePages) {
       for (let i = 1; i <= totalPages; i++) {
         pages.push(i);
@@ -186,7 +202,7 @@ function ETC() {
         }
       }
     }
-    
+
     return pages;
   };
 
@@ -442,14 +458,11 @@ function ETC() {
             {selectedCategoryNode?.name || '카테고리 선택'}
           </div>
           <CustomCascader
-            options={categories.filter(category => {
-              if (category.name === '기타자료') return true;
-              return (
-                category.parentId &&
-                categories.find(c => c.categoryId === category.parentId)
-                  ?.name === '기타자료'
-              );
-            })}
+            options={getCascaderOptions(
+              categories,
+              selectedCategoryNode,
+              '기타자료'
+            )}
             value={
               selectedCategoryNode
                 ? [selectedCategoryNode.categoryId]
@@ -458,6 +471,8 @@ function ETC() {
             onChange={handleCategoryChange}
             placeholder="카테고리 선택"
             style={{ width: '240px' }}
+            className={!isCascaderClicked ? cascaderHighlight : ''}
+            onClick={handleCascaderClick}
           />
         </div>
 
@@ -527,19 +542,25 @@ function ETC() {
             </div>
 
             {/* 페이지네이션 */}
-            <div style={{ 
-              display: 'flex', 
-              justifyContent: 'space-between', 
-              alignItems: 'center', 
-              marginTop: '20px',
-              padding: '0 20px'
-            }}>
+            <div
+              style={{
+                display: 'flex',
+                justifyContent: 'space-between',
+                alignItems: 'center',
+                marginTop: '20px',
+                padding: '0 20px'
+              }}
+            >
               {/* 페이지 크기 선택 */}
-              <div style={{ display: 'flex', alignItems: 'center', gap: '10px' }}>
-                <span style={{ fontSize: '14px', color: '#666' }}>페이지당 항목:</span>
+              <div
+                style={{ display: 'flex', alignItems: 'center', gap: '10px' }}
+              >
+                <span style={{ fontSize: '14px', color: '#666' }}>
+                  페이지당 항목:
+                </span>
                 <select
                   value={pageSize}
-                  onChange={(e) => handlePageSizeChange(Number(e.target.value))}
+                  onChange={e => handlePageSizeChange(Number(e.target.value))}
                   style={{
                     padding: '5px 10px',
                     border: '1px solid #ddd',
@@ -552,12 +573,15 @@ function ETC() {
                   <option value={20}>20</option>
                 </select>
                 <span style={{ fontSize: '14px', color: '#666' }}>
-                  총 {totalElements}개 중 {startIndex + 1}-{Math.min(endIndex, totalElements)}개 표시
+                  총 {totalElements}개 중 {startIndex + 1}-
+                  {Math.min(endIndex, totalElements)}개 표시
                 </span>
               </div>
 
               {/* 페이지 번호 */}
-              <div style={{ display: 'flex', alignItems: 'center', gap: '5px' }}>
+              <div
+                style={{ display: 'flex', alignItems: 'center', gap: '5px' }}
+              >
                 <button
                   onClick={() => handlePageChange(currentPage - 1)}
                   disabled={currentPage === 1}
@@ -572,7 +596,7 @@ function ETC() {
                 >
                   이전
                 </button>
-                
+
                 {getPageNumbers().map(pageNum => (
                   <button
                     key={pageNum}
@@ -591,7 +615,7 @@ function ETC() {
                     {pageNum}
                   </button>
                 ))}
-                
+
                 <button
                   onClick={() => handlePageChange(currentPage + 1)}
                   disabled={currentPage === totalPages}
@@ -599,8 +623,10 @@ function ETC() {
                     padding: '8px 12px',
                     border: '1px solid #ddd',
                     borderRadius: '4px',
-                    background: currentPage === totalPages ? '#f5f5f5' : 'white',
-                    cursor: currentPage === totalPages ? 'not-allowed' : 'pointer',
+                    background:
+                      currentPage === totalPages ? '#f5f5f5' : 'white',
+                    cursor:
+                      currentPage === totalPages ? 'not-allowed' : 'pointer',
                     fontSize: '14px'
                   }}
                 >

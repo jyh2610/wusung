@@ -311,3 +311,10 @@ export const activityCardThumbnail = style({
   height: '357px',
   position: 'relative'
 });
+
+// Cascader 하이라이트 스타일
+export const cascaderHighlight = style({
+  border: `2px solid ${colors.brand[500]} !important`,
+  boxShadow: `0 0 0 1px ${colors.brand[300]}`,
+  borderRadius: '8px'
+});

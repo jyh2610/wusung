@@ -34,7 +34,7 @@ function Logged() {
 
   useEffect(() => {
     if (typeof window !== 'undefined') {
-      const userInfoString = sessionStorage.getItem('userInfo');
+      const userInfoString = localStorage.getItem('userInfo');
       if (userInfoString) {
         try {
           const { username, endDate, isVip } = JSON.parse(userInfoString);
@@ -43,7 +43,7 @@ function Logged() {
           console.error('userInfo 파싱 에러:', error);
         }
       } else {
-        console.log('sessionStorage에 userInfo가 없습니다.');
+        console.log('localStorage에 userInfo가 없습니다.');
       }
     }
   }, []);

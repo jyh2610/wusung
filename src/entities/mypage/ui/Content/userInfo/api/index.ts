@@ -2,6 +2,7 @@ import request from '@/shared/api/axiosInstance';
 import { ApiResponse } from '@/shared/type';
 import { UserInfoResponse } from '../type';
 import { IFormCompany, IFormIndividual } from '@/entities/UserManage/type';
+import { toast } from 'react-toastify';
 
 const checkPwHandler = async (pw: string) => {
   const response = await request<ApiResponse<UserInfoResponse>>({
@@ -57,16 +58,21 @@ const submitIndivisualUserInfoHandler = async (
     formData.append('file', file);
   }
 
-  const response = await request<ApiResponse<UserInfoResponse>>({
-    method: 'PUT',
-    headers: {
-      'Content-Type': 'multipart/form-data'
-    },
-    url: '/api/my-page/account/personal/edit',
-    data: formData
-  });
-
-  return response;
+  try {
+    const response = await request<ApiResponse<UserInfoResponse>>({
+      method: 'PUT',
+      headers: {
+        'Content-Type': 'multipart/form-data'
+      },
+      url: '/api/my-page/account/personal/edit',
+      data: formData
+    });
+    toast.success(response.data.message);
+    return response;
+  } catch (error: any) {
+    toast.error(error.response.data.message);
+    throw error;
+  }
 };
 
 const deleteUserHandler = async ({

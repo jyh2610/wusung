@@ -19,6 +19,7 @@ interface CustomCascaderProps {
   disabled?: boolean;
   className?: string;
   style?: React.CSSProperties;
+  onClick?: () => void;
 }
 
 export function CustomCascader({
@@ -28,7 +29,8 @@ export function CustomCascader({
   placeholder = '선택해주세요',
   disabled = false,
   className,
-  style
+  style,
+  onClick
 }: CustomCascaderProps) {
   // ICategoryLeaf를 CascaderOption으로 변환
   const transformOptions = (items: ICategoryLeaf[]): CascaderOption[] => {
@@ -86,6 +88,7 @@ export function CustomCascader({
       style={style}
       changeOnSelect
       displayRender={() => getSelectedLabel(value)}
+      onClick={onClick}
     />
   );
 }

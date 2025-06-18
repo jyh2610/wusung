@@ -18,7 +18,8 @@ export const getManager = async () => {
 export const getPaymentList = async (
   filter: PaymentFilter,
   page: number,
-  size: number
+  size: number,
+  monthsAgo?: number
 ) => {
   try {
     const res = await request<ApiResponse<PaginatedResponse<paymentListDTO>>>({
@@ -26,7 +27,8 @@ export const getPaymentList = async (
       params: {
         filter,
         page,
-        size
+        size,
+        monthsAgo
       }
     });
     return res.data;
@@ -124,14 +126,19 @@ export const getCertificate = async () => {
   }
 };
 
-export const personalInquiry = async (page: number, size: number) => {
+export const personalInquiry = async (
+  page: number,
+  size: number,
+  monthsAgo?: number
+) => {
   try {
     const res = await request<ApiResponse<PaginatedResponse<IInquiry[]>>>({
       method: 'GET',
       url: '/api/inquiry/list',
       params: {
         page,
-        size
+        size,
+        monthsAgo
       }
     });
     return res.data;

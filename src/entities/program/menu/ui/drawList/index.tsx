@@ -27,11 +27,12 @@ export const DrawerList = ({ open, setOpen }: IProps) => {
   const [editUser, setEditUser] = useState<IUser | null>(null);
   const [detailModalOpen, setDetailModalOpen] = useState(false);
   const [editModalOpen, setEditModalOpen] = useState(false);
+  const [deleteModalOpen, setDeleteModalOpen] = useState(false);
+  const [userToDelete, setUserToDelete] = useState<IUser | null>(null);
 
   const queryClient = useQueryClient();
   const selectedUserId = useUserStore(state => state.selectedUserId);
   const selectUser = useUserStore(state => state.selectUser);
-  const setUsers = useUserStore(state => state.setUsers);
 
   useEffect(() => {
     console.log('현재 선택된 유저 ID:', selectedUserId);
@@ -41,17 +42,17 @@ export const DrawerList = ({ open, setOpen }: IProps) => {
 
   const pathname = usePathname();
 
-  const { data: users = [], isLoading } = useQuery({
+  const {
+    data: users = [],
+    isLoading,
+    refetch
+  } = useQuery({
     queryKey: ['users'],
-    queryFn: getUser
+    queryFn: getUser,
+    refetchOnWindowFocus: false,
+    staleTime: 0,
+    gcTime: 0
   });
-
-  // users 데이터가 변경될 때마다 useUserStore에 저장
-  useEffect(() => {
-    if (users.length > 0) {
-      setUsers(users);
-    }
-  }, [users, setUsers]);
 
   const handleUserSelect = (userId: number) => {
     console.log('유저 선택됨:', userId);
@@ -61,7 +62,9 @@ export const DrawerList = ({ open, setOpen }: IProps) => {
   const deleteUserMutation = useMutation({
     mutationFn: (elderId: number) => deleteUser(elderId),
     onSuccess: () => {
-      queryClient.invalidateQueries({ queryKey: ['users'] });
+      setTimeout(() => {
+        refetch();
+      }, 100);
     }
   });
 
@@ -82,9 +85,21 @@ export const DrawerList = ({ open, setOpen }: IProps) => {
 
   // 삭제
   const handleDelete = async (user: IUser) => {
-    if (window.confirm('정말 삭제하시겠습니까?')) {
-      deleteUserMutation.mutate(user.elderId);
+    setUserToDelete(user);
+    setDeleteModalOpen(true);
+  };
+
+  const confirmDelete = () => {
+    if (userToDelete) {
+      deleteUserMutation.mutate(userToDelete.elderId);
+      setDeleteModalOpen(false);
+      setUserToDelete(null);
     }
+  };
+
+  const cancelDelete = () => {
+    setDeleteModalOpen(false);
+    setUserToDelete(null);
   };
 
   if (isLoading) {
@@ -125,6 +140,9 @@ export const DrawerList = ({ open, setOpen }: IProps) => {
                 onDetail={handleDetail}
                 onEdit={handleEdit}
                 onDelete={handleDelete}
+                onSuccess={() => {
+                  refetch();
+                }}
               />
             ))}
           </div>
@@ -133,7 +151,7 @@ export const DrawerList = ({ open, setOpen }: IProps) => {
             open={openAddUser}
             closeModal={closeModal}
             onSuccess={() => {
-              queryClient.invalidateQueries({ queryKey: ['users'] });
+              refetch();
             }}
           />
         </>
@@ -154,7 +172,17 @@ export const DrawerList = ({ open, setOpen }: IProps) => {
         closeModal={() => setEditModalOpen(false)}
         defaultValue={editUser as unknown as IRegUser}
         mode="edit"
-        // onSubmit={...} 등 props 추가
+        onSuccess={() => {
+          refetch();
+        }}
+      />
+
+      {/* 삭제 확인 모달 */}
+      <DeleteConfirmModal
+        open={deleteModalOpen}
+        onClose={cancelDelete}
+        onConfirm={confirmDelete}
+        user={userToDelete}
       />
     </Box>
   );
@@ -331,6 +359,133 @@ export function UserDetailModal({
         ) : (
           <div>로딩중...</div>
         )}
+      </div>
+    </Modal>
+  );
+}
+
+export function DeleteConfirmModal({
+  open,
+  onClose,
+  onConfirm,
+  user
+}: {
+  open: boolean;
+  onClose: () => void;
+  onConfirm: () => void;
+  user: IUser | null;
+}) {
+  return (
+    <Modal open={open} onClose={onClose}>
+      <div
+        style={{
+          position: 'absolute',
+          top: '50%',
+          left: '50%',
+          transform: 'translate(-50%, -50%)',
+          background: '#fff',
+          padding: '40px 32px',
+          borderRadius: 20,
+          minWidth: 400,
+          boxShadow: '0 8px 32px rgba(0,0,0,0.18)',
+          outline: 'none',
+          display: 'flex',
+          flexDirection: 'column',
+          alignItems: 'center',
+          textAlign: 'center'
+        }}
+      >
+        <div
+          style={{
+            width: 60,
+            height: 60,
+            borderRadius: '50%',
+            background: '#ffebee',
+            display: 'flex',
+            alignItems: 'center',
+            justifyContent: 'center',
+            marginBottom: 24
+          }}
+        >
+          <span style={{ fontSize: 32, color: '#f44336' }}>⚠️</span>
+        </div>
+
+        <h2
+          style={{
+            fontSize: 24,
+            fontWeight: 700,
+            marginBottom: 16,
+            color: '#333'
+          }}
+        >
+          삭제 확인
+        </h2>
+
+        <p
+          style={{
+            fontSize: 16,
+            color: '#666',
+            marginBottom: 32,
+            lineHeight: 1.5
+          }}
+        >
+          <strong style={{ color: '#333' }}>{user?.name}</strong>님의 정보를
+          <br />
+          정말 삭제하시겠습니까?
+        </p>
+
+        <p style={{ fontSize: 14, color: '#999', marginBottom: 32 }}>
+          삭제된 정보는 복구할 수 없습니다.
+        </p>
+
+        <div style={{ display: 'flex', gap: 12, width: '100%' }}>
+          <button
+            onClick={onClose}
+            style={{
+              flex: 1,
+              padding: '12px 24px',
+              border: '1px solid #ddd',
+              borderRadius: 8,
+              background: '#fff',
+              color: '#666',
+              fontSize: 16,
+              fontWeight: 500,
+              cursor: 'pointer',
+              transition: 'all 0.2s'
+            }}
+            onMouseOver={e => {
+              e.currentTarget.style.background = '#f5f5f5';
+            }}
+            onMouseOut={e => {
+              e.currentTarget.style.background = '#fff';
+            }}
+          >
+            취소
+          </button>
+          <button
+            onClick={onConfirm}
+            style={{
+              flex: 1,
+              padding: '12px 24px',
+              border: 'none',
+              borderRadius: 8,
+              background: '#f44336',
+              color: '#fff',
+              fontSize: 16,
+              fontWeight: 500,
+              cursor: 'pointer',
+              transition: 'all 0.2s'
+            }}
+            onMouseOver={e => {
+              e.currentTarget.style.background = '#d32f2f';
+            }}
+            onMouseOut={e => {
+              e.currentTarget.style.background = '#f44336';
+            }}
+          >
+            삭제
+          </button>
+        </div>
       </div>
     </Modal>
   );

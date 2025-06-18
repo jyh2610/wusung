@@ -165,3 +165,10 @@ export const paginationContainer = style({
   justifyContent: 'center',
   marginTop: '20px'
 });
+
+// Cascader 하이라이트 스타일
+export const cascaderHighlight = style({
+  border: `2px solid ${colors.brand[500]} !important`,
+  boxShadow: `0 0 0 1px ${colors.brand[300]}`,
+  borderRadius: '8px'
+});

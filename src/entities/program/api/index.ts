@@ -9,7 +9,7 @@ import {
   IUserDetail
 } from '../type.dto';
 import { EduContent, IRes } from '@/shared/type';
-import { extractLeafNodes, getsessionStorageValue } from '@/lib/utils';
+import { extractLeafNodes, getlocalStorageValue } from '@/lib/utils';
 import { toast } from 'react-toastify';
 
 export const putEduContent = async ({
@@ -65,7 +65,7 @@ export const putEduContent = async ({
       formData.append('files', file);
     });
 
-    const userInfo = getsessionStorageValue('userInfo');
+    const userInfo = getlocalStorageValue('userInfo');
     const token = userInfo ? JSON.parse(userInfo).token : '';
     console.log(editDTO);
     const res = await request({
@@ -119,7 +119,7 @@ export const eduContentReg = async (content: IContent, imageFiles: File[]) => {
       formData.append('files', file);
     });
     console.log(imageFiles);
-    const userInfo = getsessionStorageValue('userInfo');
+    const userInfo = getlocalStorageValue('userInfo');
     const token = userInfo ? JSON.parse(userInfo).token : '';
 
     const res = await request({
@@ -387,14 +387,10 @@ export const getPlan = async ({
       url: `/api/program/use/plan/${year}/${month}/${difficultyLevel}`
     });
 
-    if (res.status === 400) {
-      toast.info(res.data.message);
-    }
-    toast.success('계획안을 불러왔습니다.');
+    toast.success(res.data.message);
     return res.data.data;
-  } catch (error) {
-    toast.error('계획안을 불러오는데 실패했습니다.');
-    console.error(error);
+  } catch (error: any) {
+    toast.error(error.response.data.message);
   }
 };
 

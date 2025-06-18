@@ -119,9 +119,41 @@ export function AddUser({
           day: String(Number(day))
         });
       }
+    } else if (mode === 'add' || !mode) {
+      // 생성 모드일 때 기본값 설정
+      const currentDate = new Date();
+      const currentYear = currentDate.getFullYear();
+      const currentMonth = currentDate.getMonth() + 1;
+      const currentDay = currentDate.getDate();
+
+      setBirth({
+        year: String(currentYear),
+        month: String(currentMonth),
+        day: String(currentDay)
+      });
+
+      setValidateStartDate({
+        year: String(currentYear),
+        month: String(currentMonth),
+        day: String(currentDay)
+      });
+
+      setValidateEndDate({
+        year: String(currentYear + 1), // 종료일은 1년 후로 설정
+        month: String(currentMonth),
+        day: String(currentDay)
+      });
+
+      // form도 업데이트
+      setForm(prev => ({
+        ...prev,
+        birthDate: `${currentYear}-${String(currentMonth).padStart(2, '0')}-${String(currentDay).padStart(2, '0')}`,
+        certificationStart: `${currentYear}-${String(currentMonth).padStart(2, '0')}-${String(currentDay).padStart(2, '0')}`,
+        certificationEnd: `${currentYear + 1}-${String(currentMonth).padStart(2, '0')}-${String(currentDay).padStart(2, '0')}`
+      }));
     }
     // eslint-disable-next-line
-  }, [defaultValue, mode]);
+  }, [defaultValue, mode, open]);
 
   const handleBirthChange = (type: 'year' | 'month' | 'day', value: string) => {
     const updated = { ...birth, [type]: value };

@@ -30,7 +30,6 @@ import {
   modalTitle,
   fullButton
 } from '@/entities/UserManage/FindInfo/Id/index.css';
-import { toast } from 'react-toastify';
 
 export const IndivisualInfo = ({
   setIsWithdrawal
@@ -143,14 +142,12 @@ export const IndivisualInfo = ({
       email: formData.email + '@' + formData.emailDomain
     };
     try {
-      const response = await submitIndivisualUserInfoHandler(
+      await submitIndivisualUserInfoHandler(
         domainFormData,
         profileFile as File
       );
-      toast.success('회원정보가 수정되었습니다.');
       router.push('/mypage?tab=결제내역');
     } catch (error) {
-      toast.error('회원정보 수정에 실패했습니다.');
       console.log(error);
     }
   };

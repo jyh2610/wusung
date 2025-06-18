@@ -21,21 +21,37 @@ export function ProgramComponent() {
 
   const [categoryId, setCategoryId] = useState<number>(1);
   const [difficultyLevel, setDifficultyLevel] = useState<number>(2);
+  const [currentPage, setCurrentPage] = useState<number>(1);
+  const [pageSize, setPageSize] = useState<number>(15);
 
-  const { activities, setActivities } = useActivities({
-    isAdmin,
-    categoryId,
-    difficultyLevel
-  });
+  const { activities, setActivities, totalElements, totalPages } =
+    useActivities({
+      isAdmin,
+      categoryId,
+      difficultyLevel,
+      page: currentPage,
+      size: pageSize
+    });
 
   const { onDragEnd, onDragUpdate, onDragStart } = useDragAndDrop(
     activities,
     setActivities
   );
 
-  const handleFilterChange = (categoryId: number, difficultyLevel: number) => {
+  const handleFilterChange = (
+    categoryId: number,
+    difficultyLevel: number,
+    page?: number,
+    size?: number
+  ) => {
     setCategoryId(categoryId);
     setDifficultyLevel(difficultyLevel);
+    if (page !== undefined) {
+      setCurrentPage(page);
+    }
+    if (size !== undefined) {
+      setPageSize(size);
+    }
   };
 
   return (
@@ -62,6 +78,10 @@ export function ProgramComponent() {
             isAdmin={isAdmin}
             activities={activities}
             onFilterChange={handleFilterChange}
+            totalElements={totalElements}
+            totalPages={totalPages}
+            currentPage={currentPage}
+            pageSize={pageSize}
           />
           <SchedulerLayout schedule={schedule} isAdmin={isAdmin} />
         </div>

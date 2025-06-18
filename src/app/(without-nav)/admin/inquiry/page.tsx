@@ -61,12 +61,12 @@ export default function InquiryListPage() {
       key: 'title'
     },
     {
-      title: '답변 여부',
+      title: '조회 여부',
       dataIndex: 'haveToReadByAdmin',
       key: 'haveToReadByAdmin',
       render: (haveToReadByAdmin: boolean) => (
         <span className={haveToReadByAdmin ? 'text-green-600' : 'text-red-600'}>
-          {haveToReadByAdmin ? '답변완료' : '답변대기'}
+          {!haveToReadByAdmin ? '안읽음' : '읽음'}
         </span>
       )
     },

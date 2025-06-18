@@ -124,7 +124,8 @@ export function ProgramNav() {
           className={btn}
           style={{
             backgroundColor: 'transparent',
-            color: colors.gray_scale[700]
+            color: colors.gray_scale[700],
+            cursor: 'default'
           }}
         >
           <div className={imgContainer}>
@@ -134,7 +135,7 @@ export function ProgramNav() {
         </div>
 
         <div className={navBtnContainer}>
-          <div className={btn}>
+          <div className={btn} style={{ cursor: 'default' }}>
             <div className={textAlign}>사용기한 : {endDate}</div>
           </div>
         </div>

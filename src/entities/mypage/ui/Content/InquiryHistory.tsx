@@ -36,11 +36,12 @@ export function InquiryHistory() {
   const [selectedInquiryId, setSelectedInquiryId] = useState<number | null>(
     null
   );
+  const [monthsAgo, setMonthsAgo] = useState<number>(0);
   const queryClient = useQueryClient();
 
   const { data, isLoading } = useQuery({
-    queryKey: ['personalInquiry', page],
-    queryFn: () => personalInquiry(page - 1, PAGE_SIZE)
+    queryKey: ['personalInquiry', page, monthsAgo],
+    queryFn: () => personalInquiry(page - 1, PAGE_SIZE, monthsAgo)
   });
 
   const { data: inquiryDetail, isLoading: isDetailLoading } = useQuery({
@@ -60,6 +61,16 @@ export function InquiryHistory() {
   const handleFilter = (option: string) => {
     setSelectedFilter(option);
     setPage(1);
+    // 필터 옵션에 따라 monthsAgo 설정
+    if (option === '3개월전') {
+      setMonthsAgo(3);
+    } else if (option === '6개월전') {
+      setMonthsAgo(6);
+    } else if (option === '12개월전') {
+      setMonthsAgo(12);
+    } else {
+      setMonthsAgo(0); // 전체
+    }
   };
 
   const handleAddReply = async (

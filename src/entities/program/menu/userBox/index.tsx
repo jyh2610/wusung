@@ -38,6 +38,7 @@ interface IProps {
   onDetail: (user: IUser) => void;
   onEdit: (user: IUser) => void;
   onDelete: (user: IUser) => void;
+  onSuccess?: () => void;
 }
 
 export function UserBox({
@@ -46,7 +47,8 @@ export function UserBox({
   onSelect,
   onDetail,
   onEdit,
-  onDelete
+  onDelete,
+  onSuccess
 }: IProps) {
   const [showMenu, setShowMenu] = useState(false);
   const [editModalOpen, setEditModalOpen] = useState(false);
@@ -168,6 +170,7 @@ export function UserBox({
         closeModal={() => setEditModalOpen(false)}
         defaultValue={editUser ? convertToRegUser(editUser) : undefined}
         mode="edit"
+        onSuccess={onSuccess}
       />
     </div>
   );

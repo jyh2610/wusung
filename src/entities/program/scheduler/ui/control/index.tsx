@@ -220,15 +220,11 @@ export function Control({ isAdmin }: { isAdmin: boolean }) {
       toast.warn('대상자를 선택해주세요');
       return;
     }
-    try {
-      await autoRegisterPlan({
-        year,
-        month,
-        difficultyLevel: selectedUser.difficultyLevel
-      });
-    } catch (error) {
-      console.log(error);
-    }
+    await autoRegisterPlan({
+      year,
+      month,
+      difficultyLevel: selectedUser.difficultyLevel
+    });
   };
 
   const handleDeleteItem = (id: number) => {
@@ -624,7 +620,7 @@ export function Control({ isAdmin }: { isAdmin: boolean }) {
                     </button>
                   </div>
                 ) : (
-                  <p>등록된 커버가 없습니다.</p>
+                  <p>등록된 표지가 없습니다.</p>
                 ))}
             </div>
           </div>

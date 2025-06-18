@@ -21,7 +21,7 @@ export function NavList({
   useEffect(() => {
     if (list.title === '우성인지펜 소개') setRouteKey('introduce_greeting');
     else if (list.title === '요금안내') setRouteKey('payment');
-    else if (list.title === '공지사항') setRouteKey('inquiry');
+    else if (list.title === '공지사항') setRouteKey('dashboard');
     else if (list.title === '마이페이지') {
       if (username) {
         setRouteKey('mypage');
@@ -37,9 +37,6 @@ export function NavList({
 
   const handleClick = () => {
     if (!routeKey) return;
-    console.log('결제내역', routeMap.mypage_payment);
-    console.log('문의내역', routeMap.mypage_inquiry);
-    console.log('routeKey', routeKey);
 
     if (list.title === '마이페이지' && list.subTitle) {
       if (list.subTitle[0] === '결제내역') {

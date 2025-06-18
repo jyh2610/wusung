@@ -52,7 +52,6 @@ export const Id = () => {
         phoneNum
       });
       setIsSend(true);
-      toast.success(res.data.message);
     } catch (error) {
       console.error(error);
     }
@@ -67,8 +66,8 @@ export const Id = () => {
       });
       setFoundId(res.data.data);
       toast.success(res.data.message);
-    } catch (error) {
-      console.error(error);
+    } catch (error: any) {
+      toast.error(error.response.data.message);
     }
   };
 

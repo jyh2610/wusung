@@ -37,7 +37,7 @@ export const useAuthStore = create<AuthState>((set, get) => ({
       const res = await login({ userName: id, password });
       const userSub = await getSubscription(res.accessToken);
 
-      sessionStorage.setItem(
+      localStorage.setItem(
         'userInfo',
         JSON.stringify({
           token: res.accessToken,
@@ -89,7 +89,7 @@ export const useAuthStore = create<AuthState>((set, get) => ({
 
       const userSub = await getSubscription(res.accessToken);
 
-      sessionStorage.setItem(
+      localStorage.setItem(
         'userInfo',
         JSON.stringify({
           token: res.accessToken,
@@ -129,7 +129,7 @@ export const useAuthStore = create<AuthState>((set, get) => ({
   logout: async () => {
     await logout();
 
-    sessionStorage.removeItem('userInfo');
+    localStorage.removeItem('userInfo');
     document.cookie = 'token=; path=/; expires=Thu, 01 Jan 1970 00:00:00 UTC;';
     document.cookie =
       'username=; path=/; expires=Thu, 01 Jan 1970 00:00:00 UTC;';
@@ -146,7 +146,7 @@ export const useAuthStore = create<AuthState>((set, get) => ({
   },
 
   checkAuthentication: () => {
-    const userInfo = sessionStorage.getItem('userInfo');
+    const userInfo = localStorage.getItem('userInfo');
     if (userInfo) {
       const parsed = JSON.parse(userInfo);
       set({

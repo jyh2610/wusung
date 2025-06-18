@@ -40,7 +40,7 @@ import {
 import { Button } from '@/shared/ui';
 import { PreparePaymentResDTO } from '../../types';
 import { toast } from 'react-toastify';
-import { getsessionStorageValue } from '@/lib/utils';
+import { getlocalStorageValue } from '@/lib/utils';
 import { useAuthStore } from '@/shared/stores/useAuthStore';
 
 interface PaymentPageProps {

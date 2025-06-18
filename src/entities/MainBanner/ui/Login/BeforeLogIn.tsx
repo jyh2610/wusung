@@ -104,7 +104,12 @@ export function BeforeLogIn() {
             thickness="1px"
             color={colors.gray_scale[300]}
           />
-          <span className={InfoContentStyles}>아이디·비밀번호 찾기</span>
+          <span
+            className={InfoContentStyles}
+            onClick={() => navigate.push('signin/find/id')}
+          >
+            아이디·비밀번호 찾기
+          </span>
         </div>
       </div>
       <TwoFAModal />

@@ -94,8 +94,6 @@ export const PaymentList = ({
     }
   };
 
-  console.log(payment);
-
   return (
     <div style={{ overflowY: 'auto' }} ref={isLast ? observe : undefined}>
       <div style={{ display: 'flex', flexDirection: 'column', gap: '20px' }}>
@@ -128,14 +126,16 @@ export const PaymentList = ({
           >
             {buttonLabel(payment)}
           </button>
-          <a
-            className={receipt}
-            href={payment.receiptUrl}
-            target="_blank"
-            rel="noopener noreferrer"
+          <button
+            className={receipt({ disabled: !payment.receiptUrl })}
+            onClick={() =>
+              payment.receiptUrl &&
+              window.open(payment.receiptUrl, '_blank', 'noopener,noreferrer')
+            }
+            disabled={!payment.receiptUrl}
           >
             영수증
-          </a>
+          </button>
         </div>
       </div>
 
