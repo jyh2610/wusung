@@ -16,6 +16,7 @@ interface ScheduleState {
   noPrintDate: boolean;
 
   disabledDrops: Set<string>; // ✅ 추가
+  draggingItem: string | null; // 드래그 중인 아이템 추적
 
   updateSchedule: (newSchedule: Schedule) => void;
   undo: () => void;
@@ -34,6 +35,7 @@ interface ScheduleState {
   addEtcItem: (item: ScheduleItem) => void;
   clearEtcItems: () => void;
   setDisabledDrop: (id: string, disabled: boolean) => void;
+  setDraggingItem: (itemId: string | null) => void; // 드래그 상태 설정
 
   selectedDifficulty: number;
   setSelectedDifficulty: (difficulty: number) => void;
@@ -46,6 +48,7 @@ export const useScheduleStore = create<ScheduleState>(set => ({
   coverItems: null,
   etcItems: [],
   disabledDrops: new Set(),
+  draggingItem: null, // 드래그 중인 아이템 초기값
   noPrintDate: true,
   selectedDifficulty: 2,
 
@@ -100,12 +103,19 @@ export const useScheduleStore = create<ScheduleState>(set => ({
       coverItems: null,
       etcItems: [],
       disabledDrops: new Set(),
+      draggingItem: null,
       noPrintDate: true,
       selectedDifficulty: 2
     }),
 
   removeScheduleItem: (dateKey, itemId) =>
     set(state => {
+      // 드래그 중인 아이템은 삭제하지 않음
+      const itemKey = `${dateKey}-${itemId}`;
+      if (state.draggingItem && state.draggingItem.includes(itemKey)) {
+        return state;
+      }
+
       const daySchedule = state.schedule[Number(dateKey)];
       if (!daySchedule) return state;
 
@@ -127,6 +137,9 @@ export const useScheduleStore = create<ScheduleState>(set => ({
       disabled ? newSet.add(id) : newSet.delete(id);
       return { disabledDrops: newSet };
     }),
+
+  setDraggingItem: (itemId: string | null) =>
+    set({ draggingItem: itemId }),
 
   removeCoverItems: () => set({ coverItems: null }),
 

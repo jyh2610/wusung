@@ -32,7 +32,7 @@ const weekdays = ['일', '월', '화', '수', '목', '금', '토'];
 
 export function Calendar({ schedule, isAdmin }: CalendarProps) {
   const { year, month } = useDateStore();
-  const { disabledDrops, setDisabledDrop, removeScheduleItem } =
+  const { disabledDrops, setDisabledDrop, removeScheduleItem, draggingItem } =
     useScheduleStore();
 
   const firstDayOfMonth = new Date(year, month - 1, 1);
@@ -57,27 +57,12 @@ export function Calendar({ schedule, isAdmin }: CalendarProps) {
     weeks.push(currentWeek);
   }
 
-  // const updateDisableByDayNums = (dayNums: number[], enabled: boolean) => {
-  //   dayNums.forEach(dayNum => {
-  //     if (dayNum <= 0) return;
-  //     ['cognitive', 'daily'].forEach(category => {
-  //       const id = `${dayNum}-${category}`;
-  //       setDisabledDrop(id, !enabled); // 명시적 설정
-  //       const item = schedule[dayNum]?.[category as 'cognitive' | 'daily'];
-  //       if (!enabled && item) {
-  //         removeScheduleItem(String(dayNum), item!.id);
-  //       }
-  //     });
-  //   });
-  // };
-
   const updateDisableByDayNums = (dayNums: number[], enabled: boolean) => {
     dayNums.forEach(dayNum => {
       if (dayNum <= 0) return;
       ['cognitive', 'daily'].forEach(category => {
         const id = `${dayNum}-${category}`;
-        setDisabledDrop(id, !enabled); // ❗ 상태만 변경
-        // ❌ removeScheduleItem 호출 제거!
+        setDisabledDrop(id, !enabled);
       });
     });
   };
@@ -122,6 +107,7 @@ export function Calendar({ schedule, isAdmin }: CalendarProps) {
               <Draggable
                 draggableId={`${dayNum}-${category}-${item.id}`}
                 index={0}
+                isDragDisabled={isDisabled}
               >
                 {dragProvided => (
                   <div
@@ -132,7 +118,8 @@ export function Calendar({ schedule, isAdmin }: CalendarProps) {
                       display: 'flex',
                       gap: '4px',
                       justifyContent: 'center',
-                      alignItems: 'center'
+                      alignItems: 'center',
+                      ...dragProvided.draggableProps.style
                     }}
                   >
                     <Tooltip
@@ -172,7 +159,13 @@ export function Calendar({ schedule, isAdmin }: CalendarProps) {
                           : item.content}
                       </span>
                     </Tooltip>
-                    <MdDelete onClick={handleDelete} />
+                    <MdDelete 
+                      onClick={handleDelete}
+                      style={{ 
+                        cursor: 'pointer',
+                        opacity: draggingItem === `${dayNum}-${category}-${item.id}` ? 0.5 : 1
+                      }}
+                    />
                   </div>
                 )}
               </Draggable>
