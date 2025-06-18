@@ -28,7 +28,7 @@ export function MypageMenu({
   setSelectedMenu
 }: {
   selectedMenu: string;
-  setSelectedMenu: React.Dispatch<React.SetStateAction<string>>;
+  setSelectedMenu: (menu: string) => void;
 }) {
   const id = 'test';
   const limitDate = '2022-01-01';
@@ -45,7 +45,7 @@ export function MypageMenu({
               icon={icon}
               label={label}
               isSelected={selectedMenu === label}
-              onClick={setSelectedMenu}
+              onClick={() => setSelectedMenu(label)}
             />
           ))}
         </ul>

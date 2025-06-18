@@ -1,4 +1,4 @@
-import React, { useState } from 'react';
+import React, { useState, useRef, useEffect } from 'react';
 import { InquiryFilePreview } from './InquiryFilePreview';
 import { IInquiry, Comment, File as ApiFile } from '@/entities/mypage/type';
 import {
@@ -85,6 +85,7 @@ export function InquiryDetail({
   const [replyContent, setReplyContent] = useState<string>('');
   const [selectedFiles, setSelectedFiles] = useState<globalThis.File[]>([]);
   const [isSubmitting, setIsSubmitting] = useState(false);
+  const commentListRef = useRef<HTMLDivElement>(null);
 
   const handleFileChange = (e: React.ChangeEvent<HTMLInputElement>) => {
     if (e.target.files) {
@@ -100,9 +101,13 @@ export function InquiryDetail({
         await onAddReply(inquiry.inquiryId, replyContent.trim(), selectedFiles);
         setReplyContent('');
         setSelectedFiles([]);
-        onRefresh?.();
+        // 댓글 등록 성공 후 즉시 리페치
+        if (onRefresh) {
+          await onRefresh();
+        }
       } catch (error) {
         console.error('댓글 작성 중 오류 발생:', error);
+        alert('댓글 작성에 실패했습니다. 다시 시도해주세요.');
       } finally {
         setIsSubmitting(false);
       }
@@ -129,6 +134,12 @@ export function InquiryDetail({
     const fileIds = parseFileIdList(inquiry.fileIdList);
     return files.filter(file => fileIds.includes(file.fileId));
   };
+
+  useEffect(() => {
+    if (commentListRef.current) {
+      commentListRef.current.scrollTop = commentListRef.current.scrollHeight;
+    }
+  }, [comments]);
 
   return (
     <div className={detailWrapper}>
@@ -212,6 +223,7 @@ export function InquiryDetail({
           <strong className={detailSectionTitle}>댓글</strong>
           <div
             className={detailCommentList}
+            ref={commentListRef}
             style={{
               display: 'flex',
               flexDirection: 'column',
@@ -348,18 +360,20 @@ export function InquiryDetail({
             </div>
             <button
               type="submit"
+              disabled={isSubmitting}
               style={{
                 padding: '0 16px',
-                backgroundColor: '#e1007b',
+                backgroundColor: isSubmitting ? '#ccc' : '#e1007b',
                 color: 'white',
                 border: 'none',
                 borderRadius: '4px',
-                cursor: 'pointer',
+                cursor: isSubmitting ? 'not-allowed' : 'pointer',
                 height: '40px',
-                alignSelf: 'flex-end'
+                alignSelf: 'flex-end',
+                opacity: isSubmitting ? 0.7 : 1
               }}
             >
-              전송
+              {isSubmitting ? '전송 중...' : '전송'}
             </button>
           </form>
         </div>

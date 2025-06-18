@@ -22,7 +22,7 @@ import {
   getInquiryDetail,
   addReply
 } from '@/entities/mypage/api';
-import { useQuery } from '@tanstack/react-query';
+import { useQuery, useQueryClient } from '@tanstack/react-query';
 import { IInquiry } from '@/entities/mypage/type';
 import { filterInquiries } from '../../utils';
 import { InquiryDetail } from './InquiryDetail';
@@ -36,6 +36,7 @@ export function InquiryHistory() {
   const [selectedInquiryId, setSelectedInquiryId] = useState<number | null>(
     null
   );
+  const queryClient = useQueryClient();
 
   const { data, isLoading } = useQuery({
     queryKey: ['personalInquiry', page],
@@ -78,6 +79,15 @@ export function InquiryHistory() {
     }
   };
 
+  const handleRefresh = async () => {
+    if (selectedInquiryId) {
+      // 캐시 무효화 후 데이터 다시 가져오기
+      await queryClient.invalidateQueries({
+        queryKey: ['inquiryDetail', selectedInquiryId]
+      });
+    }
+  };
+
   if (selectedInquiryId && inquiryDetail) {
     const inquiryData = inquiryDetail.data;
     return (
@@ -87,6 +97,7 @@ export function InquiryHistory() {
         files={inquiryData.files || []}
         onBack={() => setSelectedInquiryId(null)}
         onAddReply={handleAddReply}
+        onRefresh={handleRefresh}
       />
     );
   }
