@@ -110,7 +110,7 @@ interface PageInfo {
 }
 
 // 콘텐츠 목록 응답 타입
-interface ContentListResponse {
+export interface ContentListResponse {
   content: IContent[];
   pageable: PageInfo;
   totalPages: number;
@@ -159,17 +159,22 @@ export const getContentList = async (params: ContentListParams) => {
 
 export const getUserContentList = async ({
   categoryId,
-  difficultyLevel
+  difficultyLevel,
+  page = 0,
+  size = 15
 }: {
   categoryId: number;
   difficultyLevel: number;
-}): Promise<IContent[] | undefined> => {
+  page?: number;
+  size?: number;
+}): Promise<ContentListResponse | undefined> => {
   try {
     const res = await request<IApiResponse>({
       method: 'GET',
-      url: `/api/program/use/${categoryId}/${difficultyLevel}` // URL 수정 (category/list가 아닌 edu-content/list)
+      url: `/api/program/use/${categoryId}/${difficultyLevel}`,
+      params: { page, size }
     });
-    return res.data.data.content;
+    return res.data.data;
   } catch (error) {
     console.error(error);
     return undefined;
