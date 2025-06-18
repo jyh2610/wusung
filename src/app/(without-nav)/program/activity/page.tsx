@@ -78,7 +78,7 @@ function Activity() {
 
   // 페이지네이션 상태 추가
   const [currentPage, setCurrentPage] = useState(1);
-  const [pageSize, setPageSize] = useState(15);
+  const [pageSize, setPageSize] = useState(20);
 
   const { categories, fetchCategories } = useCategoryStore();
 
@@ -452,7 +452,7 @@ function Activity() {
                 >
                   <option value={10}>10</option>
                   <option value={15}>15</option>
-                  <option value={25}>25</option>
+                  <option value={20}>20</option>
                 </select>
                 <span style={{ fontSize: '14px', color: '#666' }}>
                   총 {totalElements}개 중 {startIndex + 1}-{Math.min(endIndex, totalElements)}개 표시

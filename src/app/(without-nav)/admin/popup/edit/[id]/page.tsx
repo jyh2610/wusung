@@ -68,8 +68,8 @@ const Page = () => {
           p => p.popupId === Number(params.id)
         );
         if (popupData) {
-          const startDate = popupData.startTime.split('T')[0];
-          const endDate = popupData.endTime.split('T')[0];
+          const startDateTime = popupData.startTime.replace('T', ' ').substring(0, 16);
+          const endDateTime = popupData.endTime.replace('T', ' ').substring(0, 16);
 
           setPopup({
             title: popupData.title,
@@ -77,8 +77,8 @@ const Page = () => {
             positionCode: popupData.positionCode,
             isActive: popupData.isActive,
             priority: popupData.priority,
-            startTime: startDate,
-            endTime: endDate
+            startTime: startDateTime,
+            endTime: endDateTime
           });
           setEditorContent(popupData.content);
         }
@@ -117,18 +117,18 @@ const Page = () => {
         return;
       }
       if (!popup.startTime) {
-        message.error('시작일을 입력해주세요.');
+        message.error('시작일시를 입력해주세요.');
         return;
       }
       if (!popup.endTime) {
-        message.error('종료일을 입력해주세요.');
+        message.error('종료일시를 입력해주세요.');
         return;
       }
 
       setIsUpdating(true);
 
-      const formattedStartTime = popup.startTime + 'T00:00:00';
-      const formattedEndTime = popup.endTime + 'T23:59:59';
+      const formattedStartTime = popup.startTime.replace(' ', 'T') + ':00';
+      const formattedEndTime = popup.endTime.replace(' ', 'T') + ':00';
 
       await updatePopup(Number(params.id), {
         ...popup,
@@ -287,10 +287,10 @@ const Page = () => {
 
       <div className="grid grid-cols-2 gap-4">
         <div className="space-y-2">
-          <Label htmlFor="startDate">시작일</Label>
+          <Label htmlFor="startDate">시작일시</Label>
           <Input
             id="startDate"
-            type="date"
+            type="datetime-local"
             value={popup.startTime}
             onChange={e =>
               setPopup((prev: IRegPopup) => ({
@@ -302,10 +302,10 @@ const Page = () => {
         </div>
 
         <div className="space-y-2">
-          <Label htmlFor="endDate">종료일</Label>
+          <Label htmlFor="endDate">종료일시</Label>
           <Input
             id="endDate"
-            type="date"
+            type="datetime-local"
             value={popup.endTime}
             onChange={e =>
               setPopup((prev: IRegPopup) => ({
