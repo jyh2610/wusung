@@ -199,7 +199,7 @@ export const PaymentList = ({
           </button>
           {/* receiptUrl이 유효한 URL일 때만 링크 활성화/표시 고려 필요 */}
           <a
-            className={receipt} // 'refundable' 상태 클래스가 영수증 버튼에도 적합한지 확인 필요
+            className={receipt({ disabled: !payment.receiptUrl })} // 'refundable' 상태 클래스가 영수증 버튼에도 적합한지 확인 필요
             href={payment.receiptUrl}
             target="_blank"
             rel="noopener noreferrer"

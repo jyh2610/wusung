@@ -20,7 +20,11 @@ export const ActionButton = ({ payment }: { payment: paymentListDTO }) => {
         {buttonLabel(payment)}
       </button>
 
-      <a className={receipt} href={payment.receiptUrl} target="_blank">
+      <a
+        className={receipt({ disabled: !payment.receiptUrl })}
+        href={payment.receiptUrl}
+        target="_blank"
+      >
         영수증
       </a>
     </div>
