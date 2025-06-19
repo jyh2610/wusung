@@ -94,18 +94,15 @@ interface CustomAxiosRequestConfig extends AxiosRequestConfig {
 const handleAxiosError = async (error: AxiosError) => {
   const originalRequest = error.config as CustomAxiosRequestConfig;
 
-  if (error.response?.status === 401 && !originalRequest._retry) {
+  if (error.response?.status === 403 && !originalRequest._retry) {
     originalRequest._retry = true;
-    console.log('401 에러 발생 - 응답 헤더:', error.response.headers);
 
     const newAccessToken =
       error.response.headers['authorization'] ||
       error.response.headers['Authorization'];
-    console.log('401 에러에서 받은 새로운 토큰:', newAccessToken);
 
     if (newAccessToken) {
       const token = newAccessToken.replace('Bearer ', '');
-      console.log('처리된 새로운 토큰:', token);
       updateToken(token);
 
       originalRequest.headers = {
@@ -116,7 +113,7 @@ const handleAxiosError = async (error: AxiosError) => {
       return axiosInstance(originalRequest);
     } else {
       console.warn('액세스 토큰이 만료되었습니다.');
-      
+
       // 세션 비우기 및 로그아웃 처리
       try {
         useAuthStore.getState().logout();
