@@ -36,10 +36,10 @@ export const metadata: Metadata = {
     siteName: '우성인지펜',
     images: [
       {
-        url: '/images/og-image.jpg', // 오픈그래프용 이미지를 추가하세요
-        width: 1200,
-        height: 630,
-        alt: '우성인지펜 - 치매학습지 및 인지활동형프로그램'
+        url: '/images/woosung-logo.png',
+        width: 512,
+        height: 512,
+        alt: '우성인지펜 로고'
       }
     ]
   },
@@ -87,7 +87,13 @@ const structuredData = {
   name: '우성인지펜',
   description: '치매학습지, 인지활동형프로그램 등 노인복지 관련 콘텐츠',
   url: 'https://woosungpen.com',
-  logo: 'https://woosungpen.com/favicon.ico',
+  logo: {
+    '@type': 'ImageObject',
+    url: 'https://woosungpen.com/images/logo.png',
+    width: '512',
+    height: '512',
+    caption: '우성인지펜 로고'
+  },
   contactPoint: {
     '@type': 'ContactPoint',
     contactType: '고객 서비스',
