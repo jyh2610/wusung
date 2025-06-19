@@ -47,8 +47,15 @@ export function Control({ isAdmin }: { isAdmin: boolean }) {
 
   const { year, month } = useDateStore();
   const selectedUserId = useUserStore(state => state.selectedUserId);
-  const users = useUserStore.getState().users;
+  const users = useUserStore(state => state.users);
   const selectedUser = users.find(user => user.elderId === selectedUserId);
+
+  // 디버깅을 위한 useEffect
+  useEffect(() => {
+    console.log('Control 컴포넌트 - selectedUserId 변경:', selectedUserId);
+    console.log('Control 컴포넌트 - users 변경:', users);
+    console.log('Control 컴포넌트 - selectedUser 변경:', selectedUser);
+  }, [selectedUserId, users, selectedUser]);
 
   const searchParams = useSearchParams();
 
@@ -216,6 +223,11 @@ export function Control({ isAdmin }: { isAdmin: boolean }) {
   };
 
   const handleConfirm = async () => {
+    console.log('계획안 불러오기 클릭됨');
+    console.log('selectedUserId:', selectedUserId);
+    console.log('users:', users);
+    console.log('selectedUser:', selectedUser);
+    
     if (!selectedUser?.difficultyLevel) {
       toast.warn('대상자를 선택해주세요');
       return;

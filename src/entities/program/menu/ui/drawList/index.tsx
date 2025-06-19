@@ -33,6 +33,7 @@ export const DrawerList = ({ open, setOpen }: IProps) => {
   const queryClient = useQueryClient();
   const selectedUserId = useUserStore(state => state.selectedUserId);
   const selectUser = useUserStore(state => state.selectUser);
+  const setUsers = useUserStore(state => state.setUsers);
 
   useEffect(() => {
     console.log('현재 선택된 유저 ID:', selectedUserId);
@@ -53,6 +54,14 @@ export const DrawerList = ({ open, setOpen }: IProps) => {
     staleTime: 0,
     gcTime: 0
   });
+
+  // 유저 목록이 변경될 때 useUserStore에 저장
+  useEffect(() => {
+    if (users.length > 0) {
+      setUsers(users);
+      console.log('유저 목록을 store에 저장:', users);
+    }
+  }, [users, setUsers]);
 
   const handleUserSelect = (userId: number) => {
     console.log('유저 선택됨:', userId);

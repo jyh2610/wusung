@@ -8,6 +8,7 @@ import axios, {
 } from 'axios';
 import https from 'https';
 import { useAuthStore } from '@/shared/stores/useAuthStore';
+import { toast } from 'react-toastify';
 
 const axiosInstance = axios.create({
   baseURL: process.env.NEXT_PUBLIC_API_BASE_URL,
@@ -115,6 +116,21 @@ const handleAxiosError = async (error: AxiosError) => {
       return axiosInstance(originalRequest);
     } else {
       console.warn('액세스 토큰이 만료되었습니다.');
+      
+      // 세션 비우기 및 로그아웃 처리
+      try {
+        useAuthStore.getState().logout();
+        localStorage.removeItem('userInfo');
+        // 로그아웃 알림 표시
+        toast.error('로그인 세션이 만료되었습니다. 다시 로그인해주세요.');
+
+        // 로그인 페이지로 리다이렉트 (선택사항)
+        if (typeof window !== 'undefined') {
+          window.location.href = '/signin';
+        }
+      } catch (logoutError) {
+        console.error('로그아웃 처리 중 오류:', logoutError);
+      }
     }
   }
 
