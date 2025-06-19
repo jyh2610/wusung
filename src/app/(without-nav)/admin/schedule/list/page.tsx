@@ -29,7 +29,7 @@ const Page = () => {
       : currentDate.getFullYear();
   });
   const [selectedMonth, setSelectedMonth] = useState<number>(() => {
-    const currentMonth = new Date().getMonth() + 1;
+    const currentMonth = new Date().getMonth() + 2;
     return currentMonth === 12 ? 1 : currentMonth;
   });
   const [selectedDifficulty, setSelectedDifficulty] = useState<number>(2);
