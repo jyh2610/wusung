@@ -245,15 +245,16 @@ export const topContainer = style({
 });
 
 export const categorySection = style({
-  display: 'flex'
+  display: 'flex',
+  flexDirection: 'column',
+  gap: '12px'
 });
 
 export const categoryTitle = style({
-  width: '150px',
   fontSize: '32px',
   fontWeight: 600,
   color: colors.gray_scale[900],
-  marginRight: '16px'
+  marginBottom: '8px'
 });
 
 export const buttonGroup = style({

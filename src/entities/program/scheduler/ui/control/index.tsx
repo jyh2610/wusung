@@ -50,13 +50,6 @@ export function Control({ isAdmin }: { isAdmin: boolean }) {
   const users = useUserStore(state => state.users);
   const selectedUser = users.find(user => user.elderId === selectedUserId);
 
-  // 디버깅을 위한 useEffect
-  useEffect(() => {
-    console.log('Control 컴포넌트 - selectedUserId 변경:', selectedUserId);
-    console.log('Control 컴포넌트 - users 변경:', users);
-    console.log('Control 컴포넌트 - selectedUser 변경:', selectedUser);
-  }, [selectedUserId, users, selectedUser]);
-
   const searchParams = useSearchParams();
 
   const [selectedDifficulty, setSelectedDifficulty] = useState<number>(() => {
@@ -95,6 +88,14 @@ export function Control({ isAdmin }: { isAdmin: boolean }) {
           return;
         }
         plan = await getAdminPlan(scheduleId);
+
+        // 어드민의 경우 plan에서 난이도를 가져와서 설정
+        if (plan && plan.difficultyLevel) {
+          setSelectedDifficulty(plan.difficultyLevel);
+          useScheduleStore
+            .getState()
+            .setSelectedDifficulty(plan.difficultyLevel);
+        }
       } else {
         // 일반 사용자인 경우 getPlan 사용
         plan = await getPlan({
@@ -108,7 +109,10 @@ export function Control({ isAdmin }: { isAdmin: boolean }) {
       await autoRegisterPlan({
         year,
         month,
-        difficultyLevel
+        difficultyLevel:
+          isAdmin && plan?.difficultyLevel
+            ? plan.difficultyLevel
+            : difficultyLevel
       });
     } catch (error) {
       console.error('계획안 불러오기 실패:', error);
@@ -227,7 +231,7 @@ export function Control({ isAdmin }: { isAdmin: boolean }) {
     console.log('selectedUserId:', selectedUserId);
     console.log('users:', users);
     console.log('selectedUser:', selectedUser);
-    
+
     if (!selectedUser?.difficultyLevel) {
       toast.warn('대상자를 선택해주세요');
       return;

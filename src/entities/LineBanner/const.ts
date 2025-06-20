@@ -1,5 +1,5 @@
 export const mainLineBannerData = [
-  { content: '무료 체험', link: '/program/guide' },
+  // { content: '무료 체험', link: '/program/guide' },
   {
     content: '구글 원격 지원',
     link: 'https://remotedesktop.google.com/support'

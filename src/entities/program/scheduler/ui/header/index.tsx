@@ -34,6 +34,18 @@ function Header({
   const router = useRouter();
   const { year, month, setYear, setMonth } = useDateStore();
 
+  const { coverItems, etcItems, noPrintDate, disabledDrops } = useScheduleStore(
+    state => ({
+      disabledDrops: state.disabledDrops,
+      coverItems: state.coverItems,
+      etcItems: state.etcItems,
+      noPrintDate: state.noPrintDate,
+      toggleNoPrintDate: state.toggleNoPrintDate
+    })
+  );
+
+  const { resetScheduleOnly } = useScheduleStore();
+
   useEffect(() => {
     const yearParam = searchParams.get('year');
     const monthParam = searchParams.get('month');
@@ -59,15 +71,6 @@ function Header({
   }, [searchParams, setYear, setMonth]);
 
   const mainEduContentIds = formatScheduleData(schedule, year, month);
-  const { coverItems, etcItems, noPrintDate, disabledDrops } = useScheduleStore(
-    state => ({
-      disabledDrops: state.disabledDrops,
-      coverItems: state.coverItems,
-      etcItems: state.etcItems,
-      noPrintDate: state.noPrintDate,
-      toggleNoPrintDate: state.toggleNoPrintDate
-    })
-  );
 
   const handleOpenPrintModal = () => setIsPrintModalOpen(true);
   const handleClosePrintModal = () => setIsPrintModalOpen(false);
@@ -93,6 +96,7 @@ function Header({
     } else {
       setMonth(month - 1);
     }
+    resetScheduleOnly(); // 스케줄만 초기화
   };
 
   const handleNextMonth = () => {
@@ -102,6 +106,7 @@ function Header({
     } else {
       setMonth(month + 1);
     }
+    resetScheduleOnly(); // 스케줄만 초기화
   };
   // ✅ 비활성 날짜 필터링 적용한 mainEduContentIds 생성 함수
   const getFilteredMainEduContentIds = () => {

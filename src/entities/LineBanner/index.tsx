@@ -11,7 +11,7 @@ export function LineBanner() {
       {mainLineBannerData.map((data, index) => (
         <React.Fragment key={index}>
           <LineBannerContent content={data.content} link={data.link} />
-          {(index === 0 || 1) && (
+          {index < mainLineBannerData.length - 1 && (
             <VerticalLine
               height="78px"
               thickness="1px"

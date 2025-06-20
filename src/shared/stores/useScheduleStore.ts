@@ -39,6 +39,9 @@ interface ScheduleState {
 
   selectedDifficulty: number;
   setSelectedDifficulty: (difficulty: number) => void;
+
+  // 월 변경 시 스케줄만 초기화 (기타자료, 커버자료 유지)
+  resetScheduleOnly: () => void;
 }
 
 export const useScheduleStore = create<ScheduleState>(set => ({
@@ -108,6 +111,17 @@ export const useScheduleStore = create<ScheduleState>(set => ({
       selectedDifficulty: 2
     }),
 
+  // 월 변경 시 스케줄만 초기화 (기타자료, 커버자료 유지)
+  resetScheduleOnly: () =>
+    set(state => ({
+      schedule: {},
+      history: [],
+      redoStack: [],
+      disabledDrops: new Set(),
+      draggingItem: null
+      // coverItems, etcItems, noPrintDate, selectedDifficulty는 유지
+    })),
+
   removeScheduleItem: (dateKey, itemId) =>
     set(state => {
       // 드래그 중인 아이템은 삭제하지 않음
@@ -138,8 +152,7 @@ export const useScheduleStore = create<ScheduleState>(set => ({
       return { disabledDrops: newSet };
     }),
 
-  setDraggingItem: (itemId: string | null) =>
-    set({ draggingItem: itemId }),
+  setDraggingItem: (itemId: string | null) => set({ draggingItem: itemId }),
 
   removeCoverItems: () => set({ coverItems: null }),
 

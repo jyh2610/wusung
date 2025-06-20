@@ -445,14 +445,13 @@ function ETC() {
           alignItems: 'center'
         }}
       >
-        <div style={{ display: 'flex' }}>
+        <div style={{ display: 'flex', flexDirection: 'column', gap: '12px' }}>
           <div
             style={{
-              width: '150px',
               fontSize: '32px',
               fontWeight: 600,
               color: colors.gray_scale[900],
-              marginRight: '16px'
+              marginBottom: '8px'
             }}
           >
             {selectedCategoryNode?.name || '카테고리 선택'}
