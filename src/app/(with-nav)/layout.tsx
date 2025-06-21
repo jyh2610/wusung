@@ -1,10 +1,7 @@
-import localFont from '@next/font/local';
-import type { Metadata } from 'next';
 import '../globals.css';
 import { colors } from '@/design-tokens';
 import { Footer } from '@/entities';
 import { Nav } from '@/entities/Nav';
-import { NextUiProvider, QueryProvider } from '../_provider';
 import { layout } from './style.css';
 
 export default function RootLayout({

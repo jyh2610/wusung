@@ -3,17 +3,9 @@
 import { useEffect, useState } from 'react';
 import request from '@/shared/api/axiosInstance';
 import { EduContent, IRes } from '@/shared/type';
-import { IContent } from '@/entities/program/type.dto';
 import { useParams, useRouter } from 'next/navigation';
-import { ContentUploadForm } from '@/components/admin/content-upload-form';
-import { content } from '@/entities/mypage/index.css';
-import { Card, CardHeader, CardContent } from '@mui/material';
-import { CardFooter } from '@nextui-org/react';
-import { Separator } from '@radix-ui/react-dropdown-menu';
-import { formatDate } from 'date-fns';
-import { Badge, Eye, Calendar, BarChart3, Clock } from 'lucide-react';
+import { Eye, Calendar, BarChart3, Clock } from 'lucide-react';
 import Image from 'next/image';
-import { deleteContent } from '@/entities/program/api';
 
 export default function ContentPage() {
   const [content, setContent] = useState<EduContent | null>(null);

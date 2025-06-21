@@ -3,7 +3,7 @@ import './globals.css';
 import { colors } from '@/design-tokens';
 import 'react-toastify/dist/ReactToastify.css';
 import { ToastContainer } from 'react-toastify';
-import { QueryProvider, NextUiProvider } from './_provider';
+import { QueryProvider } from './_provider';
 import { TokenSync } from '@/components/TokenSync';
 
 export const metadata: Metadata = {
@@ -127,10 +127,8 @@ export default function RootLayout({
           }}
         />
         <QueryProvider>
-          <NextUiProvider>
-            <TokenSync />
-            {children}
-          </NextUiProvider>
+          <TokenSync />
+          {children}
         </QueryProvider>
         <ToastContainer
           position="top-center"
