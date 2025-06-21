@@ -13,6 +13,8 @@ interface ScheduleState {
   coverItems: ScheduleItem | null;
   etcItems: ScheduleItem[];
 
+  savedSchedule: Record<string, Schedule>; // 년월일을 키값으로 스케줄 저장
+
   noPrintDate: boolean;
 
   disabledDrops: Set<string>; // ✅ 추가
@@ -37,11 +39,17 @@ interface ScheduleState {
   setDisabledDrop: (id: string, disabled: boolean) => void;
   setDraggingItem: (itemId: string | null) => void; // 드래그 상태 설정
 
+  // 저장된 스케줄 관련 함수들
+  saveSchedule: (dateKey: string, schedule: Schedule) => void;
+  loadSchedule: (dateKey: string) => void; // 스케줄을 로드하여 현재 스케줄로 설정
+  removeSavedSchedule: (dateKey: string) => void;
+  clearSavedSchedules: () => void;
+
   selectedDifficulty: number;
   setSelectedDifficulty: (difficulty: number) => void;
 
   // 월 변경 시 스케줄만 초기화 (기타자료, 커버자료 유지)
-  resetScheduleOnly: () => void;
+  resetScheduleOnly: (year?: number, month?: number) => void;
 }
 
 export const useScheduleStore = create<ScheduleState>(set => ({
@@ -50,6 +58,7 @@ export const useScheduleStore = create<ScheduleState>(set => ({
   redoStack: [],
   coverItems: null,
   etcItems: [],
+  savedSchedule: {}, // 년월일별 저장된 스케줄
   disabledDrops: new Set(),
   draggingItem: null, // 드래그 중인 아이템 초기값
   noPrintDate: true,
@@ -105,6 +114,7 @@ export const useScheduleStore = create<ScheduleState>(set => ({
       redoStack: [],
       coverItems: null,
       etcItems: [],
+      savedSchedule: {},
       disabledDrops: new Set(),
       draggingItem: null,
       noPrintDate: true,
@@ -112,15 +122,71 @@ export const useScheduleStore = create<ScheduleState>(set => ({
     }),
 
   // 월 변경 시 스케줄만 초기화 (기타자료, 커버자료 유지)
-  resetScheduleOnly: () =>
+  resetScheduleOnly: (year?: number, month?: number) =>
+    set(state => {
+      // 선택된 년월 또는 현재 년월에 저장된 스케줄이 있는지 확인
+      const targetYear = year || new Date().getFullYear();
+      const targetMonth = month || new Date().getMonth() + 1;
+      const currentDateKey = `${targetYear}-${targetMonth.toString().padStart(2, '0')}`;
+      const savedSchedule = state.savedSchedule[currentDateKey];
+      
+      console.log('🔍 resetScheduleOnly 디버깅:');
+      console.log('📅 타겟 년월:', targetYear, targetMonth);
+      console.log('📅 현재 날짜 키:', currentDateKey);
+      console.log('💾 저장된 스케줄 전체:', state.savedSchedule);
+      console.log('📋 현재 날짜의 저장된 스케줄:', savedSchedule);
+      console.log('📊 현재 스케줄:', state.schedule);
+      console.log('🎯 커버 아이템:', state.coverItems);
+      console.log('📝 기타 아이템:', state.etcItems);
+      
+      if (savedSchedule) {
+        // 저장된 스케줄이 있으면 로드
+        console.log('✅ 저장된 스케줄을 로드합니다:', savedSchedule);
+        return {
+          schedule: savedSchedule,
+          history: [],
+          redoStack: [],
+          disabledDrops: new Set(),
+          draggingItem: null
+        };
+      } else {
+        // 저장된 스케줄이 없으면 모든 데이터 리셋
+        console.log('❌ 저장된 스케줄이 없어서 모든 데이터를 리셋합니다');
+        return {
+          schedule: {},
+          history: [],
+          redoStack: [],
+          coverItems: null,
+          etcItems: [],
+          disabledDrops: new Set(),
+          draggingItem: null
+        };
+      }
+    }),
+
+  // 저장된 스케줄 관련 함수들
+  saveSchedule: (dateKey: string, schedule: Schedule) =>
     set(state => ({
-      schedule: {},
-      history: [],
-      redoStack: [],
-      disabledDrops: new Set(),
-      draggingItem: null
-      // coverItems, etcItems, noPrintDate, selectedDifficulty는 유지
+      savedSchedule: {
+        ...state.savedSchedule,
+        [dateKey]: schedule
+      }
     })),
+
+  loadSchedule: (dateKey: string) =>
+    set(state => {
+      const savedSchedule = state.savedSchedule[dateKey] || null;
+      return { schedule: savedSchedule || {} };
+    }),
+
+  removeSavedSchedule: (dateKey: string) =>
+    set(state => {
+      const newSavedSchedule = { ...state.savedSchedule };
+      delete newSavedSchedule[dateKey];
+      return { savedSchedule: newSavedSchedule };
+    }),
+
+  clearSavedSchedules: () => set({ savedSchedule: {} }),
 
   removeScheduleItem: (dateKey, itemId) =>
     set(state => {

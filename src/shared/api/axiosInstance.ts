@@ -9,6 +9,10 @@ import axios, {
 import https from 'https';
 import { useAuthStore } from '@/shared/stores/useAuthStore';
 import { toast } from 'react-toastify';
+import {
+  getTokenFromLocalStorage,
+  syncTokenFromLocalStorage
+} from '@/lib/utils';
 
 const axiosInstance = axios.create({
   baseURL: process.env.NEXT_PUBLIC_API_BASE_URL,
@@ -25,14 +29,20 @@ const axiosInstance = axios.create({
 axiosInstance.interceptors.request.use(
   (config: InternalAxiosRequestConfig) => {
     try {
-      const getCookie = (name: string) => {
-        const value = `; ${document.cookie}`;
-        const parts = value.split(`; ${name}=`);
-        if (parts.length === 2) return parts.pop()?.split(';').shift();
-        return '';
-      };
+      // 로컬 스토리지에서 토큰을 우선적으로 가져오기
+      let token = getTokenFromLocalStorage();
 
-      const token = getCookie('token') || '';
+      // 로컬 스토리지에 토큰이 없으면 쿠키에서 가져오기
+      if (!token) {
+        const getCookie = (name: string) => {
+          const value = `; ${document.cookie}`;
+          const parts = value.split(`; ${name}=`);
+          if (parts.length === 2) return parts.pop()?.split(';').shift();
+          return '';
+        };
+        token = getCookie('token') || '';
+      }
+
       if (token) {
         config.headers.Authorization = `Bearer ${token}`;
       }
@@ -48,17 +58,12 @@ axiosInstance.interceptors.request.use(
 // 응답 인터셉터
 axiosInstance.interceptors.response.use(
   response => {
-    console.log('전체 응답:', response);
-    console.log('응답 헤더 키들:', Object.keys(response.headers));
-    console.log('응답 헤더 전체:', response.headers);
 
     const newAccessToken =
       response.headers['authorization'] || response.headers['Authorization'];
 
-    console.log('새로운 액세스 토큰:', newAccessToken);
     if (newAccessToken) {
       const token = newAccessToken.replace('Bearer ', '');
-      console.log('처리된 토큰:', token);
       updateToken(token);
     }
     return response;
@@ -72,8 +77,18 @@ axiosInstance.interceptors.response.use(
 const updateToken = (token: string) => {
   try {
     useAuthStore.setState({ token });
+
+    // 로컬 스토리지의 userInfo 업데이트
     if (typeof window !== 'undefined') {
-      document.cookie = `token=${token}; path=/; SameSite=Lax; Secure`;
+      const userInfo = localStorage.getItem('userInfo');
+      if (userInfo) {
+        const parsed = JSON.parse(userInfo);
+        parsed.token = token;
+        localStorage.setItem('userInfo', JSON.stringify(parsed));
+      }
+
+      // 쿠키에도 동기화
+      syncTokenFromLocalStorage();
     }
   } catch (err) {
     console.warn('토큰 저장 실패', err);

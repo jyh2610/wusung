@@ -65,6 +65,42 @@ export const setlocalStorageValue = (key: string, value: string) => {
   return localStorage.setItem(key, value);
 };
 
+// 로컬 스토리지의 userInfo에서 토큰을 쿠키에 동기화
+export const syncTokenFromLocalStorage = () => {
+  if (typeof window === 'undefined') return;
+
+  try {
+    const userInfo = localStorage.getItem('userInfo');
+    if (userInfo) {
+      const parsed = JSON.parse(userInfo);
+      if (parsed.token) {
+        // 쿠키에 토큰 저장 (middleware에서 사용)
+        document.cookie = `token=${parsed.token}; path=/; SameSite=Lax`;
+        return parsed.token;
+      }
+    }
+  } catch (error) {
+    console.error('토큰 동기화 실패:', error);
+  }
+  return null;
+};
+
+// 로컬 스토리지에서 토큰 가져오기
+export const getTokenFromLocalStorage = () => {
+  if (typeof window === 'undefined') return null;
+
+  try {
+    const userInfo = localStorage.getItem('userInfo');
+    if (userInfo) {
+      const parsed = JSON.parse(userInfo);
+      return parsed.token || null;
+    }
+  } catch (error) {
+    console.error('로컬 스토리지에서 토큰 가져오기 실패:', error);
+  }
+  return null;
+};
+
 type AnyTreeNode = Record<string, any>;
 
 export function extractLeafNodes<T extends AnyTreeNode>(

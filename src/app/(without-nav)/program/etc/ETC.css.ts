@@ -172,3 +172,221 @@ export const cascaderHighlight = style({
   boxShadow: `0 0 0 1px ${colors.brand[300]}`,
   borderRadius: '8px'
 });
+
+// 모달 관련 스타일
+export const modalOverlay = style({
+  position: 'fixed',
+  top: 0,
+  left: 0,
+  right: 0,
+  bottom: 0,
+  backgroundColor: 'rgba(0, 0, 0, 0.5)',
+  display: 'flex',
+  justifyContent: 'center',
+  alignItems: 'center',
+  zIndex: 1000
+});
+
+export const modalContent = style({
+  backgroundColor: 'white',
+  padding: '24px',
+  borderRadius: '8px',
+  width: '80%',
+  maxWidth: '600px',
+  maxHeight: '80vh',
+  overflowY: 'auto'
+});
+
+export const modalHeader = style({
+  display: 'flex',
+  justifyContent: 'space-between',
+  alignItems: 'center',
+  marginBottom: '20px'
+});
+
+export const modalTitle = style({
+  margin: 0
+});
+
+export const modalCloseButton = style({
+  background: 'none',
+  border: 'none',
+  fontSize: '24px',
+  cursor: 'pointer',
+  color: colors.gray_scale[500]
+});
+
+export const modalBody = style({
+  display: 'flex',
+  flexDirection: 'column',
+  gap: '12px'
+});
+
+export const selectedActivityItem = style({
+  display: 'flex',
+  justifyContent: 'space-between',
+  alignItems: 'center',
+  padding: '12px',
+  border: '1px solid #eee',
+  borderRadius: '4px'
+});
+
+export const selectedActivityInfo = style({
+  display: 'flex',
+  gap: '12px',
+  alignItems: 'center'
+});
+
+export const selectedActivityThumbnail = style({
+  width: '60px',
+  height: '60px',
+  position: 'relative',
+  borderRadius: '4px',
+  overflow: 'hidden'
+});
+
+export const selectedActivityTitle = style({
+  fontWeight: 'bold'
+});
+
+export const selectedActivityId = style({
+  color: colors.gray_scale[500],
+  fontSize: '14px'
+});
+
+export const removeActivityButton = style({
+  background: 'none',
+  border: 'none',
+  color: colors.gray_scale[500],
+  cursor: 'pointer',
+  padding: '8px'
+});
+
+// 상단 컨테이너 스타일
+export const topContainer = style({
+  display: 'flex',
+  justifyContent: 'space-between',
+  alignItems: 'center'
+});
+
+export const categorySection = style({
+  display: 'flex',
+  flexDirection: 'column',
+  gap: '12px'
+});
+
+export const categoryTitle = style({
+  fontSize: '32px',
+  fontWeight: 600,
+  color: colors.gray_scale[900],
+  marginBottom: '8px'
+});
+
+export const buttonGroup = style({
+  display: 'flex',
+  gap: '8px',
+  alignItems: 'center'
+});
+
+export const buttonWrapper = style({
+  width: '150px',
+  height: '56px'
+});
+
+export const buttonWrapperSmall = style({
+  width: '113px',
+  height: '56px'
+});
+
+export const buttonWrapperMedium = style({
+  width: '160px',
+  height: '56px'
+});
+
+// 활동 리스트 섹션
+export const activityListSection = style({
+  marginTop: '20px'
+});
+
+export const emptyState = style({
+  marginTop: '24px',
+  textAlign: 'center',
+  color: colors.gray_scale[500]
+});
+
+// 활동 카드 내부 스타일
+export const activityCardHeader = style({
+  display: 'flex',
+  justifyContent: 'space-between'
+});
+
+export const activityCardInfo = style({
+  display: 'flex',
+  gap: '8px'
+});
+
+export const activityCardThumbnail = style({
+  maxWidth: '256px',
+  height: '357px',
+  position: 'relative'
+});
+
+// 페이지네이션 스타일
+export const pageSizeSelector = style({
+  display: 'flex',
+  alignItems: 'center',
+  gap: '10px'
+});
+
+export const pageSizeLabel = style({
+  fontSize: '14px',
+  color: '#666'
+});
+
+export const pageSizeSelect = style({
+  padding: '5px 10px',
+  border: '1px solid #ddd',
+  borderRadius: '4px',
+  fontSize: '14px'
+});
+
+export const pageInfo = style({
+  fontSize: '14px',
+  color: '#666'
+});
+
+export const pageNumbers = style({
+  display: 'flex',
+  alignItems: 'center',
+  gap: '5px'
+});
+
+export const pageButton = style({
+  padding: '8px 12px',
+  border: '1px solid #ddd',
+  borderRadius: '4px',
+  background: 'white',
+  cursor: 'pointer',
+  fontSize: '14px',
+  minWidth: '40px'
+});
+
+export const pageButtonDisabled = style({
+  padding: '8px 12px',
+  border: '1px solid #ddd',
+  borderRadius: '4px',
+  background: '#f5f5f5',
+  cursor: 'not-allowed',
+  fontSize: '14px'
+});
+
+export const pageButtonActive = style({
+  padding: '8px 12px',
+  border: '1px solid #ddd',
+  borderRadius: '4px',
+  background: '#007bff',
+  color: 'white',
+  cursor: 'pointer',
+  fontSize: '14px',
+  minWidth: '40px'
+});

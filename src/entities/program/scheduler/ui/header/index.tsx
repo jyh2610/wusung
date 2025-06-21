@@ -93,20 +93,22 @@ function Header({
     if (month === 1) {
       setMonth(12);
       setYear(year - 1);
+      resetScheduleOnly(year - 1, 12); // 스케줄만 초기화
     } else {
       setMonth(month - 1);
+      resetScheduleOnly(year, month - 1); // 스케줄만 초기화
     }
-    resetScheduleOnly(); // 스케줄만 초기화
   };
 
   const handleNextMonth = () => {
     if (month === 12) {
       setMonth(1);
       setYear(year + 1);
+      resetScheduleOnly(year + 1, 1); // 스케줄만 초기화
     } else {
       setMonth(month + 1);
+      resetScheduleOnly(year, month + 1); // 스케줄만 초기화
     }
-    resetScheduleOnly(); // 스케줄만 초기화
   };
   // ✅ 비활성 날짜 필터링 적용한 mainEduContentIds 생성 함수
   const getFilteredMainEduContentIds = () => {

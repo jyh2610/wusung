@@ -1,6 +1,7 @@
 import { create } from 'zustand';
 import { login, login_code, logout } from '@/entities/MainBanner/api';
 import { getSubscription } from '@/entities/UserManage/api';
+import { syncTokenFromLocalStorage } from '@/lib/utils';
 
 interface AuthState {
   token: string | null;
@@ -47,8 +48,7 @@ export const useAuthStore = create<AuthState>((set, get) => ({
         })
       );
 
-      document.cookie = `token=${res.accessToken}; path=/;`;
-      document.cookie = `username=${res.username}; path=/;`;
+      syncTokenFromLocalStorage();
 
       set({
         token: res.accessToken,
@@ -99,8 +99,7 @@ export const useAuthStore = create<AuthState>((set, get) => ({
         })
       );
 
-      document.cookie = `token=${res.accessToken}; path=/;`;
-      document.cookie = `username=${res.username}; path=/;`;
+      syncTokenFromLocalStorage();
 
       set({
         token: res.accessToken,
@@ -157,6 +156,8 @@ export const useAuthStore = create<AuthState>((set, get) => ({
         isAuthenticated: true,
         isHydrated: true
       });
+
+      syncTokenFromLocalStorage();
     }
   }
 }));

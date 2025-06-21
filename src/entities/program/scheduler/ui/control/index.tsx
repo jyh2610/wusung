@@ -227,10 +227,6 @@ export function Control({ isAdmin }: { isAdmin: boolean }) {
   };
 
   const handleConfirm = async () => {
-    console.log('계획안 불러오기 클릭됨');
-    console.log('selectedUserId:', selectedUserId);
-    console.log('users:', users);
-    console.log('selectedUser:', selectedUser);
 
     if (!selectedUser?.difficultyLevel) {
       toast.warn('대상자를 선택해주세요');

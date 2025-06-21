@@ -4,6 +4,7 @@ import { colors } from '@/design-tokens';
 import 'react-toastify/dist/ReactToastify.css';
 import { ToastContainer } from 'react-toastify';
 import { QueryProvider, NextUiProvider } from './_provider';
+import { TokenSync } from '@/components/TokenSync';
 
 export const metadata: Metadata = {
   title: {
@@ -126,7 +127,10 @@ export default function RootLayout({
           }}
         />
         <QueryProvider>
-          <NextUiProvider>{children}</NextUiProvider>
+          <NextUiProvider>
+            <TokenSync />
+            {children}
+          </NextUiProvider>
         </QueryProvider>
         <ToastContainer
           position="top-center"

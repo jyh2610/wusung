@@ -1,10 +1,10 @@
 'use client';
 
-import { IContent, IContentList } from '@/entities/program/type.dto';
+import { IContentList } from '@/entities/program/type.dto';
 import { DashBoard } from '@/shared';
 import { useCategoryTreeStore } from '@/shared/stores/useCategoryTreeStore';
 import React, { useEffect, useState } from 'react';
-import { fetchEvaluationContentsOnly, getContentList } from './utils';
+import { getContentList } from './utils';
 import {
   TableRow,
   TableCell,
@@ -26,8 +26,6 @@ const columns = [
 ];
 
 function Evaluation() {
-  const categoryIndividualList =
-    useCategoryTreeStore.getState().categoryIndividualList;
   const { selectedCategoryNode } = useCategoryTreeStore();
   const [page, setPage] = useState<number>(0);
   const [isModalOpen, setIsModalOpen] = useState(false);
@@ -36,7 +34,7 @@ function Evaluation() {
   const router = useRouter();
   const pathname = usePathname();
 
-  const { data: contentData, isLoading } = useQuery({
+  const { data: contentData } = useQuery({
     queryKey: ['evaluationContents', selectedCategoryNode?.categoryId, page],
     queryFn: async () => {
       if (!selectedCategoryNode) return null;

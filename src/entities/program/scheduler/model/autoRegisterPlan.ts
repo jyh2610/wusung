@@ -23,7 +23,8 @@ export const autoRegisterPlan = async ({
       addCoverItem,
       addEtcItem,
       clearCoverItems,
-      clearEtcItems
+      clearEtcItems,
+      saveSchedule
     } = useScheduleStore.getState();
 
     // 기존 데이터 초기화
@@ -95,6 +96,10 @@ export const autoRegisterPlan = async ({
     }
 
     updateSchedule(updatedSchedule);
+
+    // getPlan이 성공적으로 실행되면 스케줄 저장
+    const dateKey = `${year}-${month.toString().padStart(2, '0')}`;
+    saveSchedule(dateKey, updatedSchedule);
   } catch (error) {
     console.error('Error while auto-registering the plan:', error);
   }
