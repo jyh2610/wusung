@@ -272,7 +272,6 @@ function Activity() {
               try {
                 iframe.contentWindow.focus();
                 iframe.contentWindow.print();
-                console.log('Print dialog initiated.');
               } catch (printError) {
                 console.error('Error initiating print on iframe:', printError);
                 toast.error('인쇄 대화 상자를 열 수 없습니다.');

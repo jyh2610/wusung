@@ -1,15 +1,24 @@
 /** @type {import('next').NextConfig} */
 const { createVanillaExtractPlugin } = require('@vanilla-extract/next-plugin');
+const withBundleAnalyzer = require('@next/bundle-analyzer')({
+  enabled: process.env.ANALYZE === 'true',
+});
 
 const withVanillaExtract = createVanillaExtractPlugin({
-  identifiers: ({ hash }) => `prefix_${hash}`
+  identifiers: ({ hash }) => `prefix_${hash}`,
 });
 
 const nextConfig = {
+  compiler: {
+    removeConsole: process.env.NODE_ENV === 'production',
+  },
   images: {
-    domains: ['dwkcd9qfwbc4t.cloudfront.net', 'dc4jgoljm3ewc.cloudfront.net'],
+    domains: [
+      'dwkcd9qfwbc4t.cloudfront.net',
+      'dc4jgoljm3ewc.cloudfront.net',
+    ],
     formats: ['image/webp', 'image/avif'],
-    minimumCacheTTL: 60
+    minimumCacheTTL: 60,
   },
   compress: true,
   poweredByHeader: false,
@@ -21,50 +30,50 @@ const nextConfig = {
         headers: [
           {
             key: 'X-DNS-Prefetch-Control',
-            value: 'on'
+            value: 'on',
           },
           {
             key: 'X-Frame-Options',
-            value: 'DENY'
+            value: 'DENY',
           },
           {
             key: 'X-Content-Type-Options',
-            value: 'nosniff'
+            value: 'nosniff',
           },
           {
             key: 'Referrer-Policy',
-            value: 'origin-when-cross-origin'
-          }
-        ]
+            value: 'origin-when-cross-origin',
+          },
+        ],
       },
       {
         source: '/sitemap.xml',
         headers: [
           {
             key: 'Cache-Control',
-            value: 'public, max-age=86400, stale-while-revalidate'
-          }
-        ]
+            value: 'public, max-age=86400, stale-while-revalidate',
+          },
+        ],
       },
       {
         source: '/robots.txt',
         headers: [
           {
             key: 'Cache-Control',
-            value: 'public, max-age=86400'
-          }
-        ]
-      }
+            value: 'public, max-age=86400',
+          },
+        ],
+      },
     ];
   },
-  async rewrites() {
-    return [
-      {
-        source: '/api/:path*', // 프론트엔드에서 사용하는 API 경로
-        destination: 'https://13.124.172.100.sslip.io/api/:path*' // 실제 백엔드 서버 URL
-      }
-    ];
-  }
+  // async rewrites() {
+  //   return [
+  //     {
+  //       source: '/api/:path*',
+  //       destination: 'https://13.124.172.100.sslip.io/api/:path*'
+  //     }
+  //   ];
+  // }
 };
 
-module.exports = withVanillaExtract(nextConfig);
+module.exports = withBundleAnalyzer(withVanillaExtract(nextConfig));

@@ -79,7 +79,6 @@ export default function InquiryDetailPage({
       message.error('댓글 등록 중 오류가 발생했습니다.');
     }
   };
-  console.log(editingComment);
 
   const handleCommentUpdate = async () => {
     if (!editingComment) return;

@@ -119,7 +119,6 @@ export default function ActivityPage() {
               try {
                 iframe.contentWindow.focus();
                 iframe.contentWindow.print();
-                console.log('Print dialog initiated.');
                 // 아이프레임은 사용자가 인쇄 대화 상자를 닫으면 연결이 해제되므로
                 // 여기서 별도로 제거하는 코드는 추가하지 않습니다.
               } catch (printError) {
