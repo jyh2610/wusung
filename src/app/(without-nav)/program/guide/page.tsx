@@ -57,7 +57,7 @@ const guideSteps = [
 
 function Guide() {
   return (
-    <div className="min-h-screen bg-gradient-to-br from-blue-50 to-indigo-100 py-8 px-4">
+    <div className="min-h-screen bg-gradient-to-br from-blue-50 to-indigo-100 py-8 px-4 rounded-lg">
       <div className="max-w-6xl mx-auto">
         {/* 헤더 */}
         <div className="text-center mb-12">
