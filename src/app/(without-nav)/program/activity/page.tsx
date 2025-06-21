@@ -134,6 +134,7 @@ function Activity() {
         return undefined;
       };
 
+      // 전체 경로에서 마지막 선택된 노드의 ID를 사용
       const selectedId = value[value.length - 1];
       const selectedCategory = findCategoryById(categories, selectedId);
 
@@ -349,6 +350,41 @@ function Activity() {
     fetchData();
   }, [categoryId, fetchActivities, setActivities]);
 
+  const getCategoryPath = (categoryId: number): number[] => {
+    const findPath = (
+      categories: ICategoryLeaf[],
+      targetId: number,
+      currentPath: number[] = []
+    ): number[] | null => {
+      for (const category of categories) {
+        const newPath = [...currentPath, category.categoryId];
+
+        if (category.categoryId === targetId) {
+          return newPath;
+        }
+
+        if (category.children) {
+          const found = findPath(category.children, targetId, newPath);
+          if (found) return found;
+        }
+      }
+      return null;
+    };
+
+    return findPath(categories, categoryId) || [];
+  };
+
+  const getActivityCategories = (): ICategoryLeaf[] => {
+    // 활동지 카테고리만 찾기
+    const activityCategory = categories.find(
+      category => category.name === '활동지'
+    );
+    if (activityCategory && activityCategory.children) {
+      return [activityCategory];
+    }
+    return [];
+  };
+
   return (
     <div className={container}>
       {/* 선택된 활동지 모달 */}
@@ -412,14 +448,10 @@ function Activity() {
             {selectedCategoryNode?.name || '카테고리 선택'}
           </div>
           <CustomCascader
-            options={getCascaderOptions(
-              categories,
-              selectedCategoryNode,
-              '활동지'
-            )}
+            options={getActivityCategories()}
             value={
               selectedCategoryNode
-                ? [selectedCategoryNode.categoryId]
+                ? getCategoryPath(selectedCategoryNode.categoryId)
                 : undefined
             }
             onChange={handleCategoryChange}

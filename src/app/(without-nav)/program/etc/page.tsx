@@ -121,6 +121,41 @@ function ETC() {
     }
   };
 
+  const getCategoryPath = (categoryId: number): number[] => {
+    const findPath = (
+      categories: ICategoryLeaf[],
+      targetId: number,
+      currentPath: number[] = []
+    ): number[] | null => {
+      for (const category of categories) {
+        const newPath = [...currentPath, category.categoryId];
+
+        if (category.categoryId === targetId) {
+          return newPath;
+        }
+
+        if (category.children) {
+          const found = findPath(category.children, targetId, newPath);
+          if (found) return found;
+        }
+      }
+      return null;
+    };
+
+    return findPath(categories, categoryId) || [];
+  };
+
+  const getEtcCategories = (): ICategoryLeaf[] => {
+    // 기타자료 카테고리만 찾기
+    const etcCategory = categories.find(
+      category => category.name === '기타자료'
+    );
+    if (etcCategory && etcCategory.children) {
+      return [etcCategory];
+    }
+    return [];
+  };
+
   const handleCategoryChange = (value: number[]) => {
     if (value && value.length > 0) {
       const findCategoryById = (
@@ -139,6 +174,7 @@ function ETC() {
         return undefined;
       };
 
+      // 전체 경로에서 마지막 선택된 노드의 ID를 사용
       const selectedId = value[value.length - 1];
       const selectedCategory = findCategoryById(categories, selectedId);
 
@@ -347,14 +383,10 @@ function ETC() {
             {selectedCategoryNode?.name || '카테고리 선택'}
           </div>
           <CustomCascader
-            options={getCascaderOptions(
-              categories,
-              selectedCategoryNode,
-              '기타자료'
-            )}
+            options={getEtcCategories()}
             value={
               selectedCategoryNode
-                ? [selectedCategoryNode.categoryId]
+                ? getCategoryPath(selectedCategoryNode.categoryId)
                 : undefined
             }
             onChange={handleCategoryChange}

@@ -53,27 +53,88 @@ export function CustomCascader({
     }
   };
 
-  const getSelectedLabel = (value: number[] | undefined): string => {
-    if (!value || value.length === 0) return '';
+  const getSelectedPath = (
+    value: number[] | undefined
+  ): { id: number; label: string }[] => {
+    if (!value || value.length === 0) return [];
 
-    const findLabel = (
+    const findPath = (
       items: ICategoryLeaf[],
-      targetId: number
-    ): string | undefined => {
-      for (const item of items) {
-        if (item.categoryId === targetId) {
-          return item.name;
+      targetIds: number[]
+    ): { id: number; label: string }[] => {
+      const result: { id: number; label: string }[] = [];
+
+      const findPathRecursive = (
+        currentItems: ICategoryLeaf[],
+        remainingIds: number[],
+        currentPath: { id: number; label: string }[]
+      ): boolean => {
+        for (const item of currentItems) {
+          const newPath = [
+            ...currentPath,
+            { id: item.categoryId, label: item.name }
+          ];
+
+          if (item.categoryId === remainingIds[0]) {
+            if (remainingIds.length === 1) {
+              // 마지막 노드를 찾았을 때
+              result.push(...newPath);
+              return true;
+            } else {
+              // 하위 노드에서 계속 검색
+              if (
+                item.children &&
+                findPathRecursive(item.children, remainingIds.slice(1), newPath)
+              ) {
+                return true;
+              }
+            }
+          }
+
+          // 현재 아이템의 하위에서 검색
+          if (
+            item.children &&
+            findPathRecursive(item.children, remainingIds, newPath)
+          ) {
+            return true;
+          }
         }
-        if (item.children) {
-          const found = findLabel(item.children, targetId);
-          if (found) return found;
-        }
-      }
-      return undefined;
+        return false;
+      };
+
+      findPathRecursive(items, targetIds, []);
+      return result;
     };
 
-    const lastId = value[value.length - 1];
-    return findLabel(options, lastId) || '';
+    return findPath(options, value);
+  };
+
+  const renderDisplay = () => {
+    const path = getSelectedPath(value);
+
+    if (path.length === 0) {
+      return <span style={{ color: '#999' }}>{placeholder}</span>;
+    }
+
+    return (
+      <span>
+        {path.map((item, index) => (
+          <React.Fragment key={item.id}>
+            {index > 0 && (
+              <span style={{ color: '#999', margin: '0 4px' }}>/</span>
+            )}
+            <span
+              style={{
+                color: index === path.length - 1 ? '#1890ff' : '#333',
+                fontWeight: index === path.length - 1 ? '600' : 'normal'
+              }}
+            >
+              {item.label}
+            </span>
+          </React.Fragment>
+        ))}
+      </span>
+    );
   };
 
   return (
@@ -87,7 +148,7 @@ export function CustomCascader({
       className={className}
       style={style}
       changeOnSelect
-      displayRender={() => getSelectedLabel(value)}
+      displayRender={renderDisplay}
       onClick={onClick}
     />
   );
