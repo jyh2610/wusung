@@ -633,7 +633,7 @@ export const printScheduleonly = async (
   month: number
 ) => {
   try {
-    const res = await request<IRes<Blob>>({
+    const res = await request<Blob>({
       method: 'POST',
       url: `/api/program/use/print/calendar`,
       data: {
@@ -645,9 +645,13 @@ export const printScheduleonly = async (
         elderId
       }
     });
-    return res.data.data;
+    const blob = new Blob([res.data], { type: 'application/pdf' });
+    const url = URL.createObjectURL(blob);
+    toast.success('스케줄 출력 성공');
+    return url;
   } catch (error) {
-    console.error('스케줄 출력 실패');
+    toast.error((error as any).response.data.message);
+    console.error('스케줄 출력 실패', error);
     return null;
   }
 };

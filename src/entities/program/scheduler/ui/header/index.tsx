@@ -265,24 +265,21 @@ function Header({
 
       const mainEduContentIds = getFilteredMainEduContentIds();
 
-      const pdfBlob = await printScheduleonly(
+      const pdfUrl = await printScheduleonly(
         selectedUserId,
         mainEduContentIds,
         year,
         month
       );
 
-      if (pdfBlob) {
-        const blob = new Blob([pdfBlob], { type: 'application/pdf' });
-        const url = URL.createObjectURL(blob);
-
+      if (pdfUrl) {
         const iframe = document.createElement('iframe');
         iframe.style.position = 'fixed';
         iframe.style.right = '0';
         iframe.style.bottom = '0';
         iframe.style.width = '0';
         iframe.style.height = '0';
-        iframe.src = url;
+        iframe.src = pdfUrl;
 
         iframe.onload = () => {
           setTimeout(() => {
