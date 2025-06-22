@@ -20,11 +20,11 @@ export function Tooltip({ children, content }: TooltipProps) {
     }
 
     const rect = e.currentTarget.getBoundingClientRect();
-    const tooltipWidth = 250; // 툴팁의 예상 너비
-    const tooltipHeight = 250; // 툴팁의 예상 높이
+    const tooltipWidth = 375; // 툴팁의 예상 너비
+    const tooltipHeight = 375; // 툴팁의 예상 높이
 
     let x = rect.left + window.scrollX;
-    let y = rect.bottom + window.scrollY + 150; // 위치를 더 아래로 조정
+    let y = rect.bottom + window.scrollY + 20; // 위치를 더 아래로 조정
 
     // 화면 오른쪽 끝을 벗어나는 경우 왼쪽으로 조정
     if (x + tooltipWidth > window.innerWidth) {

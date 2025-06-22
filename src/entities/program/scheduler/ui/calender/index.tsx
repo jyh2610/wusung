@@ -165,16 +165,32 @@ export function Calendar({ schedule, isAdmin }: CalendarProps) {
                             </div>
                           )}
                           <span
-                            style={{ fontWeight: 'bold', fontSize: '13px' }}
+                            style={{
+                              fontWeight: 'bold',
+                              fontSize: '13px',
+                              wordBreak: 'break-all',
+                              lineHeight: '1.2',
+                              maxWidth: '180px'
+                            }}
                           >
-                            {item.content}
+                            {item.content.length > 16
+                              ? `${item.content.slice(0, 16)}...`
+                              : item.content}
                           </span>
                         </div>
                       }
                     >
-                      <span>
-                        {item.content.length > 5
-                          ? `${item.content.slice(0, 5)}...`
+                      <span
+                        style={{
+                          fontWeight: 'bold',
+                          fontSize: '13px',
+                          wordBreak: 'break-all',
+                          lineHeight: '1.2',
+                          maxWidth: '180px'
+                        }}
+                      >
+                        {item.content.length > 16
+                          ? `${item.content.slice(0, 16)}...`
                           : item.content}
                       </span>
                     </Tooltip>

@@ -643,7 +643,11 @@ export const printScheduleonly = async (
       },
       params: {
         elderId
-      }
+      },
+      headers: {
+        Accept: 'application/pdf'
+      },
+      responseType: 'blob'
     });
     const blob = new Blob([res.data], { type: 'application/pdf' });
     const url = URL.createObjectURL(blob);

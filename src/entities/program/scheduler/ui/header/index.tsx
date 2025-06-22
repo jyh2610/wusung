@@ -24,6 +24,7 @@ import { toast } from 'react-toastify';
 import { useScheduleStore } from '@/shared/stores/useScheduleStore';
 import { Box, Button, Modal, Typography } from '@mui/material';
 import { useSearchParams, useRouter } from 'next/navigation';
+import { printPdfWithIframe } from '@/lib/utils/printUtils';
 
 function Header({
   isAdmin,
@@ -231,22 +232,7 @@ function Header({
       });
 
       if (pdfUrl) {
-        const iframe = document.createElement('iframe');
-        iframe.style.position = 'fixed';
-        iframe.style.right = '0';
-        iframe.style.bottom = '0';
-        iframe.style.width = '0';
-        iframe.style.height = '0';
-        iframe.src = pdfUrl;
-
-        iframe.onload = () => {
-          setTimeout(() => {
-            iframe.contentWindow?.focus();
-            iframe.contentWindow?.print();
-          }, 500);
-        };
-
-        document.body.appendChild(iframe);
+        await printPdfWithIframe(pdfUrl);
       } else {
         toast.error('PDF 파일을 받지 못했습니다.');
       }
@@ -272,23 +258,12 @@ function Header({
         month
       );
 
+      console.log('스케줄만 인쇄 - pdfUrl:', pdfUrl);
+
       if (pdfUrl) {
-        const iframe = document.createElement('iframe');
-        iframe.style.position = 'fixed';
-        iframe.style.right = '0';
-        iframe.style.bottom = '0';
-        iframe.style.width = '0';
-        iframe.style.height = '0';
-        iframe.src = pdfUrl;
-
-        iframe.onload = () => {
-          setTimeout(() => {
-            iframe.contentWindow?.focus();
-            iframe.contentWindow?.print();
-          }, 500);
-        };
-
-        document.body.appendChild(iframe);
+        console.log('스케줄만 인쇄 - printPdfWithIframe 호출 시작');
+        await printPdfWithIframe(pdfUrl);
+        console.log('스케줄만 인쇄 - printPdfWithIframe 호출 완료');
       } else {
         toast.error('스케줄 PDF 파일을 받지 못했습니다.');
       }
@@ -326,18 +301,18 @@ function Header({
           <button
             className={printButton}
             type="button"
-            onClick={handleOpenPrintModal}
-          >
-            <MdLocalPrintshop className={iconStyle} size={24} />
-            인쇄
-          </button>
-          <button
-            className={printButton}
-            type="button"
             onClick={printScheduleOnly}
           >
             <MdLocalPrintshop className={iconStyle} size={24} />
             스케줄만 인쇄
+          </button>
+          <button
+            className={printButton}
+            type="button"
+            onClick={handleOpenPrintModal}
+          >
+            <MdLocalPrintshop className={iconStyle} size={24} />
+            인쇄
           </button>
         </div>
       ) : (

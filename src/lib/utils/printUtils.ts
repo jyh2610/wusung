@@ -6,6 +6,8 @@ import { toast } from 'react-toastify';
  * @returns Promise<void>
  */
 export const printPdfWithIframe = async (pdfUrl: string): Promise<void> => {
+  console.log('printPdfWithIframe 시작 - pdfUrl:', pdfUrl);
+
   return new Promise((resolve, reject) => {
     // iframe을 생성해서 자동 프린트
     const iframe = document.createElement('iframe');
@@ -18,15 +20,19 @@ export const printPdfWithIframe = async (pdfUrl: string): Promise<void> => {
     iframe.style.visibility = 'hidden'; // Ensure it's not visible, though 0 size should be enough
     iframe.style.pointerEvents = 'none'; // Prevent mouse interactions
 
+    console.log('iframe 생성 완료, src 설정:', pdfUrl);
     iframe.src = pdfUrl;
 
     iframe.onload = () => {
+      console.log('iframe onload 이벤트 발생');
       // Use setTimeout with a slight delay to ensure the iframe content
       // is fully loaded and the print dialog is likely to appear.
       setTimeout(() => {
+        console.log('setTimeout 실행, contentWindow 확인 중...');
         // Check if contentWindow exists before calling methods on it
         if (iframe.contentWindow) {
           try {
+            console.log('contentWindow 존재, print() 호출 시도');
             iframe.contentWindow.focus();
             iframe.contentWindow.print();
             console.log('Print dialog initiated.');
@@ -56,7 +62,7 @@ export const printPdfWithIframe = async (pdfUrl: string): Promise<void> => {
     };
 
     // Optional: Add an onerror handler for the iframe
-    iframe.onerror = (e) => {
+    iframe.onerror = e => {
       console.error('Error loading PDF in iframe:', e);
       toast.error('PDF 로딩 중 오류가 발생했습니다.');
       // Clean up the iframe even on error
@@ -66,6 +72,7 @@ export const printPdfWithIframe = async (pdfUrl: string): Promise<void> => {
       reject(e);
     };
 
+    console.log('iframe을 document.body에 추가');
     document.body.appendChild(iframe);
 
     // *** 이전 코드에서 아이프레임을 DOM에서 제거하는 setTimeout 부분을 삭제했습니다. ***
@@ -101,4 +108,4 @@ export const printSelectedActivities = async (
     console.error('프린트 에러:', error);
     toast.error('인쇄 실패되었습니다!');
   }
-}; 
+};
