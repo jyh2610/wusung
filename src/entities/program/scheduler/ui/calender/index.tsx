@@ -19,7 +19,7 @@ import {
 import { Schedule } from '@/entities/program/type.dto';
 import { useDateStore } from '@/shared/stores/useDateStores';
 import { useScheduleStore } from '@/shared/stores/useScheduleStore';
-import { MdDelete } from 'react-icons/md';
+import { IoIosClose } from 'react-icons/io';
 import { colors } from '@/design-tokens';
 import { Tooltip } from '@/shared/ui/tooltip';
 
@@ -129,27 +129,46 @@ export function Calendar({ schedule, isAdmin }: CalendarProps) {
                             display: 'flex',
                             flexDirection: 'column',
                             gap: '8px',
-                            alignItems: 'center'
-                          }}
-                          onMouseEnter={() => {
-                            if (item.thumbnailUrl) {
-                              console.log('Thumbnail URL:', item.thumbnailUrl);
-                            }
+                            alignItems: 'center',
+                            textAlign: 'center'
                           }}
                         >
                           {item.thumbnailUrl && (
-                            <img
-                              src={item.thumbnailUrl}
-                              alt={item.content}
+                            <div
                               style={{
-                                maxWidth: '200px',
-                                maxHeight: '200px',
-                                objectFit: 'contain',
-                                borderRadius: '4px'
+                                width: '200px',
+                                height: '150px',
+                                display: 'flex',
+                                alignItems: 'center',
+                                justifyContent: 'center',
+                                backgroundColor: 'rgba(255, 255, 255, 0.1)',
+                                borderRadius: '4px',
+                                overflow: 'hidden'
                               }}
-                            />
+                            >
+                              <img
+                                src={item.thumbnailUrl}
+                                alt={item.content}
+                                style={{
+                                  maxWidth: '100%',
+                                  maxHeight: '100%',
+                                  objectFit: 'contain',
+                                  borderRadius: '4px'
+                                }}
+                                onError={e => {
+                                  const target = e.target as HTMLImageElement;
+                                  target.style.display = 'none';
+                                  target.parentElement!.innerHTML =
+                                    '<span style="color: #ccc;">이미지 로드 실패</span>';
+                                }}
+                              />
+                            </div>
                           )}
-                          <span>{item.content}</span>
+                          <span
+                            style={{ fontWeight: 'bold', fontSize: '13px' }}
+                          >
+                            {item.content}
+                          </span>
                         </div>
                       }
                     >
@@ -159,11 +178,16 @@ export function Calendar({ schedule, isAdmin }: CalendarProps) {
                           : item.content}
                       </span>
                     </Tooltip>
-                    <MdDelete 
+                    <IoIosClose
                       onClick={handleDelete}
-                      style={{ 
+                      className="text-red-500"
+                      size={35}
+                      style={{
                         cursor: 'pointer',
-                        opacity: draggingItem === `${dayNum}-${category}-${item.id}` ? 0.5 : 1
+                        opacity:
+                          draggingItem === `${dayNum}-${category}-${item.id}`
+                            ? 0.5
+                            : 1
                       }}
                     />
                   </div>

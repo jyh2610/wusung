@@ -39,7 +39,9 @@ export function ManagerSettings() {
     );
   }
 
-  const isEmpty = error || !data || data.length === 0;
+  // data가 undefined이거나 배열이 아닌 경우를 처리
+  const managerData = Array.isArray(data) ? data : data ? [data] : [];
+  const isEmpty = error || !data || managerData.length === 0;
 
   return (
     <div className={container}>
@@ -58,7 +60,7 @@ export function ManagerSettings() {
         {isEmpty ? (
           <div className={noData}>담당자 정보가 없습니다.</div>
         ) : (
-          data.map((manager: any) => (
+          managerData.map((manager: any) => (
             <div
               key={manager.email}
               onClick={() => {
