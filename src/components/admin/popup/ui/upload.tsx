@@ -81,18 +81,18 @@ export const Upload = ({ onCancel }: UploadProps) => {
         return;
       }
       if (!newPopup.startTime) {
-        message.error('시작일을 입력해주세요.');
+        message.error('시작일시를 입력해주세요.');
         return;
       }
       if (!newPopup.endTime) {
-        message.error('종료일을 입력해주세요.');
+        message.error('종료일시를 입력해주세요.');
         return;
       }
 
       setIsUploading(true);
 
-      const formattedStartTime = newPopup.startTime + 'T00:00:00';
-      const formattedEndTime = newPopup.endTime + 'T23:59:59';
+      const formattedStartTime = newPopup.startTime + ':00';
+      const formattedEndTime = newPopup.endTime + ':00';
 
       await regPopup({
         ...newPopup,
@@ -250,10 +250,10 @@ export const Upload = ({ onCancel }: UploadProps) => {
 
       <div className="grid grid-cols-2 gap-4">
         <div className="space-y-2">
-          <Label htmlFor="startDate">시작일</Label>
+          <Label htmlFor="startDate">시작일시</Label>
           <Input
             id="startDate"
-            type="date"
+            type="datetime-local"
             value={newPopup.startTime}
             onChange={e =>
               setNewPopup((prev: IRegPopup) => ({
@@ -265,10 +265,10 @@ export const Upload = ({ onCancel }: UploadProps) => {
         </div>
 
         <div className="space-y-2">
-          <Label htmlFor="endDate">종료일</Label>
+          <Label htmlFor="endDate">종료일시</Label>
           <Input
             id="endDate"
-            type="date"
+            type="datetime-local"
             value={newPopup.endTime}
             onChange={e =>
               setNewPopup((prev: IRegPopup) => ({
