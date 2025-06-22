@@ -77,11 +77,11 @@ export const List = ({ onAdd }: ListProps) => {
                 </td>
                 <td className="px-6 py-4 whitespace-nowrap">
                   <div className="text-sm text-gray-500">
-                    {format(new Date(popup.startTime), 'yyyy.MM.dd HH:mm', {
+                    {format(new Date(popup.startTime), 'yyyy-MM-dd HH:mm', {
                       locale: ko
                     })}{' '}
                     ~{' '}
-                    {format(new Date(popup.endTime), 'yyyy.MM.dd HH:mm', {
+                    {format(new Date(popup.endTime), 'yyyy-MM-dd HH:mm', {
                       locale: ko
                     })}
                   </div>
