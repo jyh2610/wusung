@@ -21,7 +21,12 @@ import { useDateStore } from '@/shared/stores/useDateStores';
 import { useScheduleStore } from '@/shared/stores/useScheduleStore';
 import { IoIosClose } from 'react-icons/io';
 import { colors } from '@/design-tokens';
-import { Tooltip } from '@/shared/ui/tooltip';
+import {
+  Tooltip,
+  TooltipContent,
+  TooltipProvider,
+  TooltipTrigger
+} from '@/components/ui/tooltip';
 
 interface CalendarProps {
   schedule: Schedule;
@@ -110,107 +115,117 @@ export function Calendar({ schedule, isAdmin }: CalendarProps) {
                 isDragDisabled={isDisabled}
               >
                 {dragProvided => (
-                  <div
-                    ref={dragProvided.innerRef}
-                    {...dragProvided.draggableProps}
-                    {...dragProvided.dragHandleProps}
-                    style={{
-                      display: 'flex',
-                      gap: '4px',
-                      justifyContent: 'center',
-                      alignItems: 'center',
-                      ...dragProvided.draggableProps.style
-                    }}
-                  >
-                    <Tooltip
-                      content={
-                        <div
-                          style={{
-                            display: 'flex',
-                            flexDirection: 'column',
-                            gap: '8px',
-                            alignItems: 'center',
-                            textAlign: 'center'
-                          }}
-                        >
-                          {item.thumbnailUrl && (
-                            <div
-                              style={{
-                                width: '200px',
-                                height: '150px',
-                                display: 'flex',
-                                alignItems: 'center',
-                                justifyContent: 'center',
-                                backgroundColor: 'rgba(255, 255, 255, 0.1)',
-                                borderRadius: '4px',
-                                overflow: 'hidden'
-                              }}
-                            >
-                              <img
-                                src={item.thumbnailUrl}
-                                alt={item.content}
-                                style={{
-                                  maxWidth: '100%',
-                                  maxHeight: '100%',
-                                  objectFit: 'contain',
-                                  borderRadius: '4px'
-                                }}
-                                onError={e => {
-                                  const target = e.target as HTMLImageElement;
-                                  target.style.display = 'none';
-                                  target.parentElement!.innerHTML =
-                                    '<span style="color: #ccc;">이미지 로드 실패</span>';
-                                }}
-                              />
-                            </div>
-                          )}
-                          <span
-                            style={{
-                              fontWeight: 'bold',
-                              fontSize: '12px',
-                              wordBreak: 'break-all',
-                              lineHeight: '1.2',
-                              maxWidth: '120px'
-                            }}
-                          >
-                            {item.content.length > 16
-                              ? `${item.content.slice(0, 8)}\n${item.content.slice(8, 16)}...`
-                              : item.content.length > 8
-                                ? `${item.content.slice(0, 8)}\n${item.content.slice(8)}`
-                                : item.content}
-                          </span>
-                        </div>
-                      }
-                    >
-                      <span
+                  <Tooltip>
+                    <TooltipTrigger asChild>
+                      <div
+                        ref={dragProvided.innerRef}
+                        {...dragProvided.draggableProps}
+                        {...dragProvided.dragHandleProps}
                         style={{
-                          fontWeight: 'bold',
-                          fontSize: '12px',
-                          wordBreak: 'break-all',
-                          lineHeight: '1.2',
-                          maxWidth: '120px'
+                          display: 'flex',
+                          gap: '4px',
+                          justifyContent: 'center',
+                          alignItems: 'center',
+                          cursor: 'pointer',
+                          width: '100%',
+                          height: '100%',
+                          minHeight: '40px',
+                          ...dragProvided.draggableProps.style
                         }}
                       >
-                        {item.content.length > 16
-                          ? `${item.content.slice(0, 8)}\n${item.content.slice(8, 16)}...`
-                          : item.content.length > 8
-                            ? `${item.content.slice(0, 8)}\n${item.content.slice(8)}`
-                            : item.content}
-                      </span>
-                    </Tooltip>
-                    <IoIosClose
-                      onClick={handleDelete}
-                      className="text-red-500"
-                      size={32}
-                      style={{
-                        cursor: 'pointer',
-                        opacity:
-                          draggingItem === `${dayNum}-${category}-${item.id}`
-                            ? 0.5
-                            : 1
-                      }}
-                    />
-                  </div>
+                        <span
+                          style={{
+                            fontWeight: 'bold',
+                            fontSize: '12px',
+                            wordBreak: 'break-all',
+                            lineHeight: '1.2',
+                            maxWidth: '120px'
+                          }}
+                        >
+                          {item.content.length > 16
+                            ? `${item.content.slice(0, 8)}\n${item.content.slice(8, 16)}...`
+                            : item.content.length > 8
+                              ? `${item.content.slice(0, 8)}\n${item.content.slice(8)}`
+                              : item.content}
+                        </span>
+                        <IoIosClose
+                          onClick={handleDelete}
+                          className="text-red-500"
+                          size={32}
+                          style={{
+                            cursor: 'pointer',
+                            opacity:
+                              draggingItem ===
+                              `${dayNum}-${category}-${item.id}`
+                                ? 0.5
+                                : 1
+                          }}
+                        />
+                      </div>
+                    </TooltipTrigger>
+                    <TooltipContent
+                      align="center"
+                      sideOffset={5}
+                      className="max-w-[320px] p-3"
+                    >
+                      <div
+                        style={{
+                          display: 'flex',
+                          flexDirection: 'column',
+                          gap: '8px',
+                          alignItems: 'center',
+                          textAlign: 'center'
+                        }}
+                      >
+                        {item.thumbnailUrl && (
+                          <div
+                            style={{
+                              width: '280px',
+                              height: '200px',
+                              display: 'flex',
+                              alignItems: 'center',
+                              justifyContent: 'center',
+                              backgroundColor: 'rgba(255, 255, 255, 0.1)',
+                              borderRadius: '4px',
+                              overflow: 'hidden'
+                            }}
+                          >
+                            <img
+                              src={item.thumbnailUrl}
+                              alt={item.content}
+                              style={{
+                                maxWidth: '100%',
+                                maxHeight: '100%',
+                                objectFit: 'contain',
+                                borderRadius: '4px'
+                              }}
+                              onError={e => {
+                                const target = e.target as HTMLImageElement;
+                                target.style.display = 'none';
+                                target.parentElement!.innerHTML =
+                                  '<span style="color: #ccc;">이미지 로드 실패</span>';
+                              }}
+                            />
+                          </div>
+                        )}
+                        <span
+                          style={{
+                            fontWeight: 'bold',
+                            fontSize: '12px',
+                            wordBreak: 'break-all',
+                            lineHeight: '1.2',
+                            maxWidth: '120px'
+                          }}
+                        >
+                          {item.content.length > 16
+                            ? `${item.content.slice(0, 8)}\n${item.content.slice(8, 16)}...`
+                            : item.content.length > 8
+                              ? `${item.content.slice(0, 8)}\n${item.content.slice(8)}`
+                              : item.content}
+                        </span>
+                      </div>
+                    </TooltipContent>
+                  </Tooltip>
                 )}
               </Draggable>
             ) : (
@@ -224,108 +239,110 @@ export function Calendar({ schedule, isAdmin }: CalendarProps) {
   };
 
   return (
-    <div className={container}>
-      {/* 요일 헤더 */}
-      <div className={grid}>
-        <div className={weekgridItem} />
-        {weekdays.map((day, dayIdx) => (
-          <div
-            key={dayIdx}
-            className={`${weekgridItem} ${weekDay} ${dayIdx === 0 ? redText : ''} ${dayIdx === 6 ? blueText : ''}`}
-          >
-            <span>{day}</span>
-            <input
-              type="checkbox"
-              checked={weeks.every(
-                week =>
-                  week[dayIdx] === 0 ||
-                  (!disabledDrops.has(`${week[dayIdx]}-cognitive`) &&
-                    !disabledDrops.has(`${week[dayIdx]}-daily`))
-              )}
-              onChange={e => {
-                const checked = e.target.checked;
-                const dayNums = weeks
-                  .map(week => week[dayIdx])
-                  .filter(d => d > 0);
-                updateDisableByDayNums(dayNums, checked);
-              }}
-            />
-          </div>
-        ))}
-      </div>
-
-      {/* 날짜별 행 */}
-      {weeks.map((week, weekIdx) => (
-        <div key={weekIdx}>
-          {/* 주차 */}
-          <div className={grid}>
-            <div className={`${gridItem} ${weekLabel} ${weekLabelBg}`}>
-              <span>{weekIdx + 1}주차</span>
+    <TooltipProvider>
+      <div className={container}>
+        {/* 요일 헤더 */}
+        <div className={grid}>
+          <div className={weekgridItem} />
+          {weekdays.map((day, dayIdx) => (
+            <div
+              key={dayIdx}
+              className={`${weekgridItem} ${weekDay} ${dayIdx === 0 ? redText : ''} ${dayIdx === 6 ? blueText : ''}`}
+            >
+              <span>{day}</span>
               <input
                 type="checkbox"
-                checked={week.every(
-                  dayNum =>
-                    dayNum === 0 ||
-                    (!disabledDrops.has(`${dayNum}-cognitive`) &&
-                      !disabledDrops.has(`${dayNum}-daily`))
+                checked={weeks.every(
+                  week =>
+                    week[dayIdx] === 0 ||
+                    (!disabledDrops.has(`${week[dayIdx]}-cognitive`) &&
+                      !disabledDrops.has(`${week[dayIdx]}-daily`))
                 )}
                 onChange={e => {
                   const checked = e.target.checked;
-                  updateDisableByDayNums(week, checked);
+                  const dayNums = weeks
+                    .map(week => week[dayIdx])
+                    .filter(d => d > 0);
+                  updateDisableByDayNums(dayNums, checked);
                 }}
               />
             </div>
-
-            {/* 날짜 + 개별 체크박스 */}
-            {week.map((dayNum, dayIdx) => (
-              <div
-                key={dayIdx}
-                className={`${gridItem} ${weekLabelBg} ${dayIdx === 0 ? redText : ''} ${dayIdx === 6 ? blueText : ''}`}
-              >
-                {dayNum > 0 ? (
-                  <>
-                    {String(dayNum).padStart(2, '0')}
-                    <input
-                      type="checkbox"
-                      checked={
-                        !(
-                          disabledDrops.has(`${dayNum}-cognitive`) ||
-                          disabledDrops.has(`${dayNum}-daily`)
-                        )
-                      }
-                      onChange={e =>
-                        updateDisableByDayNums([dayNum], e.target.checked)
-                      }
-                    />
-                  </>
-                ) : (
-                  ''
-                )}
-              </div>
-            ))}
-          </div>
-
-          {/* 인지활동 */}
-          <div className={activityRow}>
-            <div className={activityCell}>
-              <div className={activityLabel}>인지활동</div>
-            </div>
-            {week.map((dayNum, colIdx) =>
-              renderCell(dayNum, 'cognitive', weekIdx, colIdx)
-            )}
-          </div>
-
-          {/* 일상생활 */}
-          <div className={activityRow}>
-            <div className={activityCell}>
-              <div className={activityLabel}>일상생활 & 추가 인지활동</div>
-            </div>
-            {week.map((dayNum, colIdx) =>
-              renderCell(dayNum, 'daily', weekIdx, colIdx)
-            )}
-          </div>
+          ))}
         </div>
-      ))}
-    </div>
+
+        {/* 날짜별 행 */}
+        {weeks.map((week, weekIdx) => (
+          <div key={weekIdx}>
+            {/* 주차 */}
+            <div className={grid}>
+              <div className={`${gridItem} ${weekLabel} ${weekLabelBg}`}>
+                <span>{weekIdx + 1}주차</span>
+                <input
+                  type="checkbox"
+                  checked={week.every(
+                    dayNum =>
+                      dayNum === 0 ||
+                      (!disabledDrops.has(`${dayNum}-cognitive`) &&
+                        !disabledDrops.has(`${dayNum}-daily`))
+                  )}
+                  onChange={e => {
+                    const checked = e.target.checked;
+                    updateDisableByDayNums(week, checked);
+                  }}
+                />
+              </div>
+
+              {/* 날짜 + 개별 체크박스 */}
+              {week.map((dayNum, dayIdx) => (
+                <div
+                  key={dayIdx}
+                  className={`${gridItem} ${weekLabelBg} ${dayIdx === 0 ? redText : ''} ${dayIdx === 6 ? blueText : ''}`}
+                >
+                  {dayNum > 0 ? (
+                    <>
+                      {String(dayNum).padStart(2, '0')}
+                      <input
+                        type="checkbox"
+                        checked={
+                          !(
+                            disabledDrops.has(`${dayNum}-cognitive`) ||
+                            disabledDrops.has(`${dayNum}-daily`)
+                          )
+                        }
+                        onChange={e =>
+                          updateDisableByDayNums([dayNum], e.target.checked)
+                        }
+                      />
+                    </>
+                  ) : (
+                    ''
+                  )}
+                </div>
+              ))}
+            </div>
+
+            {/* 인지활동 */}
+            <div className={activityRow}>
+              <div className={activityCell}>
+                <div className={activityLabel}>인지활동</div>
+              </div>
+              {week.map((dayNum, colIdx) =>
+                renderCell(dayNum, 'cognitive', weekIdx, colIdx)
+              )}
+            </div>
+
+            {/* 일상생활 */}
+            <div className={activityRow}>
+              <div className={activityCell}>
+                <div className={activityLabel}>일상생활 & 추가 인지활동</div>
+              </div>
+              {week.map((dayNum, colIdx) =>
+                renderCell(dayNum, 'daily', weekIdx, colIdx)
+              )}
+            </div>
+          </div>
+        ))}
+      </div>
+    </TooltipProvider>
   );
 }
