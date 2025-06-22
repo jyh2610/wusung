@@ -167,15 +167,17 @@ export function Calendar({ schedule, isAdmin }: CalendarProps) {
                           <span
                             style={{
                               fontWeight: 'bold',
-                              fontSize: '13px',
+                              fontSize: '12px',
                               wordBreak: 'break-all',
                               lineHeight: '1.2',
-                              maxWidth: '180px'
+                              maxWidth: '120px'
                             }}
                           >
                             {item.content.length > 16
-                              ? `${item.content.slice(0, 16)}...`
-                              : item.content}
+                              ? `${item.content.slice(0, 8)}\n${item.content.slice(8, 16)}...`
+                              : item.content.length > 8
+                                ? `${item.content.slice(0, 8)}\n${item.content.slice(8)}`
+                                : item.content}
                           </span>
                         </div>
                       }
@@ -183,21 +185,23 @@ export function Calendar({ schedule, isAdmin }: CalendarProps) {
                       <span
                         style={{
                           fontWeight: 'bold',
-                          fontSize: '13px',
+                          fontSize: '12px',
                           wordBreak: 'break-all',
                           lineHeight: '1.2',
-                          maxWidth: '180px'
+                          maxWidth: '120px'
                         }}
                       >
                         {item.content.length > 16
-                          ? `${item.content.slice(0, 16)}...`
-                          : item.content}
+                          ? `${item.content.slice(0, 8)}\n${item.content.slice(8, 16)}...`
+                          : item.content.length > 8
+                            ? `${item.content.slice(0, 8)}\n${item.content.slice(8)}`
+                            : item.content}
                       </span>
                     </Tooltip>
                     <IoIosClose
                       onClick={handleDelete}
                       className="text-red-500"
-                      size={28}
+                      size={32}
                       style={{
                         cursor: 'pointer',
                         opacity:
