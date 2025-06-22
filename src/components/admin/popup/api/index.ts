@@ -1,6 +1,7 @@
 import { ApiResponse, PaginatedResponse } from '@/shared/type';
 import { IPopup, IRegPopup, ResponseFile } from '../tpye';
 import request from '@/shared/api/axiosInstance';
+import { toast } from 'react-toastify';
 
 export const regPopup = async (popup: IRegPopup) => {
   try {
@@ -58,6 +59,24 @@ export const getPopup = async (page: number, size: number) => {
     return response.data.data;
   } catch (error) {
     console.error(error);
+    return undefined;
+  }
+};
+
+export const getPopupById = async (popupId: number) => {
+  try {
+    const response = await request<ApiResponse<IPopup>>({
+      method: 'GET',
+      url: `/api/admin/popup/${popupId}`,
+      params: {
+        popupId
+      }
+    });
+    toast.success('팝업 조회 성공');
+    return response.data.data;
+  } catch (error) {
+    console.error(error);
+    toast.error((error as any).message);
     return undefined;
   }
 };

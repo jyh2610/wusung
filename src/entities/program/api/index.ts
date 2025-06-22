@@ -625,3 +625,29 @@ export const getAdminContentByIds = async (ids: number[]) => {
     return [];
   }
 };
+
+export const printScheduleonly = async (
+  elderId: number,
+  mainEduContentIds: number[][],
+  year: number,
+  month: number
+) => {
+  try {
+    const res = await request<IRes<Blob>>({
+      method: 'POST',
+      url: `/api/program/use/print/calendar`,
+      data: {
+        year,
+        month,
+        mainEduContentIds
+      },
+      params: {
+        elderId
+      }
+    });
+    return res.data.data;
+  } catch (error) {
+    console.error('스케줄 출력 실패');
+    return null;
+  }
+};

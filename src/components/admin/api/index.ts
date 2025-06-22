@@ -306,7 +306,10 @@ export const changePassword = async ({
   }
 };
 
-export const getIpList = async (memberId: number, params: { page: number; size: number }) => {
+export const getIpList = async (
+  memberId: number,
+  params: { page: number; size: number }
+) => {
   try {
     const res = await request<ApiResponse<PaginatedResponse<IpList>>>({
       method: 'GET',
@@ -316,6 +319,32 @@ export const getIpList = async (memberId: number, params: { page: number; size: 
     return res.data.data;
   } catch (error) {
     console.error(error);
+    return undefined;
+  }
+};
+
+export interface Manager {
+  managerId: number;
+  name: string;
+  jobGrade: string;
+  phoneNumber: string;
+  phoneAuthId: number;
+  address: string;
+  email: string;
+  createdAt: string;
+  updatedAt: string;
+}
+
+export const getManagerList = async (memberId: number) => {
+  try {
+    const res = await request<ApiResponse<Manager[]>>({
+      method: 'GET',
+      url: `/api/admin/member/${memberId}/manager`
+    });
+    toast.success('매니저 조회 성공');
+    return res.data.data;
+  } catch (error) {
+    toast.error((error as any).message);
     return undefined;
   }
 };

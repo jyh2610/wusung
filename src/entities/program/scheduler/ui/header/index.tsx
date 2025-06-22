@@ -12,7 +12,12 @@ import {
 import { CircularProgress } from '@mui/material';
 import { Schedule } from '@/entities/program/type.dto';
 import { formatScheduleData } from '../../utils';
-import { printPDF, regSchedule, updateSchedule } from '@/entities/program/api';
+import {
+  printPDF,
+  regSchedule,
+  updateSchedule,
+  printScheduleonly
+} from '@/entities/program/api';
 import { useUserStore } from '@/shared/stores/useUserStore';
 import { useDateStore } from '@/shared/stores/useDateStores'; // ✅ 전역 상태 store
 import { toast } from 'react-toastify';
@@ -251,6 +256,51 @@ function Header({
     }
   };
 
+  const printScheduleOnly = async () => {
+    try {
+      if (!selectedUserId) {
+        toast.error('사용자가 선택되지 않았습니다.');
+        return;
+      }
+
+      const mainEduContentIds = getFilteredMainEduContentIds();
+
+      const pdfBlob = await printScheduleonly(
+        selectedUserId,
+        mainEduContentIds,
+        year,
+        month
+      );
+
+      if (pdfBlob) {
+        const blob = new Blob([pdfBlob], { type: 'application/pdf' });
+        const url = URL.createObjectURL(blob);
+
+        const iframe = document.createElement('iframe');
+        iframe.style.position = 'fixed';
+        iframe.style.right = '0';
+        iframe.style.bottom = '0';
+        iframe.style.width = '0';
+        iframe.style.height = '0';
+        iframe.src = url;
+
+        iframe.onload = () => {
+          setTimeout(() => {
+            iframe.contentWindow?.focus();
+            iframe.contentWindow?.print();
+          }, 500);
+        };
+
+        document.body.appendChild(iframe);
+      } else {
+        toast.error('스케줄 PDF 파일을 받지 못했습니다.');
+      }
+    } catch (error) {
+      console.error('스케줄 프린트 에러:', error);
+      toast.error('스케줄 프린트 실패되었습니다!');
+    }
+  };
+
   return (
     <div className={headerContainer}>
       <div style={{ display: 'flex', gap: '32px' }}>
@@ -275,14 +325,24 @@ function Header({
         </button>
       </div>
       {!isAdmin ? (
-        <button
-          className={printButton}
-          type="button"
-          onClick={handleOpenPrintModal}
-        >
-          <MdLocalPrintshop className={iconStyle} size={24} />
-          인쇄
-        </button>
+        <div style={{ display: 'flex', gap: '8px' }}>
+          <button
+            className={printButton}
+            type="button"
+            onClick={handleOpenPrintModal}
+          >
+            <MdLocalPrintshop className={iconStyle} size={24} />
+            인쇄
+          </button>
+          <button
+            className={printButton}
+            type="button"
+            onClick={printScheduleOnly}
+          >
+            <MdLocalPrintshop className={iconStyle} size={24} />
+            스케줄만 인쇄
+          </button>
+        </div>
       ) : (
         <button
           className={printButton}

@@ -20,7 +20,8 @@ import { IRegPopup } from '@/components/admin/popup/tpye';
 import {
   getPopup,
   updatePopup,
-  regPopupFile
+  regPopupFile,
+  getPopupById
 } from '@/components/admin/popup/api';
 
 const ReactQuill = dynamic(() => import('react-quill'), {
@@ -63,10 +64,7 @@ const Page = () => {
   useEffect(() => {
     const fetchPopup = async () => {
       try {
-        const data = await getPopup(0, 1);
-        const popupData = data?.content.find(
-          p => p.popupId === Number(params.id)
-        );
+        const popupData = await getPopupById(Number(params.id));
         if (popupData) {
           // 서버에서 받은 시간을 yyyy-MM-dd HH:mm 형식으로 변환
           const formatDateTimeForInput = (dateTimeString: string) => {
