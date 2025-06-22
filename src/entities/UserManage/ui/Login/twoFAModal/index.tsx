@@ -12,18 +12,45 @@ import {
   Button as MuiButton,
   Box,
   Stack,
-  Typography
+  Typography,
+  Divider
 } from '@mui/material';
 import { useAuthStore } from '@/shared/stores/useAuthStore';
 import { useRouter } from 'next/navigation';
-import { login_code } from '@/entities/MainBanner/api';
-import { colors } from '@/design-tokens'; // ✅ 여기 추가
+import { login_code, resendCode, sendSmsCode } from '@/entities/MainBanner/api';
+import { colors } from '@/design-tokens';
+
+// SMS 인증 API 함수 추가
+const sendSMSCode = async (username: string) => {
+  try {
+    const response = await fetch('/api/auth/sms-send', {
+      method: 'POST',
+      headers: {
+        'Content-Type': 'application/json'
+      },
+      body: JSON.stringify({ username })
+    });
+
+    if (!response.ok) {
+      throw new Error('SMS 전송에 실패했습니다.');
+    }
+
+    return await response.json();
+  } catch (error) {
+    throw error;
+  }
+};
 
 export const TwoFAModal = () => {
   const [code, setCode] = useState('');
   const [timeLeft, setTimeLeft] = useState(180);
   const [error, setError] = useState('');
   const [snackbarOpen, setSnackbarOpen] = useState(false);
+  const [snackbarMessage, setSnackbarMessage] = useState('');
+  const [snackbarSeverity, setSnackbarSeverity] = useState<'success' | 'error'>(
+    'success'
+  );
+  const [isSMSLoading, setIsSMSLoading] = useState(false);
 
   const { submit2FACode, requires2FA, set2FAState, tempUser } = useAuthStore();
   const router = useRouter();
@@ -56,10 +83,10 @@ export const TwoFAModal = () => {
   };
 
   const handleSubmit = async () => {
-    const success = await submit2FACode(code); // ✅ 결과 받기
+    const success = await submit2FACode(code);
     if (success) {
       setError('');
-      router.push('/'); // 로그인 성공 시 이동
+      router.push('/');
     } else {
       setError('인증 코드가 올바르지 않습니다. 다시 시도해주세요.');
     }
@@ -72,16 +99,36 @@ export const TwoFAModal = () => {
   const handleResend = async () => {
     if (!tempUser) return;
     try {
-      await login_code({
-        userName: tempUser.id,
-        password: tempUser.password,
-        code: ''
+      await resendCode({
+        username: tempUser.id
       });
+      setSnackbarMessage('인증 코드가 재전송되었습니다.');
+      setSnackbarSeverity('success');
       setSnackbarOpen(true);
       setTimeLeft(180);
       setError('');
     } catch (e) {
       setError('재전송에 실패했습니다. 잠시 후 다시 시도해주세요.');
+    }
+  };
+
+  const handleSMSSend = async () => {
+    if (!tempUser) return;
+
+    setIsSMSLoading(true);
+    try {
+      await sendSmsCode({ username: tempUser.id });
+      setSnackbarMessage('SMS 인증 코드가 전송되었습니다.');
+      setSnackbarSeverity('success');
+      setSnackbarOpen(true);
+      setTimeLeft(180);
+      setError('');
+    } catch (e) {
+      setSnackbarMessage('SMS 전송에 실패했습니다. 잠시 후 다시 시도해주세요.');
+      setSnackbarSeverity('error');
+      setSnackbarOpen(true);
+    } finally {
+      setIsSMSLoading(false);
     }
   };
 
@@ -124,17 +171,36 @@ export const TwoFAModal = () => {
               inputProps={{ maxLength: 6 }}
             />
 
-            <MuiButton
-              onClick={handleResend}
-              size="small"
-              sx={{
-                alignSelf: 'flex-end',
-                textTransform: 'none',
-                color: colors.brand[400]
-              }}
+            <Box
+              sx={{ display: 'flex', gap: 1, justifyContent: 'space-between' }}
             >
-              인증 코드 재전송
-            </MuiButton>
+              <MuiButton
+                onClick={handleResend}
+                size="small"
+                sx={{
+                  textTransform: 'none',
+                  color: colors.brand[400]
+                }}
+              >
+                인증 코드 재전송
+              </MuiButton>
+
+              <MuiButton
+                onClick={handleSMSSend}
+                size="small"
+                disabled={isSMSLoading}
+                sx={{
+                  textTransform: 'none',
+                  color: colors.brand[400],
+                  border: `1px solid ${colors.brand[400]}`,
+                  '&:hover': {
+                    backgroundColor: colors.brand[100]
+                  }
+                }}
+              >
+                {isSMSLoading ? '전송 중...' : 'SMS 인증'}
+              </MuiButton>
+            </Box>
           </Stack>
         </DialogContent>
 
@@ -167,8 +233,11 @@ export const TwoFAModal = () => {
         onClose={() => setSnackbarOpen(false)}
         anchorOrigin={{ vertical: 'top', horizontal: 'center' }}
       >
-        <Alert severity="success" onClose={() => setSnackbarOpen(false)}>
-          인증 코드가 재전송되었습니다.
+        <Alert
+          severity={snackbarSeverity}
+          onClose={() => setSnackbarOpen(false)}
+        >
+          {snackbarMessage}
         </Alert>
       </Snackbar>
     </>

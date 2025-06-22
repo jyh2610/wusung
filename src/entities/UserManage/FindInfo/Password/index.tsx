@@ -16,7 +16,7 @@ import { CompleteId } from '../complete';
 import { container, title } from '../index.css';
 import { ResetPw } from './ResetPw';
 import { useSearchParams } from 'next/navigation';
-import { sendCode, findPassword } from '../../api/findInfo';
+import { sendCode, findPassword, sendSmsCode } from '../../api/findInfo';
 const TIME_LEFT = 300;
 export const Password = () => {
   const searchParams = useSearchParams();
@@ -51,6 +51,19 @@ export const Password = () => {
       await sendCode({
         name: '',
         userName: name,
+        phoneNum
+      });
+      setIsSend(true);
+    } catch (error: any) {
+      toast.error(error.response.data.message);
+    }
+  };
+
+  const SmsCode = async () => {
+    try {
+      await sendSmsCode({
+        name: '',
+        username: name,
         phoneNum
       });
       setIsSend(true);
@@ -122,6 +135,21 @@ export const Password = () => {
                 type="borderBrand"
                 onClick={sendPhoneCode}
               />
+              <button
+                onClick={SmsCode}
+                style={{
+                  fontSize: '12px',
+                  color: '#007bff',
+                  backgroundColor: 'transparent',
+                  border: 'none',
+                  cursor: 'pointer',
+                  textDecoration: 'underline',
+                  padding: '0',
+                  margin: '0'
+                }}
+              >
+                SMS로 인증번호 전송
+              </button>
             </div>
           </div>
         )}

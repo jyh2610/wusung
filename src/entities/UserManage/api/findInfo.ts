@@ -32,6 +32,29 @@ const sendCode = async (payload: {
   }
 };
 
+const sendSmsCode = async (payload: {
+  name: string;
+  username: string;
+  phoneNum: string;
+}) => {
+  try {
+    const res = await request<ApiResponse<unknown>>({
+      method: 'POST',
+      url: '/api/phone/verification/send/sms',
+      data: {
+        name: payload.name || '',
+        username: payload.username || '',
+        phoneNum: payload.phoneNum
+      }
+    });
+    toast.success(res.data.message);
+    return res;
+  } catch (error: any) {
+    toast.error(error.response.data.message);
+    throw error;
+  }
+};
+
 const findId = async (payload: {
   code: string;
   phoneNum: string;
@@ -86,4 +109,4 @@ const resetPassword = async (payload: {
   return res;
 };
 
-export { findId, findPassword, sendCode, resetPassword };
+export { findId, findPassword, sendCode, resetPassword, sendSmsCode };

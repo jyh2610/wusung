@@ -10,7 +10,7 @@ import {
   inputContainer,
   label
 } from './index.css';
-import { findId, sendCode } from '../../api/findInfo';
+import { findId, sendCode, sendSmsCode } from '../../api/findInfo';
 import { toast } from 'react-toastify';
 import { formatTime } from '@/lib/utils';
 import { CompleteId } from '../complete';
@@ -40,15 +40,15 @@ export const Id = () => {
   }, [isSend, timeLeft]);
 
   const handleSendVerification = () => {
-    setIsSend(true);
     setTimeLeft(TIME_LEFT);
     sendPhoneCode();
   };
 
   const sendPhoneCode = async () => {
     try {
-      const res = await sendCode({
+      const res = await sendSmsCode({
         name,
+        username: '',
         phoneNum
       });
       setIsSend(true);
@@ -118,6 +118,21 @@ export const Id = () => {
                 type="borderBrand"
                 onClick={sendPhoneCode}
               />
+              <button
+                onClick={sendPhoneCode}
+                style={{
+                  fontSize: '12px',
+                  color: '#007bff',
+                  backgroundColor: 'transparent',
+                  border: 'none',
+                  cursor: 'pointer',
+                  textDecoration: 'underline',
+                  padding: '0',
+                  margin: '0'
+                }}
+              >
+                SMS로 인증번호 전송
+              </button>
             </div>
           </div>
         )}

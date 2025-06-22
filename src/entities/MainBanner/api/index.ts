@@ -1,6 +1,7 @@
 import request from '@/shared/api/axiosInstance';
 import { ILoginData, ILoginRes, ILoginWithCode, ILogoutData } from '../type';
 import { ApiResponse } from '@/shared/type';
+import { toast } from 'react-toastify';
 
 export const login_code = async ({
   userName,
@@ -17,6 +18,37 @@ export const login_code = async ({
     }
   });
   return res.data;
+};
+export const resendCode = async ({ username }: { username: string }) => {
+  try {
+    const res = await request<ILoginRes>({
+      method: 'POST',
+      url: '/api/phone/verification/send',
+      data: { username }
+    });
+    toast.success('인증 코드가 재전송되었습니다.');
+    return res.data;
+  } catch (error) {
+    toast.error('재전송에 실패했습니다. 잠시 후 다시 시도해주세요.');
+    console.error(error);
+    return null;
+  }
+};
+
+export const sendSmsCode = async ({ username }: { username: string }) => {
+  try {
+    const res = await request<ILoginRes>({
+      method: 'POST',
+      url: '/api/phone/verification/send/sms',
+      data: { username }
+    });
+    toast.success('인증 코드가 문자로 재전송되었습니다.');
+    return res.data;
+  } catch (error) {
+    toast.error('재전송에 실패했습니다. 잠시 후 다시 시도해주세요.');
+    console.error(error);
+    return null;
+  }
 };
 
 export const login = async ({ userName, password }: ILoginData) => {
