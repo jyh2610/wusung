@@ -214,7 +214,7 @@ export function MemberList() {
           <Button
             variant="outline"
             onClick={() => setPage(prev => prev + 1)}
-            disabled={!data?.last}
+            disabled={data?.last || !data?.content?.length}
           >
             다음
           </Button>
