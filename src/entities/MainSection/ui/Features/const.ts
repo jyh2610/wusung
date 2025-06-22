@@ -15,7 +15,6 @@ export const bigFeaturesContents: IFeatureContents[] = [
   {
     title: '활동 준비도 서류 작성도 간단하게',
     content: `매월 필요한 여러 서류를 한 번에 간단하게\n 출력하여 사용하실 수 있어요. `,
-    subContent: '( 활동계획표와 일일점검표는 다운로드 및 수정이 가능합니다. )',
     image: '/images/icon2.svg'
   }
 ];

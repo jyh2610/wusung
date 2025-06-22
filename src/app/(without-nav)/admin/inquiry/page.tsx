@@ -66,7 +66,7 @@ export default function InquiryListPage() {
       key: 'haveToReadByAdmin',
       render: (haveToReadByAdmin: boolean) => (
         <span className={haveToReadByAdmin ? 'text-green-600' : 'text-red-600'}>
-          {!haveToReadByAdmin ? '안읽음' : '읽음'}
+          {haveToReadByAdmin ? '안읽음' : '읽음'}
         </span>
       )
     },
