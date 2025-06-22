@@ -181,7 +181,7 @@ export function Calendar({ schedule, isAdmin }: CalendarProps) {
                     <IoIosClose
                       onClick={handleDelete}
                       className="text-red-500"
-                      size={35}
+                      size={28}
                       style={{
                         cursor: 'pointer',
                         opacity:
