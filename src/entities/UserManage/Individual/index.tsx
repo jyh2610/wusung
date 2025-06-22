@@ -15,7 +15,7 @@ import { TermsOfUse } from '../ui/SignupForm/TermsOfUse';
 import { IdPw } from '../ui/form';
 import { UserInfo } from '../ui/form/UserInfo';
 import { useState, useEffect } from 'react';
-import { individualSignup, IndividualSignUpDTO } from '../api';
+import { individualSignup, IndividualSignUpDTO, sendSmsCode } from '../api';
 import { toast } from 'react-toastify';
 import { useRouter } from 'next/navigation';
 
@@ -143,7 +143,16 @@ export function IndividualComponent() {
       [field]: value
     }));
   }
-
+  const smsCode = async () => {
+    try {
+      const response = await sendSmsCode(formData.phone);
+      toast.info(response.message);
+      setShowVerification(true);
+      setTimeLeft(120);
+    } catch (error) {
+      toast.error('인증번호 발송 중 오류가 발생했습니다');
+    }
+  };
   return (
     <div className={inputContainer}>
       <div
@@ -178,6 +187,7 @@ export function IndividualComponent() {
           <UserInfo
             formData={formData}
             handleInputChange={handleInputChange}
+            onSmsVerification={smsCode}
             showVerification={showVerification}
             setShowVerification={setShowVerification}
             timeLeft={timeLeft}

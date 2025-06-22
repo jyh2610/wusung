@@ -66,7 +66,8 @@ export const emailBox = style({
 
 export const regBtn = style({
   width: '140px',
-  height: '56px'
+  height: '56px',
+  position: 'relative'
 });
 
 export const inputBox = style({ display: 'flex', gap: '12px' });

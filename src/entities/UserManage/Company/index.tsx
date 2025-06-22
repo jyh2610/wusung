@@ -19,6 +19,7 @@ import { toast } from 'react-toastify';
 import 'react-toastify/dist/ReactToastify.css';
 import {
   checkAuthenticationNumber,
+  sendSmsCode,
   SignupCompanyRequest,
   verifyPhoneNum
 } from '../api';
@@ -169,6 +170,17 @@ export function Company() {
     }
   };
 
+  const smsCode = async () => {
+    try {
+      const response = await sendSmsCode(formData.phone);
+      toast.info(response.message);
+      setShowVerification(true);
+      setTimeLeft(120);
+    } catch (error) {
+      toast.error('인증번호 발송 중 오류가 발생했습니다');
+    }
+  };
+
   return (
     <div className={inputContainer}>
       <div
@@ -210,6 +222,7 @@ export function Company() {
             formData={formData}
             handleInputChange={handleInputChange}
             onSendVerification={handleSendVerification}
+            onSmsVerification={smsCode}
             showVerification={showVerification}
             timeLeft={timeLeft}
             setShowVerification={setShowVerification}

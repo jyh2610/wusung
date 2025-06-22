@@ -23,6 +23,7 @@ interface IProps {
     value: string | { year: string; month: string; day: string }
   ) => void;
   onSendVerification: () => void;
+  onSmsVerification: () => void;
   showVerification: boolean;
   timeLeft: number;
   setShowVerification: Dispatch<SetStateAction<boolean>>;
@@ -32,6 +33,7 @@ export const CompanyLocation = ({
   formData,
   handleInputChange,
   onSendVerification,
+  onSmsVerification,
   showVerification,
   timeLeft,
   setShowVerification
@@ -88,7 +90,14 @@ export const CompanyLocation = ({
       />
 
       {/* 휴대폰 번호 및 인증 발송 */}
-      <div style={{ display: 'flex', gap: '8px' }}>
+      <div
+        style={{
+          display: 'flex',
+          gap: '8px',
+          alignItems: 'flex-end',
+          position: 'relative'
+        }}
+      >
         <NomalInput
           placeholder="번호를 입력해주세요"
           inputSize="medium"
@@ -107,6 +116,40 @@ export const CompanyLocation = ({
             type="borderBrand"
             content="인증번호 발송"
           />
+          {showVerification && (
+            <div
+              style={{
+                position: 'absolute',
+                right: '0',
+                display: 'flex',
+                justifyContent: 'flex-end',
+                marginTop: '2px'
+              }}
+            >
+              <button
+                onClick={onSmsVerification}
+                style={{
+                  fontSize: '12px',
+                  color: '#007bff',
+                  backgroundColor: 'transparent',
+                  cursor: 'pointer',
+                  textDecoration: 'underline',
+                  padding: '0',
+                  margin: '0',
+                  borderRadius: '0',
+                  fontWeight: '500'
+                }}
+                onMouseEnter={e => {
+                  e.currentTarget.style.backgroundColor = '#f8f9fa';
+                }}
+                onMouseLeave={e => {
+                  e.currentTarget.style.backgroundColor = 'transparent';
+                }}
+              >
+                SMS로 인증번호 전송
+              </button>
+            </div>
+          )}
         </div>
       </div>
 
