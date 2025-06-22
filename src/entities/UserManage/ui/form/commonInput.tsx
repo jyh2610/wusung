@@ -33,7 +33,7 @@ export const IdPw = <T extends IFormIndividual | IFormCompany>({
     const value = e.target.value;
     handleInputChange('id', value);
 
-    if (value.length >= 4) {
+    if (value.length >= 1) {
       try {
         const response = await checkUserName(value);
         const isAvailable = response.message === '사용 가능한 아이디입니다.';
