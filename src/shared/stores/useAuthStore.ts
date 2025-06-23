@@ -2,6 +2,7 @@ import { create } from 'zustand';
 import { login, login_code, logout } from '@/entities/MainBanner/api';
 import { getSubscription } from '@/entities/UserManage/api';
 import { syncTokenFromLocalStorage } from '@/lib/utils';
+import { toast } from 'react-toastify';
 
 interface AuthState {
   token: string | null;
@@ -62,6 +63,7 @@ export const useAuthStore = create<AuthState>((set, get) => ({
 
       return true;
     } catch (error: any) {
+      toast.error('로그인에 실패했습니다. 아이디와 비밀번호를 확인해주세요.');
       const errorRes = error?.response?.data;
       if (errorRes?.requires2FA) {
         set({

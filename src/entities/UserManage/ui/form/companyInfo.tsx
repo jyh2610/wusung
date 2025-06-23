@@ -221,9 +221,8 @@ export const CompanyInfo = ({ formData, handleInputChange }: IProps) => {
           download
           style={{ color: colors.brand[400], textDecoration: 'none' }}
         >
-          개업일자를 모르시나요? <span>{'>'}</span>
+          기업정보를 모르시나요? <span>{'>'}</span>
         </a>
-        <p style={{ color: colors.brand[400] }}>(고유번호증을 보고 있어요)</p>
       </div>
       <div className={buttonContainer}>
         <Button

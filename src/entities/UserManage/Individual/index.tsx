@@ -151,7 +151,7 @@ export function IndividualComponent() {
   const smsCode = async () => {
     try {
       const response = await sendSignupSmsCode(formData.phone);
-      toast.info(response);
+      toast.success(response);
       setShowVerification(true);
       setTimeLeft(120);
     } catch (error) {

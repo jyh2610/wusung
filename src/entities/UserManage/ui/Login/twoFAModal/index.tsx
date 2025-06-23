@@ -108,7 +108,9 @@ export const TwoFAModal = () => {
       setTimeLeft(180);
       setError('');
     } catch (e) {
-      setError('재전송에 실패했습니다. 잠시 후 다시 시도해주세요.');
+      setSnackbarMessage('재전송에 실패했습니다. 잠시 후 다시 시도해주세요.');
+      setSnackbarSeverity('error');
+      setSnackbarOpen(true);
     }
   };
 

@@ -31,7 +31,7 @@ export const resendCode = async ({ username }: { username: string }) => {
   } catch (error) {
     toast.error('재전송에 실패했습니다. 잠시 후 다시 시도해주세요.');
     console.error(error);
-    return null;
+    throw error;
   }
 };
 
@@ -47,7 +47,7 @@ export const sendSmsCode = async ({ username }: { username: string }) => {
   } catch (error) {
     toast.error('재전송에 실패했습니다. 잠시 후 다시 시도해주세요.');
     console.error(error);
-    return null;
+    throw error;
   }
 };
 

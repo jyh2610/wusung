@@ -1,5 +1,6 @@
-import React, { Dispatch, SetStateAction } from 'react';
+import React, { Dispatch, SetStateAction, useState } from 'react';
 import { toast } from 'react-toastify';
+import CreatableSelect from 'react-select/creatable';
 
 import {
   emailBox,
@@ -9,7 +10,6 @@ import { labelContainer, starSpan } from '../SignupForm/index.css';
 import { container, inputBox } from './index.css';
 import { Button, DaumAddressSearchButton, IEmail } from '@/shared/ui';
 import { NomalInput } from '@/shared/ui/Input';
-import Select, { SingleValue } from 'react-select';
 
 import { IFormCompany } from '../../type';
 import { checkAuthenticationNumber } from '../../api';
@@ -38,6 +38,8 @@ export const CompanyLocation = ({
   timeLeft,
   setShowVerification
 }: IProps) => {
+  const [inputValue, setInputValue] = useState<string>('');
+
   const handleVerifyCode = async () => {
     if (!formData.verificationCode) {
       toast.error('인증번호를 입력해주세요');
@@ -150,7 +152,7 @@ export const CompanyLocation = ({
                   e.currentTarget.style.backgroundColor = 'transparent';
                 }}
               >
-                SMS로 인증번호 전송
+                문자로 인증번호 전송
               </button>
             </div>
           )}
@@ -192,32 +194,68 @@ export const CompanyLocation = ({
               이메일<span className={starSpan}>*</span>
             </div>
           }
-          value={formData.email}
-          onChange={(e: React.ChangeEvent<HTMLInputElement>) =>
-            handleInputChange('email', e.target.value)
-          }
+          value={formData.email.split('@')[0]}
+          onChange={e => {
+            const emailId = e.target.value;
+            handleInputChange(
+              'email',
+              emailId + '@' + (formData.emailDomain || '')
+            );
+          }}
         />
         <span style={{ fontSize: '18px', color: '#333' }}>@</span>
-        <Select
+        <CreatableSelect
+          isClearable
           options={emailOptions}
-          placeholder={'선택'}
+          placeholder="선택 또는 입력"
           value={
             formData.emailDomain
               ? { label: formData.emailDomain, value: formData.emailDomain }
               : null
           }
-          onChange={(newValue: SingleValue<IEmail>) => {
-            if (newValue) {
-              handleInputChange('emailDomain', newValue.value);
+          onChange={selected => {
+            if (selected) {
+              const emailId = formData.email.split('@')[0];
+              const domainValue = selected.value;
+              handleInputChange('emailDomain', domainValue);
+              handleInputChange('email', emailId + '@' + domainValue);
+            } else {
+              // 선택이 해제된 경우
+              const emailId = formData.email.split('@')[0];
+              handleInputChange('emailDomain', '');
+              handleInputChange('email', emailId);
             }
           }}
+          onCreateOption={inputValue => {
+            const emailId = formData.email.split('@')[0];
+            handleInputChange('emailDomain', inputValue);
+            handleInputChange('email', emailId + '@' + inputValue);
+          }}
+          onBlur={() => {
+            // 포커스가 벗어날 때 입력된 값이 있으면 저장
+            if (
+              inputValue &&
+              !emailOptions.find(option => option.value === inputValue)
+            ) {
+              const emailId = formData.email.split('@')[0];
+              handleInputChange('emailDomain', inputValue);
+              handleInputChange('email', emailId + '@' + inputValue);
+            }
+          }}
+          onInputChange={newValue => {
+            setInputValue(newValue);
+          }}
+          formatCreateLabel={inputValue => inputValue}
           styles={{
             control: (provided, state) => ({
               ...provided,
               height: '57px',
-              minHeight: '57px',
               width: '200px',
-              borderRadius: '12px'
+              borderRadius: '12px',
+              border: state.isFocused
+                ? '1px solid #1AA93E'
+                : '1px solid #BFBFBF',
+              boxShadow: state.isFocused ? '0 0 0 1px #1AA93E' : 'none'
             }),
             valueContainer: provided => ({
               ...provided,
@@ -225,11 +263,6 @@ export const CompanyLocation = ({
               padding: '0 8px',
               display: 'flex',
               alignItems: 'center'
-            }),
-            input: provided => ({
-              ...provided,
-              margin: '0',
-              padding: '0'
             }),
             indicatorsContainer: provided => ({
               ...provided,
@@ -249,6 +282,17 @@ export const CompanyLocation = ({
               ...provided,
               borderRadius: '12px',
               overflow: 'hidden'
+            }),
+            option: (provided, state) => ({
+              ...provided,
+              backgroundColor: state.isSelected
+                ? '#1AA93E'
+                : state.isFocused
+                  ? '#E6F7EA'
+                  : 'white',
+              color: state.isSelected ? 'white' : '#333',
+              fontSize: '16px',
+              padding: '12px 8px'
             })
           }}
         />

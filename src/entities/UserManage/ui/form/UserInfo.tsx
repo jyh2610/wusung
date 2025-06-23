@@ -1,5 +1,6 @@
 import React, { Dispatch, SetStateAction, useState } from 'react';
 import Select, { SingleValue } from 'react-select';
+import CreatableSelect from 'react-select/creatable';
 import { toast } from 'react-toastify';
 
 import { NomalInput } from '@/shared/ui/Input';
@@ -42,7 +43,7 @@ interface IProps {
 
 export const emailOptions: IEmail[] = [
   { label: 'naver.com', value: 'naver.com' },
-  { label: 'google.com', value: 'google.com' },
+  { label: 'gmail.com', value: 'gmail.com' },
   { label: 'daum.net', value: 'daum.net' }
 ];
 
@@ -56,6 +57,7 @@ export const UserInfo = ({
   setShowVerification
 }: IProps) => {
   const [birthError, setBirthError] = useState<string>('');
+  const [inputValue, setInputValue] = useState<string>('');
   console.log(formData.birth, 'formData');
   const yearList = generateYears();
   const monthList = generateMonths();
@@ -108,7 +110,7 @@ export const UserInfo = ({
         code: formData.verificationCode,
         phoneNum: formData.phone
       });
-      toast.info(res.message);
+      toast.success(res.message);
       setShowVerification(false);
     } catch (error) {
       toast.error('인증 처리 중 오류가 발생했습니다');
@@ -209,9 +211,10 @@ export const UserInfo = ({
           }}
         />
         <span style={{ fontSize: '18px', color: '#333' }}>@</span>
-        <Select
+        <CreatableSelect
+          isClearable
           options={emailOptions}
-          placeholder="선택"
+          placeholder="선택 또는 입력"
           value={
             formData.emailDomain
               ? { label: formData.emailDomain, value: formData.emailDomain }
@@ -220,10 +223,36 @@ export const UserInfo = ({
           onChange={selected => {
             if (selected) {
               const emailId = formData.email.split('@')[0];
-              handleInputChange('emailDomain', selected.value);
-              handleInputChange('email', emailId + '@' + selected.value);
+              const domainValue = selected.value;
+              handleInputChange('emailDomain', domainValue);
+              handleInputChange('email', emailId + '@' + domainValue);
+            } else {
+              // 선택이 해제된 경우
+              const emailId = formData.email.split('@')[0];
+              handleInputChange('emailDomain', '');
+              handleInputChange('email', emailId);
             }
           }}
+          onCreateOption={inputValue => {
+            const emailId = formData.email.split('@')[0];
+            handleInputChange('emailDomain', inputValue);
+            handleInputChange('email', emailId + '@' + inputValue);
+          }}
+          onBlur={() => {
+            // 포커스가 벗어날 때 입력된 값이 있으면 저장
+            if (
+              inputValue &&
+              !emailOptions.find(option => option.value === inputValue)
+            ) {
+              const emailId = formData.email.split('@')[0];
+              handleInputChange('emailDomain', inputValue);
+              handleInputChange('email', emailId + '@' + inputValue);
+            }
+          }}
+          onInputChange={newValue => {
+            setInputValue(newValue);
+          }}
+          formatCreateLabel={inputValue => inputValue}
           styles={{
             control: (provided, state) => ({
               ...provided,
@@ -296,38 +325,40 @@ export const UserInfo = ({
             type="borderBrand"
             content="인증번호 발송"
           />
-          <div
-            style={{
-              position: 'absolute',
-              right: '0',
-              display: 'flex',
-              justifyContent: 'flex-end',
-              marginTop: '2px'
-            }}
-          >
-            <button
-              onClick={onSmsVerification}
+          {showVerification && (
+            <div
               style={{
-                fontSize: '12px',
-                color: '#007bff',
-                backgroundColor: 'transparent',
-                cursor: 'pointer',
-                textDecoration: 'underline',
-                padding: '0',
-                margin: '0',
-                borderRadius: '0',
-                fontWeight: '500'
-              }}
-              onMouseEnter={e => {
-                e.currentTarget.style.backgroundColor = '#f8f9fa';
-              }}
-              onMouseLeave={e => {
-                e.currentTarget.style.backgroundColor = 'transparent';
+                position: 'absolute',
+                right: '0',
+                display: 'flex',
+                justifyContent: 'flex-end',
+                marginTop: '2px'
               }}
             >
-              SMS로 인증번호 전송
-            </button>
-          </div>
+              <button
+                onClick={onSmsVerification}
+                style={{
+                  fontSize: '12px',
+                  color: '#007bff',
+                  backgroundColor: 'transparent',
+                  cursor: 'pointer',
+                  textDecoration: 'underline',
+                  padding: '0',
+                  margin: '0',
+                  borderRadius: '0',
+                  fontWeight: '500'
+                }}
+                onMouseEnter={e => {
+                  e.currentTarget.style.backgroundColor = '#f8f9fa';
+                }}
+                onMouseLeave={e => {
+                  e.currentTarget.style.backgroundColor = 'transparent';
+                }}
+              >
+                문자로 인증번호 전송
+              </button>
+            </div>
+          )}
         </div>
       </div>
 

@@ -16,7 +16,12 @@ import { CompleteId } from '../complete';
 import { container, title } from '../index.css';
 import { ResetPw } from './ResetPw';
 import { useSearchParams } from 'next/navigation';
-import { sendCode, findPassword, sendSmsCode } from '../../api/findInfo';
+import {
+  sendCode,
+  findPassword,
+  sendSmsCode,
+  sendSmsCodeV2
+} from '../../api/findInfo';
 const TIME_LEFT = 300;
 export const Password = () => {
   const searchParams = useSearchParams();
@@ -55,18 +60,19 @@ export const Password = () => {
       });
       setIsSend(true);
     } catch (error: any) {
-      toast.error(error.response.data.message);
+      console.log(error);
     }
   };
 
   const SmsCode = async () => {
     try {
-      await sendSmsCode({
+      await sendSmsCodeV2({
         name: '',
-        username: name,
+        userName: name,
         phoneNum
       });
       setIsSend(true);
+      setTimeLeft(TIME_LEFT);
     } catch (error: any) {
       toast.error(error.response.data.message);
     }

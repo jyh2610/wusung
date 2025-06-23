@@ -30,6 +30,8 @@ import {
   modalTitle,
   fullButton
 } from '@/entities/UserManage/FindInfo/Id/index.css';
+import { sendSignupSmsCode } from '@/entities/UserManage/api';
+import { toast } from 'react-toastify';
 
 export const IndivisualInfo = ({
   setIsWithdrawal
@@ -107,10 +109,6 @@ export const IndivisualInfo = ({
     return () => clearInterval(timer);
   }, [showVerification, timeLeft]);
 
-  if (!isIndividualUser(userInfo)) {
-    return null;
-  }
-
   const handleInputChange = (
     field: keyof IFormIndividual,
     value: string | { year: string; month: string; day: string }
@@ -151,7 +149,16 @@ export const IndivisualInfo = ({
       console.log(error);
     }
   };
-
+  const smsCode = async () => {
+    try {
+      const response = await sendSignupSmsCode(formData.phone);
+      toast.info(response);
+      setShowVerification(true);
+      setTimeLeft(120);
+    } catch (error) {
+      toast.error('인증번호 발송 중 오류가 발생했습니다');
+    }
+  };
   return (
     <div className={container}>
       <div
@@ -207,9 +214,7 @@ export const IndivisualInfo = ({
           setShowVerification={setShowVerification}
           timeLeft={timeLeft}
           onSendVerification={handleSendVerification}
-          onSmsVerification={function (): void {
-            throw new Error('Function not implemented.');
-          }}
+          onSmsVerification={smsCode}
         />
       </div>
       <div className={buttonWrapper}>

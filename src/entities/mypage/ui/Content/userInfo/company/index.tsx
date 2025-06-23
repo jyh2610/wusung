@@ -1,33 +1,39 @@
+'use client';
+
+import { colors } from '@/design-tokens';
+import { IdPw } from '@/entities/UserManage';
+import { IFormCompany } from '@/entities/UserManage/type';
 import { CompanyInfo } from '@/entities/UserManage/ui/form/companyInfo';
 import { CompanyLocation } from '@/entities/UserManage/ui/form/companyLocation';
-import React, { Dispatch, SetStateAction, useEffect, useState } from 'react';
 import {
-  CompanyUserInfo,
   useUserInfoStore,
+  CompanyUserInfo,
   UserInfoStore
 } from '@/shared/stores/EditUserInfostore';
-import { IFormCompany } from '@/entities/UserManage/type';
-import { IdPw } from '@/entities/UserManage';
-import { HorizontalLine, VerticalLine } from '@/shared/ui/VerticalLine';
-import { colors } from '@/design-tokens';
-import { submitCompanyUserInfoHandler } from '../api';
-import { ProfileImageUpload } from '../ProfileImageUpload';
+import { HorizontalLine } from '@/shared/ui/VerticalLine';
+import { Dispatch, SetStateAction, useEffect, useState } from 'react';
+import { buttonContainer, labelContainer } from '../index.css';
+import { NomalInput } from '@/shared/ui/Input';
 import {
-  companyEditContainer,
-  profileLabel,
-  profileWrapper
+  container,
+  row,
+  label,
+  input as inputStyle,
+  buttonWrapper
 } from './index.css';
-import { Button } from '@/shared/ui';
-import { buttonContainer } from '../index.css';
-import { toast } from 'react-toastify';
+import { Button } from '@/shared/ui/Button';
+import { profileLabel, profileWrapper } from './index.css';
+import { ProfileImageUpload } from '../ProfileImageUpload';
 import { useRouter } from 'next/navigation';
+import { submitCompanyUserInfoHandler } from '../api';
+import { toast } from 'react-toastify';
+import { sendSignupSmsCode } from '@/entities/UserManage/api';
 
 export const CompanyInfoEdit = ({
   setIsWithdrawal
 }: {
   setIsWithdrawal: Dispatch<SetStateAction<boolean>>;
 }) => {
-  const router = useRouter();
   const userInfo = useUserInfoStore();
   const setUserInfo = useUserInfoStore(state => state.setUserInfo);
   const [showVerification, setShowVerification] = useState(false);
@@ -51,6 +57,10 @@ export const CompanyInfoEdit = ({
     emailDomain: ''
   });
 
+  const router = useRouter();
+  const [emailId, emailDomain] = (userInfo.email || '').split('@');
+  const [mainAddress, detailAddress] = (userInfo.address || '').split('|');
+
   // 타입 가드 추가
   const isCompanyUser = (
     user: UserInfoStore
@@ -61,22 +71,21 @@ export const CompanyInfoEdit = ({
   };
 
   useEffect(() => {
-    if (isCompanyUser(userInfo)) {
-      setFormData(prev => ({
-        ...prev,
-        id: userInfo.id || '',
-        representativeName: userInfo.representativeName || '',
-        companyName: userInfo.companyName || '',
-        corporateNumber: userInfo.corporateNumber || '',
-        openingDate: userInfo.openingDate || '',
-        address: userInfo.address || '',
-        detailAddress: userInfo.detailAddress || '',
-        phone: userInfo.phoneNumber || '',
-        email: userInfo.email?.split('@')[0] || '',
-        emailDomain: userInfo.email?.split('@')[1] || ''
-      }));
-    }
-  }, [userInfo]);
+    // API 응답의 실제 필드명에 맞게 매핑
+    setFormData(prev => ({
+      ...prev,
+      id: userInfo.username || '',
+      representativeName: (userInfo as any).name || '', // API 응답의 name 필드 사용
+      companyName: (userInfo as any).name || '', // API 응답의 name 필드 사용
+      corporateNumber: (userInfo as any).businessRegistrationNumber || '', // API 응답의 businessRegistrationNumber 필드 사용
+      openingDate: (userInfo as any).birthOrEstablishmentDate || '', // API 응답의 birthOrEstablishmentDate 필드 사용
+      address: mainAddress || '',
+      detailAddress: detailAddress || '',
+      phone: userInfo.phoneNumber || '',
+      email: emailId || '',
+      emailDomain: emailDomain || ''
+    }));
+  }, [userInfo, mainAddress, detailAddress, emailId, emailDomain]);
 
   useEffect(() => {
     let timer: NodeJS.Timeout;
@@ -90,10 +99,6 @@ export const CompanyInfoEdit = ({
     }
     return () => clearInterval(timer);
   }, [showVerification, timeLeft]);
-
-  if (!isCompanyUser(userInfo)) {
-    return null;
-  }
 
   const handleInputChange = (
     field: keyof IFormCompany,
@@ -126,49 +131,94 @@ export const CompanyInfoEdit = ({
       email: formData.email + '@' + formData.emailDomain
     };
     try {
-      const response = await submitCompanyUserInfoHandler(
-        domainFormData,
-        profileFile as File
-      );
-      toast.success('회원정보가 수정되었습니다.');
+      await submitCompanyUserInfoHandler(domainFormData, profileFile as File);
       router.push('/mypage?tab=결제내역');
     } catch (error) {
-      toast.error('회원정보 수정에 실패했습니다.');
       console.log(error);
     }
   };
-
+  const smsCode = async () => {
+    try {
+      const response = await sendSignupSmsCode(formData.phone);
+      toast.info(response);
+      setShowVerification(true);
+      setTimeLeft(120);
+    } catch (error) {
+      toast.error('인증번호 발송 중 오류가 발생했습니다');
+    }
+  };
   return (
-    <div className={companyEditContainer}>
-      <div className={profileWrapper}>
-        <label className={profileLabel}>프로필</label>
-        <ProfileImageUpload
-          value={userInfo.profilePictureUrl}
-          onChange={setProfileFile}
+    <div className={container}>
+      <div
+        style={{
+          display: 'flex',
+          flexDirection: 'column',
+          gap: 40,
+          marginBottom: 24
+        }}
+      >
+        <div className={profileWrapper}>
+          <label className={profileLabel}>프로필</label>
+          <ProfileImageUpload
+            value={userInfo.profilePictureUrl}
+            onChange={setProfileFile}
+          />
+        </div>
+        <div className={row}>
+          <span className={label}>아이디</span>
+          <input
+            type="text"
+            value={userInfo.username}
+            disabled
+            className={inputStyle}
+          />
+        </div>
+        <div className={row}>
+          <label className={label}>비밀번호</label>
+          <div className={buttonContainer}>
+            <Button
+              content="비밀번호 변경"
+              type="borderBrand"
+              onClick={() => router.push(`/signin/find/password?type=change`)}
+            />
+          </div>
+        </div>
+      </div>
+      <HorizontalLine
+        width="100%"
+        thickness="1px"
+        color={colors.gray_scale[300]}
+      />
+      <div
+        style={{
+          display: 'flex',
+          flexDirection: 'column',
+          gap: 40,
+          height: '100%',
+          backgroundColor: colors.gray_scale.default
+        }}
+      >
+        <CompanyInfo
+          formData={formData}
+          handleInputChange={handleInputChange}
+        />
+        <CompanyLocation
+          formData={formData}
+          handleInputChange={handleInputChange}
+          onSendVerification={handleSendVerification}
+          showVerification={showVerification}
+          timeLeft={timeLeft}
+          setShowVerification={setShowVerification}
+          onSmsVerification={smsCode}
         />
       </div>
-      <IdPw formData={formData} handleInputChange={handleInputChange} />
-      <div style={{ width: '100%' }}>
-        <HorizontalLine width="100%" color={colors.gray_scale[300]} />
-      </div>
-      <CompanyInfo formData={formData} handleInputChange={handleInputChange} />
-      <div style={{ width: '100%' }}>
-        <HorizontalLine width="100%" color={colors.gray_scale[300]} />
-      </div>
-      <CompanyLocation
-        formData={formData}
-        handleInputChange={handleInputChange}
-        onSendVerification={handleSendVerification}
-        showVerification={showVerification}
-        timeLeft={timeLeft}
-        setShowVerification={setShowVerification}
-        onSmsVerification={function (): void {
-          throw new Error('Function not implemented.');
-        }}
-      />
-      <div>
+      <div className={buttonWrapper}>
         <div className={buttonContainer}>
-          <Button content="회원정보 수정" onClick={SubmitUserInfo} />
+          <Button
+            content="회원정보 수정"
+            type="brand"
+            onClick={SubmitUserInfo}
+          />
         </div>
         <div className={buttonContainer}>
           <Button content="회원탈퇴" onClick={() => setIsWithdrawal(true)} />

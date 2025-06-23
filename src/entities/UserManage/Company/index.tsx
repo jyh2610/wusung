@@ -163,7 +163,7 @@ export function Company() {
     }
     try {
       const response = await verifyPhoneNum(formData.phone);
-      toast.info(response.message);
+      toast.success(response.message);
       setShowVerification(true);
       setTimeLeft(120);
     } catch (error) {
@@ -174,7 +174,7 @@ export function Company() {
   const smsCode = async () => {
     try {
       const response = await sendSignupSmsCode(formData.phone);
-      toast.info(response);
+      toast.success(response);
       setShowVerification(true);
       setTimeLeft(120);
     } catch (error) {
