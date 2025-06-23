@@ -27,6 +27,15 @@ export const sendSmsCode = async (num: string) => {
   });
   return res.data;
 };
+
+export const sendSignupSmsCode = async (num: string) => {
+  const res = await request<IPostCheckIdRes>({
+    method: 'POST',
+    url: '/api/common/signup/phone/verification/send/sms',
+    data: { phoneNum: num }
+  });
+  return res.data.message;
+};
 export const verifyPhoneNum = async (num: string) => {
   const res = await request<IPostCheckIdRes>({
     method: 'POST',

@@ -19,6 +19,7 @@ import { toast } from 'react-toastify';
 import 'react-toastify/dist/ReactToastify.css';
 import {
   checkAuthenticationNumber,
+  sendSignupSmsCode,
   sendSmsCode,
   SignupCompanyRequest,
   verifyPhoneNum
@@ -172,8 +173,8 @@ export function Company() {
 
   const smsCode = async () => {
     try {
-      const response = await sendSmsCode(formData.phone);
-      toast.info(response.message);
+      const response = await sendSignupSmsCode(formData.phone);
+      toast.info(response);
       setShowVerification(true);
       setTimeLeft(120);
     } catch (error) {

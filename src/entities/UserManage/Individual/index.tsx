@@ -15,7 +15,12 @@ import { TermsOfUse } from '../ui/SignupForm/TermsOfUse';
 import { IdPw } from '../ui/form';
 import { UserInfo } from '../ui/form/UserInfo';
 import { useState, useEffect } from 'react';
-import { individualSignup, IndividualSignUpDTO, sendSmsCode } from '../api';
+import {
+  individualSignup,
+  IndividualSignUpDTO,
+  sendSignupSmsCode,
+  sendSmsCode
+} from '../api';
 import { toast } from 'react-toastify';
 import { useRouter } from 'next/navigation';
 
@@ -145,8 +150,8 @@ export function IndividualComponent() {
   }
   const smsCode = async () => {
     try {
-      const response = await sendSmsCode(formData.phone);
-      toast.info(response.message);
+      const response = await sendSignupSmsCode(formData.phone);
+      toast.info(response);
       setShowVerification(true);
       setTimeLeft(120);
     } catch (error) {
