@@ -1,6 +1,7 @@
-import React from 'react';
+import React, { useState, useEffect } from 'react';
 import { NomalInput } from '@/shared/ui/Input';
 import { Button } from '@/shared/ui';
+import { SelectBox } from '@/shared/ui/SelectBox';
 import { labelContainer, starSpan } from '../SignupForm/index.css';
 import { buttonContainer, container } from './index.css';
 import { IFormCompany } from '../../type';
@@ -17,6 +18,60 @@ interface IProps {
 }
 
 export const CompanyInfo = ({ formData, handleInputChange }: IProps) => {
+  const [selectedYear, setSelectedYear] = useState('');
+  const [selectedMonth, setSelectedMonth] = useState('');
+  const [selectedDay, setSelectedDay] = useState('');
+
+  // 년도 옵션 생성 (현재 년도부터 50년 전까지)
+  const currentYear = new Date().getFullYear();
+  const yearOptions = Array.from({ length: 51 }, (_, i) => ({
+    value: String(currentYear - i),
+    label: String(currentYear - i)
+  }));
+
+  // 월 옵션 생성
+  const monthOptions = Array.from({ length: 12 }, (_, i) => ({
+    value: String(i + 1).padStart(2, '0'),
+    label: String(i + 1).padStart(2, '0')
+  }));
+
+  // 일 옵션 생성 (기본 31일)
+  const dayOptions = Array.from({ length: 31 }, (_, i) => ({
+    value: String(i + 1).padStart(2, '0'),
+    label: String(i + 1).padStart(2, '0')
+  }));
+
+  // 선택된 년월일에 따라 일 옵션 업데이트
+  const getDayOptions = () => {
+    if (!selectedYear || !selectedMonth) return dayOptions;
+
+    const year = parseInt(selectedYear);
+    const month = parseInt(selectedMonth);
+    const daysInMonth = new Date(year, month, 0).getDate();
+
+    return Array.from({ length: daysInMonth }, (_, i) => ({
+      value: String(i + 1).padStart(2, '0'),
+      label: String(i + 1).padStart(2, '0')
+    }));
+  };
+
+  // 개업일자 업데이트
+  useEffect(() => {
+    if (selectedYear && selectedMonth && selectedDay) {
+      const openingDate = `${selectedYear}${selectedMonth}${selectedDay}`;
+      handleInputChange('openingDate', openingDate);
+    }
+  }, [selectedYear, selectedMonth, selectedDay]);
+
+  // 기존 개업일자 값이 있으면 파싱하여 드롭다운 값 설정
+  useEffect(() => {
+    if (formData.openingDate && formData.openingDate.length === 8) {
+      setSelectedYear(formData.openingDate.substring(0, 4));
+      setSelectedMonth(formData.openingDate.substring(4, 6));
+      setSelectedDay(formData.openingDate.substring(6, 8));
+    }
+  }, [formData.openingDate]);
+
   const handleVerifyCorporate = async () => {
     // 필수 필드 검증
     const missingFields = [];
@@ -96,19 +151,62 @@ export const CompanyInfo = ({ formData, handleInputChange }: IProps) => {
           handleInputChange('corporateNumber', e.target.value)
         }
       />
-      <NomalInput
-        placeholder="개업일자를 입력해주세요"
-        inputSize="medium"
-        label={
-          <div className={labelContainer}>
-            개업일자 <span className={starSpan}>*</span>
+
+      {/* 개업일자 드롭다운 */}
+      <div
+        style={{
+          display: 'flex',
+          flexDirection: 'row',
+          alignItems: 'center',
+          gap: '40px',
+          justifyContent: 'space-between',
+          width: '100%'
+        }}
+      >
+        <div
+          className={labelContainer}
+          style={{ flexShrink: 0, width: '176px' }}
+        >
+          개업일자 <span className={starSpan}>*</span>
+        </div>
+        <div
+          style={{
+            display: 'flex',
+            gap: '8px',
+            height: '56px',
+            flex: '1 1 0%'
+          }}
+        >
+          <div style={{ flex: 1 }}>
+            <SelectBox
+              options={yearOptions}
+              placeholder="년도"
+              value={selectedYear}
+              onChange={setSelectedYear}
+              isSearchable={false}
+            />
           </div>
-        }
-        value={formData.openingDate}
-        onChange={(e: React.ChangeEvent<HTMLInputElement>) =>
-          handleInputChange('openingDate', e.target.value)
-        }
-      />
+          <div style={{ flex: 1 }}>
+            <SelectBox
+              options={monthOptions}
+              placeholder="월"
+              value={selectedMonth}
+              onChange={setSelectedMonth}
+              isSearchable={false}
+            />
+          </div>
+          <div style={{ flex: 1 }}>
+            <SelectBox
+              options={getDayOptions()}
+              placeholder="일"
+              value={selectedDay}
+              onChange={setSelectedDay}
+              isSearchable={false}
+            />
+          </div>
+        </div>
+      </div>
+
       <div
         style={{
           display: 'flex',

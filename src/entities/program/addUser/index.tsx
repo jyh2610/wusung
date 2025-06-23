@@ -25,32 +25,6 @@ const grade = [
   { label: '6', value: '6' }
 ];
 
-const currentYear = new Date().getFullYear();
-
-const birthYears = Array.from({ length: currentYear - 1900 + 1 }, (_, i) => {
-  const year = 1900 + i;
-  return { label: `${year}`, value: `${year}` };
-});
-
-const years = Array.from({ length: 2100 - 1900 + 1 }, (_, i) => {
-  const year = 1900 + i;
-  return { label: `${year}`, value: `${year}` };
-});
-
-const endYears = Array.from({ length: 2100 - 1900 + 1 }, (_, i) => {
-  const year = 2100 - i;
-  return { label: `${year}`, value: `${year}` };
-});
-
-const months = Array.from({ length: 12 }, (_, i) => {
-  const month = i + 1;
-  return { label: `${month}`, value: `${month}` };
-});
-const days = Array.from({ length: 31 }, (_, i) => {
-  const day = i + 1;
-  return { label: `${day}`, value: `${day}` };
-});
-
 export function AddUser({
   open,
   closeModal,
@@ -66,175 +40,52 @@ export function AddUser({
 }) {
   const [form, setForm] = useState<IRegUser>({
     name: '',
-    birthDate: '',
-    longTermNum: '',
-    certificationStart: '',
-    certificationEnd: '',
     servicer: '',
     difficulty: '',
     grade: ''
   });
 
-  const [birth, setBirth] = useState({
-    year: String(currentYear),
-    month: '1',
-    day: '1'
-  });
-  const [validateStartDate, setValidateStartDate] = useState({
-    year: String(currentYear),
-    month: '1',
-    day: '1'
-  });
-  const [validateEndDate, setValidateEndDate] = useState({
-    year: String(currentYear),
-    month: '1',
-    day: '1'
-  });
-
   useEffect(() => {
     if (defaultValue && mode === 'edit') {
       setForm(defaultValue);
-
-      if (defaultValue.birthDate) {
-        const [year, month, day] = defaultValue.birthDate.split('-');
-        setBirth({
-          year: String(Number(year)),
-          month: String(Number(month)),
-          day: String(Number(day))
-        });
-      }
-      if (defaultValue.certificationStart) {
-        const [year, month, day] = defaultValue.certificationStart.split('-');
-        setValidateStartDate({
-          year: String(Number(year)),
-          month: String(Number(month)),
-          day: String(Number(day))
-        });
-      }
-      if (defaultValue.certificationEnd) {
-        const [year, month, day] = defaultValue.certificationEnd.split('-');
-        setValidateEndDate({
-          year: String(Number(year)),
-          month: String(Number(month)),
-          day: String(Number(day))
-        });
-      }
-    } else if (mode === 'add' || !mode) {
-      // 생성 모드일 때 기본값 설정
-      const currentDate = new Date();
-      const currentYear = currentDate.getFullYear();
-      const currentMonth = currentDate.getMonth() + 1;
-      const currentDay = currentDate.getDate();
-
-      setBirth({
-        year: String(currentYear),
-        month: String(currentMonth),
-        day: String(currentDay)
+    } else {
+      setForm({
+        name: '',
+        servicer: '',
+        difficulty: '',
+        grade: ''
       });
-
-      setValidateStartDate({
-        year: String(currentYear),
-        month: String(currentMonth),
-        day: String(currentDay)
-      });
-
-      setValidateEndDate({
-        year: String(currentYear + 1), // 종료일은 1년 후로 설정
-        month: String(currentMonth),
-        day: String(currentDay)
-      });
-
-      // form도 업데이트
-      setForm(prev => ({
-        ...prev,
-        birthDate: `${currentYear}-${String(currentMonth).padStart(2, '0')}-${String(currentDay).padStart(2, '0')}`,
-        certificationStart: `${currentYear}-${String(currentMonth).padStart(2, '0')}-${String(currentDay).padStart(2, '0')}`,
-        certificationEnd: `${currentYear + 1}-${String(currentMonth).padStart(2, '0')}-${String(currentDay).padStart(2, '0')}`
-      }));
     }
-    // eslint-disable-next-line
   }, [defaultValue, mode, open]);
-
-  const handleBirthChange = (type: 'year' | 'month' | 'day', value: string) => {
-    const updated = { ...birth, [type]: value };
-    setBirth(updated);
-
-    const { year, month, day } = updated;
-    if (year && month && day) {
-      setForm(prev => ({
-        ...prev,
-        birthDate: `${year}-${month.padStart(2, '0')}-${day.padStart(2, '0')}`
-      }));
-    }
-  };
-
-  const handleValidateStartChange = (
-    type: 'year' | 'month' | 'day',
-    value: string
-  ) => {
-    const updated = { ...validateStartDate, [type]: value };
-    setValidateStartDate(updated);
-
-    const { year, month, day } = updated;
-    if (year && month && day) {
-      setForm(prev => ({
-        ...prev,
-        certificationStart: `${year}-${month.padStart(2, '0')}-${day.padStart(2, '0')}`
-      }));
-    }
-  };
-
-  const handleValidateEndChange = (
-    type: 'year' | 'month' | 'day',
-    value: string
-  ) => {
-    const updated = { ...validateEndDate, [type]: value };
-    setValidateEndDate(updated);
-
-    const { year, month, day } = updated;
-    if (year && month && day) {
-      setForm(prev => ({
-        ...prev,
-        certificationEnd: `${year}-${month.padStart(2, '0')}-${day.padStart(2, '0')}`
-      }));
-    }
-  };
 
   const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
 
     if (
       !form.name.trim() ||
-      !form.longTermNum.trim() ||
-      !form.birthDate.trim() ||
       !form.servicer.trim() ||
       !form.difficulty.trim() ||
-      !form.grade.trim() ||
-      !validateEndDate.year ||
-      !validateEndDate.month ||
-      !validateEndDate.day
+      !form.grade.trim()
     ) {
       toast.error('필수 항목을 모두 입력해주세요.');
       return;
     }
 
-    const certificationStart = `${validateStartDate.year}-${validateStartDate.month.padStart(2, '0')}-${validateStartDate.day.padStart(2, '0')}`;
-    const certificationEnd = `${validateEndDate.year}-${validateEndDate.month.padStart(2, '0')}-${validateEndDate.day.padStart(2, '0')}`;
+    // 고정된 날짜와 장기요양 인정번호로 서버에 전송
+    const fixedData = {
+      ...form,
+      longTermNum: 'L0000000000-000',
+      birthDate: '2000-01-01',
+      certificationStart: '1900-01-01',
+      certificationEnd: '2100-12-31'
+    };
 
     try {
       if (mode === 'edit' && defaultValue) {
-        await updateUser(Number(defaultValue.elderId), {
-          ...form,
-          certificationStart,
-          certificationEnd
-        });
+        await updateUser(Number(defaultValue.elderId), fixedData);
         toast.success('수정이 완료되었습니다!');
       } else {
-        await submitAddUser({
-          ...form,
-          certificationStart,
-          certificationEnd
-        });
+        await submitAddUser(fixedData);
         toast.success('등록이 완료되었습니다!');
       }
       closeModal();
@@ -266,161 +117,6 @@ export function AddUser({
                 value={form.name}
                 onChange={e => setForm({ ...form, name: e.target.value })}
               />
-            </div>
-          </div>
-
-          {/* 장기요양인증번호 */}
-          <div className={styles.rowStyle}>
-            <label className={styles.labelStyle}>
-              장기요양인정번호<span className={styles.starSpan}>*</span>
-            </label>
-            <div className={styles.inputWrapperStyle}>
-              <NomalInput
-                name="longTermNum"
-                placeholder="L00000000-000 -> L[10자리]-[3자리] 숫자를 입력하세요"
-                value={form.longTermNum}
-                onChange={e =>
-                  setForm({ ...form, longTermNum: e.target.value })
-                }
-              />
-            </div>
-          </div>
-
-          {/* 생년월일 */}
-          <div className={styles.rowStyle}>
-            <label className={styles.labelStyle}>
-              생년월일<span className={styles.starSpan}>*</span>
-            </label>
-            <div className={styles.inputWrapperStyle}>
-              <div className={styles.dateGroup}>
-                <div className={styles.dateItem}>
-                  <div className={styles.select128}>
-                    <DropDown
-                      options={birthYears}
-                      placeholder="년"
-                      isSearchable={false}
-                      value={birth.year}
-                      onChange={(val: string) => handleBirthChange('year', val)}
-                    />
-                  </div>
-                  <span>년</span>
-                  <div className={styles.select128}>
-                    <DropDown
-                      options={months}
-                      placeholder="월"
-                      isSearchable={false}
-                      value={birth.month}
-                      onChange={(val: string) =>
-                        handleBirthChange('month', val)
-                      }
-                    />
-                  </div>
-                  <span>월</span>
-                  <div className={styles.select128}>
-                    <DropDown
-                      options={days}
-                      placeholder="일"
-                      isSearchable={false}
-                      value={birth.day}
-                      onChange={(val: string) => handleBirthChange('day', val)}
-                    />
-                  </div>
-                  <span>일</span>
-                </div>
-              </div>
-            </div>
-          </div>
-
-          {/* 인정유효기간 */}
-          <div className={styles.rowStyle}>
-            <label className={styles.labelStyle}>
-              인정유효기간<span className={styles.starSpan}>*</span>
-            </label>
-            <div className={styles.inputWrapperStyle}>
-              <div className={styles.dateGroup}>
-                <div className={styles.dateSection}>
-                  <div className={styles.dateLabel}>시작일</div>
-                  <div className={styles.dateItem}>
-                    <div className={styles.select128}>
-                      <DropDown
-                        options={years}
-                        placeholder="년"
-                        isSearchable={false}
-                        value={validateStartDate.year}
-                        onChange={(val: string) =>
-                          handleValidateStartChange('year', val)
-                        }
-                      />
-                    </div>
-                    <span>년</span>
-                    <div className={styles.select128}>
-                      <DropDown
-                        options={months}
-                        placeholder="월"
-                        isSearchable={false}
-                        value={validateStartDate.month}
-                        onChange={(val: string) =>
-                          handleValidateStartChange('month', val)
-                        }
-                      />
-                    </div>
-                    <span>월</span>
-                    <div className={styles.select128}>
-                      <DropDown
-                        options={days}
-                        placeholder="일"
-                        isSearchable={false}
-                        value={validateStartDate.day}
-                        onChange={(val: string) =>
-                          handleValidateStartChange('day', val)
-                        }
-                      />
-                    </div>
-                    <span>일</span>
-                  </div>
-                </div>
-                <div className={styles.dateSection}>
-                  <div className={styles.dateLabel}>종료일</div>
-                  <div className={styles.dateItem}>
-                    <div className={styles.select128}>
-                      <DropDown
-                        options={endYears}
-                        placeholder="년"
-                        isSearchable={false}
-                        value={validateEndDate.year}
-                        onChange={(val: string) =>
-                          handleValidateEndChange('year', val)
-                        }
-                      />
-                    </div>
-                    <span>년</span>
-                    <div className={styles.select128}>
-                      <DropDown
-                        options={months}
-                        placeholder="월"
-                        isSearchable={false}
-                        value={validateEndDate.month}
-                        onChange={(val: string) =>
-                          handleValidateEndChange('month', val)
-                        }
-                      />
-                    </div>
-                    <span>월</span>
-                    <div className={styles.select128}>
-                      <DropDown
-                        options={days}
-                        placeholder="일"
-                        isSearchable={false}
-                        value={validateEndDate.day}
-                        onChange={(val: string) =>
-                          handleValidateEndChange('day', val)
-                        }
-                      />
-                    </div>
-                    <span>일</span>
-                  </div>
-                </div>
-              </div>
             </div>
           </div>
 

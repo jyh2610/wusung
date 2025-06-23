@@ -62,10 +62,10 @@ export interface ICategoryLeaf {
 export interface IRegUser {
   elderId?: number;
   name: string;
-  birthDate: string;
-  longTermNum: string;
-  certificationStart: string;
-  certificationEnd: string;
+  birthDate?: string;
+  longTermNum?: string;
+  certificationStart?: string;
+  certificationEnd?: string;
   servicer: string;
   difficulty: string;
   grade: string;

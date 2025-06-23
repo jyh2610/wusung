@@ -68,7 +68,11 @@ export const CompanyLocation = ({
         <NomalInput
           placeholder="주소를 입력해주세요"
           inputSize="medium"
-          label={<div className={labelContainer}>주소</div>}
+          label={
+            <div className={labelContainer}>
+              주소 <span className={starSpan}>*</span>
+            </div>
+          }
           value={formData.address}
           onChange={e => handleInputChange('address', e.target.value)}
           readOnly
@@ -183,7 +187,11 @@ export const CompanyLocation = ({
         <NomalInput
           placeholder="이메일을 입력해주세요"
           inputSize="medium"
-          label={<div className={labelContainer}>이메일</div>}
+          label={
+            <div className={labelContainer}>
+              이메일<span className={starSpan}>*</span>
+            </div>
+          }
           value={formData.email}
           onChange={(e: React.ChangeEvent<HTMLInputElement>) =>
             handleInputChange('email', e.target.value)

@@ -265,30 +265,6 @@ export function UserDetailModal({
                   marginBottom: 8
                 }}
               >
-                <div style={{ color: '#888', fontSize: 14 }}>생년월일</div>
-                <div style={{ fontWeight: 500 }}>{user.birthDate}</div>
-              </div>
-              <div
-                style={{
-                  display: 'flex',
-                  justifyContent: 'space-between',
-                  width: '100%',
-                  marginBottom: 8
-                }}
-              >
-                <div style={{ color: '#888', fontSize: 14 }}>
-                  장기요양인정번호
-                </div>
-                <div style={{ fontWeight: 500 }}>{user.recipientNumber}</div>
-              </div>
-              <div
-                style={{
-                  display: 'flex',
-                  justifyContent: 'space-between',
-                  width: '100%',
-                  marginBottom: 8
-                }}
-              >
                 <div style={{ color: '#888', fontSize: 14 }}>요양등급</div>
                 <div style={{ fontWeight: 500 }}>{user.disabilityGrade}</div>
               </div>
@@ -324,34 +300,20 @@ export function UserDetailModal({
                   marginBottom: 8
                 }}
               >
-                <div style={{ color: '#888', fontSize: 14 }}>
-                  인정유효기간(시작)
-                </div>
-                <div style={{ fontWeight: 500 }}>{user.certificationStart}</div>
-              </div>
-              <div
-                style={{
-                  display: 'flex',
-                  justifyContent: 'space-between',
-                  width: '100%',
-                  marginBottom: 8
-                }}
-              >
-                <div style={{ color: '#888', fontSize: 14 }}>
-                  인정유효기간(종료)
-                </div>
-                <div style={{ fontWeight: 500 }}>{user.certificationEnd}</div>
-              </div>
-              <div
-                style={{
-                  display: 'flex',
-                  justifyContent: 'space-between',
-                  width: '100%',
-                  marginBottom: 8
-                }}
-              >
                 <div style={{ color: '#888', fontSize: 14 }}>생성일</div>
-                <div style={{ fontWeight: 500 }}>{user.createdAt}</div>
+                <div style={{ fontWeight: 500 }}>
+                  {new Date(user.updatedAt)
+                    .toLocaleString('ko-KR', {
+                      year: 'numeric',
+                      month: '2-digit',
+                      day: '2-digit',
+                      hour: '2-digit',
+                      minute: '2-digit',
+                      hour12: false
+                    })
+                    .replace(/\./g, '-')
+                    .replace(',', '')}
+                </div>
               </div>
               <div
                 style={{
@@ -361,7 +323,19 @@ export function UserDetailModal({
                 }}
               >
                 <div style={{ color: '#888', fontSize: 14 }}>수정일</div>
-                <div style={{ fontWeight: 500 }}>{user.updatedAt}</div>
+                <div style={{ fontWeight: 500 }}>
+                  {new Date(user.updatedAt)
+                    .toLocaleString('ko-KR', {
+                      year: 'numeric',
+                      month: '2-digit',
+                      day: '2-digit',
+                      hour: '2-digit',
+                      minute: '2-digit',
+                      hour12: false
+                    })
+                    .replace(/\./g, '-')
+                    .replace(',', '')}
+                </div>
               </div>
             </div>
           </>

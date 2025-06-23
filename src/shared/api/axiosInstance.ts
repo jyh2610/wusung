@@ -58,7 +58,6 @@ axiosInstance.interceptors.request.use(
 // 응답 인터셉터
 axiosInstance.interceptors.response.use(
   response => {
-
     const newAccessToken =
       response.headers['authorization'] || response.headers['Authorization'];
 
@@ -109,6 +108,30 @@ interface CustomAxiosRequestConfig extends AxiosRequestConfig {
 const handleAxiosError = async (error: AxiosError) => {
   const originalRequest = error.config as CustomAxiosRequestConfig;
 
+  // 401 에러에서 "Token is missing or invalid" 메시지 처리
+  if (error.response?.status === 401) {
+    const errorData = error.response.data as any;
+    if (errorData?.message === 'Token is missing or invalid') {
+      console.warn('토큰이 누락되었거나 유효하지 않습니다.');
+
+      // 세션 비우기 및 로그아웃 처리
+      try {
+        useAuthStore.getState().logout();
+        localStorage.removeItem('userInfo');
+        // 로그아웃 알림 표시
+        toast.error('로그인 세션이 만료되었습니다. 다시 로그인해주세요.');
+
+        // 로그인 페이지로 리다이렉트
+        if (typeof window !== 'undefined') {
+          window.location.href = '/signin';
+        }
+      } catch (logoutError) {
+        console.error('로그아웃 처리 중 오류:', logoutError);
+      }
+    }
+  }
+
+  // 403 에러 처리 (기존 로직 유지)
   if (error.response?.status === 403 && !originalRequest._retry) {
     originalRequest._retry = true;
 
