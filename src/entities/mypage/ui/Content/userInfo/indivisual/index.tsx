@@ -207,6 +207,9 @@ export const IndivisualInfo = ({
           setShowVerification={setShowVerification}
           timeLeft={timeLeft}
           onSendVerification={handleSendVerification}
+          onSmsVerification={function (): void {
+            throw new Error('Function not implemented.');
+          }}
         />
       </div>
       <div className={buttonWrapper}>

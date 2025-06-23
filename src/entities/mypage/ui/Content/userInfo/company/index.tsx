@@ -162,6 +162,9 @@ export const CompanyInfoEdit = ({
         showVerification={showVerification}
         timeLeft={timeLeft}
         setShowVerification={setShowVerification}
+        onSmsVerification={function (): void {
+          throw new Error('Function not implemented.');
+        }}
       />
       <div>
         <div className={buttonContainer}>
