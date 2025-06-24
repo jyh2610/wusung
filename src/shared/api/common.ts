@@ -54,6 +54,8 @@ export interface IPopupResponse {
   popupId: number;
   title: string;
   content: string;
+  positionCode: 'L' | 'R' | 'M';
+  priority?: number;
   createdAt: string;
   updatedAt: string;
 }

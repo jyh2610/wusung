@@ -4,7 +4,7 @@ import { popupList, IPopupResponse } from '@/shared/api/common';
 interface Notice {
   title: string;
   content: string;
-  positionCode: 'L' | 'R' | 'C';
+  positionCode: 'L' | 'R' | 'M';
   priority: number;
 }
 
@@ -19,15 +19,23 @@ export const useNotices = () => {
         setLoading(true);
         const response = await popupList();
 
+        console.log('API Response:', response);
+        console.log('API Response data:', response?.data);
+        console.log('API Response data.data:', response?.data?.data);
+
         if (response?.data?.data) {
           const transformedNotices = response.data.data.map(
-            (notice: IPopupResponse) => ({
-              title: notice.title || '',
-              content: notice.content || '',
-              positionCode: 'C' as const,
-              priority: notice.popupId || 0
-            })
+            (notice: IPopupResponse) => {
+              console.log('Individual notice:', notice);
+              return {
+                title: notice.title || '',
+                content: notice.content || '',
+                positionCode: notice.positionCode || 'L',
+                priority: notice.priority || notice.popupId || 0
+              };
+            }
           );
+          console.log('Transformed notices:', transformedNotices);
           setNotices(transformedNotices);
         } else {
           setNotices([]);

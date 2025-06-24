@@ -353,7 +353,7 @@ const Page = () => {
           >
             <option value="L">왼쪽</option>
             <option value="R">오른쪽</option>
-            <option value="C">중앙</option>
+            <option value="M">중앙</option>
           </select>
         </div>
 
