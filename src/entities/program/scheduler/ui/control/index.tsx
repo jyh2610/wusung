@@ -19,7 +19,8 @@ import {
   getContent,
   getAdminPlan,
   searchContent,
-  getAdminContentByIds
+  getAdminContentByIds,
+  getHistoryPlan
 } from '@/entities/program/api';
 import { autoRegisterPlan } from '../../model/autoRegisterPlan';
 import { useDateStore } from '@/shared/stores/useDateStores';
@@ -227,16 +228,48 @@ export function Control({ isAdmin }: { isAdmin: boolean }) {
   };
 
   const handleConfirm = async () => {
-
-    if (!selectedUser?.difficultyLevel) {
+    if (!selectedUser || !selectedUser?.difficultyLevel) {
       toast.warn('대상자를 선택해주세요');
       return;
     }
-    await autoRegisterPlan({
+    const plan = await getPlan({
       year,
       month,
       difficultyLevel: selectedUser.difficultyLevel
     });
+    if (!plan) {
+      toast.warn('계획안을 불러오는데 실패했습니다');
+      return;
+    }
+    await autoRegisterPlan({
+      plan,
+      year,
+      month,
+      difficultyLevel: selectedUser.difficultyLevel
+    });
+  };
+
+  const getHistory = async () => {
+    if (!selectedUser || !selectedUser?.elderId) {
+      toast.warn('대상자를 선택해주세요');
+      return;
+    }
+    const res = await getHistoryPlan({
+      elderId: selectedUser?.elderId,
+      year,
+      month
+    });
+    if (!res) {
+      toast.warn('계획안 기록이 없습니다');
+      return;
+    }
+    await autoRegisterPlan({
+      plan: res,
+      year,
+      month,
+      difficultyLevel: selectedUser.difficultyLevel
+    });
+    console.log(res);
   };
 
   const handleDeleteItem = (id: number) => {
@@ -279,9 +312,14 @@ export function Control({ isAdmin }: { isAdmin: boolean }) {
           초기화
         </button>
         {!isAdmin && (
-          <button className={buttonStyle} onClick={handleConfirm}>
-            계획안 불러오기
-          </button>
+          <>
+            <button className={buttonStyle} onClick={handleConfirm}>
+              계획안 불러오기
+            </button>
+            <button className={buttonStyle} onClick={getHistory}>
+              계획안 기록 불러오기
+            </button>
+          </>
         )}
         {isAdmin && (
           <div style={{ display: 'flex', gap: '8px' }}>

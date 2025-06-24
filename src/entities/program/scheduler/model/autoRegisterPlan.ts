@@ -1,21 +1,28 @@
 import { useScheduleStore } from '@/shared/stores/useScheduleStore';
-import { getPlan, getContent } from '../../api';
+import { getPlan, getContent, IPlan } from '../../api';
 import { ScheduleItem } from '../../type.dto';
 
 interface AutoRegisterParams {
+  plan?: IPlan;
   year: number;
   month: number;
   difficultyLevel: number;
 }
 
 export const autoRegisterPlan = async ({
+  plan,
   year,
   month,
   difficultyLevel
 }: AutoRegisterParams) => {
   try {
-    const plan = await getPlan({ year, month, difficultyLevel });
-    if (!plan) return;
+    // plan이 제공되지 않으면 내부에서 가져오기
+    let targetPlan = plan;
+    if (!targetPlan) {
+      targetPlan = await getPlan({ year, month, difficultyLevel });
+    }
+
+    if (!targetPlan) return;
 
     const {
       schedule,
@@ -32,8 +39,8 @@ export const autoRegisterPlan = async ({
     clearEtcItems();
 
     // 커버 데이터 설정
-    if (plan.coverEduContentId) {
-      const coverContent = await getContent(plan.coverEduContentId);
+    if (targetPlan.coverEduContentId) {
+      const coverContent = await getContent(targetPlan.coverEduContentId);
       if (coverContent) {
         addCoverItem({
           id: coverContent.eduContentId!,
@@ -44,9 +51,12 @@ export const autoRegisterPlan = async ({
     }
 
     // 미들 데이터 설정
-    if (plan.middleEduContentIds && plan.middleEduContentIds.length > 0) {
+    if (
+      targetPlan.middleEduContentIds &&
+      targetPlan.middleEduContentIds.length > 0
+    ) {
       const middleContents = await Promise.all(
-        plan.middleEduContentIds.map(id => getContent(id))
+        targetPlan.middleEduContentIds.map(id => getContent(id))
       );
 
       middleContents.forEach(content => {
@@ -61,12 +71,12 @@ export const autoRegisterPlan = async ({
     }
 
     // 메인 데이터 설정
-    if (!plan.mainEduContentIds?.length) return;
+    if (!targetPlan.mainEduContentIds?.length) return;
 
     const updatedSchedule = { ...schedule };
 
-    for (let i = 0; i < plan.mainEduContentIds.length; i++) {
-      const contentIds = plan.mainEduContentIds[i];
+    for (let i = 0; i < targetPlan.mainEduContentIds.length; i++) {
+      const contentIds = targetPlan.mainEduContentIds[i];
       if (!contentIds.length) continue;
 
       const contents = await Promise.all(contentIds.map(id => getContent(id)));

@@ -11,10 +11,7 @@ import { colors } from '@/design-tokens';
 
 interface IProps {
   formData: IFormCompany;
-  handleInputChange: (
-    field: keyof IFormCompany,
-    value: string | { year: string; month: string; day: string }
-  ) => void;
+  handleInputChange: (field: keyof IFormCompany, value: string) => void;
 }
 
 export const CompanyInfo = ({ formData, handleInputChange }: IProps) => {
@@ -61,7 +58,7 @@ export const CompanyInfo = ({ formData, handleInputChange }: IProps) => {
       const openingDate = `${selectedYear}${selectedMonth}${selectedDay}`;
       handleInputChange('openingDate', openingDate);
     }
-  }, [selectedYear, selectedMonth, selectedDay]);
+  }, [selectedYear, selectedMonth, selectedDay, handleInputChange]);
 
   // 기존 개업일자 값이 있으면 파싱하여 드롭다운 값 설정
   useEffect(() => {

@@ -27,6 +27,7 @@ import {
   TooltipProvider,
   TooltipTrigger
 } from '@/components/ui/tooltip';
+import Image from 'next/image';
 
 interface CalendarProps {
   schedule: Schedule;
@@ -130,7 +131,8 @@ export function Calendar({ schedule, isAdmin }: CalendarProps) {
                           width: '100%',
                           height: '100%',
                           minHeight: '40px',
-                          ...dragProvided.draggableProps.style
+                          ...dragProvided.draggableProps.style,
+                          marginLeft: '4px'
                         }}
                       >
                         <span
@@ -148,11 +150,17 @@ export function Calendar({ schedule, isAdmin }: CalendarProps) {
                               ? `${item.content.slice(0, 8)}\n${item.content.slice(8)}`
                               : item.content}
                         </span>
-                        <IoIosClose
+                        <span
                           onClick={handleDelete}
-                          className="text-red-500"
-                          size={32}
                           style={{
+                            display: 'inline-block',
+                            width: '40px',
+                            height: '40px',
+                            backgroundImage:
+                              'url(/images/GettyImages-1309775865.jpg)',
+                            backgroundPosition: '-280px 0',
+                            backgroundSize: '320px 40px',
+                            backgroundRepeat: 'no-repeat',
                             cursor: 'pointer',
                             opacity:
                               draggingItem ===
