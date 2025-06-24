@@ -62,7 +62,6 @@ export function AddUser({
     e.preventDefault();
 
     if (
-      !form.name.trim() ||
       !form.servicer.trim() ||
       !form.difficulty.trim() ||
       !form.grade.trim()
