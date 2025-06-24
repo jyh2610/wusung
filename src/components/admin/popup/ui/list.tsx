@@ -4,7 +4,7 @@ import React, { useState } from 'react';
 import { useQuery } from '@tanstack/react-query';
 import { getPopup, deletePopup } from '../api';
 import { Button } from '@/components/ui/button';
-import { message } from 'antd';
+import { message, Modal } from 'antd';
 import { useRouter } from 'next/navigation';
 import { format } from 'date-fns';
 import { ko } from 'date-fns/locale';
@@ -25,13 +25,22 @@ export const List = ({ onAdd }: ListProps) => {
   });
 
   const handleDelete = async (id: number) => {
-    try {
-      await deletePopup(id);
-      message.success('팝업이 삭제되었습니다.');
-      refetch();
-    } catch (error) {
-      message.error('팝업 삭제 중 오류가 발생했습니다.');
-    }
+    Modal.confirm({
+      title: '팝업 삭제',
+      content: '정말로 이 팝업을 삭제하시겠습니까?',
+      okText: '삭제',
+      cancelText: '취소',
+      okType: 'danger',
+      onOk: async () => {
+        try {
+          await deletePopup(id);
+          message.success('팝업이 삭제되었습니다.');
+          refetch();
+        } catch (error) {
+          message.error('팝업 삭제 중 오류가 발생했습니다.');
+        }
+      }
+    });
   };
 
   const handleEdit = (id: number) => {
