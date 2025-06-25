@@ -34,6 +34,7 @@ export function IndividualComponent() {
     detailAddress: '',
     phone: '',
     email: '',
+    emailId: '',
     termOfUse: [false, false],
     verificationCode: '',
     emailDomain: '',
