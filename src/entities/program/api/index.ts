@@ -394,6 +394,26 @@ export const getPlan = async ({
   }
 };
 
+export const getHistoryPlan = async ({
+  elderId,
+  year,
+  month
+}: {
+  elderId: number;
+  year: number;
+  month: number;
+}) => {
+  try {
+    const res = await request<IRes<IPlan>>({
+      method: 'GET',
+      url: `/api/program/use/plan/history/${elderId}/${year}/${month}`
+    });
+    return res.data.data;
+  } catch (error) {
+    console.error(error);
+  }
+};
+
 export const getAdminPlan = async (scheduleId: number) => {
   try {
     const res = await request<IRes<IPlan>>({

@@ -83,7 +83,12 @@ export const CompanyInfoEdit = ({
       detailAddress: detailAddress || '',
       phone: userInfo.phoneNumber || '',
       email: emailId || '',
-      emailDomain: emailDomain || ''
+      emailDomain: emailDomain || '',
+      verificationCode: '',
+      password: '',
+      passwordConfirm: '',
+      phoneCode: '',
+      termOfUse: [false, false]
     }));
   }, [userInfo, mainAddress, detailAddress, emailId, emailDomain]);
 
@@ -100,24 +105,11 @@ export const CompanyInfoEdit = ({
     return () => clearInterval(timer);
   }, [showVerification, timeLeft]);
 
-  const handleInputChange = (
-    field: keyof IFormCompany,
-    value: string | { year: string; month: string; day: string }
-  ) => {
-    if (field === 'openingDate' && typeof value === 'object') {
-      const openingDate = `${value.year}${value.month}${value.day}`;
-      setUserInfo({ ...userInfo, openingDate } as any);
-      setFormData(prev => ({
-        ...prev,
-        openingDate
-      }));
-    } else {
-      setUserInfo({ ...userInfo, [field]: value } as any);
-      setFormData(prev => ({
-        ...prev,
-        [field]: value
-      }));
-    }
+  const handleInputChange = (field: keyof IFormCompany, value: string) => {
+    setFormData(prev => ({
+      ...prev,
+      [field]: value
+    }));
   };
 
   const handleSendVerification = () => {

@@ -323,6 +323,48 @@ export const getIpList = async (
   }
 };
 
+export interface MemberChangeHistory {
+  historyId: number;
+  memberId: number;
+  oldName: string;
+  newName: string;
+  oldBirthOrEstablishmentDate: string;
+  newBirthOrEstablishmentDate: string;
+  oldRepresentativeName: string | null;
+  newRepresentativeName: string;
+  oldBusinessRegistrationNumber: string | null;
+  newBusinessRegistrationNumber: string;
+  updatedAt: string;
+}
+
+export const getMemberChangeHistory = async ({
+  memberId,
+  page,
+  size
+}: {
+  memberId: number;
+  page: number;
+  size: number;
+}) => {
+  try {
+    const res = await request<
+      ApiResponse<PaginatedResponse<MemberChangeHistory>>
+    >({
+      method: 'GET',
+      url: `/api/admin/member/${memberId}/change-history`,
+      params: {
+        page,
+        size
+      }
+    });
+    toast.success('회원 변경 이력 조회 성공');
+    return res.data.data;
+  } catch (error) {
+    toast.error((error as any).message);
+    return undefined;
+  }
+};
+
 export interface Manager {
   managerId: number;
   name: string;

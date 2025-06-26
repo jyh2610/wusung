@@ -18,10 +18,7 @@ import { formatTime } from '@/lib/utils';
 
 interface IProps {
   formData: IFormCompany;
-  handleInputChange: (
-    field: keyof IFormCompany,
-    value: string | { year: string; month: string; day: string }
-  ) => void;
+  handleInputChange: (field: keyof IFormCompany, value: string) => void;
   onSendVerification: () => void;
   onSmsVerification: () => void;
   showVerification: boolean;
@@ -47,17 +44,13 @@ export const CompanyLocation = ({
     }
 
     try {
-      const response = await checkAuthenticationNumber({
+      await checkAuthenticationNumber({
         code: formData.verificationCode,
         phoneNum: formData.phone
       });
 
-      if (response.message === '인증이 완료되었습니다.') {
-        toast.success('인증이 완료되었습니다');
-        setShowVerification(false);
-      } else {
-        toast.error(response.message || '인증에 실패했습니다');
-      }
+      toast.success('인증이 완료되었습니다');
+      setShowVerification(false);
     } catch {
       toast.error('인증 중 오류가 발생했습니다');
     }
@@ -194,7 +187,7 @@ export const CompanyLocation = ({
               이메일<span className={starSpan}>*</span>
             </div>
           }
-          value={formData.email.split('@')[0]}
+          value={formData.email ? formData.email.split('@')[0] : ''}
           onChange={e => {
             const emailId = e.target.value;
             handleInputChange(
@@ -215,19 +208,23 @@ export const CompanyLocation = ({
           }
           onChange={selected => {
             if (selected) {
-              const emailId = formData.email.split('@')[0];
+              const emailId = formData.email
+                ? formData.email.split('@')[0]
+                : '';
               const domainValue = selected.value;
               handleInputChange('emailDomain', domainValue);
               handleInputChange('email', emailId + '@' + domainValue);
             } else {
               // 선택이 해제된 경우
-              const emailId = formData.email.split('@')[0];
+              const emailId = formData.email
+                ? formData.email.split('@')[0]
+                : '';
               handleInputChange('emailDomain', '');
               handleInputChange('email', emailId);
             }
           }}
           onCreateOption={inputValue => {
-            const emailId = formData.email.split('@')[0];
+            const emailId = formData.email ? formData.email.split('@')[0] : '';
             handleInputChange('emailDomain', inputValue);
             handleInputChange('email', emailId + '@' + inputValue);
           }}
@@ -237,7 +234,9 @@ export const CompanyLocation = ({
               inputValue &&
               !emailOptions.find(option => option.value === inputValue)
             ) {
-              const emailId = formData.email.split('@')[0];
+              const emailId = formData.email
+                ? formData.email.split('@')[0]
+                : '';
               handleInputChange('emailDomain', inputValue);
               handleInputChange('email', emailId + '@' + inputValue);
             }

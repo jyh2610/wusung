@@ -16,20 +16,47 @@ const checkPwHandler = async (pw: string) => {
 
 const submitCompanyUserInfoHandler = async (data: IFormCompany, file: File) => {
   const formData = new FormData();
-  formData.append('businessAccountEditDTO', JSON.stringify(data));
 
-  formData.append('files', file);
-
-  const response = await request<ApiResponse<UserInfoResponse>>({
-    method: 'post',
-    headers: {
-      'Content-Type': 'multipart/form-data'
+  // 서버 요청 형식에 맞게 데이터 재가공
+  const businessAccountEditDTO = {
+    representativeName: data.representativeName,
+    name: data.companyName,
+    address: data.address + '|' + data.detailAddress,
+    email: data.email,
+    phoneVerificationDTO: {
+      code: data.verificationCode,
+      phoneNum: data.phone
     },
-    url: '/api/my-page/account/business/edit',
-    data: formData
-  });
+    businessRegistrationNumber: data.corporateNumber,
+    birthOrEstablishmentDate: data.openingDate
+  };
 
-  return response;
+  formData.append(
+    'businessAccountEditDTO',
+    JSON.stringify(businessAccountEditDTO)
+  );
+
+  if (file) {
+    formData.append('file', file);
+  }
+
+  try {
+    const response = await request<ApiResponse<UserInfoResponse>>({
+      method: 'PUT',
+      headers: {
+        'Content-Type': 'multipart/form-data'
+      },
+      url: '/api/my-page/account/business/edit',
+      data: formData
+    });
+    toast.success(response.data.message);
+    return response;
+  } catch (error: any) {
+    toast.error(
+      error.response?.data?.message || '회원정보 수정 중 오류가 발생했습니다.'
+    );
+    throw error;
+  }
 };
 
 const submitIndivisualUserInfoHandler = async (
