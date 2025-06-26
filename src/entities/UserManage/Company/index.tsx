@@ -141,7 +141,7 @@ export function Company() {
 
       const res = await companySignup(formattedData);
       toast.success(res.data.message);
-      router.push('/signin');
+      window.location.href = '/signin';
     } catch (error: any) {
       toast.error(error.response?.data?.message || '회원가입에 실패했습니다.');
     }
