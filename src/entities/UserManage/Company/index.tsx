@@ -42,6 +42,7 @@ export function Company() {
     phone: '',
     phoneCode: '',
     email: '',
+    emailId: '',
     termOfUse: [false, false],
     verificationCode: '',
     emailDomain: ''

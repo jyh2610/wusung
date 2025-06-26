@@ -22,6 +22,7 @@ export interface IFormCompany {
   phone: string;
   phoneCode: string;
   email: string;
+  emailId: string;
   termOfUse: [boolean, boolean];
   emailDomain: string;
 }
@@ -36,6 +37,7 @@ export interface IFormIndividual {
   detailAddress: string;
   phone: string;
   email: string;
+  emailId: string;
   termOfUse: [boolean, boolean];
   emailDomain: string;
   birth: {
