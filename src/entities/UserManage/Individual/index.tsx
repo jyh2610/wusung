@@ -67,7 +67,7 @@ export function IndividualComponent() {
     setShowVerification(true);
     setTimeLeft(120);
   };
-
+  console.log(formData.email);
   const onSubmit = async (e: React.FormEvent<HTMLFormElement>) => {
     e.preventDefault();
 

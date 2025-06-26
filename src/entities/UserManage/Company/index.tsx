@@ -47,7 +47,7 @@ export function Company() {
     verificationCode: '',
     emailDomain: ''
   });
-
+  console.log(formData);
   const [showVerification, setShowVerification] = useState(false);
   const [timeLeft, setTimeLeft] = useState(120);
   const router = useRouter();
@@ -126,7 +126,7 @@ export function Company() {
           formData.address && formData.detailAddress
             ? formData.address + '|' + formData.detailAddress
             : '',
-        email: `${formData.email}@${formData.emailDomain}`,
+        email: `${formData.email}`,
         phoneVerificationDTO: {
           code: formData.verificationCode,
           phoneNum: formData.phone
