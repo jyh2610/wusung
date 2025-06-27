@@ -47,7 +47,7 @@ export function Company() {
     verificationCode: '',
     emailDomain: ''
   });
-
+  console.log(formData);
   const [showVerification, setShowVerification] = useState(false);
   const [timeLeft, setTimeLeft] = useState(120);
   const router = useRouter();
@@ -126,7 +126,7 @@ export function Company() {
           formData.address && formData.detailAddress
             ? formData.address + '|' + formData.detailAddress
             : '',
-        email: `${formData.email}@${formData.emailDomain}`,
+        email: `${formData.email}`,
         phoneVerificationDTO: {
           code: formData.verificationCode,
           phoneNum: formData.phone
@@ -141,7 +141,7 @@ export function Company() {
 
       const res = await companySignup(formattedData);
       toast.success(res.data.message);
-      router.push('/signin');
+      window.location.href = '/signin';
     } catch (error: any) {
       toast.error(error.response?.data?.message || '회원가입에 실패했습니다.');
     }

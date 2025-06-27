@@ -290,7 +290,7 @@ export const submitAddUser = async (form: IRegUser) => {
       method: 'POST',
       url: '/api/program/elder',
       data: {
-        name: form.name,
+        name: form.name || '',
         birthDate: form.birthDate,
         certificationStart: form.certificationStart,
         certificationEnd: form.certificationEnd,
@@ -336,7 +336,7 @@ export const updateUser = async (elderId: number, form: IRegUser) => {
       method: 'PUT',
       url: `/api/program/elder/${elderId}`,
       data: {
-        name: form.name,
+        name: form.name || '',
         birthDate: form.birthDate,
         certificationStart: form.certificationStart,
         certificationEnd: form.certificationEnd,
