@@ -154,19 +154,22 @@ export function Calendar({ schedule, isAdmin }: CalendarProps) {
                           onClick={handleDelete}
                           style={{
                             display: 'inline-block',
-                            width: '40px',
-                            height: '40px',
+                            width: '30px',
+                            height: '30px',
                             backgroundImage:
                               'url(/images/GettyImages-1309775865.jpg)',
-                            backgroundPosition: '-280px 0',
-                            backgroundSize: '320px 40px',
+                            backgroundPosition: '-210px 0',
+                            backgroundSize: '240px 30px',
                             backgroundRepeat: 'no-repeat',
+                            borderRadius: '50%',
                             cursor: 'pointer',
                             opacity:
                               draggingItem ===
                               `${dayNum}-${category}-${item.id}`
                                 ? 0.5
-                                : 1
+                                : 1,
+                            // 'border: '1px solid #ccc', // 테두리 제거
+                            backgroundColor: '#fff'
                           }}
                         />
                       </div>
