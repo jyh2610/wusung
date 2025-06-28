@@ -28,6 +28,7 @@ import {
   TooltipTrigger
 } from '@/components/ui/tooltip';
 import Image from 'next/image';
+import { CloseIcon } from '@/shared/ui';
 
 interface CalendarProps {
   schedule: Schedule;
@@ -150,26 +151,10 @@ export function Calendar({ schedule, isAdmin }: CalendarProps) {
                               ? `${item.content.slice(0, 8)}\n${item.content.slice(8)}`
                               : item.content}
                         </span>
-                        <span
-                          onClick={handleDelete}
-                          style={{
-                            display: 'inline-block',
-                            width: '40px',
-                            height: '40px',
-                            backgroundImage:
-                              'url(/images/GettyImages-1309775865.jpg)',
-                            backgroundPosition: '-280px 0',
-                            backgroundSize: '320px 40px',
-                            backgroundRepeat: 'no-repeat',
-                            objectFit: 'contain',
-                            cursor: 'pointer',
-                            opacity:
-                              draggingItem ===
-                              `${dayNum}-${category}-${item.id}`
-                                ? 0.5
-                                : 1
-                          }}
-                        />
+
+                        <span onClick={handleDelete} className="cursor-pointer">
+                          <CloseIcon />
+                        </span>
                       </div>
                     </TooltipTrigger>
                     <TooltipContent

@@ -9,3 +9,4 @@ export { DashBoard } from './dashboard/index';
 export { SkeletonList } from './SkeletonList';
 export { DaumAddressSearchButton } from './AddressSearchButton/index';
 export { ImageSlider } from './ImageSlider';
+export { CloseIcon } from './CloseIcon';

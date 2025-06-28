@@ -1,0 +1,35 @@
+export const CloseIcon = () => (
+  <svg
+    xmlns="http://www.w3.org/2000/svg"
+    viewBox="0 0 100 100"
+    width="20"
+    height="20"
+  >
+    <circle
+      cx="50"
+      cy="50"
+      r="48"
+      fill="#fff"
+      stroke="#e81a23"
+      strokeWidth="4"
+    />
+    <line
+      x1="32"
+      y1="32"
+      x2="68"
+      y2="68"
+      stroke="#e81a23"
+      strokeWidth="6"
+      strokeLinecap="round"
+    />
+    <line
+      x1="68"
+      y1="32"
+      x2="32"
+      y2="68"
+      stroke="#e81a23"
+      strokeWidth="6"
+      strokeLinecap="round"
+    />
+  </svg>
+);
