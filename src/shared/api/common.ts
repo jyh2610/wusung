@@ -141,3 +141,21 @@ export const getFAQList = async (page: number, size: number) => {
     console.error('FAQ 목록 조회 실패:', error);
   }
 };
+
+export const getHWPList = async (page: number, size: number) => {
+  try {
+    const res = await request<
+      ApiResponse<PaginatedResponse<IAnnouncementResponse>>
+    >({
+      method: 'GET',
+      url: '/api/common/main/announcement/HWP/list',
+      params: {
+        page: page,
+        size: size
+      }
+    });
+    return res.data.data;
+  } catch (error) {
+    console.error('HWP 목록 조회 실패:', error);
+  }
+};

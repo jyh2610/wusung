@@ -7,6 +7,7 @@ const menuList: MenuList = {
   subTitle: {
     dashboard: '공지사항',
     inquiry: '자주 묻는 질문',
+    hwp: 'HWP',
     'personal-inquiry': '1:1문의'
   }
 };

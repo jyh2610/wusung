@@ -120,7 +120,7 @@ export function LoginModal() {
           </div>
         </div>
       </div>
-      <TwoFAModal />
+      {requires2FA && <TwoFAModal />}
     </>
   );
 }

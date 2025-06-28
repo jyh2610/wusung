@@ -20,11 +20,10 @@ export function MypageComponent() {
     }
   }, [searchParams]);
 
-
-const handleMenuClick = (menu: string) => {
-  setSelectedMenu(menu);
-  router.push(`/mypage?tab=${menu}`);
-};
+  const handleMenuClick = (menu: string) => {
+    setSelectedMenu(menu);
+    router.push(`/mypage?tab=${menu}`);
+  };
 
   return (
     <div className={container}>

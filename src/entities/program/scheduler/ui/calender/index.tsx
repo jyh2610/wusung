@@ -161,6 +161,7 @@ export function Calendar({ schedule, isAdmin }: CalendarProps) {
                             backgroundPosition: '-280px 0',
                             backgroundSize: '320px 40px',
                             backgroundRepeat: 'no-repeat',
+                            objectFit: 'contain',
                             cursor: 'pointer',
                             opacity:
                               draggingItem ===

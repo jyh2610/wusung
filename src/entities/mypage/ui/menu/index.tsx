@@ -30,8 +30,6 @@ export function MypageMenu({
   selectedMenu: string;
   setSelectedMenu: (menu: string) => void;
 }) {
-  const id = 'test';
-  const limitDate = '2022-01-01';
   return (
     <div className={container}>
       <Logged />

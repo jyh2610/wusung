@@ -100,9 +100,7 @@ export function UserBox({
     >
       <div className={title}>
         <div className={userInfo}>
-          <span className={userNumber}>{user.elderId}</span>
           <span className={userName}>{user.name}</span>
-
           <div className={imgContainer}>
             <div className={imgBox}>
               <GradeCircle grade={Number(user.disabilityGrade)} />

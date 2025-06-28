@@ -4,11 +4,11 @@ import { colors } from '@/design-tokens';
 import { DashBoard } from '@/shared';
 import { TableRow, TableCell } from '@mui/material';
 import { useEffect, useState } from 'react';
-import { getFAQList } from '@/shared/api/common';
+import { getFAQList, getHWPList } from '@/shared/api/common';
 import { IAnnouncementResponse } from '@/shared/api/common';
 import { useRouter } from 'next/navigation';
 
-function Inquiry() {
+function HWP() {
   const router = useRouter();
   const [faqList, setFaqList] = useState<IAnnouncementResponse[]>([]);
   const [currentPage, setCurrentPage] = useState(1);
@@ -18,7 +18,7 @@ function Inquiry() {
 
   useEffect(() => {
     const fetchFAQList = async () => {
-      const data = await getFAQList(currentPage - 1, pageSize); // API는 0부터 시작하므로 -1
+      const data = await getHWPList(currentPage - 1, pageSize); // API는 0부터 시작하므로 -1
       if (data) {
         setFaqList(data.content);
         setTotalElements(data.totalElements);
@@ -63,7 +63,7 @@ function Inquiry() {
     <TableRow
       key={row.announcementId}
       hover
-      onClick={() => router.push(`/notice/inquiry/${row.announcementId}`)}
+      onClick={() => router.push(`/notice/hwp/${row.announcementId}`)}
       style={{ cursor: 'pointer' }}
     >
       <TableCell>{row.title}</TableCell>
@@ -227,4 +227,4 @@ function Inquiry() {
   );
 }
 
-export default Inquiry;
+export default HWP;

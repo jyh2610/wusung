@@ -5,12 +5,12 @@ export const useBoxContainer = style({
   display: 'flex',
   flexDirection: 'column',
   gap: '8px',
-  height: '450px',
-  overflowY: 'auto'
+  overflowY: 'auto',
+  height: '100%'
 });
 
 globalStyle(`${useBoxContainer}::-webkit-scrollbar`, {
-  width: '3px'
+  width: '5px'
 });
 
 globalStyle(`${useBoxContainer}::-webkit-scrollbar-track`, {

@@ -3,20 +3,10 @@
 import { IContentList } from '@/entities/program/type.dto';
 import { DashBoard } from '@/shared';
 import { useCategoryTreeStore } from '@/shared/stores/useCategoryTreeStore';
-import React, { useEffect, useState } from 'react';
+import React, { useState } from 'react';
 import { getContentList } from './utils';
-import {
-  TableRow,
-  TableCell,
-  Pagination,
-  Dialog,
-  DialogTitle,
-  DialogContent,
-  DialogActions,
-  Button
-} from '@mui/material';
+import { TableRow, TableCell, Pagination } from '@mui/material';
 import { usePathname, useRouter } from 'next/navigation';
-import { getNotokenSubscription } from '@/entities/UserManage/api';
 import { useQuery } from '@tanstack/react-query';
 
 const columns = [
@@ -28,7 +18,6 @@ const columns = [
 function Evaluation() {
   const { selectedCategoryNode } = useCategoryTreeStore();
   const [page, setPage] = useState<number>(0);
-  const [isModalOpen, setIsModalOpen] = useState(false);
   const pageSize = 10;
 
   const router = useRouter();
@@ -47,21 +36,6 @@ function Evaluation() {
     },
     enabled: !!selectedCategoryNode
   });
-
-  useEffect(() => {
-    const checkSubscription = async () => {
-      const subscription = await getNotokenSubscription();
-      if (!subscription?.data?.isVip) {
-        setIsModalOpen(true);
-      }
-    };
-    checkSubscription();
-  }, [router]);
-
-  const handleModalClose = () => {
-    setIsModalOpen(false);
-    router.push('/program');
-  };
 
   const handleClick = (id: string) => {
     const currentPath = pathname.replace(/\/$/, '');
@@ -90,17 +64,6 @@ function Evaluation() {
 
   return (
     <div>
-      <Dialog open={isModalOpen} onClose={handleModalClose}>
-        <DialogTitle>접근 권한 없음</DialogTitle>
-        <DialogContent>
-          <p>VIP 회원만 이용할 수 있는 서비스입니다.</p>
-        </DialogContent>
-        <DialogActions>
-          <Button onClick={handleModalClose} color="primary">
-            확인
-          </Button>
-        </DialogActions>
-      </Dialog>
       <p
         style={{
           fontSize: '24px',

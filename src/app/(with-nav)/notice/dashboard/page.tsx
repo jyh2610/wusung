@@ -21,14 +21,20 @@ function NoticeDashBoard() {
   const [page, setPage] = useState(0);
   const [rowsPerPage, setRowsPerPage] = useState(10);
   const [totalCount, setTotalCount] = useState(0);
-  const username = useAuthStore(state => state.username);
+  const { isAuthenticated, isHydrated, checkAuthentication } = useAuthStore();
   const [showModal, setShowModal] = useState(false);
 
+  // 컴포넌트 마운트 시 인증 상태 확인
   useEffect(() => {
-    if (!username) {
+    checkAuthentication();
+  }, [checkAuthentication]);
+
+  useEffect(() => {
+    // isHydrated가 true이고 isAuthenticated가 false일 때만 모달 표시
+    if (isHydrated && !isAuthenticated) {
       setShowModal(true);
     }
-  }, [username]);
+  }, [isAuthenticated, isHydrated]);
 
   const handleModalConfirm = () => {
     setShowModal(false);
@@ -84,10 +90,17 @@ function NoticeDashBoard() {
 
   const formatDate = (dateString: string) => {
     try {
-      return format(parseISO(dateString), 'yyyy-MM-dd');
+      const date = new Date(dateString);
+      if (isNaN(date.getTime())) {
+        return '-';
+      }
+      return date.toLocaleDateString('ko-KR', {
+        year: 'numeric',
+        month: '2-digit',
+        day: '2-digit'
+      });
     } catch (error) {
-      console.error('날짜 형식 오류:', error);
-      return '날짜 오류';
+      return '-';
     }
   };
 

@@ -67,7 +67,7 @@ export const CompanyInfoEdit = ({
   ): user is CompanyUserInfo & {
     setUserInfo: (info: CompanyUserInfo) => void;
   } => {
-    return user.UserType === '기업';
+    return user.UserType === '법인';
   };
 
   useEffect(() => {

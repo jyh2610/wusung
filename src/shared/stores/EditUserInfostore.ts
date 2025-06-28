@@ -26,7 +26,7 @@ export interface CompanyUserInfo {
   email: string;
   phoneNumber: string;
   id: string;
-  UserType: '기업';
+  UserType: '법인' | '개인';
 }
 
 export type UserInfoStore =

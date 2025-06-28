@@ -33,7 +33,7 @@ export const IdPw = <T extends IFormIndividual | IFormCompany>({
     const value = e.target.value;
     handleInputChange('id', value);
 
-    if (value.length >= 1) {
+    if (value.length >= 4) {
       try {
         const response = await checkUserName(value);
         const isAvailable = response.message === '사용 가능한 아이디입니다.';
@@ -48,6 +48,9 @@ export const IdPw = <T extends IFormIndividual | IFormCompany>({
         setIsIdValid(false);
         setIdError('아이디 중복 확인 중 오류가 발생했습니다.');
       }
+    } else if (value.length > 0) {
+      setIsIdValid(null);
+      setIdError('4글자 이상 입력해주세요.');
     } else {
       setIsIdValid(null);
       setIdError('');

@@ -2,10 +2,11 @@ import request from '@/shared/api/axiosInstance';
 import { ApiResponse, IManager, PaginatedResponse } from '@/shared/type';
 import { IGetInquiryDetail, IInquiry, paymentListDTO } from '../type';
 import { PaymentFilter } from '../ui/Content/const';
+import { toast } from 'react-toastify';
 
 export const getManager = async () => {
   try {
-    const res = await request<IManager[]>({
+    const res = await request<ApiResponse<IManager>>({
       url: '/api/my-page/account/business/manager'
     });
 
@@ -102,11 +103,23 @@ export const fixUserInfo = async (data: IManager) => {
     const res = await request<ApiResponse<{ code: string }>>({
       url: '/api/my-page/account/business/manager/edit',
       method: 'POST',
-      data
+      data: {
+        name: data.name,
+        jobGrade: data.jobGrade,
+        address: data.address,
+        email: data.email,
+        phoneVerificationDTO: {
+          code: data.verificationCode,
+          phoneNum: data.phoneNumber
+        }
+      }
     });
-
+    toast.success(res.data.message);
     return res.data;
   } catch (error) {
+    toast.error(
+      (error as any).response?.data?.message || '수정에 실패했습니다.'
+    );
     console.error('인증 실패:', error);
     throw error;
   }

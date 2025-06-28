@@ -71,3 +71,100 @@ export const regBtn = style({
 });
 
 export const inputBox = style({ display: 'flex', gap: '12px' });
+
+export const managerCard = style({
+  backgroundColor: colors.gray_scale.default,
+  borderRadius: '16px',
+  padding: '32px',
+  boxShadow: '0 4px 20px rgba(0, 0, 0, 0.08)',
+  border: `1px solid ${colors.gray_scale[200]}`,
+  cursor: 'pointer',
+  transition: 'all 0.2s ease-in-out',
+  ':hover': {
+    transform: 'translateY(-2px)',
+    boxShadow: '0 8px 30px rgba(0, 0, 0, 0.12)',
+    borderColor: colors.brand[300]
+  }
+});
+
+export const managerHeader = style({
+  display: 'flex',
+  alignItems: 'center',
+  gap: '16px',
+  marginBottom: '24px'
+});
+
+export const managerAvatar = style({
+  width: '64px',
+  height: '64px',
+  borderRadius: '50%',
+  backgroundColor: colors.brand[400],
+  display: 'flex',
+  alignItems: 'center',
+  justifyContent: 'center',
+  color: colors.gray_scale.default,
+  fontSize: '24px',
+  fontWeight: '600'
+});
+
+export const managerInfo = style({
+  flex: 1
+});
+
+export const managerName = style({
+  fontSize: '24px',
+  fontWeight: '600',
+  color: colors.gray_scale[900],
+  marginBottom: '4px'
+});
+
+export const managerJobGrade = style({
+  fontSize: '16px',
+  color: colors.brand[500],
+  fontWeight: '500'
+});
+
+export const managerDetails = style({
+  display: 'grid',
+  gridTemplateColumns: 'repeat(auto-fit, minmax(250px, 1fr))',
+  gap: '20px',
+  marginTop: '20px'
+});
+
+export const detailItem = style({
+  display: 'flex',
+  flexDirection: 'column',
+  gap: '8px'
+});
+
+export const detailLabel = style({
+  fontSize: '14px',
+  color: colors.gray_scale[600],
+  fontWeight: '500'
+});
+
+export const detailValue = style({
+  fontSize: '16px',
+  color: colors.gray_scale[900],
+  fontWeight: '400',
+  wordBreak: 'break-all'
+});
+
+export const editButton = style({
+  position: 'absolute',
+  top: '16px',
+  right: '16px',
+  padding: '8px 12px',
+  backgroundColor: colors.brand[0],
+  border: `1px solid ${colors.brand[200]}`,
+  borderRadius: '8px',
+  color: colors.brand[600],
+  fontSize: '14px',
+  fontWeight: '500',
+  cursor: 'pointer',
+  transition: 'all 0.2s ease-in-out',
+  ':hover': {
+    backgroundColor: colors.brand[100],
+    borderColor: colors.brand[300]
+  }
+});

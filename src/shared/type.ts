@@ -57,9 +57,10 @@ export interface phoneVerificationDTO {
 export interface IManager {
   name: string;
   jobGrade: string;
+  phoneNumber: string;
   address: string;
   email: string;
-  phoneVerificationDTO: phoneVerificationDTO;
+  verificationCode?: string;
 }
 
 export interface Sort {
