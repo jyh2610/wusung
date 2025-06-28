@@ -132,8 +132,9 @@ export function IndividualComponent() {
       };
 
       const res = await individualSignup(formattedData);
-      toast.success(res.data.message);
-      router.push('/signin');
+      if (res.status === 200) {
+        window.location.href = '/signup/complete';
+      }
     } catch (error: any) {
       console.log(error);
       toast.error('회원가입 중 오류가 발생했습니다.');

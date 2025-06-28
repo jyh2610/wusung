@@ -62,9 +62,9 @@ function Complete() {
             height: '56px',
             marginTop: '40px'
           }}
-          href={'/'}
+          href={'/signin'}
         >
-          {/* <Button type="brand" content="로그인 하기" /> */}
+          <Button type="brand" content="로그인 하기" />
         </Link>
       </div>
     </div>

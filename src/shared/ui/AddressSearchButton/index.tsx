@@ -3,7 +3,7 @@
 
 import React from 'react';
 import { useDaumPostcodePopup } from 'react-daum-postcode';
-import { Button } from '@/shared/ui';
+import { Button } from '../Button';
 
 const scriptUrl =
   'https://t1.daumcdn.net/mapjsapi/bundle/postcode/prod/postcode.v2.js';

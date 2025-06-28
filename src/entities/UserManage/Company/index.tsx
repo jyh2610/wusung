@@ -140,8 +140,9 @@ export function Company() {
       };
 
       const res = await companySignup(formattedData);
-      toast.success(res.data.message);
-      window.location.href = '/signin';
+      if (res.status === 200) {
+        window.location.href = '/signup/complete';
+      }
     } catch (error: any) {
       toast.error(error.response?.data?.message || '회원가입에 실패했습니다.');
     }
