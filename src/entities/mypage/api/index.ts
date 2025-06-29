@@ -199,3 +199,16 @@ export const addReply = async (id: number, content: string, files?: File[]) => {
     throw error;
   }
 };
+
+export const getUserType = async () => {
+  try {
+    const res = await request<ApiResponse<{ UserType: string }>>({
+      method: 'GET',
+      url: '/api/my-page/account/info/type'
+    });
+    return res.data;
+  } catch (error) {
+    console.error('사용자 유형 조회 실패:', error);
+    throw error;
+  }
+};

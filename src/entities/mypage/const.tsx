@@ -26,3 +26,13 @@ export const menuItems = [
   },
   { label: '회원정보 수정', icon: <FaCog />, component: <ProfileEdit /> }
 ];
+
+// 유저 타입에 따라 메뉴를 필터링하는 함수
+export const getFilteredMenuItems = (userType: string) => {
+  if (userType === '법인') {
+    return menuItems; // 법인인 경우 모든 메뉴 표시
+  } else {
+    // 개인인 경우 담당자 관리 메뉴 제외
+    return menuItems.filter(item => item.label !== '담당자 관리');
+  }
+};

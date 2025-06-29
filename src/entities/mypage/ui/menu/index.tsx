@@ -23,13 +23,24 @@ import {
 } from './index.css';
 import { ListComponent } from './ListComponent';
 import Logged from '@/entities/MainBanner/ui/Login/Logged';
+
+interface MenuItem {
+  label: string;
+  icon: React.ReactElement;
+  component: React.ReactElement;
+}
+
 export function MypageMenu({
   selectedMenu,
-  setSelectedMenu
+  setSelectedMenu,
+  menuItems: customMenuItems
 }: {
   selectedMenu: string;
   setSelectedMenu: (menu: string) => void;
+  menuItems?: MenuItem[];
 }) {
+  const itemsToRender = customMenuItems || menuItems;
+
   return (
     <div className={container}>
       <Logged />
@@ -37,7 +48,7 @@ export function MypageMenu({
       {/* 사이드 메뉴 */}
       <div className={menuListContainer}>
         <ul>
-          {menuItems.map(({ label, icon }) => (
+          {itemsToRender.map(({ label, icon }) => (
             <ListComponent
               key={label}
               icon={icon}
