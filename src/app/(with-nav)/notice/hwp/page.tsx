@@ -126,7 +126,7 @@ function HWP() {
             paddingBottom: '40px'
           }}
         >
-          자주 묻는 질문
+          한글 파일
         </h1>
       </div>
       <div>
