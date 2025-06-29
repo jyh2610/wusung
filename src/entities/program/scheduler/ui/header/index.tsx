@@ -304,7 +304,7 @@ function Header({
             onClick={printScheduleOnly}
           >
             <MdLocalPrintshop className={iconStyle} size={24} />
-            계획안만 인쇄
+            계획표만 인쇄
           </button>
           <button
             className={printButton}

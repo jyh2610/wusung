@@ -116,8 +116,8 @@ export function Control({ isAdmin }: { isAdmin: boolean }) {
             : difficultyLevel
       });
     } catch (error) {
-      console.error('계획안 불러오기 실패:', error);
-      toast.error('계획안을 불러오는데 실패했습니다.');
+      console.error('계획표 불러오기 실패:', error);
+      toast.error('계획표을 불러오는데 실패했습니다.');
     }
   };
 
@@ -238,7 +238,7 @@ export function Control({ isAdmin }: { isAdmin: boolean }) {
       difficultyLevel: selectedUser.difficultyLevel
     });
     if (!plan) {
-      toast.warn('계획안을 불러오는데 실패했습니다');
+      toast.warn('계획표을 불러오는데 실패했습니다');
       return;
     }
     await autoRegisterPlan({
@@ -260,7 +260,7 @@ export function Control({ isAdmin }: { isAdmin: boolean }) {
       month
     });
     if (!res) {
-      toast.warn('계획안 기록이 없습니다');
+      toast.warn('계획표 기록이 없습니다');
       return;
     }
     await autoRegisterPlan({
@@ -314,10 +314,10 @@ export function Control({ isAdmin }: { isAdmin: boolean }) {
         {!isAdmin && (
           <>
             <button className={buttonStyle} onClick={handleConfirm}>
-              계획안 불러오기
+              계획표 불러오기
             </button>
             <button className={buttonStyle} onClick={getHistory}>
-              계획안 기록 불러오기
+              계획표 기록 불러오기
             </button>
           </>
         )}
