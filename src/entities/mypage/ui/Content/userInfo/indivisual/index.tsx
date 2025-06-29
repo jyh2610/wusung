@@ -54,6 +54,7 @@ export const IndivisualInfo = ({
     detailAddress: '',
     phone: '',
     email: '',
+    emailId: '',
     termOfUse: [false, false],
     emailDomain: '',
     birth: {
@@ -86,6 +87,7 @@ export const IndivisualInfo = ({
         detailAddress: detailAddress || '',
         phone: userInfo.phoneNumber || '',
         email: emailId || '',
+        emailId: emailId || '',
         emailDomain: emailDomain || '',
         birth: {
           year: userInfo.birthOrEstablishmentDate?.substring(0, 4) || '',

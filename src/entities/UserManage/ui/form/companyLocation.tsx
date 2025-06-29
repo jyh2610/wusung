@@ -187,12 +187,14 @@ export const CompanyLocation = ({
               이메일<span className={starSpan}>*</span>
             </div>
           }
-          value={formData.email ? formData.email.split('@')[0] : ''}
+          value={formData.emailId || ''}
           onChange={e => {
             const emailId = e.target.value;
+            handleInputChange('emailId', emailId);
+            const domain = formData.emailDomain || '';
             handleInputChange(
               'email',
-              emailId + '@' + (formData.emailDomain || '')
+              domain ? `${emailId}@${domain}` : emailId
             );
           }}
         />
@@ -208,25 +210,21 @@ export const CompanyLocation = ({
           }
           onChange={selected => {
             if (selected) {
-              const emailId = formData.email
-                ? formData.email.split('@')[0]
-                : '';
+              const emailId = formData.emailId || '';
               const domainValue = selected.value;
               handleInputChange('emailDomain', domainValue);
-              handleInputChange('email', emailId + '@' + domainValue);
+              handleInputChange('email', `${emailId}@${domainValue}`);
             } else {
               // 선택이 해제된 경우
-              const emailId = formData.email
-                ? formData.email.split('@')[0]
-                : '';
+              const emailId = formData.emailId || '';
               handleInputChange('emailDomain', '');
               handleInputChange('email', emailId);
             }
           }}
           onCreateOption={inputValue => {
-            const emailId = formData.email ? formData.email.split('@')[0] : '';
+            const emailId = formData.emailId || '';
             handleInputChange('emailDomain', inputValue);
-            handleInputChange('email', emailId + '@' + inputValue);
+            handleInputChange('email', `${emailId}@${inputValue}`);
           }}
           onBlur={() => {
             // 포커스가 벗어날 때 입력된 값이 있으면 저장
@@ -234,11 +232,20 @@ export const CompanyLocation = ({
               inputValue &&
               !emailOptions.find(option => option.value === inputValue)
             ) {
-              const emailId = formData.email
-                ? formData.email.split('@')[0]
-                : '';
-              handleInputChange('emailDomain', inputValue);
-              handleInputChange('email', emailId + '@' + inputValue);
+              // 입력된 값에 @가 포함되어 있는지 확인
+              if (inputValue.includes('@')) {
+                const [inputEmailId, inputDomain] = inputValue.split('@');
+                if (inputEmailId && inputDomain) {
+                  handleInputChange('emailId', inputEmailId);
+                  handleInputChange('emailDomain', inputDomain);
+                  handleInputChange('email', inputValue);
+                }
+              } else {
+                // @가 없는 경우 도메인으로 처리
+                const emailId = formData.emailId || '';
+                handleInputChange('emailDomain', inputValue);
+                handleInputChange('email', `${emailId}@${inputValue}`);
+              }
             }
           }}
           onInputChange={newValue => {

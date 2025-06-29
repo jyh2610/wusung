@@ -53,6 +53,7 @@ export const CompanyInfoEdit = ({
     phone: '',
     phoneCode: '',
     email: '',
+    emailId: '',
     termOfUse: [false, false],
     emailDomain: ''
   });
@@ -83,6 +84,7 @@ export const CompanyInfoEdit = ({
       detailAddress: detailAddress || '',
       phone: userInfo.phoneNumber || '',
       email: emailId || '',
+      emailId: emailId || '',
       emailDomain: emailDomain || '',
       verificationCode: '',
       password: '',
