@@ -32,7 +32,7 @@ import {
 function TableSkeleton() {
   return (
     <TableRow>
-      {Array.from({ length: 6 }).map((_, index) => (
+      {Array.from({ length: 7 }).map((_, index) => (
         <TableCell key={index}>
           <Skeleton className="h-4 w-[100px]" />
         </TableCell>
@@ -40,6 +40,28 @@ function TableSkeleton() {
     </TableRow>
   );
 }
+
+const getTagVariant = (tag: string) => {
+  switch (tag.toUpperCase()) {
+    case 'HWP':
+      return 'default';
+    case 'FAQ':
+      return 'secondary';
+    default:
+      return 'outline';
+  }
+};
+
+const getTagColor = (tag: string) => {
+  switch (tag.toUpperCase()) {
+    case 'HWP':
+      return 'bg-blue-100 text-blue-800 border-blue-200';
+    case 'FAQ':
+      return 'bg-green-100 text-green-800 border-green-200';
+    default:
+      return '';
+  }
+};
 
 export const Dashboard = () => {
   const [search, setSearch] = useState('');
@@ -103,6 +125,7 @@ export const Dashboard = () => {
         <Table>
           <TableHeader>
             <TableRow>
+              <TableHead>태그</TableHead>
               <TableHead>제목</TableHead>
               <TableHead>상태</TableHead>
               <TableHead>조회수</TableHead>
@@ -118,7 +141,7 @@ export const Dashboard = () => {
               ))
             ) : filteredDashboard?.length === 0 ? (
               <TableRow>
-                <TableCell colSpan={6} className="text-center py-8">
+                <TableCell colSpan={7} className="text-center py-8">
                   공지사항이 없습니다.
                 </TableCell>
               </TableRow>
@@ -131,6 +154,20 @@ export const Dashboard = () => {
                   }
                   className="cursor-pointer"
                 >
+                  <TableCell className="font-medium">
+                    <div className="space-y-1">
+                      {item.topExposureTag && (
+                        <div>
+                          <Badge
+                            variant={getTagVariant(item.topExposureTag)}
+                            className={getTagColor(item.topExposureTag)}
+                          >
+                            {item.topExposureTag}
+                          </Badge>
+                        </div>
+                      )}
+                    </div>
+                  </TableCell>
                   <TableCell className="font-medium">{item.title}</TableCell>
                   <TableCell>
                     <Badge variant={item.isVisible ? 'default' : 'secondary'}>

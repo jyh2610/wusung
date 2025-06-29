@@ -159,7 +159,13 @@ export function MemberList() {
                   <TableCell>{member.email}</TableCell>
                   <TableCell>{member.createdAt?.slice(0, 10)}</TableCell>
                   <TableCell>{member.isWithdrawn ? '탈퇴' : '정상'}</TableCell>
-                  <TableCell>{member.isVip ? 'VIP' : '-'}</TableCell>
+                  <TableCell>
+                    {member.isVip === true
+                      ? 'VIP'
+                      : member.isVip === false
+                        ? '일반'
+                        : '-'}
+                  </TableCell>
                   <TableCell>
                     {member.subscriptionEndDate ? (
                       <div className="flex items-center gap-2">

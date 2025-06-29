@@ -44,5 +44,5 @@ export const useUserInfoStore = create<UserInfoStore>(set => ({
   email: '',
   phoneNumber: '',
   UserType: '개인',
-  setUserInfo: info => set({ ...info })
+  setUserInfo: (info: IndividualUserInfo | CompanyUserInfo) => set({ ...info })
 }));

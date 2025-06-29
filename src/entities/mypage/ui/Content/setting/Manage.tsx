@@ -3,7 +3,7 @@
 // components/ui/Content/ManagerForm.tsx
 import React, { useState, useEffect } from 'react';
 // react-select 컴포넌트 임포트
-import Select from 'react-select'; // react-select의 Select 컴포넌트 임포트
+import CreatableSelect from 'react-select/creatable'; // CreatableSelect로 변경
 import { toast } from 'react-toastify';
 
 // 기존 컴포넌트 임포트
@@ -44,8 +44,8 @@ export const emailOptions: IEmail[] = [
     value: 'naver.com' // 선택 시 실제 값
   },
   {
-    label: 'google.com',
-    value: 'google.com'
+    label: 'gmail.com',
+    value: 'gmail.com'
   },
   {
     label: 'daum.net',
@@ -89,6 +89,7 @@ export function ManagerForm({ onCancel, initialData }: ManagerFormProps) {
   const [isCodeSent, setIsCodeSent] = useState(false);
   const [timeLeft, setTimeLeft] = useState(0);
   const [showVerification, setShowVerification] = useState(false);
+  const [inputValue, setInputValue] = useState<string>(''); // CreatableSelect를 위한 입력값 상태 추가
 
   // 타이머 효과
   useEffect(() => {
@@ -106,13 +107,27 @@ export function ManagerForm({ onCancel, initialData }: ManagerFormProps) {
     }));
   };
 
-  // ★ react-select 값이 변경될 때 상태를 업데이트하는 핸들러
-  // react-select의 onChange는 선택된 '옵션 객체' 또는 null을 전달합니다.
+  // ★ CreatableSelect 값이 변경될 때 상태를 업데이트하는 핸들러
   const handleEmailDomainChange = (selectedOption: IEmail | null) => {
+    if (selectedOption) {
+      setFormData(prevData => ({
+        ...prevData,
+        emailDomain: selectedOption.value
+      }));
+    } else {
+      // 선택이 해제된 경우
+      setFormData(prevData => ({
+        ...prevData,
+        emailDomain: ''
+      }));
+    }
+  };
+
+  // 새로운 옵션 생성 핸들러
+  const handleCreateOption = (inputValue: string) => {
     setFormData(prevData => ({
       ...prevData,
-      // 선택된 옵션이 있으면 해당 value를, 없으면 빈 문자열을 상태에 저장
-      emailDomain: selectedOption ? selectedOption.value : ''
+      emailDomain: inputValue
     }));
   };
 
@@ -143,11 +158,11 @@ export function ManagerForm({ onCancel, initialData }: ManagerFormProps) {
     }
   };
 
-  // react-select의 value prop에 전달할 '선택된 옵션 객체' 찾기
-  // formData.emailDomain 값과 일치하는 emailOptions 배열의 객체를 찾습니다.
-  const selectedEmailOption = emailOptions.find(
-    option => option.value === formData.emailDomain
-  );
+  // CreatableSelect의 value prop에 전달할 '선택된 옵션 객체' 찾기
+  const selectedEmailOption = formData.emailDomain
+    ? { label: formData.emailDomain, value: formData.emailDomain }
+    : null;
+
   const isFormValid = () => {
     const {
       name,
@@ -295,29 +310,74 @@ export function ManagerForm({ onCancel, initialData }: ManagerFormProps) {
           />
 
           <span>@</span>
-          {/* ★ react-select Select 컴포넌트 사용 */}
-          <Select
+          {/* ★ CreatableSelect 컴포넌트 사용 */}
+          <CreatableSelect
+            isClearable
             options={emailOptions}
-            placeholder={'선택'}
+            placeholder="선택 또는 입력"
             value={selectedEmailOption}
             onChange={handleEmailDomainChange}
-            // ★ styles prop을 사용하여 높이 설정
+            onCreateOption={handleCreateOption}
+            onBlur={() => {
+              // 포커스가 벗어날 때 입력된 값이 있으면 저장
+              if (
+                inputValue &&
+                !emailOptions.find(option => option.value === inputValue)
+              ) {
+                handleCreateOption(inputValue);
+              }
+            }}
+            onInputChange={newValue => {
+              setInputValue(newValue);
+            }}
+            formatCreateLabel={inputValue => inputValue}
             styles={{
-              control: provided => ({
+              control: (provided, state) => ({
                 ...provided,
-                height: 57, // 높이를 57px로 설정
-                minHeight: 57, // 최소 높이도 57px로 설정하여 축소 방지
+                height: '57px',
                 width: '200px',
-                borderRadius: '12px'
+                borderRadius: '12px',
+                border: state.isFocused
+                  ? '1px solid #1AA93E'
+                  : '1px solid #BFBFBF',
+                boxShadow: state.isFocused ? '0 0 0 1px #1AA93E' : 'none'
               }),
               valueContainer: provided => ({
                 ...provided,
-                height: 'calc(57px - 8px - 8px)', // control padding 고려 (기본 8px)
-                padding: '0 8px' // 기본 패딩 유지 또는 조정
+                height: '100%',
+                padding: '0 8px',
+                display: 'flex',
+                alignItems: 'center'
               }),
               indicatorsContainer: provided => ({
                 ...provided,
-                height: 57 // control과 동일하게 설정
+                height: '100%'
+              }),
+              placeholder: provided => ({
+                ...provided,
+                color: '#BFBFBF',
+                fontSize: '16px'
+              }),
+              singleValue: provided => ({
+                ...provided,
+                color: '#333',
+                fontSize: '16px'
+              }),
+              menu: provided => ({
+                ...provided,
+                borderRadius: '12px',
+                overflow: 'hidden'
+              }),
+              option: (provided, state) => ({
+                ...provided,
+                backgroundColor: state.isSelected
+                  ? '#1AA93E'
+                  : state.isFocused
+                    ? '#E6F7EA'
+                    : 'white',
+                color: state.isSelected ? 'white' : '#333',
+                fontSize: '16px',
+                padding: '12px 8px'
               })
             }}
           />
@@ -380,7 +440,7 @@ export function ManagerForm({ onCancel, initialData }: ManagerFormProps) {
           )}
 
           {/* 인증번호 관련 그룹 */}
-          {isCodeSent && (
+          {isCodeSent && !isVerified && (
             <div className={inputBox}>
               <NomalInput
                 placeholder="인증번호를 입력해주세요"

@@ -1,7 +1,7 @@
 'use client';
 
 import { useState } from 'react';
-import { useQuery } from '@tanstack/react-query';
+import { useQuery, useQueryClient } from '@tanstack/react-query';
 import { getManager } from '@/entities/mypage/api';
 import { Button } from '@/shared/ui';
 import {
@@ -30,23 +30,25 @@ export function ManagerSettings() {
   const [selectedManager, setSelectedManager] = useState<IManager | undefined>(
     undefined
   );
+  const queryClient = useQueryClient();
 
   const { data, isLoading, error } = useQuery({
     queryKey: ['managers'],
     queryFn: getManager
   });
 
+  const handleCancel = () => {
+    setIsCreating(false);
+    setSelectedManager(undefined);
+    // 수정 완료 후 데이터를 새로 받아오기 위해 캐시 무효화
+    queryClient.invalidateQueries({ queryKey: ['managers'] });
+  };
+
   if (isLoading) return <div>로딩 중...</div>;
 
   if (isCreating) {
     return (
-      <ManagerForm
-        onCancel={() => {
-          setIsCreating(false);
-          setSelectedManager(undefined);
-        }}
-        initialData={selectedManager}
-      />
+      <ManagerForm onCancel={handleCancel} initialData={selectedManager} />
     );
   }
 
@@ -59,8 +61,6 @@ export function ManagerSettings() {
     if (!name) return '';
     return name.split('').slice(0, 2).join('');
   };
-
-  console.log(managerData);
 
   return (
     <div className={container}>
@@ -89,7 +89,6 @@ export function ManagerSettings() {
             <div className={editButton}>수정</div>
 
             <div className={managerHeader}>
-              <div className={managerAvatar}>{getInitials(manager.name)}</div>
               <div className={managerInfo}>
                 <div className={managerName}>{manager.name}</div>
                 <div className={managerJobGrade}>{manager.jobGrade}</div>
