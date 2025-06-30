@@ -15,7 +15,7 @@ export const navLists: INaviList[] = [
   },
   {
     title: '공지사항',
-    subTitle: ['공지사항', '1:1문의']
+    subTitle: ['공지사항', '한글 다운로드']
   },
   {
     title: '마이페이지',

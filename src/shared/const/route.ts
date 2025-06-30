@@ -13,6 +13,7 @@ export const routeMap = {
   payment_info: '/payment', // 요금 안내 및 결제
   notice: '/notice/dashboard', // 공지사항
   inquiry: '/notice/personal-inquiry', // 1:1문의
+  hwp: '/notice/hwp', // 한글 다운로드
   mypage: '/mypage', // 마이페이지
   mypage_payment: '/mypage?tab=결제내역', // 결제내역
   mypage_inquiry: '/mypage?tab=문의내역' // 문의내역

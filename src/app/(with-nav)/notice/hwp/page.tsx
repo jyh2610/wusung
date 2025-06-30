@@ -126,7 +126,7 @@ function HWP() {
             paddingBottom: '40px'
           }}
         >
-          한글 파일
+          한글 다운로드
         </h1>
       </div>
       <div>

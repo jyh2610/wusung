@@ -7,7 +7,7 @@ const menuList: MenuList = {
   subTitle: {
     dashboard: '공지사항',
     inquiry: '자주 묻는 질문',
-    hwp: '한글 파일',
+    hwp: '한글 다운로드',
     'personal-inquiry': '1:1문의'
   }
 };

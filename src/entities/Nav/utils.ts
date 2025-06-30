@@ -11,7 +11,7 @@ export function getRouteKey(title: string, sub?: string): string | null {
   if (title === '공지사항') {
     if (!sub) return 'notice';
     if (sub === '공지사항') return 'notice';
-    if (sub === '1:1문의') return 'inquiry';
+    if (sub === '한글 다운로드') return 'hwp';
   }
   if (title === '마이페이지') return 'mypage';
   return null;

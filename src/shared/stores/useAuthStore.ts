@@ -63,14 +63,15 @@ export const useAuthStore = create<AuthState>((set, get) => ({
 
       return true;
     } catch (error: any) {
-      toast.error('로그인에 실패했습니다. 아이디와 비밀번호를 확인해주세요.');
       const errorRes = error?.response?.data;
       if (errorRes?.requires2FA) {
+        toast.info('새로운 IP에서 로그인했습니다. 휴대폰 인증이 필요합니다.');
         set({
           requires2FA: true,
           tempUser: { id, password }
         });
       } else {
+        toast.error('로그인에 실패했습니다. 아이디와 비밀번호를 확인해주세요.');
         console.error('로그인 실패:', error);
         set({ isAuthenticated: false });
       }
