@@ -61,7 +61,7 @@ const printHistoryColumns = [
 export const PrintHistoryTab: React.FC<PrintHistoryTabProps> = ({
   memberId
 }) => {
-  const [printHistoryPage, setPrintHistoryPage] = useState(1);
+  const [printHistoryPage, setPrintHistoryPage] = useState(0);
   const [printHistoryPageSize, setPrintHistoryPageSize] = useState(10);
 
   const { data: printHistoryData } = useQuery({
