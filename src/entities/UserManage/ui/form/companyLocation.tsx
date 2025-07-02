@@ -15,6 +15,7 @@ import { IFormCompany } from '../../type';
 import { checkAuthenticationNumber } from '../../api';
 import { emailOptions } from './UserInfo';
 import { formatTime } from '@/lib/utils';
+import { verificationCode } from '@/entities/mypage/api';
 
 interface IProps {
   formData: IFormCompany;
@@ -24,6 +25,7 @@ interface IProps {
   showVerification: boolean;
   timeLeft: number;
   setShowVerification: Dispatch<SetStateAction<boolean>>;
+  isEdit?: boolean;
 }
 
 export const CompanyLocation = ({
@@ -33,7 +35,8 @@ export const CompanyLocation = ({
   onSmsVerification,
   showVerification,
   timeLeft,
-  setShowVerification
+  setShowVerification,
+  isEdit = false
 }: IProps) => {
   const [inputValue, setInputValue] = useState<string>('');
 
@@ -44,16 +47,21 @@ export const CompanyLocation = ({
     }
 
     try {
-      await checkAuthenticationNumber({
-        code: formData.verificationCode,
-        phoneNum: formData.phone
-      });
+      await (isEdit
+        ? verificationCode({
+            code: formData.verificationCode,
+            phoneNum: formData.phone
+          })
+        : checkAuthenticationNumber({
+            code: formData.verificationCode,
+            phoneNum: formData.phone
+          }));
 
       toast.success('인증이 완료되었습니다');
       setShowVerification(false);
     } catch {
       toast.error('인증 중 오류가 발생했습니다');
-    }
+    } 
   };
 
   return (

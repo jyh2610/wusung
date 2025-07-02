@@ -8,6 +8,7 @@ import { Button, Modal } from '@/shared/ui';
 import { validatePassword } from '@/lib/vaildatrion';
 import { modalTitle } from './index.css';
 import { useRouter } from 'next/navigation';
+
 export const ResetPw = () => {
   const [resetPw, setResetPw] = useState('');
   const [checkPw, setCheckPw] = useState('');

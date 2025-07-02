@@ -32,6 +32,7 @@ import {
 } from '@/entities/UserManage/FindInfo/Id/index.css';
 import { sendSignupSmsCode } from '@/entities/UserManage/api';
 import { toast } from 'react-toastify';
+import { verificationNum } from '@/entities/mypage/api';
 
 export const IndivisualInfo = ({
   setIsWithdrawal
@@ -131,9 +132,10 @@ export const IndivisualInfo = ({
     }
   };
 
-  const handleSendVerification = () => {
+  const handleSendVerification = async () => {
     setShowVerification(true);
     setTimeLeft(120);
+    await verificationNum(formData.phone);
   };
 
   const SubmitUserInfo = async () => {

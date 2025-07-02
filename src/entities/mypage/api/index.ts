@@ -61,7 +61,7 @@ export const verificationNum = async (phoneNum: string) => {
       method: 'POST',
       data: { phoneNum }
     });
-
+    toast.success(res.data.message);
     return res.data;
   } catch (error) {
     console.error('인증번호 전송 실패:', error);

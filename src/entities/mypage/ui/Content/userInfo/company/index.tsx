@@ -28,6 +28,7 @@ import { useRouter } from 'next/navigation';
 import { submitCompanyUserInfoHandler } from '../api';
 import { toast } from 'react-toastify';
 import { sendSignupSmsCode } from '@/entities/UserManage/api';
+import { verificationNum } from '@/entities/mypage/api';
 
 export const CompanyInfoEdit = ({
   setIsWithdrawal
@@ -114,9 +115,10 @@ export const CompanyInfoEdit = ({
     }));
   };
 
-  const handleSendVerification = () => {
+  const handleSendVerification = async () => {
     setShowVerification(true);
     setTimeLeft(120);
+    await verificationNum(formData.phone);
   };
 
   const SubmitUserInfo = async () => {
@@ -195,6 +197,7 @@ export const CompanyInfoEdit = ({
         <CompanyInfo
           formData={formData}
           handleInputChange={handleInputChange}
+          isEdit={true}
         />
         <CompanyLocation
           formData={formData}
@@ -204,6 +207,7 @@ export const CompanyInfoEdit = ({
           timeLeft={timeLeft}
           setShowVerification={setShowVerification}
           onSmsVerification={smsCode}
+          isEdit={true}
         />
       </div>
       <div className={buttonWrapper}>

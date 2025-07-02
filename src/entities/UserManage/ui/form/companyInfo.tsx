@@ -5,16 +5,20 @@ import { SelectBox } from '@/shared/ui/SelectBox';
 import { labelContainer, starSpan } from '../SignupForm/index.css';
 import { buttonContainer, container } from './index.css';
 import { IFormCompany } from '../../type';
-import { verifyCoporate } from '../../api';
+import { editCompanyInfo, verifyCoporate } from '../../api';
 import { toast } from 'react-toastify';
 import { colors } from '@/design-tokens';
 
 interface IProps {
   formData: IFormCompany;
   handleInputChange: (field: keyof IFormCompany, value: string) => void;
+  /**
+   * 수정(회원정보 변경) 화면인지 여부. 기본값은 false 이며, true 인 경우 기관정보 수정 API(editCompanyInfo)를 호출합니다.
+   */
+  isEdit?: boolean;
 }
 
-export const CompanyInfo = ({ formData, handleInputChange }: IProps) => {
+export const CompanyInfo = ({ formData, handleInputChange, isEdit = false }: IProps) => {
   const [selectedYear, setSelectedYear] = useState('');
   const [selectedMonth, setSelectedMonth] = useState('');
   const [selectedDay, setSelectedDay] = useState('');
@@ -92,14 +96,23 @@ export const CompanyInfo = ({ formData, handleInputChange }: IProps) => {
     }
 
     try {
-      await verifyCoporate({
-        b_no: formData.corporateNumber,
-        start_dt: formData.openingDate,
-        p_nm: formData.representativeName,
-        b_nm: formData.companyName
-      });
-
-      toast.success('기관인증이 완료되었습니다.');
+      if (isEdit) {
+        // 수정화면: 기관 정보 수정 API 호출
+        await editCompanyInfo({
+          b_no: formData.corporateNumber,
+          start_dt: formData.openingDate,
+          p_nm: formData.representativeName,
+          b_nm: formData.companyName
+        });
+      } else {
+        // 회원가입화면: 기관 인증 API 호출
+        await verifyCoporate({
+          b_no: formData.corporateNumber,
+          start_dt: formData.openingDate,
+          p_nm: formData.representativeName,
+          b_nm: formData.companyName
+        });
+      }
     } catch (error: any) {
       toast.error(
         error.response?.data?.message || '기관인증 중 오류가 발생했습니다.'

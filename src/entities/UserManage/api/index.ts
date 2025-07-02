@@ -7,6 +7,7 @@ import {
   userSub
 } from '../type';
 import { ApiResponse } from '@/shared/type';
+import { toast } from 'react-toastify';
 
 export const checkUserName = async (userName: string) => {
   const res = await request<IPostCheckIdRes>({
@@ -80,17 +81,23 @@ export const verifyCoporate = async ({
   p_nm,
   b_nm
 }: ICheckCorporate) => {
-  const res = await request<ApiResponse<{}>>({
-    method: 'POST',
-    url: '/api/common/signup/corporate/verification',
-    data: {
+  try {
+    const res = await request<ApiResponse<{}>>({
+      method: 'POST',
+      url: '/api/common/signup/corporate/verification',
+      data: {
       b_no,
       start_dt,
       p_nm,
       b_nm
     }
-  });
-  return res.data;
+    });
+    toast.success(res.data.message);
+    return res.data;
+  } catch (error: any) {
+    toast.error(error.response?.data?.message || '기관인증 실패');
+    throw error;
+  }
 };
 
 export interface PhoneVerificationDTO {
@@ -195,3 +202,26 @@ export const getNotokenSubscription = async () => {
     console.log('구독 잔여기간 조회 실패');
   }
 };
+
+
+export const editCompanyInfo = async ( { b_no,
+  start_dt,
+  p_nm,
+  b_nm}: ICheckCorporate) => {
+  try {
+    const res = await request<ApiResponse<ILoginData>>({
+      method: 'POST',
+      url: '/api/my-page/account/business/verify',
+      data: {
+        p_nm: p_nm,
+        b_nm: b_nm,
+        b_no: b_no,
+        start_dt: start_dt
+      }
+    });
+    toast.success(res.data.message);
+  } catch (error : any) {
+    toast.error(error.response?.data?.message || '기관정보 수정 실패');
+  }
+};
+
