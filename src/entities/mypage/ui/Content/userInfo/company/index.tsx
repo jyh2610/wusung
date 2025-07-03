@@ -77,7 +77,7 @@ export const CompanyInfoEdit = ({
     setFormData(prev => ({
       ...prev,
       id: userInfo.username || '',
-      representativeName: (userInfo as any).name || '', // API 응답의 name 필드 사용
+      representativeName: (userInfo as any).representativeName || '', // API 응답의 name 필드 사용
       companyName: (userInfo as any).name || '', // API 응답의 name 필드 사용
       corporateNumber: (userInfo as any).businessRegistrationNumber || '', // API 응답의 businessRegistrationNumber 필드 사용
       openingDate: (userInfo as any).birthOrEstablishmentDate || '', // API 응답의 birthOrEstablishmentDate 필드 사용
