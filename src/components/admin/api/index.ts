@@ -139,16 +139,23 @@ interface ContentListParams {
   year?: number; // 년도 (선택)
   month?: number; // 월 (선택)
   page?: number; // 페이지 번호 (선택, 기본값 0)
-  size?: number; // 페이지 크기 (선택)
+  size?: number; // 페이지 크기 (선택, 기본값 10)
 }
 
 // getContentList 함수의 수정된 타입
 export const getContentList = async (params: ContentListParams) => {
   try {
+    // 기본값 설정
+    const requestParams = {
+      page: 0,
+      size: 10,
+      ...params
+    };
+
     const res = await request<IApiResponse>({
       method: 'GET',
       url: '/api/admin/edu-content/list',
-      params
+      params: requestParams
     });
     return res.data.data;
   } catch (error) {

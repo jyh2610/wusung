@@ -31,6 +31,7 @@ import { getCategoryList, getContentList } from './api';
 import { IContent } from '@/entities/program/type.dto';
 import { useState } from 'react';
 import { CustomCascader } from '@/shared/ui/cascader';
+import { Pageable } from '@/shared/ui/Pageable';
 
 // 최하위 노드만 추출하는 함수
 function getLeafNodes(categories: Category[] = []): Category[] {
@@ -70,6 +71,8 @@ export function ContentList() {
   );
   const [selectedDifficulty, setSelectedDifficulty] = useState<number>(1);
   const [selectedCategory, setSelectedCategory] = useState<number | null>(null);
+  const [currentPage, setCurrentPage] = useState<number>(0);
+  const [pageSize] = useState<number>(10);
 
   const { data: categories = [] } = useQuery({
     queryKey: ['categories'],
@@ -84,7 +87,9 @@ export function ContentList() {
       selectedCategory,
       selectedYear,
       selectedMonth,
-      selectedDifficulty
+      selectedDifficulty,
+      currentPage,
+      pageSize
     ],
     queryFn: () => {
       if (!selectedCategory) return Promise.resolve(undefined);
@@ -92,7 +97,9 @@ export function ContentList() {
         categoryId: selectedCategory,
         difficultyLevel: selectedDifficulty,
         year: selectedYear,
-        month: selectedMonth
+        month: selectedMonth,
+        page: currentPage,
+        size: pageSize
       }).then(response => {
         if (response?.content) {
           return {
@@ -126,6 +133,15 @@ export function ContentList() {
     }
   };
 
+  const handlePageChange = (page: number) => {
+    setCurrentPage(page);
+  };
+
+  // 필터 변경 시 페이지를 0으로 리셋
+  const handleFilterChange = () => {
+    setCurrentPage(0);
+  };
+
   const formatDate = (dateString: string | number | Date) => {
     const date = new Date(dateString);
     return date.toLocaleDateString('ko-KR', {
@@ -146,6 +162,7 @@ export function ContentList() {
             onChange={value => {
               if (value && value.length > 0) {
                 setSelectedCategory(value[value.length - 1]);
+                handleFilterChange();
               }
             }}
             placeholder="카테고리 선택"
@@ -157,7 +174,10 @@ export function ContentList() {
           <label className="text-sm font-medium mb-1 block">년도</label>
           <Select
             value={selectedYear.toString()}
-            onValueChange={value => setSelectedYear(Number(value))}
+            onValueChange={value => {
+              setSelectedYear(Number(value));
+              handleFilterChange();
+            }}
           >
             <SelectTrigger>
               <SelectValue placeholder="년도 선택" />
@@ -176,7 +196,10 @@ export function ContentList() {
           <label className="text-sm font-medium mb-1 block">월</label>
           <Select
             value={selectedMonth.toString()}
-            onValueChange={value => setSelectedMonth(Number(value))}
+            onValueChange={value => {
+              setSelectedMonth(Number(value));
+              handleFilterChange();
+            }}
           >
             <SelectTrigger>
               <SelectValue placeholder="월 선택" />
@@ -195,7 +218,10 @@ export function ContentList() {
           <label className="text-sm font-medium mb-1 block">난이도</label>
           <Select
             value={selectedDifficulty.toString()}
-            onValueChange={value => setSelectedDifficulty(Number(value))}
+            onValueChange={value => {
+              setSelectedDifficulty(Number(value));
+              handleFilterChange();
+            }}
           >
             <SelectTrigger>
               <SelectValue placeholder="난이도 선택" />
@@ -266,6 +292,17 @@ export function ContentList() {
           </TableBody>
         </Table>
       </div>
+
+      {/* 페이지네이션 */}
+      {contentData && (
+        <div className="flex justify-center">
+          <Pageable
+            currentPage={currentPage}
+            totalPages={contentData.totalPages}
+            handlePageChange={handlePageChange}
+          />
+        </div>
+      )}
     </div>
   );
 }
