@@ -318,7 +318,7 @@ export function Calendar({ schedule, isAdmin }: CalendarProps) {
             {/* 인지활동 */}
             <div className={activityRow}>
               <div className={activityCell}>
-                <div className={activityLabel}>인지활동</div>
+                <div className={activityLabel}>인지활동1</div>
               </div>
               {week.map((dayNum, colIdx) =>
                 renderCell(dayNum, 'cognitive', weekIdx, colIdx)
@@ -328,7 +328,7 @@ export function Calendar({ schedule, isAdmin }: CalendarProps) {
             {/* 일상생활 */}
             <div className={activityRow}>
               <div className={activityCell}>
-                <div className={activityLabel}>일상생활 & 추가 인지활동</div>
+                <div className={activityLabel}>인지활동2</div>
               </div>
               {week.map((dayNum, colIdx) =>
                 renderCell(dayNum, 'daily', weekIdx, colIdx)
