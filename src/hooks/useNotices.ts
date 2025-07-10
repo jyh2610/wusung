@@ -2,6 +2,7 @@ import { useState, useEffect } from 'react';
 import { popupList, IPopupResponse } from '@/shared/api/common';
 
 interface Notice {
+  announcementId: number;
   title: string;
   content: string;
   positionCode: 'L' | 'R' | 'M';
@@ -31,7 +32,8 @@ export const useNotices = () => {
                 title: notice.title || '',
                 content: notice.content || '',
                 positionCode: notice.positionCode || 'L',
-                priority: notice.priority || notice.popupId || 0
+                priority: notice.priority || 0,
+                announcementId: notice.announcementId || 0
               };
             }
           );

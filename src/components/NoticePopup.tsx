@@ -6,6 +6,7 @@ interface Notice {
   content: string;
   positionCode: 'L' | 'R' | 'M'; // Left, Right, Center
   priority: number;
+  announcementId: number; // 추가된 필드
 }
 
 interface NoticePopupProps {
@@ -26,9 +27,9 @@ const NoticePopup: React.FC<NoticePopupProps> = ({
 
   console.log('Original notices:', notices);
   console.log(dontShowTodayState);
-  
-  const handleDontShowToday = (noticeId: number) => {
-    setDontShowTodayState(prev => [...prev, noticeId]);
+
+  const handleDontShowToday = (announcementId: number) => {
+    setDontShowTodayState(prev => [...prev, announcementId]);
     // 로컬 스토리지에 저장
     const today = new Date().toDateString();
     const storedNotices = JSON.parse(
@@ -36,13 +37,13 @@ const NoticePopup: React.FC<NoticePopupProps> = ({
     );
     localStorage.setItem(
       'noticePopupLastClosed',
-      JSON.stringify([...storedNotices, { id: noticeId, date: today }])
+      JSON.stringify([...storedNotices, { id: announcementId, date: today }])
     );
-    handleClose(noticeId);
+    handleClose(announcementId);
   };
 
-  const handleClose = (noticeId: number) => {
-    setClosedNotices(prev => [...prev, noticeId]);
+  const handleClose = (announcementId: number) => {
+    setClosedNotices(prev => [...prev, announcementId]);
   };
 
   useEffect(() => {
@@ -60,53 +61,61 @@ const NoticePopup: React.FC<NoticePopupProps> = ({
   // 모든 공지사항이 닫혔는지 확인
   useEffect(() => {
     const totalNotices = notices.length;
-    const closedAndDontShowToday = Array.from(new Set([...closedNotices, ...dontShowTodayState]));
+    const closedAndDontShowToday = Array.from(
+      new Set([...closedNotices, ...dontShowTodayState])
+    );
     if (closedAndDontShowToday.length === totalNotices) {
       onClose();
     }
   }, [closedNotices, dontShowTodayState, notices.length, onClose]);
-  
+
   console.log('Closed notices:', closedNotices);
   console.log('Dont show today state:', dontShowTodayState);
-  
+
   // 포지션별로 공지사항 그룹화하고 각각 priority로 정렬
   const leftNotices = notices
-    .filter(
-      notice => {
-        const positionCode = String(notice.positionCode).toUpperCase();
-        const isLeft = positionCode === 'L';
-        const isNotClosed = !closedNotices.includes(notice.priority);
-        const isNotDontShowToday = !dontShowTodayState.includes(notice.priority);
-        console.log(`Notice ${notice.title}: positionCode="${notice.positionCode}" (type: ${typeof notice.positionCode}), normalized="${positionCode}", isLeft=${isLeft}, isNotClosed=${isNotClosed}, isNotDontShowToday=${isNotDontShowToday}`);
-        return isLeft && isNotClosed && isNotDontShowToday;
-      }
-    )
+    .filter(notice => {
+      const positionCode = String(notice.positionCode).toUpperCase();
+      const isLeft = positionCode === 'L';
+      const isNotClosed = !closedNotices.includes(notice.announcementId);
+      const isNotDontShowToday = !dontShowTodayState.includes(
+        notice.announcementId
+      );
+      console.log(
+        `Notice ${notice.title}: positionCode="${notice.positionCode}" (type: ${typeof notice.positionCode}), normalized="${positionCode}", isLeft=${isLeft}, isNotClosed=${isNotClosed}, isNotDontShowToday=${isNotDontShowToday}`
+      );
+      return isLeft && isNotClosed && isNotDontShowToday;
+    })
     .sort((a, b) => a.priority - b.priority); // priority 낮은 순으로 정렬
-  
+
   const centerNotices = notices
-    .filter(
-      notice => {
-        const positionCode = String(notice.positionCode).toUpperCase();
-        const isCenter = positionCode === 'M';
-        const isNotClosed = !closedNotices.includes(notice.priority);
-        const isNotDontShowToday = !dontShowTodayState.includes(notice.priority);
-        console.log(`Notice ${notice.title}: positionCode="${notice.positionCode}" (type: ${typeof notice.positionCode}), normalized="${positionCode}", isCenter=${isCenter}, isNotClosed=${isNotClosed}, isNotDontShowToday=${isNotDontShowToday}`);
-        return isCenter && isNotClosed && isNotDontShowToday;
-      }
-    )
+    .filter(notice => {
+      const positionCode = String(notice.positionCode).toUpperCase();
+      const isCenter = positionCode === 'M';
+      const isNotClosed = !closedNotices.includes(notice.announcementId);
+      const isNotDontShowToday = !dontShowTodayState.includes(
+        notice.announcementId
+      );
+      console.log(
+        `Notice ${notice.title}: positionCode="${notice.positionCode}" (type: ${typeof notice.positionCode}), normalized="${positionCode}", isCenter=${isCenter}, isNotClosed=${isNotClosed}, isNotDontShowToday=${isNotDontShowToday}`
+      );
+      return isCenter && isNotClosed && isNotDontShowToday;
+    })
     .sort((a, b) => a.priority - b.priority); // priority 낮은 순으로 정렬
-  
+
   const rightNotices = notices
-    .filter(
-      notice => {
-        const positionCode = String(notice.positionCode).toUpperCase();
-        const isRight = positionCode === 'R';
-        const isNotClosed = !closedNotices.includes(notice.priority);
-        const isNotDontShowToday = !dontShowTodayState.includes(notice.priority);
-        console.log(`Notice ${notice.title}: positionCode="${notice.positionCode}" (type: ${typeof notice.positionCode}), normalized="${positionCode}", isRight=${isRight}, isNotClosed=${isNotClosed}, isNotDontShowToday=${isNotDontShowToday}`);
-        return isRight && isNotClosed && isNotDontShowToday;
-      }
-    )
+    .filter(notice => {
+      const positionCode = String(notice.positionCode).toUpperCase();
+      const isRight = positionCode === 'R';
+      const isNotClosed = !closedNotices.includes(notice.announcementId);
+      const isNotDontShowToday = !dontShowTodayState.includes(
+        notice.announcementId
+      );
+      console.log(
+        `Notice ${notice.title}: positionCode="${notice.positionCode}" (type: ${typeof notice.positionCode}), normalized="${positionCode}", isRight=${isRight}, isNotClosed=${isNotClosed}, isNotDontShowToday=${isNotDontShowToday}`
+      );
+      return isRight && isNotClosed && isNotDontShowToday;
+    })
     .sort((a, b) => a.priority - b.priority); // priority 낮은 순으로 정렬
 
   // 디버깅을 위한 로그 추가
@@ -114,9 +123,12 @@ const NoticePopup: React.FC<NoticePopupProps> = ({
   console.log('Center notices:', centerNotices);
   console.log('Right notices:', rightNotices);
 
-  const renderNoticeStack = (notices: Notice[], position: 'left' | 'center' | 'right') => {
+  const renderNoticeStack = (
+    notices: Notice[],
+    position: 'left' | 'center' | 'right'
+  ) => {
     if (notices.length === 0) return null;
-    
+
     const positionClasses = {
       left: 'left-4',
       center: 'left-1/2 -translate-x-1/2',
@@ -126,17 +138,21 @@ const NoticePopup: React.FC<NoticePopupProps> = ({
     console.log(`Rendering ${position} stack with ${notices.length} notices`);
 
     return (
-      <div 
+      <div
         className={`fixed top-4 ${positionClasses[position]} w-full max-w-[500px] px-4`}
         style={{
           ...(position === 'right' && { right: '16px', left: 'auto' }),
           ...(position === 'left' && { left: '16px', right: 'auto' }),
-          ...(position === 'center' && { left: '50%', transform: 'translateX(-50%)', right: 'auto' })
+          ...(position === 'center' && {
+            left: '50%',
+            transform: 'translateX(-50%)',
+            right: 'auto'
+          })
         }}
       >
         {notices.map((notice, index) => (
           <div
-            key={index}
+            key={notice.announcementId}
             className="bg-white p-6 rounded-lg shadow-lg pointer-events-auto border-2 border-gray-300"
             style={{
               zIndex: 10000 + index, // z-index로 겹쳐서 쌓이도록
@@ -152,7 +168,7 @@ const NoticePopup: React.FC<NoticePopupProps> = ({
                 {notice.title}
               </h2>
               <button
-                onClick={() => handleClose(notice.priority)}
+                onClick={() => handleClose(notice.announcementId)}
                 className="text-2xl text-gray-500 hover:text-gray-800 bg-transparent border-none cursor-pointer"
               >
                 &times;
@@ -164,17 +180,17 @@ const NoticePopup: React.FC<NoticePopupProps> = ({
             <div className="flex items-center gap-2">
               <input
                 type="checkbox"
-                id={`dontShowToday-${notice.priority}`}
-                checked={dontShowTodayState.includes(notice.priority)}
+                id={`dontShowToday-${notice.announcementId}`}
+                checked={dontShowTodayState.includes(notice.announcementId)}
                 onChange={e => {
                   if (e.target.checked) {
-                    handleDontShowToday(notice.priority);
+                    handleDontShowToday(notice.announcementId);
                   }
                 }}
                 className="w-4 h-4"
               />
               <label
-                htmlFor={`dontShowToday-${notice.priority}`}
+                htmlFor={`dontShowToday-${notice.announcementId}`}
                 className="text-sm text-gray-600"
               >
                 오늘 하루 동안 열지 않기
@@ -193,7 +209,7 @@ const NoticePopup: React.FC<NoticePopupProps> = ({
                 <Button
                   type="borderBrand"
                   content="확인"
-                  onClick={() => handleDontShowToday(notice.priority)}
+                  onClick={() => handleDontShowToday(notice.announcementId)}
                 />
               </div>
             </div>

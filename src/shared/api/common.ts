@@ -51,7 +51,7 @@ export interface IAnnouncementResponse {
 }
 
 export interface IPopupResponse {
-  popupId: number;
+  announcementId: number;
   title: string;
   content: string;
   positionCode: 'L' | 'R' | 'M';
