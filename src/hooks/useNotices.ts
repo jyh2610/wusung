@@ -26,14 +26,14 @@ export const useNotices = () => {
 
         if (response?.data?.data) {
           const transformedNotices = response.data.data.map(
-            (notice: IPopupResponse) => {
+            (notice: IPopupResponse, index: number) => {
               console.log('Individual notice:', notice);
               return {
                 title: notice.title || '',
                 content: notice.content || '',
                 positionCode: notice.positionCode || 'L',
                 priority: notice.priority || 0,
-                announcementId: notice.announcementId || 0
+                announcementId: notice.announcementId || index + 1 // 임의의 ID 생성
               };
             }
           );

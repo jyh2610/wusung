@@ -64,7 +64,7 @@ const NoticePopup: React.FC<NoticePopupProps> = ({
     const closedAndDontShowToday = Array.from(
       new Set([...closedNotices, ...dontShowTodayState])
     );
-    if (closedAndDontShowToday.length === totalNotices) {
+    if (closedAndDontShowToday.length === totalNotices && totalNotices > 0) {
       onClose();
     }
   }, [closedNotices, dontShowTodayState, notices.length, onClose]);
@@ -209,7 +209,13 @@ const NoticePopup: React.FC<NoticePopupProps> = ({
                 <Button
                   type="borderBrand"
                   content="확인"
-                  onClick={() => handleDontShowToday(notice.announcementId)}
+                  onClick={() => {
+                    if (dontShowTodayState.includes(notice.announcementId)) {
+                      handleDontShowToday(notice.announcementId);
+                    } else {
+                      handleClose(notice.announcementId);
+                    }
+                  }}
                 />
               </div>
             </div>

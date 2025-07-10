@@ -51,13 +51,13 @@ export interface IAnnouncementResponse {
 }
 
 export interface IPopupResponse {
-  announcementId: number;
+  announcementId?: number;
   title: string;
   content: string;
   positionCode: 'L' | 'R' | 'M';
   priority?: number;
-  createdAt: string;
-  updatedAt: string;
+  createdAt?: string;
+  updatedAt?: string;
 }
 
 interface IPartResponse {
