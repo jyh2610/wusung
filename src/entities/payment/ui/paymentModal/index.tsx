@@ -296,7 +296,7 @@ export default function PaymentPage({
                         className={radioInput}
                         onChange={handleInputChange}
                         checked={formData.paymentMethod === method}
-                        disabled={method === 'card' && username !== 'payment'}
+                        // disabled={method === 'card' && username !== 'payment'}
                       />
                       <label
                         htmlFor={method}
@@ -309,7 +309,7 @@ export default function PaymentPage({
                       >
                         <span className={radioIcon}>
                           {method === 'card' ? '💳' : '🏦'}
-                        </span>{' '}
+                        </span>
                         {method === 'card' ? '카드 결제' : '무통장 입금'}
                       </label>
                     </div>
