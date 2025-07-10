@@ -144,8 +144,8 @@ const NoticePopup: React.FC<NoticePopupProps> = ({
           ...(position === 'right' && { right: '16px', left: 'auto' }),
           ...(position === 'left' && { left: '16px', right: 'auto' }),
           ...(position === 'center' && {
-            left: '50%',
-            transform: 'translateX(-50%)',
+            left: '49%',
+            transform: 'translateX(-45%)',
             right: 'auto'
           })
         }}
