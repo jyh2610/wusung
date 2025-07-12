@@ -297,7 +297,16 @@ export default function PaymentPage({
                         onChange={handleInputChange}
                         checked={formData.paymentMethod === method}
                       />
-                      <label htmlFor={method} className={radioLabel}>
+                      <label
+                        htmlFor={method}
+                        className={radioLabel}
+                        style={
+                          method === 'card' &&
+                          (username === 'dev1' || username === 'dev2')
+                            ? { color: '#9CA3AF', cursor: 'not-allowed' }
+                            : {}
+                        }
+                      >
                         <span className={radioIcon}>
                           {method === 'card' ? '💳' : '🏦'}
                         </span>
