@@ -35,6 +35,15 @@ export function PaymentComponent() {
     setIsModalOpen(false);
   };
 
+  // 외부 클릭으로 모달을 닫지 않도록 처리
+  const handleModalClose = (event: object, reason: string) => {
+    // reason이 'backdropClick'이면 외부 클릭을 의미
+    if (reason === 'backdropClick') {
+      return; // 외부 클릭 시 아무것도 하지 않음
+    }
+    handleCloseModal();
+  };
+
   const handleOpenModal = () => {
     const { username } = useAuthStore.getState();
     if (!username) return toast.info('로그인이 필요한 서비스입니다.');
@@ -88,7 +97,7 @@ export function PaymentComponent() {
 
       <Modal
         open={isModalOpen}
-        onClose={handleCloseModal}
+        onClose={handleModalClose}
         aria-labelledby="payment-modal-title"
         aria-describedby="payment-modal-description"
       >
