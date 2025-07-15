@@ -30,7 +30,7 @@ export const ResetPw = () => {
 
   const redirectToLogin = () => {
     setIsOpen(false);
-    router.push('/signin');
+    window.location.href = '/signin';
   };
 
   return (

@@ -175,6 +175,7 @@ export const CompanyInfoEdit = ({
             <Button
               content="비밀번호 변경"
               type="borderBrand"
+              btnType="button"
               onClick={() => router.push(`/signin/find/password?type=change`)}
             />
           </div>

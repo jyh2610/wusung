@@ -157,7 +157,7 @@ const NoticePopup: React.FC<NoticePopupProps> = ({
             style={{
               zIndex: 10000 + index, // z-index로 겹쳐서 쌓이도록
               position: 'absolute',
-              marginTop: index * 50, // 인덱스에 따라 10px씩 아래로
+              marginTop: index * 60, // 인덱스에 따라 10px씩 아래로
               left: 0,
               right: 0,
               width: '100%'
