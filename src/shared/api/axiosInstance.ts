@@ -108,7 +108,7 @@ interface CustomAxiosRequestConfig extends AxiosRequestConfig {
 const handleAxiosError = async (error: AxiosError) => {
   const originalRequest = error.config as CustomAxiosRequestConfig;
 
-  // 네트워크 에러 처리 (서버 응답이 없는 경우)
+  // 네트워크 에러 처리 (서버 응답이 없는 경우) - 네트워크 에러 시 다른 처리 없이 바로 종료
   if (!error.response) {
     // 네트워크 연결 오류, 서버 다운, CORS 등의 문제
     if (error.code === 'NETWORK_ERROR' || error.code === 'ERR_NETWORK') {
@@ -124,7 +124,8 @@ const handleAxiosError = async (error: AxiosError) => {
       toast.error('네트워크 연결을 확인해주세요.');
     }
     console.error('네트워크 에러:', error.message);
-    return Promise.reject(error);
+    // 네트워크 에러 시 다른 에러 처리 로직 실행하지 않고 바로 종료
+    throw error;
   }
 
   // 401 에러에서 "Token is missing or invalid" 메시지 처리
