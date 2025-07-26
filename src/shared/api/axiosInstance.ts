@@ -108,6 +108,25 @@ interface CustomAxiosRequestConfig extends AxiosRequestConfig {
 const handleAxiosError = async (error: AxiosError) => {
   const originalRequest = error.config as CustomAxiosRequestConfig;
 
+  // 네트워크 에러 처리 (서버 응답이 없는 경우)
+  if (!error.response) {
+    // 네트워크 연결 오류, 서버 다운, CORS 등의 문제
+    if (error.code === 'NETWORK_ERROR' || error.code === 'ERR_NETWORK') {
+      toast.error('네트워크 연결을 확인해주세요.');
+    } else if (
+      error.code === 'ECONNABORTED' ||
+      error.message.includes('timeout')
+    ) {
+      // 타임아웃 에러
+      toast.error('요청 시간이 초과되었습니다. 네트워크 연결을 확인해주세요.');
+    } else {
+      // 기타 네트워크 관련 에러
+      toast.error('네트워크 연결을 확인해주세요.');
+    }
+    console.error('네트워크 에러:', error.message);
+    return Promise.reject(error);
+  }
+
   // 401 에러에서 "Token is missing or invalid" 메시지 처리
   if (error.response?.status === 401) {
     const errorData = error.response.data as any;
