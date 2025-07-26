@@ -124,8 +124,14 @@ const handleAxiosError = async (error: AxiosError) => {
       toast.error('네트워크 연결을 확인해주세요.');
     }
     console.error('네트워크 에러:', error.message);
-    // 네트워크 에러 시 다른 에러 처리 로직 실행하지 않고 바로 종료
-    throw error;
+    // 네트워크 에러 시 catch 블록으로 가지 않고 빈 응답 반환하여 호출 종료
+    return Promise.resolve({
+      data: null,
+      status: 0,
+      statusText: 'Network Error',
+      headers: {},
+      config: error.config || {}
+    } as any); // 빈 응답으로 성공 처리
   }
 
   // 401 에러에서 "Token is missing or invalid" 메시지 처리

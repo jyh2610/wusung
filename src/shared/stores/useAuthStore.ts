@@ -71,7 +71,11 @@ export const useAuthStore = create<AuthState>((set, get) => ({
           tempUser: { id, password }
         });
       } else {
-        toast.error('로그인에 실패했습니다. 아이디와 비밀번호를 확인해주세요.');
+        toast.error(
+          errorRes?.message === 'Invalid username or password'
+            ? '아이디와 비밀번호를 확인해주세요.'
+            : errorRes?.message
+        );
         console.error('로그인 실패:', error);
         set({ isAuthenticated: false });
       }

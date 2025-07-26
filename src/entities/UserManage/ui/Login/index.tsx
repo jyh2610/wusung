@@ -44,7 +44,6 @@ export function LoginModal() {
     }
   });
   const { login, requires2FA } = useAuthStore();
-  console.log(requires2FA);
 
   const id = watch('id');
   const password = watch('password');
