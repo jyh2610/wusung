@@ -197,6 +197,11 @@ export const MemberDetail: React.FC<MemberDetailProps> = ({ memberId }) => {
               <p className="text-lg">
                 <strong>회원 유형:</strong> {data.userType}
               </p>
+              {data.userType === '법인' && (
+                <p className="text-lg">
+                  <strong>사업자번호:</strong> {data.businessRegistrationNumber}
+                </p>
+              )}
               <p className="text-lg">
                 <strong>역할:</strong> {data.role}
               </p>
