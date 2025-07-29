@@ -35,6 +35,8 @@ function Header({
 }) {
   const [isPrintModalOpen, setIsPrintModalOpen] = useState(false);
   const [autoFillDate, setAutoFillDate] = useState(true);
+  const [printCalendar, setPrintCalendar] = useState(false);
+  const [printDailyCheck, setPrintDailyCheck] = useState(false);
   const [isPrinting, setIsPrinting] = useState(false);
   const searchParams = useSearchParams();
   const router = useRouter();
@@ -228,7 +230,9 @@ function Header({
         coverEduContentId: coverItemId!,
         middleEduContentIds,
         mainEduContentIds,
-        noPrintDate: autoFillDate
+        noPrintDate: autoFillDate,
+        noPrintDailyChecklist: printDailyCheck,
+        noPrintCalendar: printCalendar
       });
 
       if (pdfUrl) {
@@ -357,6 +361,28 @@ function Header({
                 type="checkbox"
                 checked={!autoFillDate}
                 onChange={() => setAutoFillDate(prev => !prev)}
+              />
+            </Typography>
+            <Typography
+              id="print-modal-description"
+              sx={{ mt: 2, display: 'flex', gap: '8px' }}
+            >
+              <div>자동 달력 출력</div>
+              <input
+                type="checkbox"
+                checked={!printCalendar}
+                onChange={() => setPrintCalendar(prev => !prev)}
+              />
+            </Typography>
+            <Typography
+              id="print-modal-description"
+              sx={{ mt: 2, display: 'flex', gap: '8px' }}
+            >
+              <div>일일 점검표 출력</div>
+              <input
+                type="checkbox"
+                checked={!printDailyCheck}
+                onChange={() => setPrintDailyCheck(prev => !prev)}
               />
             </Typography>
             <Box

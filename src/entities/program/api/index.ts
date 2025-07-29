@@ -434,6 +434,8 @@ export interface PrintPDFPayload {
   middleEduContentIds: number[];
   mainEduContentIds: number[][];
   noPrintDate: boolean;
+  noPrintDailyChecklist: boolean;
+  noPrintCalendar: boolean;
 }
 
 export const printPDF = async (
