@@ -17,7 +17,9 @@ export const head = style({
   fontWeight: '500',
   lineHeight: '23.87px',
   letterSpacing: '-2.5%',
-  color: colors.gray_scale['800'] // Default color
+  color: colors.gray_scale['800'], // Default color
+  display: 'flex',
+  gap: '8px'
 });
 
 export const body = style({

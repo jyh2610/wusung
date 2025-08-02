@@ -356,10 +356,10 @@ function Header({
               id="print-modal-description"
               sx={{ mt: 2, display: 'flex', gap: '8px' }}
             >
-              <div>활동지 날짜 자동 설정</div>
+              <div>활동지 날짜 자동 입력</div>
               <input
                 type="checkbox"
-                checked={!autoFillDate}
+                checked={autoFillDate}
                 onChange={() => setAutoFillDate(prev => !prev)}
               />
             </Typography>
@@ -367,7 +367,7 @@ function Header({
               id="print-modal-description"
               sx={{ mt: 2, display: 'flex', gap: '8px' }}
             >
-              <div>자동 달력 출력</div>
+              <div>계획표 인쇄하기</div>
               <input
                 type="checkbox"
                 checked={!printCalendar}
@@ -378,7 +378,7 @@ function Header({
               id="print-modal-description"
               sx={{ mt: 2, display: 'flex', gap: '8px' }}
             >
-              <div>일일 점검표 출력</div>
+              <div>일일 점검표 인쇄하기</div>
               <input
                 type="checkbox"
                 checked={!printDailyCheck}
