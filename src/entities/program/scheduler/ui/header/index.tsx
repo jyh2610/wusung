@@ -34,7 +34,7 @@ function Header({
   schedule: Schedule;
 }) {
   const [isPrintModalOpen, setIsPrintModalOpen] = useState(false);
-  const [autoFillDate, setAutoFillDate] = useState(true);
+  const [autoFillDate, setAutoFillDate] = useState(false);
   const [printCalendar, setPrintCalendar] = useState(false);
   const [printDailyCheck, setPrintDailyCheck] = useState(false);
   const [isPrinting, setIsPrinting] = useState(false);
@@ -359,7 +359,7 @@ function Header({
               <div>활동지 날짜 자동 입력</div>
               <input
                 type="checkbox"
-                checked={autoFillDate}
+                checked={!autoFillDate}
                 onChange={() => setAutoFillDate(prev => !prev)}
               />
             </Typography>
