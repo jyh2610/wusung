@@ -7,11 +7,17 @@ import {
   ResponseFile
 } from '../type';
 
-export const getDashboard = async () => {
+export const getDashboard = async ({
+  page = 0,
+  size = 10
+}: {
+  page?: number;
+  size?: number;
+} = {}) => {
   try {
     const res = await request<ApiResponse<PaginatedResponse<IDashboard>>>({
       method: 'GET',
-      url: '/api/admin/announcement/list'
+      url: `/api/admin/announcement/list?page=${page}&size=${size}`
     });
     return res.data.data;
   } catch (error) {

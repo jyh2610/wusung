@@ -12,10 +12,9 @@ import {
 import { Button } from '@/components/ui/button';
 import { useQuery, useQueryClient } from '@tanstack/react-query';
 import { getDashboard, deleteDashboard } from './api';
-import { Input } from '@/components/ui/input';
 import { Skeleton } from '@/components/ui/skeleton';
 import { Badge } from '@/components/ui/badge';
-import { Trash2, Pencil } from 'lucide-react';
+import { Trash2, Pencil, ChevronLeft, ChevronRight } from 'lucide-react';
 import { message } from 'antd';
 import { format } from 'date-fns';
 import { IDashboard } from './type';
@@ -64,18 +63,19 @@ const getTagColor = (tag: string) => {
 };
 
 export const Dashboard = () => {
-  const [search, setSearch] = useState('');
   const [isUploadOpen, setIsUploadOpen] = useState(false);
   const [isDeleteModalOpen, setIsDeleteModalOpen] = useState(false);
   const [selectedAnnouncementId, setSelectedAnnouncementId] = useState<
     number | null
   >(null);
+  const [currentPage, setCurrentPage] = useState(0);
+  const [pageSize] = useState(10);
   const router = useRouter();
   const queryClient = useQueryClient();
 
   const { data: dashboardData, isLoading } = useQuery({
-    queryKey: ['dashboard'],
-    queryFn: getDashboard,
+    queryKey: ['dashboard', currentPage, pageSize],
+    queryFn: () => getDashboard({ page: currentPage, size: pageSize }),
     refetchOnWindowFocus: true,
     refetchOnMount: true
   });
@@ -92,8 +92,6 @@ export const Dashboard = () => {
       await deleteDashboard(selectedAnnouncementId);
       message.success('공지사항이 성공적으로 삭제되었습니다.');
       await queryClient.invalidateQueries({ queryKey: ['dashboard'] });
-      const newData = await getDashboard();
-      queryClient.setQueryData(['dashboard'], newData);
     } catch (error) {
       message.error('공지사항 삭제 중 오류가 발생했습니다.');
     }
@@ -101,9 +99,9 @@ export const Dashboard = () => {
     setSelectedAnnouncementId(null);
   };
 
-  const filteredDashboard = dashboardData?.content.filter(item =>
-    item.title.toLowerCase().includes(search.toLowerCase())
-  );
+  const handlePageChange = (newPage: number) => {
+    setCurrentPage(newPage);
+  };
 
   if (isUploadOpen) {
     return <Upload onCancel={() => setIsUploadOpen(false)} />;
@@ -111,13 +109,7 @@ export const Dashboard = () => {
 
   return (
     <div className="space-y-4">
-      <div className="flex items-center justify-between mb-4">
-        <Input
-          placeholder="공지사항 검색"
-          value={search}
-          onChange={e => setSearch(e.target.value)}
-          className="max-w-sm bg-white"
-        />
+      <div className="flex items-center justify-end mb-4">
         <Button onClick={() => setIsUploadOpen(true)}>공지사항 등록</Button>
       </div>
 
@@ -139,14 +131,14 @@ export const Dashboard = () => {
               Array.from({ length: 5 }).map((_, index) => (
                 <TableSkeleton key={index} />
               ))
-            ) : filteredDashboard?.length === 0 ? (
+            ) : dashboardData?.content?.length === 0 ? (
               <TableRow>
                 <TableCell colSpan={7} className="text-center py-8">
                   공지사항이 없습니다.
                 </TableCell>
               </TableRow>
             ) : (
-              filteredDashboard?.map((item: IDashboard) => (
+              dashboardData?.content?.map((item: IDashboard) => (
                 <TableRow
                   key={item.announcementId}
                   onClick={() =>
@@ -216,6 +208,45 @@ export const Dashboard = () => {
           </TableBody>
         </Table>
       </div>
+
+      {/* 페이지네이션 */}
+      {dashboardData && (
+        <div className="flex flex-col items-center space-y-2 mt-4">
+          <div className="flex items-center space-x-2">
+            <Button
+              variant="outline"
+              size="sm"
+              onClick={() => handlePageChange(currentPage - 1)}
+              disabled={currentPage === 0}
+            >
+              <ChevronLeft className="h-4 w-4" />
+            </Button>
+
+            <div className="flex space-x-1">
+              {Array.from({ length: dashboardData.totalPages }, (_, i) => (
+                <Button
+                  key={i}
+                  variant={currentPage === i ? 'default' : 'outline'}
+                  size="sm"
+                  onClick={() => handlePageChange(i)}
+                  className="w-8 h-8"
+                >
+                  {i + 1}
+                </Button>
+              ))}
+            </div>
+
+            <Button
+              variant="outline"
+              size="sm"
+              onClick={() => handlePageChange(currentPage + 1)}
+              disabled={currentPage === dashboardData.totalPages - 1}
+            >
+              <ChevronRight className="h-4 w-4" />
+            </Button>
+          </div>
+        </div>
+      )}
 
       <Dialog open={isDeleteModalOpen} onOpenChange={setIsDeleteModalOpen}>
         <DialogContent className="bg-white">
