@@ -12,6 +12,7 @@ import {
 import { Button } from '@/components/ui/button';
 import { useQuery, useQueryClient } from '@tanstack/react-query';
 import { getDashboard, deleteDashboard } from './api';
+import { Input } from '@/components/ui/input';
 import { Skeleton } from '@/components/ui/skeleton';
 import { Badge } from '@/components/ui/badge';
 import { Trash2, Pencil, ChevronLeft, ChevronRight } from 'lucide-react';
@@ -63,6 +64,7 @@ const getTagColor = (tag: string) => {
 };
 
 export const Dashboard = () => {
+  const [search, setSearch] = useState('');
   const [isUploadOpen, setIsUploadOpen] = useState(false);
   const [isDeleteModalOpen, setIsDeleteModalOpen] = useState(false);
   const [selectedAnnouncementId, setSelectedAnnouncementId] = useState<
@@ -99,6 +101,12 @@ export const Dashboard = () => {
     setSelectedAnnouncementId(null);
   };
 
+  const filteredDashboard = dashboardData?.content?.filter(item =>
+    item.title.toLowerCase().includes(search.toLowerCase())
+  );
+
+  const displayData = search ? filteredDashboard : dashboardData?.content;
+
   const handlePageChange = (newPage: number) => {
     setCurrentPage(newPage);
   };
@@ -109,7 +117,16 @@ export const Dashboard = () => {
 
   return (
     <div className="space-y-4">
-      <div className="flex items-center justify-end mb-4">
+      <div className="flex items-center justify-between mb-4">
+        <Input
+          placeholder="공지사항 검색"
+          value={search}
+          onChange={e => {
+            setSearch(e.target.value);
+            setCurrentPage(0); // 검색 시 첫 페이지로 이동
+          }}
+          className="max-w-sm bg-white"
+        />
         <Button onClick={() => setIsUploadOpen(true)}>공지사항 등록</Button>
       </div>
 
@@ -131,14 +148,14 @@ export const Dashboard = () => {
               Array.from({ length: 5 }).map((_, index) => (
                 <TableSkeleton key={index} />
               ))
-            ) : dashboardData?.content?.length === 0 ? (
+            ) : displayData?.length === 0 ? (
               <TableRow>
                 <TableCell colSpan={7} className="text-center py-8">
                   공지사항이 없습니다.
                 </TableCell>
               </TableRow>
             ) : (
-              dashboardData?.content?.map((item: IDashboard) => (
+              displayData?.map((item: IDashboard) => (
                 <TableRow
                   key={item.announcementId}
                   onClick={() =>
