@@ -25,6 +25,8 @@ import { useScheduleStore } from '@/shared/stores/useScheduleStore';
 import { Box, Button, Modal, Typography } from '@mui/material';
 import { useSearchParams, useRouter } from 'next/navigation';
 import { printPdfWithIframe } from '@/lib/utils/printUtils';
+import { useIsFree } from '@/components/hooks/useIsFree';
+import { printFree, printFreeCalendar } from '@/entities/program/api/free';
 
 function Header({
   isAdmin,
@@ -33,6 +35,7 @@ function Header({
   isAdmin: boolean;
   schedule: Schedule;
 }) {
+  const isFree = useIsFree();
   const [isPrintModalOpen, setIsPrintModalOpen] = useState(false);
   const [autoFillDate, setAutoFillDate] = useState(false);
   const [printCalendar, setPrintCalendar] = useState(false);
@@ -223,17 +226,24 @@ function Header({
       const middleEduContentIds = etcItems.map(item => item.id);
       const mainEduContentIds = getFilteredMainEduContentIds();
 
-      const pdfUrl = await printPDF(selectedUserId, {
-        year,
-        month,
-        difficultyLevel: selectedUser.difficultyLevel,
-        coverEduContentId: coverItemId!,
-        middleEduContentIds,
-        mainEduContentIds,
-        noPrintDate: autoFillDate,
-        noPrintDailyChecklist: printDailyCheck,
-        noPrintCalendar: printCalendar
-      });
+      const pdfUrl = isFree
+        ? await printFree(selectedUserId, {
+            noPrintDate: autoFillDate,
+            noPrintDailyChecklist: printDailyCheck,
+            noPrintCalendar: printCalendar,
+            mainEduContentIds
+          })
+        : await printPDF(selectedUserId, {
+            year,
+            month,
+            difficultyLevel: selectedUser.difficultyLevel,
+            coverEduContentId: coverItemId!,
+            middleEduContentIds,
+            mainEduContentIds,
+            noPrintDate: autoFillDate,
+            noPrintDailyChecklist: printDailyCheck,
+            noPrintCalendar: printCalendar
+          });
 
       if (pdfUrl) {
         await printPdfWithIframe(pdfUrl);
@@ -255,12 +265,21 @@ function Header({
 
       const mainEduContentIds = getFilteredMainEduContentIds();
 
-      const pdfUrl = await printScheduleonly(
-        selectedUserId,
-        mainEduContentIds,
-        year,
-        month
-      );
+      const pdfUrl = isFree
+        ? await printFreeCalendar({
+            elderId: selectedUserId,
+            data: {
+              mainEduContentIds,
+              year,
+              month
+            }
+          })
+        : await printScheduleonly(
+            selectedUserId,
+            mainEduContentIds,
+            year,
+            month
+          );
 
       console.log('스케줄만 인쇄 - pdfUrl:', pdfUrl);
 

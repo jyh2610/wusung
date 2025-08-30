@@ -30,8 +30,12 @@ import { colors } from '@/design-tokens';
 import { useSearchParams } from 'next/navigation';
 import { IContent } from '@/entities/program/type.dto';
 import Image from 'next/image';
+import { useIsFree } from '@/components/hooks/useIsFree';
+import { getFreeHistoryList, getFreePlan } from '@/entities/program/api/free';
 
 export function Control({ isAdmin }: { isAdmin: boolean }) {
+  const isFree = useIsFree();
+
   const [isModalOpen, setModalOpen] = useState(false);
   const [modalType, setModalType] = useState<'etc' | 'cover' | null>(null);
   const [coverContent, setCoverContent] = useState<IContent | null>(null);
@@ -232,11 +236,13 @@ export function Control({ isAdmin }: { isAdmin: boolean }) {
       toast.warn('대상자를 선택해주세요');
       return;
     }
-    const plan = await getPlan({
-      year,
-      month,
-      difficultyLevel: selectedUser.difficultyLevel
-    });
+    const plan = isFree
+      ? await getFreePlan(selectedUser.difficultyLevel)
+      : await getPlan({
+          year,
+          month,
+          difficultyLevel: selectedUser.difficultyLevel
+        });
     if (!plan) {
       toast.warn('계획표을 불러오는데 실패했습니다');
       return;
@@ -254,11 +260,13 @@ export function Control({ isAdmin }: { isAdmin: boolean }) {
       toast.warn('대상자를 선택해주세요');
       return;
     }
-    const res = await getHistoryPlan({
-      elderId: selectedUser?.elderId,
-      year,
-      month
-    });
+    const res = isFree
+      ? await getFreeHistoryList(selectedUser?.elderId)
+      : await getHistoryPlan({
+          elderId: selectedUser?.elderId,
+          year,
+          month
+        });
     if (!res) {
       toast.warn('계획표 기록이 없습니다');
       return;

@@ -15,11 +15,18 @@ import {
 import { btn } from './ui/navBtn/index.css';
 import { useRouter, usePathname } from 'next/navigation';
 import { useAuthStore } from '@/shared/stores/useAuthStore';
+import { freeCount, FreeCountResponse } from '../api/free';
+import { useIsFree } from '@/components/hooks/useIsFree';
 
 export function ProgramNav() {
   const { username, checkAuthentication, endDate } = useAuthStore();
+  const isFree = useIsFree();
+  const [usedCount, setUsedCount] = useState<FreeCountResponse | undefined>(
+    undefined
+  );
   useEffect(() => {
     checkAuthentication();
+    getFreeCount();
   }, [checkAuthentication]);
   const router = useRouter();
   const pathname = usePathname(); // Get the current pathname using usePathname()
@@ -31,6 +38,13 @@ export function ProgramNav() {
           backgroundColor: 'transparent',
           color: colors.gray_scale[700]
         }; // Apply transparent background for non-selected buttons
+  };
+
+  const getFreeCount = async () => {
+    const res = await freeCount();
+    if (res) {
+      setUsedCount(res);
+    }
   };
 
   return (
@@ -134,12 +148,19 @@ export function ProgramNav() {
           <div className={textAlign}>{username}</div>
         </div>
 
-        <div className={navBtnContainer}>
+        {isFree ? (
           <div className={btn} style={{ cursor: 'default' }}>
-            <div className={textAlign}>사용기한 : {endDate}</div>
+            <div className={textAlign}>
+              사용 횟수 : {usedCount?.usedCount} / {usedCount?.totalCount}
+            </div>
           </div>
-        </div>
-
+        ) : (
+          <div className={navBtnContainer}>
+            <div className={btn} style={{ cursor: 'default' }}>
+              <div className={textAlign}>사용기한 : {endDate}</div>
+            </div>
+          </div>
+        )}
         <div className={navBtnContainer}>
           <div className={btn} onClick={() => router.push('/')}>
             <div className={textAlign}>프로그램 종료</div>

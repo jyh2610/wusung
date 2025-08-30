@@ -12,6 +12,7 @@ import { ApiResponse, EduContent, IRes } from '@/shared/type';
 import { extractLeafNodes, getlocalStorageValue } from '@/lib/utils';
 import { toast } from 'react-toastify';
 import { ContentListResponse } from '@/components/admin/api';
+import { IPlan } from '.';
 
 const getFreeCategoryList = async (): Promise<CategoryResponse> => {
   try {
@@ -68,40 +69,51 @@ const getElderFreeList = async () => {
   }
 };
 
+export interface FreeCountResponse {
+  totalCount: number;
+  usedCount: number;
+}
+
 const freeCount = async () => {
   try {
-    const res = await request<ApiResponse<number>>({
+    const res = await request<ApiResponse<FreeCountResponse>>({
       method: 'GET',
       url: '/api/common/free-trial/print/count'
     });
-    return res.data;
-  } catch (error) {
+    toast.success(res.data.message);
+    return res.data.data;
+  } catch (error: any) {
     console.error(error);
+    toast.error(error.response.data.message);
     return undefined;
   }
 };
 
-const getHistoryList = async (elderId: number) => {
+const getFreeHistoryList = async (elderId: number) => {
   try {
-    const res = await request<ApiResponse<ContentListResponse>>({
+    const res = await request<IRes<IPlan>>({
       method: 'GET',
       url: `/api/common/free-trial/plan/history/${elderId}`
     });
-    return res.data;
-  } catch (error) {
+    toast.success(res.data.message);
+    return res.data.data;
+  } catch (error: any) {
     console.error(error);
+    toast.error(error.response.data.message);
     return undefined;
   }
 };
 
 const getFreePlan = async (difficultyLevel: number) => {
   try {
-    const res = await request<ApiResponse<ContentListResponse>>({
+    const res = await request<IRes<IPlan>>({
       method: 'GET',
       url: `/api/common/free-trial/plan/${difficultyLevel}`
     });
-    return res.data;
-  } catch (error) {
+    toast.success(res.data.message);
+    return res.data.data;
+  } catch (error: any) {
+    toast.error(error?.response?.data?.message);
     console.error(error);
     return undefined;
   }
@@ -112,44 +124,64 @@ const printFreeCalendar = async ({
   data
 }: {
   elderId: number;
-  data: object;
+  data: {
+    mainEduContentIds: number[][];
+    year: number;
+    month: number;
+  };
 }) => {
   try {
-    const res = await request<ApiResponse<ContentListResponse>>({
+    const res = await request<Blob>({
       method: 'POST',
       url: '/api/common/free-trial/print/calendar',
       params: {
         elderId
       },
-      data
+      data,
+      headers: {
+        Accept: 'application/pdf'
+      },
+      responseType: 'blob'
     });
-    return res.data;
-  } catch (error) {
-    console.error(error);
-    return undefined;
+    const blob = new Blob([res.data], { type: 'application/pdf' });
+    const url = URL.createObjectURL(blob);
+    toast.success('스케줄 출력 성공');
+    return url;
+  } catch (error: any) {
+    toast.error(error?.response?.data?.message);
+    console.error('스케줄 출력 실패', error);
+    return null;
   }
 };
 
-const printFree = async ({
-  elderId,
-  data
-}: {
-  elderId: number;
-  data: object;
-}) => {
+interface PrintFreePayload {
+  noPrintDate: boolean;
+  noPrintDailyChecklist: boolean;
+  noPrintCalendar: boolean;
+  mainEduContentIds: number[][];
+}
+
+const printFree = async (
+  elderId: number,
+  payload: PrintFreePayload
+): Promise<string | null> => {
   try {
-    const res = await request<ApiResponse<ContentListResponse>>({
+    const res = await request<Blob>({
       method: 'POST',
-      url: '/api/common/free-trial/print',
-      params: {
-        elderId
+      url: `/api/common/free-trial/print?elderId=${elderId}`,
+      data: payload,
+      headers: {
+        Accept: 'application/pdf'
       },
-      data
+      responseType: 'blob'
     });
-    return res.data;
+
+    const blob = new Blob([res.data], { type: 'application/pdf' });
+    const url = URL.createObjectURL(blob);
+    return url;
   } catch (error) {
-    console.error(error);
-    return undefined;
+    console.error('📄 PDF 요청 실패:', error);
+    return null;
   }
 };
 
@@ -158,7 +190,7 @@ export {
   getFreeContentList,
   getElderFreeList,
   freeCount,
-  getHistoryList,
+  getFreeHistoryList,
   getFreePlan,
   printFreeCalendar,
   printFree
