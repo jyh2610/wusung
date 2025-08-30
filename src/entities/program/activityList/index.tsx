@@ -35,6 +35,7 @@ interface IProps {
     size?: number
   ) => void;
   isAdmin: boolean;
+  isFree: boolean;
   totalElements?: number;
   totalPages?: number;
   currentPage?: number;
@@ -45,6 +46,7 @@ export function ActivityList({
   activities,
   onFilterChange,
   isAdmin,
+  isFree,
   totalElements = 0,
   totalPages = 0,
   currentPage = 1,
@@ -62,12 +64,16 @@ export function ActivityList({
   const { categories, fetchCategories } = useCategoryStore();
 
   useEffect(() => {
-    fetchCategories(isAdmin);
+    fetchCategories(isAdmin, isFree);
   }, [fetchCategories]);
 
   // ✅ 카테고리 불러온 후 첫 번째 항목 자동 선택
   useEffect(() => {
-    if (categories?.length > 0) {
+    if (
+      Array.isArray(categories) &&
+      categories.length > 0 &&
+      !selectedCategoryId
+    ) {
       const firstCategory = categories[0];
       setSelectedCategoryId(firstCategory.categoryId);
       onFilterChange(
@@ -77,7 +83,14 @@ export function ActivityList({
         size
       );
     }
-  }, [categories]);
+  }, [
+    categories,
+    selectedLevel,
+    page,
+    size,
+    selectedCategoryId,
+    onFilterChange
+  ]);
 
   const MenuProps = {
     PaperProps: {
@@ -95,10 +108,23 @@ export function ActivityList({
   };
 
   const handleLevelClick = (level: 'high' | 'medium' | 'low') => {
+    console.log(
+      'ActivityList - Level clicked:',
+      level,
+      'Current selectedLevel:',
+      selectedLevel
+    );
+    console.log('ActivityList - selectedCategoryId:', selectedCategoryId);
+    console.log('ActivityList - difficultyMap[level]:', difficultyMap[level]);
+
     setSelectedLevel(level);
     setPage(1); // 난이도 변경 시 첫 페이지로 이동
     if (selectedCategoryId) {
       onFilterChange(selectedCategoryId, difficultyMap[level], 1, size);
+    } else {
+      console.log(
+        'ActivityList - selectedCategoryId is null, not calling onFilterChange'
+      );
     }
   };
 
@@ -180,7 +206,7 @@ export function ActivityList({
         </span>
         <div>
           <CustomCascader
-            options={categories}
+            options={Array.isArray(categories) ? categories : []}
             value={selectedCategoryId ? [selectedCategoryId] : undefined}
             onChange={value => {
               if (value && value.length > 0) {

@@ -15,6 +15,8 @@ import { usePathname } from 'next/navigation';
 import Modal from '@mui/material/Modal';
 import { IRegUser, IUser, IUserDetail } from '@/entities/program/type.dto';
 import { useQuery, useMutation, useQueryClient } from '@tanstack/react-query';
+import { getElderFreeList } from '@/entities/program/api/free';
+import { useIsFree } from '@/components/hooks/useIsFree';
 
 interface IProps {
   open: boolean;
@@ -35,6 +37,8 @@ export const DrawerList = ({ open, setOpen }: IProps) => {
   const selectUser = useUserStore(state => state.selectUser);
   const setUsers = useUserStore(state => state.setUsers);
 
+  const isFree = useIsFree();
+
   useEffect(() => {
     console.log('현재 선택된 유저 ID:', selectedUserId);
   }, [selectedUserId]);
@@ -47,9 +51,16 @@ export const DrawerList = ({ open, setOpen }: IProps) => {
     data: users = [],
     isLoading,
     refetch
-  } = useQuery({
+  } = useQuery<IUser[]>({
     queryKey: ['users'],
-    queryFn: getUser,
+    queryFn: async () => {
+      if (isFree) {
+        const response = await getElderFreeList();
+        return Array.isArray(response) ? response : response?.data || [];
+      } else {
+        return (await getUser()) || [];
+      }
+    },
     refetchOnWindowFocus: false,
     staleTime: 0,
     gcTime: 0

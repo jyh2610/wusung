@@ -1,8 +1,14 @@
 import { useState, useEffect, useCallback } from 'react';
 import { IContent } from '../../type.dto';
-import { getContentList, getUserContentList, ContentListResponse } from '@/components/admin/api';
+import {
+  getContentList,
+  getUserContentList,
+  ContentListResponse
+} from '@/components/admin/api';
+import { getFreeContentList } from '../../api/free';
 
 interface IProps {
+  isFree: boolean;
   isAdmin: boolean;
   categoryId: number;
   difficultyLevel: number;
@@ -11,6 +17,7 @@ interface IProps {
 }
 
 export function useActivities({
+  isFree,
   isAdmin,
   categoryId,
   difficultyLevel,
@@ -22,25 +29,46 @@ export function useActivities({
   const [totalElements, setTotalElements] = useState(0);
   const [totalPages, setTotalPages] = useState(0);
 
+  console.log('useActivities params:', {
+    isFree,
+    isAdmin,
+    categoryId,
+    difficultyLevel,
+    page,
+    size
+  });
   const fetchActivities = useCallback(() => {
     setIsLoading(true);
-    const params = { 
-      categoryId, 
+    const params = {
+      categoryId,
       difficultyLevel,
       page: page - 1, // API는 0-based 페이지네이션을 사용
-      size 
+      size
     };
 
     const fetchData = async () => {
       try {
-        const response = isAdmin
-          ? await getContentList(params)
-          : await getUserContentList({
-              categoryId,
-              difficultyLevel,
-              page: page - 1,
-              size
-            });
+        console.log('Fetching activities with params:', {
+          isFree,
+          isAdmin,
+          categoryId,
+          difficultyLevel,
+          page,
+          size
+        });
+
+        const response = isFree
+          ? await getFreeContentList(difficultyLevel, page - 1, size)
+          : isAdmin
+            ? await getContentList(params)
+            : await getUserContentList({
+                categoryId,
+                difficultyLevel,
+                page: page - 1,
+                size
+              });
+
+        console.log('API response:', response);
 
         if (Array.isArray(response)) {
           setActivities(response);
@@ -66,16 +94,16 @@ export function useActivities({
     };
 
     fetchData();
-  }, [isAdmin, categoryId, difficultyLevel, page, size]);
+  }, [isFree, isAdmin, categoryId, difficultyLevel, page, size]);
 
   useEffect(() => {
     fetchActivities();
   }, [fetchActivities]);
 
-  return { 
-    activities, 
-    fetchActivities, 
-    setActivities, 
+  return {
+    activities,
+    fetchActivities,
+    setActivities,
     isLoading,
     totalElements,
     totalPages

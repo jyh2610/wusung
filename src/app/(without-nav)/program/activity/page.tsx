@@ -47,6 +47,7 @@ import { handleCurrentPathRoute, getCascaderOptions } from '@/lib/utils';
 import { CustomCascader } from '@/shared/ui/cascader';
 import { IContent, ICategoryLeaf } from '@/entities/program/type.dto';
 import { useIsAdmin } from '@/components/hooks/useIsAdmin';
+import { useIsFree } from '@/components/hooks/useIsFree';
 
 function Activity() {
   const router = useRouter();
@@ -63,6 +64,7 @@ function Activity() {
     setSelectedCategoryNode
   } = useCategoryTreeStore();
 
+  const isFree = useIsFree();
   const isAdmin = useIsAdmin();
   const [personName, setPersonName] = useState<string[]>([]);
   const [selectedLevel, setSelectedLevel] = useState<'high' | 'medium' | 'low'>(
@@ -97,6 +99,7 @@ function Activity() {
     totalElements,
     totalPages
   } = useActivities({
+    isFree,
     isAdmin,
     categoryId: categoryId ?? 0,
     difficultyLevel: difficultyMap[selectedLevel],
@@ -156,11 +159,21 @@ function Activity() {
   };
 
   const handleLevelClick = (level: 'high' | 'medium' | 'low') => {
+    console.log(
+      'Level clicked:',
+      level,
+      'Current selectedLevel:',
+      selectedLevel
+    );
     setSelectedLevel(level);
     setCurrentPage(1); // 난이도 변경 시 첫 페이지로 이동
     if (selectedCategoryNode) {
       setCategoryId(selectedCategoryNode.categoryId);
     }
+    console.log(
+      'After setSelectedLevel, difficultyLevel will be:',
+      difficultyMap[level]
+    );
   };
 
   const handleActivitySelect = (eduContentId: number) => {
@@ -311,8 +324,8 @@ function Activity() {
   };
 
   useEffect(() => {
-    fetchCategories(isAdmin);
-  }, [fetchCategories, isAdmin]);
+    fetchCategories(isAdmin, isFree);
+  }, [fetchCategories, isAdmin, isFree]);
 
   useEffect(() => {
     if (categories && categories.length > 0 && personName.length === 0) {
@@ -349,6 +362,19 @@ function Activity() {
     };
     fetchData();
   }, [categoryId, fetchActivities, setActivities]);
+
+  // selectedLevel 변경 시 리페칭
+  useEffect(() => {
+    if (categoryId !== null) {
+      try {
+        fetchActivities();
+      } catch (error) {
+        console.error('활동지 불러오기 실패:', error);
+        toast.error('활동지 불러오기에 실패했습니다.');
+        setActivities([]);
+      }
+    }
+  }, [selectedLevel, categoryId, fetchActivities, setActivities]);
 
   const getCategoryPath = (categoryId: number): number[] => {
     const findPath = (

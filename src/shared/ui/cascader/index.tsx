@@ -34,6 +34,11 @@ export function CustomCascader({
 }: CustomCascaderProps) {
   // ICategoryLeaf를 CascaderOption으로 변환
   const transformOptions = (items: ICategoryLeaf[]): CascaderOption[] => {
+    // items가 배열이 아닌 경우 빈 배열로 처리
+    if (!Array.isArray(items)) {
+      return [];
+    }
+
     return items.map(item => ({
       value: item.categoryId,
       label: item.name,
@@ -139,7 +144,7 @@ export function CustomCascader({
 
   return (
     <Cascader
-      options={transformOptions(options)}
+      options={transformOptions(options || [])}
       value={value}
       onChange={handleChange}
       expandTrigger="hover"

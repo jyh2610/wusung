@@ -7,11 +7,13 @@ import { useActivities } from './scheduler/model/useActivities';
 import { useDragAndDrop } from './scheduler/model/useDragAndDrop';
 import { SchedulerLayout } from './scheduler';
 import { useIsAdmin } from '@/components/hooks/useIsAdmin';
+import { useIsFree } from '@/components/hooks/useIsFree';
 import { useScheduleStore } from '@/shared/stores/useScheduleStore';
 import { scrollHidden } from './scheduler/index.css';
 
 export function ProgramComponent() {
   const isAdmin = useIsAdmin();
+  const isFree = useIsFree();
   const { schedule, reInit } = useScheduleStore();
   useEffect(() => {
     return () => {
@@ -26,6 +28,7 @@ export function ProgramComponent() {
 
   const { activities, setActivities, totalElements, totalPages } =
     useActivities({
+      isFree,
       isAdmin,
       categoryId,
       difficultyLevel,
@@ -44,6 +47,12 @@ export function ProgramComponent() {
     page?: number,
     size?: number
   ) => {
+    console.log('handleFilterChange called:', {
+      categoryId,
+      difficultyLevel,
+      page,
+      size
+    });
     setCategoryId(categoryId);
     setDifficultyLevel(difficultyLevel);
     if (page !== undefined) {
@@ -82,6 +91,7 @@ export function ProgramComponent() {
             totalPages={totalPages}
             currentPage={currentPage}
             pageSize={pageSize}
+            isFree={isFree}
           />
           <SchedulerLayout schedule={schedule} isAdmin={isAdmin} />
         </div>
