@@ -62,6 +62,7 @@ import { printSelectedActivities } from '@/lib/utils/printUtils';
 import { CustomCascader } from '@/shared/ui/cascader';
 import { IContent, ICategoryLeaf } from '@/entities/program/type.dto';
 import { useIsAdmin } from '@/components/hooks/useIsAdmin';
+import { useIsFree } from '@/components/hooks/useIsFree';
 
 function ETC() {
   const router = useRouter();
@@ -94,7 +95,7 @@ function ETC() {
   const [pageSize, setPageSize] = useState(20);
 
   const { categories, fetchCategories } = useCategoryStore();
-
+  const isFree = useIsFree();
   const {
     activities,
     fetchActivities,
@@ -106,7 +107,8 @@ function ETC() {
     categoryId: categoryId ?? 0,
     difficultyLevel: 0,
     page: currentPage,
-    size: pageSize
+    size: pageSize,
+    isFree: isFree
   });
 
   // 페이지네이션 계산 - 서버에서 받아온 데이터를 그대로 사용

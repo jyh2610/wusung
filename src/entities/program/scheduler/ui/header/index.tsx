@@ -27,6 +27,8 @@ import { useSearchParams, useRouter } from 'next/navigation';
 import { printPdfWithIframe } from '@/lib/utils/printUtils';
 import { useIsFree } from '@/components/hooks/useIsFree';
 import { printFree, printFreeCalendar } from '@/entities/program/api/free';
+import { useFreeCountStore } from '@/shared/stores';
+import { FaLock } from 'react-icons/fa';
 
 function Header({
   isAdmin,
@@ -36,6 +38,7 @@ function Header({
   schedule: Schedule;
 }) {
   const isFree = useIsFree();
+  const { usedCount, isStillTrial, fetchFreeCount } = useFreeCountStore();
   const [isPrintModalOpen, setIsPrintModalOpen] = useState(false);
   const [autoFillDate, setAutoFillDate] = useState(false);
   const [printCalendar, setPrintCalendar] = useState(false);
@@ -56,6 +59,12 @@ function Header({
   );
 
   const { resetScheduleOnly } = useScheduleStore();
+
+  useEffect(() => {
+    if (isFree) {
+      fetchFreeCount();
+    }
+  }, [isFree, fetchFreeCount]);
 
   useEffect(() => {
     const yearParam = searchParams.get('year');
@@ -83,7 +92,16 @@ function Header({
 
   const mainEduContentIds = formatScheduleData(schedule, year, month);
 
-  const handleOpenPrintModal = () => setIsPrintModalOpen(true);
+  const handleOpenPrintModal = () => {
+    if (isFree && !isStillTrial) {
+      toast.error(
+        '무료 체험 횟수를 모두 사용하셨습니다. 유료 버전을 이용해주세요.'
+      );
+      return;
+    }
+    setIsPrintModalOpen(true);
+  };
+
   const handleClosePrintModal = () => setIsPrintModalOpen(false);
 
   const handlePrintConfirm = async () => {
@@ -257,6 +275,13 @@ function Header({
   };
 
   const printScheduleOnly = async () => {
+    if (isFree && !isStillTrial) {
+      toast.error(
+        '무료 체험 횟수를 모두 사용하셨습니다. 유료 버전을 이용해주세요.'
+      );
+      return;
+    }
+
     try {
       if (!selectedUserId) {
         toast.error('사용자가 선택되지 않았습니다.');
@@ -325,16 +350,38 @@ function Header({
             className={printButton}
             type="button"
             onClick={printScheduleOnly}
+            style={{
+              opacity: isFree && !isStillTrial ? 0.5 : 1,
+              cursor: isFree && !isStillTrial ? 'not-allowed' : 'pointer',
+              display: 'flex',
+              alignItems: 'center',
+              gap: '8px'
+            }}
           >
-            <MdLocalPrintshop className={iconStyle} size={24} />
+            {isFree && !isStillTrial ? (
+              <FaLock size={18} />
+            ) : (
+              <MdLocalPrintshop className={iconStyle} size={24} />
+            )}
             계획표만 인쇄
           </button>
           <button
             className={printButton}
             type="button"
             onClick={handleOpenPrintModal}
+            style={{
+              opacity: isFree && !isStillTrial ? 0.5 : 1,
+              cursor: isFree && !isStillTrial ? 'not-allowed' : 'pointer',
+              display: 'flex',
+              alignItems: 'center',
+              gap: '8px'
+            }}
           >
-            <MdLocalPrintshop className={iconStyle} size={24} />
+            {isFree && !isStillTrial ? (
+              <FaLock size={18} />
+            ) : (
+              <MdLocalPrintshop className={iconStyle} size={24} />
+            )}
             인쇄
           </button>
         </div>

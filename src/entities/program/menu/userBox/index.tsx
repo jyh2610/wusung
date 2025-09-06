@@ -30,6 +30,7 @@ import {
   DropdownMenuContent,
   DropdownMenuItem
 } from '@/components/ui/dropdown-menu';
+import { FaLock } from 'react-icons/fa';
 
 interface IProps {
   user: IUser;
@@ -39,6 +40,7 @@ interface IProps {
   onEdit: (user: IUser) => void;
   onDelete: (user: IUser) => void;
   onSuccess?: () => void;
+  disabled?: boolean;
 }
 
 export function UserBox({
@@ -48,7 +50,8 @@ export function UserBox({
   onDetail,
   onEdit,
   onDelete,
-  onSuccess
+  onSuccess,
+  disabled = false
 }: IProps) {
   const [showMenu, setShowMenu] = useState(false);
   const [editModalOpen, setEditModalOpen] = useState(false);
@@ -96,8 +99,35 @@ export function UserBox({
   return (
     <div
       className={classNames(container, { [selectedContainer]: isSelected })}
-      onClick={onSelect}
+      onClick={disabled ? undefined : onSelect}
+      style={{
+        opacity: disabled ? 0.5 : 1,
+        cursor: disabled ? 'not-allowed' : 'pointer',
+        pointerEvents: disabled ? 'none' : 'auto',
+        position: 'relative'
+      }}
     >
+      {disabled && (
+        <div
+          style={{
+            position: 'absolute',
+            top: '50%',
+            left: '50%',
+            transform: 'translate(-50%, -50%)',
+            zIndex: 10,
+            background: 'rgba(255, 255, 255, 0.9)',
+            borderRadius: '50%',
+            width: '40px',
+            height: '40px',
+            display: 'flex',
+            alignItems: 'center',
+            justifyContent: 'center',
+            boxShadow: '0 2px 8px rgba(0,0,0,0.15)'
+          }}
+        >
+          <FaLock size={20} color={colors.gray_scale[600]} />
+        </div>
+      )}
       <div className={title}>
         <div className={userInfo}>
           <span className={userName}>{user.name}</span>

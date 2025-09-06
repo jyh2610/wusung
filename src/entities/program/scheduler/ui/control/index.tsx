@@ -32,9 +32,12 @@ import { IContent } from '@/entities/program/type.dto';
 import Image from 'next/image';
 import { useIsFree } from '@/components/hooks/useIsFree';
 import { getFreeHistoryList, getFreePlan } from '@/entities/program/api/free';
+import { useFreeCountStore } from '@/shared/stores';
+import { FaLock } from 'react-icons/fa';
 
 export function Control({ isAdmin }: { isAdmin: boolean }) {
   const isFree = useIsFree();
+  const { usedCount, isStillTrial, fetchFreeCount } = useFreeCountStore();
 
   const [isModalOpen, setModalOpen] = useState(false);
   const [modalType, setModalType] = useState<'etc' | 'cover' | null>(null);
@@ -77,6 +80,12 @@ export function Control({ isAdmin }: { isAdmin: boolean }) {
 
     return () => clearTimeout(timer);
   }, []);
+
+  useEffect(() => {
+    if (isFree) {
+      fetchFreeCount();
+    }
+  }, [isFree, fetchFreeCount]);
 
   const handleLoadPlan = async (
     year: number,
@@ -232,6 +241,13 @@ export function Control({ isAdmin }: { isAdmin: boolean }) {
   };
 
   const handleConfirm = async () => {
+    if (isFree && !isStillTrial) {
+      toast.error(
+        '무료 체험 횟수를 모두 사용하셨습니다. 유료 버전을 이용해주세요.'
+      );
+      return;
+    }
+
     if (!selectedUser || !selectedUser?.difficultyLevel) {
       toast.warn('대상자를 선택해주세요');
       return;
@@ -256,6 +272,13 @@ export function Control({ isAdmin }: { isAdmin: boolean }) {
   };
 
   const getHistory = async () => {
+    if (isFree && !isStillTrial) {
+      toast.error(
+        '무료 체험 횟수를 모두 사용하셨습니다. 유료 버전을 이용해주세요.'
+      );
+      return;
+    }
+
     if (!selectedUser || !selectedUser?.elderId) {
       toast.warn('대상자를 선택해주세요');
       return;
@@ -321,10 +344,36 @@ export function Control({ isAdmin }: { isAdmin: boolean }) {
         </button>
         {!isAdmin && (
           <>
-            <button className={buttonStyle} onClick={handleConfirm}>
+            <button
+              className={buttonStyle}
+              onClick={handleConfirm}
+              style={{
+                opacity: isFree && !isStillTrial ? 0.5 : 1,
+                cursor: isFree && !isStillTrial ? 'not-allowed' : 'pointer',
+                position: 'relative',
+                display: 'flex',
+                alignItems: 'center',
+                justifyContent: 'center',
+                gap: '8px'
+              }}
+            >
+              {isFree && !isStillTrial && <FaLock size={16} />}
               계획표 불러오기
             </button>
-            <button className={buttonStyle} onClick={getHistory}>
+            <button
+              className={buttonStyle}
+              onClick={getHistory}
+              style={{
+                opacity: isFree && !isStillTrial ? 0.5 : 1,
+                cursor: isFree && !isStillTrial ? 'not-allowed' : 'pointer',
+                position: 'relative',
+                display: 'flex',
+                alignItems: 'center',
+                justifyContent: 'center',
+                gap: '8px'
+              }}
+            >
+              {isFree && !isStillTrial && <FaLock size={16} />}
               계획표 기록 불러오기
             </button>
           </>

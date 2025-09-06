@@ -17,6 +17,9 @@ import { IRegUser, IUser, IUserDetail } from '@/entities/program/type.dto';
 import { useQuery, useMutation, useQueryClient } from '@tanstack/react-query';
 import { getElderFreeList } from '@/entities/program/api/free';
 import { useIsFree } from '@/components/hooks/useIsFree';
+import { useFreeCountStore } from '@/shared/stores';
+import { toast } from 'react-toastify';
+import { FaLock } from 'react-icons/fa';
 
 interface IProps {
   open: boolean;
@@ -38,10 +41,17 @@ export const DrawerList = ({ open, setOpen }: IProps) => {
   const setUsers = useUserStore(state => state.setUsers);
 
   const isFree = useIsFree();
+  const { usedCount, isStillTrial, fetchFreeCount } = useFreeCountStore();
 
   useEffect(() => {
     console.log('현재 선택된 유저 ID:', selectedUserId);
   }, [selectedUserId]);
+
+  useEffect(() => {
+    if (isFree) {
+      fetchFreeCount();
+    }
+  }, [isFree, fetchFreeCount]);
 
   const closeModal = () => setOpenUser(false);
 
@@ -77,6 +87,26 @@ export const DrawerList = ({ open, setOpen }: IProps) => {
   const handleUserSelect = (userId: number) => {
     console.log('유저 선택됨:', userId);
     selectUser(userId);
+  };
+
+  const handleAddUserClick = () => {
+    if (isFree && !isStillTrial) {
+      toast.error(
+        '무료 체험 횟수를 모두 사용하셨습니다. 유료 버전을 이용해주세요.'
+      );
+      return;
+    }
+    setOpenUser(true);
+  };
+
+  const handleUserBoxClick = (userId: number) => {
+    if (isFree && !isStillTrial) {
+      toast.error(
+        '무료 체험 횟수를 모두 사용하셨습니다. 유료 버전을 이용해주세요.'
+      );
+      return;
+    }
+    handleUserSelect(userId);
   };
 
   const deleteUserMutation = useMutation({
@@ -140,14 +170,31 @@ export const DrawerList = ({ open, setOpen }: IProps) => {
       {pathname === '/program' ? (
         <>
           <div className={titleContainer}>
-            <h1 className={title}>대상자 목록</h1>
-            <IoIosAddCircle
-              size={30}
-              color={colors.brand[400]}
-              onClick={() => {
-                setOpenUser(true);
-              }}
-            />
+            <div
+              style={{ display: 'flex', flexDirection: 'column', gap: '4px' }}
+            >
+              <h1 className={title}>대상자 목록</h1>
+            </div>
+            {isFree && !isStillTrial ? (
+              <FaLock
+                size={24}
+                color={colors.gray_scale[500]}
+                style={{
+                  cursor: 'not-allowed',
+                  opacity: 0.7
+                }}
+                onClick={handleAddUserClick}
+              />
+            ) : (
+              <IoIosAddCircle
+                size={30}
+                color={colors.brand[400]}
+                style={{
+                  cursor: 'pointer'
+                }}
+                onClick={handleAddUserClick}
+              />
+            )}
           </div>
 
           <div className={useBoxContainer}>
@@ -156,13 +203,14 @@ export const DrawerList = ({ open, setOpen }: IProps) => {
                 key={item.elderId}
                 user={item}
                 isSelected={selectedUserId === item.elderId}
-                onSelect={() => handleUserSelect(item.elderId)}
+                onSelect={() => handleUserBoxClick(item.elderId)}
                 onDetail={handleDetail}
                 onEdit={handleEdit}
                 onDelete={handleDelete}
                 onSuccess={() => {
                   refetch();
                 }}
+                disabled={isFree && !isStillTrial}
               />
             ))}
           </div>

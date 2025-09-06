@@ -14,20 +14,27 @@ import {
 } from './index.css';
 import { btn } from './ui/navBtn/index.css';
 import { useRouter, usePathname } from 'next/navigation';
-import { useAuthStore } from '@/shared/stores/useAuthStore';
-import { freeCount, FreeCountResponse } from '../api/free';
+import { useAuthStore, useFreeCountStore } from '@/shared/stores';
 import { useIsFree } from '@/components/hooks/useIsFree';
-
+import { FaLock } from 'react-icons/fa';
+import { toast } from 'react-toastify';
 export function ProgramNav() {
   const { username, checkAuthentication, endDate } = useAuthStore();
   const isFree = useIsFree();
-  const [usedCount, setUsedCount] = useState<FreeCountResponse | undefined>(
-    undefined
-  );
+
+  // Zustand 스토어에서 상태와 액션들을 가져옴
+  const { usedCount, isStillTrial, fetchFreeCount, calculateIsStillTrial } =
+    useFreeCountStore();
+
+  useEffect(() => {
+    calculateIsStillTrial(isFree);
+  }, [isFree, usedCount, calculateIsStillTrial]);
+
   useEffect(() => {
     checkAuthentication();
-    getFreeCount();
-  }, [checkAuthentication]);
+    fetchFreeCount();
+  }, [checkAuthentication, fetchFreeCount]);
+
   const router = useRouter();
   const pathname = usePathname(); // Get the current pathname using usePathname()
 
@@ -40,11 +47,8 @@ export function ProgramNav() {
         }; // Apply transparent background for non-selected buttons
   };
 
-  const getFreeCount = async () => {
-    const res = await freeCount();
-    if (res) {
-      setUsedCount(res);
-    }
+  const handleLockedMenuClick = () => {
+    toast.info('유료 회원만 이용 가능한 서비스입니다.');
   };
 
   return (
@@ -84,38 +88,60 @@ export function ProgramNav() {
           </div>
           <div
             className={btn}
-            onClick={() => router.push('/program/activity')}
+            onClick={() =>
+              isFree
+                ? handleLockedMenuClick()
+                : router.push('/program/activity')
+            }
             style={getButtonStyle('/program/activity')}
           >
             <div className={imgContainer}>
-              <Image fill src={'/images/navBtn2.png'} alt={'이동 버튼'} />
+              {isFree ? (
+                <FaLock size={24} color={colors.gray_scale[500]} />
+              ) : (
+                <Image fill src={'/images/navBtn2.png'} alt={'이동 버튼'} />
+              )}
             </div>
             <div className={textAlign}>개별 활동지</div>
           </div>
 
           <div
             className={btn}
-            onClick={() => router.push('/program/etc')}
+            onClick={() =>
+              isFree ? handleLockedMenuClick() : router.push('/program/etc')
+            }
             style={getButtonStyle('/program/etc')}
           >
             <div className={imgContainer}>
-              <Image
-                fill
-                sizes="100%"
-                src={'/images/navBtn4.png'}
-                alt={'이동 버튼'}
-              />
+              {isFree ? (
+                <FaLock size={24} color={colors.gray_scale[500]} />
+              ) : (
+                <Image
+                  fill
+                  sizes="100%"
+                  src={'/images/navBtn4.png'}
+                  alt={'이동 버튼'}
+                />
+              )}
             </div>
             <div className={textAlign}>기타 자료</div>
           </div>
 
           <div
             className={btn}
-            onClick={() => router.push('/program/evaluation')}
+            onClick={() =>
+              isFree
+                ? handleLockedMenuClick()
+                : router.push('/program/evaluation')
+            }
             style={getButtonStyle('/program/evaluation')}
           >
             <div className={imgContainer}>
-              <Image fill src={'/images/navBtn4.png'} alt={'이동 버튼'} />
+              {isFree ? (
+                <FaLock size={24} color={colors.gray_scale[500]} />
+              ) : (
+                <Image fill src={'/images/navBtn4.png'} alt={'이동 버튼'} />
+              )}
             </div>
             <div className={textAlign}>평가자료</div>
           </div>

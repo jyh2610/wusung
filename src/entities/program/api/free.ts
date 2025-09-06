@@ -13,6 +13,7 @@ import { extractLeafNodes, getlocalStorageValue } from '@/lib/utils';
 import { toast } from 'react-toastify';
 import { ContentListResponse } from '@/components/admin/api';
 import { IPlan } from '.';
+import { FreeCountResponse } from '@/shared/stores';
 
 const getFreeCategoryList = async (): Promise<CategoryResponse> => {
   try {
@@ -69,10 +70,7 @@ const getElderFreeList = async () => {
   }
 };
 
-export interface FreeCountResponse {
-  totalCount: number;
-  usedCount: number;
-}
+// FreeCountResponse 타입은 shared/stores/freeCount.ts로 이동됨
 
 const freeCount = async () => {
   try {
