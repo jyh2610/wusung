@@ -284,7 +284,7 @@ function ETC() {
   };
 
   useEffect(() => {
-    fetchCategories(isAdmin);
+    fetchCategories(isAdmin, isFree);
   }, [fetchCategories, isAdmin]);
 
   useEffect(() => {

@@ -7,9 +7,11 @@ import { useCategoryStore } from '@/shared/stores/useCategoryStore';
 import { useCategoryTreeStore } from '@/shared/stores/useCategoryTreeStore';
 import { printUserPrint } from '@/entities/program/api';
 import { toast } from 'react-toastify';
+import { useIsFree } from '@/components/hooks/useIsFree';
 
 export function useActivityLogic() {
   const isAdmin = true;
+  const isFree = useIsFree();
   const [personName, setPersonName] = useState<string[]>([]);
   const [selectedLevel, setSelectedLevel] = useState<'high' | 'medium' | 'low'>(
     'medium'
@@ -20,7 +22,6 @@ export function useActivityLogic() {
   );
 
   const difficultyMap = { high: 1, medium: 2, low: 3 };
-
   const {
     categoryTree,
     fetchCategoryTree,
@@ -31,7 +32,8 @@ export function useActivityLogic() {
   const { activities, fetchActivities, setActivities } = useActivities({
     isAdmin,
     categoryId: categoryId ?? 0,
-    difficultyLevel: difficultyMap[selectedLevel]
+    difficultyLevel: difficultyMap[selectedLevel],
+    isFree: isFree
   });
 
   const handleCategoryChange = (event: { target: { value: any } }) => {
@@ -110,8 +112,8 @@ export function useActivityLogic() {
   };
 
   useEffect(() => {
-    fetchCategories(isAdmin);
-  }, [fetchCategories, isAdmin]);
+    fetchCategories(isAdmin, isFree);
+  }, [fetchCategories, isAdmin, isFree]);
 
   useEffect(() => {
     if (categories && categories.length > 0 && personName.length === 0) {
