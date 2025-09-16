@@ -440,7 +440,7 @@ export function Control({ isAdmin }: { isAdmin: boolean }) {
 
       <div className={additionalData}>
         {/* 커버 */}
-        <Droppable droppableId="cover" isDropDisabled={false}>
+        <Droppable droppableId="cover" isDropDisabled={isFree && !isStillTrial}>
           {(provided, snapshot) => (
             <div
               ref={provided.innerRef}
@@ -453,9 +453,17 @@ export function Control({ isAdmin }: { isAdmin: boolean }) {
                 width: '150px',
                 fontSize: '16px',
                 fontWeight: 500,
-                textAlign: 'center'
+                textAlign: 'center',
+                opacity: isFree ? 0.5 : 1,
+                cursor: isFree ? 'not-allowed' : 'pointer'
               }}
-              onClick={() => openModal('cover')}
+              onClick={() => {
+                if (isFree) {
+                  toast.info('유료 회원만 이용 가능한 서비스입니다.');
+                  return;
+                }
+                openModal('cover');
+              }}
             >
               <div
                 style={{
@@ -464,9 +472,14 @@ export function Control({ isAdmin }: { isAdmin: boolean }) {
                   textAlign: 'center',
                   whiteSpace: 'nowrap',
                   overflow: 'hidden',
-                  textOverflow: 'ellipsis'
+                  textOverflow: 'ellipsis',
+                  display: 'flex',
+                  alignItems: 'center',
+                  justifyContent: 'center',
+                  gap: '8px'
                 }}
               >
+                {isFree && <FaLock size={16} />}
                 표지
               </div>
 
@@ -497,7 +510,7 @@ export function Control({ isAdmin }: { isAdmin: boolean }) {
         </Droppable>
 
         {/* 기타자료 */}
-        <Droppable droppableId="etc" isDropDisabled={false}>
+        <Droppable droppableId="etc" isDropDisabled={isFree}>
           {(provided, snapshot) => (
             <div
               ref={provided.innerRef}
@@ -511,9 +524,17 @@ export function Control({ isAdmin }: { isAdmin: boolean }) {
                 width: '150px',
                 fontSize: '16px',
                 fontWeight: 500,
-                textAlign: 'center'
+                textAlign: 'center',
+                opacity: isFree ? 0.5 : 1,
+                cursor: isFree ? 'not-allowed' : 'pointer'
               }}
-              onClick={() => openModal('etc')}
+              onClick={() => {
+                if (isFree) {
+                  toast.info('유료 회원만 이용 가능한 서비스입니다.');
+                  return;
+                }
+                openModal('etc');
+              }}
             >
               <div
                 style={{
@@ -522,9 +543,14 @@ export function Control({ isAdmin }: { isAdmin: boolean }) {
                   textAlign: 'center',
                   whiteSpace: 'nowrap',
                   overflow: 'hidden',
-                  textOverflow: 'ellipsis'
+                  textOverflow: 'ellipsis',
+                  display: 'flex',
+                  alignItems: 'center',
+                  justifyContent: 'center',
+                  gap: '8px'
                 }}
               >
+                {isFree && <FaLock size={16} />}
                 기타자료
               </div>
 

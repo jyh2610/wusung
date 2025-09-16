@@ -1,6 +1,5 @@
 'use client';
 
-import { useRouter } from 'next/navigation';
 import { FaArrowRight } from 'react-icons/fa';
 import {
   LineBannerContentStyles,
@@ -14,13 +13,11 @@ export function LineBannerContent({
   content: string;
   link: string;
 }) {
-  const router = useRouter();
-
   const handleClick = () => {
     if (link.startsWith('http')) {
       window.open(link, '_blank');
     } else {
-      router.push(link);
+      window.location.href = link;
     }
   };
 

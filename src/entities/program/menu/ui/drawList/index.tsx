@@ -175,7 +175,7 @@ export const DrawerList = ({ open, setOpen }: IProps) => {
             >
               <h1 className={title}>대상자 목록</h1>
             </div>
-            {isFree && !isStillTrial ? (
+            {isFree ? (
               <FaLock
                 size={24}
                 color={colors.gray_scale[500]}
@@ -183,7 +183,6 @@ export const DrawerList = ({ open, setOpen }: IProps) => {
                   cursor: 'not-allowed',
                   opacity: 0.7
                 }}
-                onClick={handleAddUserClick}
               />
             ) : (
               <IoIosAddCircle

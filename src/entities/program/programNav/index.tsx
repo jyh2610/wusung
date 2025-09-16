@@ -13,7 +13,7 @@ import {
   userInfoContainer
 } from './index.css';
 import { btn } from './ui/navBtn/index.css';
-import { useRouter, usePathname } from 'next/navigation';
+import { useRouter, usePathname, useSearchParams } from 'next/navigation';
 import { useAuthStore, useFreeCountStore } from '@/shared/stores';
 import { useIsFree } from '@/components/hooks/useIsFree';
 import { FaLock } from 'react-icons/fa';
@@ -37,6 +37,7 @@ export function ProgramNav() {
 
   const router = useRouter();
   const pathname = usePathname(); // Get the current pathname using usePathname()
+  const searchParams = useSearchParams(); // Get current search params
 
   const getButtonStyle = (route: string) => {
     return pathname === route
@@ -49,6 +50,13 @@ export function ProgramNav() {
 
   const handleLockedMenuClick = () => {
     toast.info('유료 회원만 이용 가능한 서비스입니다.');
+  };
+
+  // 쿼리 파라미터를 유지하면서 라우팅하는 함수
+  const navigateWithParams = (path: string) => {
+    const currentParams = searchParams.toString();
+    const url = currentParams ? `${path}?${currentParams}` : path;
+    router.push(url);
   };
 
   return (
@@ -78,7 +86,7 @@ export function ProgramNav() {
         <div className={navBtnContainer}>
           <div
             className={btn}
-            onClick={() => router.push('/program')}
+            onClick={() => navigateWithParams('/program')}
             style={getButtonStyle('/program')}
           >
             <div className={imgContainer}>
@@ -91,7 +99,7 @@ export function ProgramNav() {
             onClick={() =>
               isFree
                 ? handleLockedMenuClick()
-                : router.push('/program/activity')
+                : navigateWithParams('/program/activity')
             }
             style={getButtonStyle('/program/activity')}
           >
@@ -108,7 +116,9 @@ export function ProgramNav() {
           <div
             className={btn}
             onClick={() =>
-              isFree ? handleLockedMenuClick() : router.push('/program/etc')
+              isFree
+                ? handleLockedMenuClick()
+                : navigateWithParams('/program/etc')
             }
             style={getButtonStyle('/program/etc')}
           >
@@ -132,7 +142,7 @@ export function ProgramNav() {
             onClick={() =>
               isFree
                 ? handleLockedMenuClick()
-                : router.push('/program/evaluation')
+                : navigateWithParams('/program/evaluation')
             }
             style={getButtonStyle('/program/evaluation')}
           >
@@ -148,7 +158,7 @@ export function ProgramNav() {
 
           <div
             className={btn}
-            onClick={() => router.push('/program/guide')}
+            onClick={() => navigateWithParams('/program/guide')}
             style={getButtonStyle('/program/guide')}
           >
             <div className={imgContainer}>
