@@ -265,6 +265,11 @@ function Header({
 
       if (pdfUrl) {
         await printPdfWithIframe(pdfUrl);
+
+        // 무료 회수 업데이트
+        if (isFree) {
+          await fetchFreeCount();
+        }
       } else {
         toast.error('PDF 파일을 받지 못했습니다.');
       }
@@ -312,6 +317,11 @@ function Header({
         console.log('스케줄만 인쇄 - printPdfWithIframe 호출 시작');
         await printPdfWithIframe(pdfUrl);
         console.log('스케줄만 인쇄 - printPdfWithIframe 호출 완료');
+
+        // 무료 회수 업데이트
+        if (isFree) {
+          await fetchFreeCount();
+        }
       } else {
         toast.error('스케줄 PDF 파일을 받지 못했습니다.');
       }
