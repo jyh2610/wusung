@@ -41,6 +41,7 @@ interface IProps {
   onDelete: (user: IUser) => void;
   onSuccess?: () => void;
   disabled?: boolean;
+  isFree?: boolean;
 }
 
 export function UserBox({
@@ -51,7 +52,8 @@ export function UserBox({
   onEdit,
   onDelete,
   onSuccess,
-  disabled = false
+  disabled = false,
+  isFree = false
 }: IProps) {
   const [showMenu, setShowMenu] = useState(false);
   const [editModalOpen, setEditModalOpen] = useState(false);
@@ -141,49 +143,51 @@ export function UserBox({
           </div>
         </div>
 
-        <DropdownMenu>
-          <DropdownMenuTrigger asChild>
-            <div
-              className={classNames(imgBox, {
-                [selectedOptContainer]: isSelected
-              })}
-              style={{ position: 'relative', cursor: 'pointer' }}
-              onClick={e => e.stopPropagation()}
-            >
-              <Image
-                fill
-                src={
-                  isSelected
-                    ? '/images/icons/selectOpt.png'
-                    : '/images/icons/opt.png'
-                }
-                alt="유저 선택됨"
-              />
-            </div>
-          </DropdownMenuTrigger>
-          <DropdownMenuContent side="bottom" align="start">
-            <DropdownMenuItem onClick={() => onDetail(user)}>
-              상세
-            </DropdownMenuItem>
-            <DropdownMenuItem
-              onClick={async () => {
-                const detail = await getUserDetail(user.elderId);
-                if (detail) {
-                  setEditUser(detail);
-                  setEditModalOpen(true);
-                }
-              }}
-            >
-              수정
-            </DropdownMenuItem>
-            <DropdownMenuItem
-              onClick={() => onDelete(user)}
-              style={{ color: '#e1007b' }}
-            >
-              삭제
-            </DropdownMenuItem>
-          </DropdownMenuContent>
-        </DropdownMenu>
+        {!isFree && (
+          <DropdownMenu>
+            <DropdownMenuTrigger asChild>
+              <div
+                className={classNames(imgBox, {
+                  [selectedOptContainer]: isSelected
+                })}
+                style={{ position: 'relative', cursor: 'pointer' }}
+                onClick={e => e.stopPropagation()}
+              >
+                <Image
+                  fill
+                  src={
+                    isSelected
+                      ? '/images/icons/selectOpt.png'
+                      : '/images/icons/opt.png'
+                  }
+                  alt="유저 선택됨"
+                />
+              </div>
+            </DropdownMenuTrigger>
+            <DropdownMenuContent side="bottom" align="start">
+              <DropdownMenuItem onClick={() => onDetail(user)}>
+                상세
+              </DropdownMenuItem>
+              <DropdownMenuItem
+                onClick={async () => {
+                  const detail = await getUserDetail(user.elderId);
+                  if (detail) {
+                    setEditUser(detail);
+                    setEditModalOpen(true);
+                  }
+                }}
+              >
+                수정
+              </DropdownMenuItem>
+              <DropdownMenuItem
+                onClick={() => onDelete(user)}
+                style={{ color: '#e1007b' }}
+              >
+                삭제
+              </DropdownMenuItem>
+            </DropdownMenuContent>
+          </DropdownMenu>
+        )}
       </div>
 
       <div className={roleBox}>

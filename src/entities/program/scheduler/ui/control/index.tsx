@@ -440,7 +440,7 @@ export function Control({ isAdmin }: { isAdmin: boolean }) {
 
       <div className={additionalData}>
         {/* 커버 */}
-        <Droppable droppableId="cover" isDropDisabled={isFree && !isStillTrial}>
+        <Droppable droppableId="cover" isDropDisabled={isFree}>
           {(provided, snapshot) => (
             <div
               ref={provided.innerRef}

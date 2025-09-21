@@ -210,6 +210,7 @@ export const DrawerList = ({ open, setOpen }: IProps) => {
                   refetch();
                 }}
                 disabled={isFree && !isStillTrial}
+                isFree={isFree}
               />
             ))}
           </div>
