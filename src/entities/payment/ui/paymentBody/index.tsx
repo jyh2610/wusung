@@ -125,7 +125,7 @@ export const SelectPayment = ({
             * 무통장 입금 시에도 요금선택하시고 주문후 입금해주세요
           </span>
           <span style={{ color: colors.gray_scale[700], paddingLeft: '8px' }}>
-            농협 335-0071-3676-33 이정희
+            농협 355-0071-3676-33 이정희
           </span>
         </div>
       </div>
