@@ -76,19 +76,25 @@ function Header({
       setYear(Number(yearParam));
       setMonth(Number(monthParam));
     } else if (!scheduleId) {
-      // 새로 생성하는 경우에만 현재 월 +1 로직 적용
       const currentDate = new Date();
       const currentMonth = currentDate.getMonth() + 1; // 0-based이므로 +1
 
-      if (currentMonth === 12) {
-        setYear(currentDate.getFullYear() + 1);
-        setMonth(1);
-      } else {
+      if (isFree) {
+        // 무료 사용자는 현재 달로 고정
         setYear(currentDate.getFullYear());
-        setMonth(currentMonth + 1);
+        setMonth(currentMonth);
+      } else {
+        // 유료 사용자는 기존 로직 (현재 월 +1)
+        if (currentMonth === 12) {
+          setYear(currentDate.getFullYear() + 1);
+          setMonth(1);
+        } else {
+          setYear(currentDate.getFullYear());
+          setMonth(currentMonth + 1);
+        }
       }
     }
-  }, [searchParams, setYear, setMonth]);
+  }, [searchParams, setYear, setMonth, isFree]);
 
   const mainEduContentIds = formatScheduleData(schedule, year, month);
 
@@ -334,25 +340,29 @@ function Header({
   return (
     <div className={headerContainer}>
       <div style={{ display: 'flex', gap: '32px' }}>
-        <button
-          style={{ cursor: 'pointer' }}
-          type="button"
-          onClick={handlePrevMonth}
-        >
-          <IoIosArrowBack size={30} />
-        </button>
+        {!isFree && (
+          <button
+            style={{ cursor: 'pointer' }}
+            type="button"
+            onClick={handlePrevMonth}
+          >
+            <IoIosArrowBack size={30} />
+          </button>
+        )}
 
         <div className={titleStyle}>
           {year}년 {month}월
         </div>
 
-        <button
-          style={{ cursor: 'pointer' }}
-          type="button"
-          onClick={handleNextMonth}
-        >
-          <IoIosArrowForward size={30} />
-        </button>
+        {!isFree && (
+          <button
+            style={{ cursor: 'pointer' }}
+            type="button"
+            onClick={handleNextMonth}
+          >
+            <IoIosArrowForward size={30} />
+          </button>
+        )}
       </div>
       {!isAdmin ? (
         <div style={{ display: 'flex', gap: '8px' }}>
