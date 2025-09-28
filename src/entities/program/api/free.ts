@@ -19,7 +19,7 @@ const getFreeCategoryList = async (): Promise<CategoryResponse> => {
   try {
     const res = await request<ApiResponse<any>>({
       method: 'GET',
-      url: '/api/common/free-trial/category/tree'
+      url: '/api/free-trial/category/tree'
     });
 
     // 무료 버전은 단일 객체로 응답이 오므로 배열로 변환
@@ -45,7 +45,7 @@ const getFreeContentList = async (
   try {
     const res = await request<ApiResponse<ContentListResponse>>({
       method: 'GET',
-      url: `/api/common/free-trial/content/${difficultyLevel}`,
+      url: `/api/free-trial/content/${difficultyLevel}`,
       params: {
         page,
         size
@@ -61,7 +61,7 @@ const getElderFreeList = async () => {
   try {
     const res = await request<IRes<IUser[]>>({
       method: 'GET',
-      url: '/api/common/free-trial/elder/list'
+      url: '/api/free-trial/elder/list'
     });
     return res.data;
   } catch (error) {
@@ -76,7 +76,7 @@ const freeCount = async () => {
   try {
     const res = await request<ApiResponse<FreeCountResponse>>({
       method: 'GET',
-      url: '/api/common/free-trial/print/count'
+      url: '/api/free-trial/print/count'
     });
     return res.data.data;
   } catch (error: any) {
@@ -89,7 +89,7 @@ const getFreeHistoryList = async (elderId: number) => {
   try {
     const res = await request<IRes<IPlan>>({
       method: 'GET',
-      url: `/api/common/free-trial/plan/history/${elderId}`
+      url: `/api/free-trial/plan/history/${elderId}`
     });
     toast.success(res.data.message);
     return res.data.data;
@@ -104,7 +104,7 @@ const getFreePlan = async (difficultyLevel: number) => {
   try {
     const res = await request<IRes<IPlan>>({
       method: 'GET',
-      url: `/api/common/free-trial/plan/${difficultyLevel}`
+      url: `/api/free-trial/plan/${difficultyLevel}`
     });
     toast.success(res.data.message);
     return res.data.data;
@@ -129,7 +129,7 @@ const printFreeCalendar = async ({
   try {
     const res = await request<Blob>({
       method: 'POST',
-      url: '/api/common/free-trial/print/calendar',
+      url: '/api/free-trial/print/calendar',
       params: {
         elderId
       },
@@ -164,7 +164,7 @@ const printFree = async (
   try {
     const res = await request<Blob>({
       method: 'POST',
-      url: `/api/common/free-trial/print?elderId=${elderId}`,
+      url: `/api/free-trial/print?elderId=${elderId}`,
       data: payload,
       headers: {
         Accept: 'application/pdf'
