@@ -521,9 +521,24 @@ export const printUserPrint = async (printLIst: number[]) => {
     const url = URL.createObjectURL(blob);
     return url;
   } catch (error: any) {
-    toast.error(
-      error.response?.data?.message || '인쇄 중 오류가 발생했습니다.'
-    );
+    console.log(error);
+
+    let errorMessage = '인쇄 중 오류가 발생했습니다.';
+
+    // blob 응답에서 에러 메시지 추출
+    if (error.response?.data instanceof Blob) {
+      try {
+        const text = await error.response.data.text();
+        const errorData = JSON.parse(text);
+        errorMessage = errorData.message || errorMessage;
+      } catch (parseError) {
+        console.error('Error parsing blob error response:', parseError);
+      }
+    } else if (error.response?.data?.message) {
+      errorMessage = error.response.data.message;
+    }
+
+    toast.error(errorMessage);
     console.error('printUserPrint error:', error);
     throw error;
   }
