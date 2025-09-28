@@ -521,6 +521,7 @@ export const printUserPrint = async (printLIst: number[]) => {
     const url = URL.createObjectURL(blob);
     return url;
   } catch (error) {
+    toast.error((error as any).response.data.message);
     console.log(error);
   }
 };

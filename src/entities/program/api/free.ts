@@ -78,11 +78,9 @@ const freeCount = async () => {
       method: 'GET',
       url: '/api/common/free-trial/print/count'
     });
-    toast.success(res.data.message);
     return res.data.data;
   } catch (error: any) {
     console.error(error);
-    toast.error(error.response.data.message);
     return undefined;
   }
 };

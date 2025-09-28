@@ -288,7 +288,6 @@ function Activity() {
                 iframe.contentWindow.print();
               } catch (printError) {
                 console.error('Error initiating print on iframe:', printError);
-                toast.error('인쇄 대화 상자를 열 수 없습니다.');
                 if (iframe.parentElement) {
                   iframe.parentElement.removeChild(iframe);
                 }
@@ -297,7 +296,6 @@ function Activity() {
               console.error(
                 'iframe contentWindow is not available after load.'
               );
-              toast.error('인쇄 창을 열 수 없습니다.');
               if (iframe.parentElement) {
                 iframe.parentElement.removeChild(iframe);
               }
@@ -314,8 +312,6 @@ function Activity() {
         };
 
         document.body.appendChild(iframe);
-      } else {
-        toast.error('PDF 파일을 받지 못했습니다.');
       }
     } catch (error) {
       console.error('프린트 에러:', error);

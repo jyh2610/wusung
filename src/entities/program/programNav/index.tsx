@@ -104,11 +104,7 @@ export function ProgramNav() {
             style={getButtonStyle('/program/activity')}
           >
             <div className={imgContainer}>
-              {isFree ? (
-                <FaLock size={24} color={colors.gray_scale[500]} />
-              ) : (
-                <Image fill src={'/images/navBtn2.png'} alt={'이동 버튼'} />
-              )}
+              <Image fill src={'/images/navBtn2.png'} alt={'이동 버튼'} />
             </div>
             <div className={textAlign}>개별 활동지</div>
           </div>
