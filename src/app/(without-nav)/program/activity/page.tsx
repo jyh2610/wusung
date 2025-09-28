@@ -103,7 +103,7 @@ function Activity() {
     totalElements,
     totalPages
   } = useActivities({
-    isFree,
+    isFree: false,
     isAdmin,
     categoryId: categoryId ?? 0,
     difficultyLevel: difficultyMap[selectedLevel],
