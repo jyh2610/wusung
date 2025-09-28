@@ -7,15 +7,21 @@ import { getNotokenSubscription } from '@/entities/UserManage/api';
 import { useRouter } from 'next/navigation';
 import { useQuery } from '@tanstack/react-query';
 import { toast } from 'react-toastify';
+import { useIsFree } from '@/components/hooks/useIsFree';
 
 const drawerWidth = 300; // 사이드바 너비
 
 function ProgramNavlayout({ children }: { children: React.ReactNode }) {
   const router = useRouter();
-
+  const isFree = useIsFree();
   const { isLoading, error } = useQuery({
     queryKey: ['subscription'],
     queryFn: async () => {
+      // 무료 사용자인 경우 구독 체크를 건너뜀
+      if (isFree) {
+        return null;
+      }
+
       const subscription = await getNotokenSubscription();
       if (subscription?.data) {
         const endDate = new Date(subscription.data.endDate);
@@ -29,7 +35,8 @@ function ProgramNavlayout({ children }: { children: React.ReactNode }) {
       return subscription;
     },
     staleTime: 1000 * 60 * 5, // 5분 동안 캐시 유지
-    retry: 1 // 실패 시 1번만 재시도
+    retry: 1, // 실패 시 1번만 재시도
+    enabled: !isFree // 무료 사용자가 아닐 때만 쿼리 실행
   });
 
   if (error) {
