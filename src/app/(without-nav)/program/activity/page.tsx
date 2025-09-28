@@ -42,7 +42,7 @@ import { Button } from '@/shared/ui';
 import { printUserPrint } from '@/entities/program/api';
 import { toast } from 'react-toastify';
 import { useCategoryTreeStore } from '@/shared/stores/useCategoryTreeStore';
-import { usePathname, useRouter } from 'next/navigation';
+import { usePathname, useRouter, useSearchParams } from 'next/navigation';
 import { handleCurrentPathRoute, getCascaderOptions } from '@/lib/utils';
 import { CustomCascader } from '@/shared/ui/cascader';
 import { IContent, ICategoryLeaf } from '@/entities/program/type.dto';
@@ -52,10 +52,14 @@ import { useIsFree } from '@/components/hooks/useIsFree';
 function Activity() {
   const router = useRouter();
   const pathname = usePathname();
+  const searchParams = useSearchParams();
   const [isModalOpen, setIsModalOpen] = useState(false);
+
   const handleClick = (id: string) => {
     const path = handleCurrentPathRoute(id, pathname);
-    router.push(path);
+    const currentParams = searchParams.toString();
+    const url = currentParams ? `${path}?${currentParams}` : path;
+    router.push(url);
   };
   const {
     categoryTree,
