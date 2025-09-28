@@ -162,7 +162,6 @@ export default function ActivityPage() {
       }
     } catch (error) {
       console.error('프린트 에러:', error);
-      toast.error('인쇄 실패되었습니다!'); // 일반적인 오류 메시지
     }
   };
 

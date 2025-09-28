@@ -520,9 +520,12 @@ export const printUserPrint = async (printLIst: number[]) => {
     const blob = new Blob([res.data], { type: 'application/pdf' });
     const url = URL.createObjectURL(blob);
     return url;
-  } catch (error) {
-    toast.error((error as any).response.data.message);
-    console.log(error);
+  } catch (error: any) {
+    toast.error(
+      error.response?.data?.message || '인쇄 중 오류가 발생했습니다.'
+    );
+    console.error('printUserPrint error:', error);
+    throw error;
   }
 };
 export const getDetailContent = async (

@@ -320,8 +320,8 @@ function Activity() {
   };
 
   useEffect(() => {
-    fetchCategories(isAdmin, isFree);
-  }, [fetchCategories, isAdmin, isFree]);
+    fetchCategories(isAdmin, false); // 항상 일반/관리자 API 사용
+  }, [fetchCategories, isAdmin]);
 
   useEffect(() => {
     if (categories && categories.length > 0 && personName.length === 0) {
