@@ -96,11 +96,7 @@ export function ProgramNav() {
           </div>
           <div
             className={btn}
-            onClick={() =>
-              isFree
-                ? handleLockedMenuClick()
-                : navigateWithParams('/program/activity')
-            }
+            onClick={() => navigateWithParams('/program/activity')}
             style={getButtonStyle('/program/activity')}
           >
             <div className={imgContainer}>
